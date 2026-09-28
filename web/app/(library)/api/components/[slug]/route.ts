@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { isLibraryUnlocked } from "@/lib/gate-server";
+
 function apiBase(): string {
 	return (
 		process.env.API_URL ??
@@ -16,6 +18,13 @@ export async function GET(_request: Request, context: RouteContext) {
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
+	if (!(await isLibraryUnlocked())) {
+		return NextResponse.json(
+			{ message: "Enter the library password before editing." },
+			{ status: 401 }
+		);
+	}
+
 	const { slug } = await context.params;
 	const body = await request.text();
 	return proxy(slug, {

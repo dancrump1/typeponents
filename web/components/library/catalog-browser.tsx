@@ -291,7 +291,12 @@ export function CatalogBrowser({
 										{items.map((entry) => {
 											n += 1;
 											return (
-												<ComponentCard key={entry.slug} entry={entry} index={n} />
+												<ComponentCard
+													key={entry.slug}
+													entry={entry}
+													index={n}
+													canEdit={unlocked}
+												/>
 											);
 										})}
 									</div>
@@ -390,7 +395,15 @@ function FacetGroup({
 	);
 }
 
-function ComponentCard({ entry, index }: { entry: CatalogEntry; index: number }) {
+function ComponentCard({
+	entry,
+	index,
+	canEdit,
+}: {
+	entry: CatalogEntry;
+	index: number;
+	canEdit: boolean;
+}) {
 	const href = `/library/${entry.slug}`;
 	return (
 		<article className="group relative flex flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/30">
@@ -425,7 +438,7 @@ function ComponentCard({ entry, index }: { entry: CatalogEntry; index: number })
 								{entry.status === "draft" ? "draft" : "review"}
 							</Badge>
 						) : null}
-						<EditComponentButton entry={entry} />
+						<EditComponentButton entry={entry} canEdit={canEdit} />
 					</span>
 				</div>
 

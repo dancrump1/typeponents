@@ -95,7 +95,11 @@ export default async function ComponentPage({
 
 				<div className="flex items-start justify-between gap-4">
 					<h1 className="text-2xl font-semibold tracking-tight">{entry.title}</h1>
-					<EditComponentButton entry={entry} appearance="page" />
+					<EditComponentButton
+						entry={entry}
+						appearance="page"
+						canEdit={unlocked}
+					/>
 				</div>
 
 				{entry.description ? (

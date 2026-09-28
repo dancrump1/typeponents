@@ -4,6 +4,7 @@ import { useEffect, useState, type Dispatch, type ReactNode, type SetStateAction
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
 
+import { authorizeEdit } from "@/app/(library)/library/unlock/actions";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -63,12 +64,18 @@ type Draft = {
 export function EditComponentButton({
 	entry,
 	appearance = "card",
+	canEdit = false,
 }: {
 	entry: CatalogEntry;
 	appearance?: "card" | "page";
+	/** True when this session already passed the library password. */
+	canEdit?: boolean;
 }) {
 	const router = useRouter();
 	const [open, setOpen] = useState(false);
+	const [authorized, setAuthorized] = useState(canEdit);
+	const [password, setPassword] = useState("");
+	const [checking, setChecking] = useState(false);
 	const [draft, setDraft] = useState<Draft>(() => draftFromEntry(entry));
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
@@ -76,7 +83,11 @@ export function EditComponentButton({
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
-		if (!open) return;
+		setAuthorized(canEdit);
+	}, [canEdit]);
+
+	useEffect(() => {
+		if (!open || !authorized) return;
 		const controller = new AbortController();
 		setLoading(true);
 		setError(null);
@@ -107,7 +118,7 @@ export function EditComponentButton({
 			});
 
 		return () => controller.abort();
-	}, [open, entry]);
+	}, [open, authorized, entry]);
 
 	const save = async () => {
 		setSaving(true);
@@ -118,6 +129,11 @@ export function EditComponentButton({
 				headers: { "content-type": "application/json" },
 				body: JSON.stringify(toPayload(draft)),
 			});
+			if (response.status === 401) {
+				setAuthorized(false);
+				setError("Enter the library password before editing.");
+				return;
+			}
 			if (!response.ok) throw new Error(await readError(response));
 			setOpen(false);
 			router.refresh();
@@ -155,15 +171,33 @@ export function EditComponentButton({
 				</Button>
 			)}
 
-			<Dialog open={open} onOpenChange={setOpen}>
-				<DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-					<DialogHeader>
-						<DialogTitle>Edit {entry.slug}</DialogTitle>
-						<DialogDescription>
-							Updates the component row in the library database. Registry source
-							files are left unchanged.
-						</DialogDescription>
-					</DialogHeader>
+			<Dialog
+				open={open}
+				onOpenChange={(next) => {
+					setOpen(next);
+					if (!next) {
+						setPassword("");
+						setError(null);
+					}
+				}}
+			>
+				<DialogContent
+					className={
+						authorized
+							? "max-h-[90vh] max-w-3xl overflow-y-auto"
+							: "max-w-md"
+					}
+				>
+					{authorized ? (
+						<EditorHeader slug={entry.slug} />
+					) : (
+						<DialogHeader>
+							<DialogTitle>Unlock editing</DialogTitle>
+							<DialogDescription>
+								Enter the library password to change component records.
+							</DialogDescription>
+						</DialogHeader>
+					)}
 
 					{error ? (
 						<p className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -171,6 +205,60 @@ export function EditComponentButton({
 						</p>
 					) : null}
 
+					{authorized ? null : (
+						<form
+							className="grid gap-3"
+							onSubmit={(event) => {
+								event.preventDefault();
+								setChecking(true);
+								setError(null);
+								void authorizeEdit(password)
+									.then((result) => {
+										if (result?.error) {
+											setError(result.error);
+											return;
+										}
+										setPassword("");
+										setAuthorized(true);
+										router.refresh();
+									})
+									.catch(() => {
+										setError("Could not check that password.");
+									})
+									.finally(() => {
+										setChecking(false);
+									});
+							}}
+						>
+							<label className="grid gap-1.5 text-xs font-medium" htmlFor={`edit-password-${entry.slug}`}>
+								Password
+								<Input
+									id={`edit-password-${entry.slug}`}
+									type="password"
+									autoComplete="current-password"
+									autoFocus
+									required
+									value={password}
+									onChange={(event) => setPassword(event.target.value)}
+								/>
+							</label>
+							<DialogFooter>
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setOpen(false)}
+									disabled={checking}
+								>
+									Cancel
+								</Button>
+								<Button type="submit" disabled={checking || password.length === 0}>
+									{checking ? "Checking…" : "Unlock"}
+								</Button>
+							</DialogFooter>
+						</form>
+					)}
+
+					{authorized ? (
 					<fieldset disabled={loading || !canSave} className="grid gap-6">
 						<section className="grid gap-3">
 							<h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -562,7 +650,9 @@ export function EditComponentButton({
 							)}
 						</section>
 					</fieldset>
+					) : null}
 
+					{authorized ? (
 					<DialogFooter>
 						<Button
 							type="button"
@@ -576,9 +666,22 @@ export function EditComponentButton({
 							{saving ? "Saving…" : "Save"}
 						</Button>
 					</DialogFooter>
+					) : null}
 				</DialogContent>
 			</Dialog>
 		</>
+	);
+}
+
+function EditorHeader({ slug }: { slug: string }) {
+	return (
+		<DialogHeader>
+			<DialogTitle>Edit {slug}</DialogTitle>
+			<DialogDescription>
+				Updates the component row in the library database. Registry source
+				files are left unchanged.
+			</DialogDescription>
+		</DialogHeader>
 	);
 }
 
