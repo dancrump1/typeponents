@@ -20765,6 +20765,45 @@
       }
     },
     {
+      "name": "magic-avatar-circles",
+      "type": "registry:ui",
+      "title": "Avatar Circles",
+      "description": "Overlapping circles of avatars.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/magic-avatar-circles/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/magic-avatar-circles.tsx"
+        }
+      ],
+      "meta": {
+        "categories": [
+          "Images"
+        ],
+        "tags": [],
+        "interaction": "",
+        "inspiration": {
+          "source": "Magic UI",
+          "url": "https://magicui.design/docs/components/avatar-circles",
+          "authorUrl": "https://magicui.design",
+          "relationship": "port"
+        },
+        "props": [],
+        "risk": {
+          "heavy": false,
+          "fullscreen": false,
+          "clientOnly": false
+        },
+        "rating": 5,
+        "status": "draft",
+        "hidden": false,
+        "gated": false,
+        "importPath": "@/components/ui/magic-avatar-circles"
+      }
+    },
+    {
       "name": "magic-bento",
       "type": "registry:ui",
       "title": "Magic Bento",
@@ -20923,6 +20962,47 @@
         "hidden": false,
         "gated": false,
         "importPath": "@/components/ui/magic-marquee"
+      }
+    },
+    {
+      "name": "magic-tweet-card",
+      "type": "registry:ui",
+      "title": "Tweet Card",
+      "description": "A card that displays a tweet with the author's name, handle, and profile picture.",
+      "dependencies": [
+        "react-tweet"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/magic-tweet-card/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/magic-tweet-card.tsx"
+        }
+      ],
+      "meta": {
+        "categories": [
+          "Cards"
+        ],
+        "tags": [],
+        "interaction": "",
+        "inspiration": {
+          "source": "Magic UI",
+          "url": "https://magicui.design/docs/components/tweet-card",
+          "authorUrl": "https://magicui.design",
+          "relationship": "port"
+        },
+        "props": [],
+        "risk": {
+          "heavy": false,
+          "fullscreen": false,
+          "clientOnly": false
+        },
+        "rating": 5,
+        "status": "draft",
+        "hidden": false,
+        "gated": false,
+        "importPath": "@/components/ui/magic-tweet-card"
       }
     },
     {

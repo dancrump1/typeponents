@@ -17998,6 +17998,39 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "magic-avatar-circles",
+		"title": "Avatar Circles",
+		"description": "Overlapping circles of avatars.",
+		"interaction": "",
+		"categories": [
+			"Images"
+		],
+		"tags": [],
+		"inspiration": {
+			"source": "Magic UI",
+			"url": "https://magicui.design/docs/components/avatar-circles",
+			"authorUrl": "https://magicui.design",
+			"relationship": "port"
+		},
+		"dependencies": [],
+		"registryDependencies": [],
+		"props": [],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": false
+		},
+		"rating": 5,
+		"status": "draft",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/magic-avatar-circles",
+		"registryUrl": "https://components.drivedev.net/r/magic-avatar-circles.json",
+		"files": [
+			"components/ui/magic-avatar-circles.tsx"
+		]
+	},
+	{
 		"slug": "magic-bento",
 		"title": "Magic Bento",
 		"description": "",
@@ -18144,6 +18177,41 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/magic-marquee.json",
 		"files": [
 			"components/ui/magic-marquee.tsx"
+		]
+	},
+	{
+		"slug": "magic-tweet-card",
+		"title": "Tweet Card",
+		"description": "A card that displays a tweet with the author's name, handle, and profile picture.",
+		"interaction": "",
+		"categories": [
+			"Cards"
+		],
+		"tags": [],
+		"inspiration": {
+			"source": "Magic UI",
+			"url": "https://magicui.design/docs/components/tweet-card",
+			"authorUrl": "https://magicui.design",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"react-tweet"
+		],
+		"registryDependencies": [],
+		"props": [],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": false
+		},
+		"rating": 5,
+		"status": "draft",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/magic-tweet-card",
+		"registryUrl": "https://components.drivedev.net/r/magic-tweet-card.json",
+		"files": [
+			"components/ui/magic-tweet-card.tsx"
 		]
 	},
 	{

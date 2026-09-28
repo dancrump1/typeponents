@@ -26,6 +26,18 @@ function writeStatus(state, extra = {}) {
 	);
 }
 
+function missingPackages(text) {
+	const names = new Set();
+	for (const match of text.matchAll(/^\s*(?:Fix with:\s*)?npm install\s+(.+)$/gm)) {
+		for (const name of match[1].trim().split(/\s+/)) {
+			if (/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i.test(name)) {
+				names.add(name);
+			}
+		}
+	}
+	return [...names];
+}
+
 function run(command, args, env) {
 	return new Promise((resolve) => {
 		const child = spawn(command, args, {
@@ -69,6 +81,23 @@ if (registryCode !== 0) {
 		error: "Rebuilding the registry catalog failed.",
 	});
 	process.exit(registryCode);
+}
+
+const missing = missingPackages(log);
+if (missing.length) {
+	const installCode = await run(
+		"npm",
+		["install", "--no-audit", "--no-fund", ...missing],
+		process.env
+	);
+	if (installCode !== 0) {
+		fs.rmSync(lockPath, { force: true });
+		writeStatus("error", {
+			finishedAt: new Date().toISOString(),
+			error: `Installing ${missing.join(", ")} failed, so the live site was left unchanged.`,
+		});
+		process.exit(installCode);
+	}
 }
 
 const buildEnv = { ...process.env, BUILD_DIR: ".next-staging" };

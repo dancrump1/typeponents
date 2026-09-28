@@ -105,9 +105,15 @@ export async function importRegistryItem(input: {
 			};
 		}
 
+		const installed = await installMissingPackages(intake.stdout);
+		const logAfterInstall = [intakeLog, installed.log].filter(Boolean).join("\n\n");
+		if (!installed.ok) {
+			return { ok: false, error: installed.error, log: logAfterInstall };
+		}
+
 		if (process.env.NODE_ENV !== "production") {
 			const built = await runCommand(tsxBin(), ["scripts/v2/build.mts"], 180_000);
-			const log = `${intakeLog}\n\n${combine(built)}`.trim();
+			let log = [logAfterInstall, combine(built)].filter(Boolean).join("\n\n");
 			if (built.code !== 0) {
 				return {
 					ok: false,
@@ -115,6 +121,11 @@ export async function importRegistryItem(input: {
 						"The component files were saved, but rebuilding the catalog failed. The library will not list it until that build succeeds.",
 					log,
 				};
+			}
+			const builtInstall = await installMissingPackages(combine(built));
+			log = [log, builtInstall.log].filter(Boolean).join("\n\n");
+			if (!builtInstall.ok) {
+				return { ok: false, error: builtInstall.error, log };
 			}
 			return { ok: true, slug, log, restart: "dev" };
 		}
@@ -124,7 +135,7 @@ export async function importRegistryItem(input: {
 		return {
 			ok: true,
 			slug,
-			log: intakeLog,
+			log: logAfterInstall,
 			restart: process.env.INTAKE_HOST === "1" ? "automatic" : "manual",
 		};
 	} finally {
@@ -167,6 +178,43 @@ function startPublish(): void {
 		throw new Error("Could not start the site rebuild.");
 	}
 	writeLock({ pid: child.pid, startedAt: Date.now(), label: "publish" });
+}
+
+/** Package names intake or registry:build tells us to install. */
+export function missingPackagesFromLog(log: string): string[] {
+	const names = new Set<string>();
+	for (const match of log.matchAll(/^\s*(?:Fix with:\s*)?npm install\s+(.+)$/gm)) {
+		for (const name of match[1].trim().split(/\s+/)) {
+			if (isNpmPackageName(name)) names.add(name);
+		}
+	}
+	return [...names];
+}
+
+function isNpmPackageName(name: string): boolean {
+	return /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i.test(name);
+}
+
+async function installMissingPackages(
+	log: string
+): Promise<{ ok: true; log: string } | { ok: false; error: string; log: string }> {
+	const missing = missingPackagesFromLog(log);
+	if (missing.length === 0) return { ok: true, log: "" };
+
+	const result = await runCommand(
+		"npm",
+		["install", "--no-audit", "--no-fund", ...missing],
+		180_000
+	);
+	const installLog = combine(result);
+	if (result.code !== 0) {
+		return {
+			ok: false,
+			error: `The component was saved, but installing ${missing.join(", ")} failed.`,
+			log: installLog,
+		};
+	}
+	return { ok: true, log: installLog };
 }
 
 function slugFromOutput(stdout: string): string | null {

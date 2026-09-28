@@ -1,6 +1,6 @@
 # DriveBrandStudio component registry
 
-> 451 React components for Tailwind CSS v4, distributed as a shadcn registry.
+> 453 React components for Tailwind CSS v4, distributed as a shadcn registry.
 
 Install any component with the shadcn CLI. It rewrites imports to match the target project's `components.json`, so `cn` resolves to whatever the project already uses:
 
@@ -158,6 +158,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Info Card](https://components.drivedev.net/docs/info-card.md)
 - [Interactive Folder](https://components.drivedev.net/docs/interactive-folder.md) — An animated folder component that expands to reveal file contents with smooth spring animations and interactive hover effects.
 - [Lane Card](https://components.drivedev.net/docs/lane-card.md)
+- [Tweet Card](https://components.drivedev.net/docs/magic-tweet-card.md) — A card that displays a tweet with the author's name, handle, and profile picture.
 - [Popular Price Card](https://components.drivedev.net/docs/popular-price-card.md) — Pricing card with a Most Popular badge tucked behind its top edge, above a checked feature list.
 - [Price Card](https://components.drivedev.net/docs/price-card.md) — Single pricing card showing plan name, monthly price and a feature list with circled check marks.
 - [Reveal Card](https://components.drivedev.net/docs/reveal-card.md) — Card covered by a full-bleed image that slides away diagonally to expose a title block and a More link.
@@ -317,6 +318,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Image Zoom](https://components.drivedev.net/docs/image-zoom.md)
 - [Image Zoom Effect](https://components.drivedev.net/docs/image-zoom-effect.md)
 - [Infinite Zoom](https://components.drivedev.net/docs/infinite-zoom.md)
+- [Avatar Circles](https://components.drivedev.net/docs/magic-avatar-circles.md) — Overlapping circles of avatars.
 - [Mask Effect](https://components.drivedev.net/docs/mask-effect.md)
 - [Media Between Text](https://components.drivedev.net/docs/media-between-text.md)
 - [Parallax Floating](https://components.drivedev.net/docs/parallax-floating.md)

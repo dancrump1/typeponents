@@ -5715,6 +5715,27 @@
       "docs": "https://components.drivedev.net/docs/macbook.md"
     },
     {
+      "name": "magic-avatar-circles",
+      "title": "Avatar Circles",
+      "description": "Overlapping circles of avatars.",
+      "categories": [
+        "Images"
+      ],
+      "tags": [],
+      "rating": 5,
+      "status": "draft",
+      "inspiration": {
+        "source": "Magic UI",
+        "url": "https://magicui.design/docs/components/avatar-circles",
+        "authorUrl": "https://magicui.design",
+        "relationship": "port"
+      },
+      "dependencies": [],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/magic-avatar-circles.json",
+      "url": "https://components.drivedev.net/r/magic-avatar-circles.json",
+      "docs": "https://components.drivedev.net/docs/magic-avatar-circles.md"
+    },
+    {
       "name": "magic-bento",
       "title": "Magic Bento",
       "description": "Magic Bento",
@@ -5760,6 +5781,29 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/magic-marquee.json",
       "url": "https://components.drivedev.net/r/magic-marquee.json",
       "docs": "https://components.drivedev.net/docs/magic-marquee.md"
+    },
+    {
+      "name": "magic-tweet-card",
+      "title": "Tweet Card",
+      "description": "A card that displays a tweet with the author's name, handle, and profile picture.",
+      "categories": [
+        "Cards"
+      ],
+      "tags": [],
+      "rating": 5,
+      "status": "draft",
+      "inspiration": {
+        "source": "Magic UI",
+        "url": "https://magicui.design/docs/components/tweet-card",
+        "authorUrl": "https://magicui.design",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "react-tweet"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/magic-tweet-card.json",
+      "url": "https://components.drivedev.net/r/magic-tweet-card.json",
+      "docs": "https://components.drivedev.net/docs/magic-tweet-card.md"
     },
     {
       "name": "magnet-button",
