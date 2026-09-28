@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { parseComponentUpdate } from './component-update';
 import { ComponentEntity } from './component.entity';
 
 export type ComponentQuery = {
@@ -42,15 +43,39 @@ export class LibraryService {
     };
   }
 
-  async findOne(slug: string) {
+  async findOne(slug: string, options?: { sources?: boolean }) {
     const component = await this.components.findOne({
       where: { slug },
-      relations: { sources: true },
+      relations: options?.sources ? { sources: true } : undefined,
     });
     if (!component) {
       throw new NotFoundException(`Component "${slug}" was not found`);
     }
     return component;
+  }
+
+  async update(slug: string, body: unknown) {
+    const existing = await this.components.findOneBy({ slug });
+    if (!existing) {
+      throw new NotFoundException(`Component "${slug}" was not found`);
+    }
+
+    const parsed = parseComponentUpdate(body);
+    if (!parsed.ok) {
+      throw new BadRequestException(parsed.message);
+    }
+
+    const values: Partial<ComponentEntity> = { ...parsed.value };
+    if (parsed.value.categories) {
+      values.primaryCategory = parsed.value.categories[0];
+    }
+    if ('inspiration' in parsed.value) {
+      values.inspirationSource = parsed.value.inspiration?.source ?? null;
+    }
+
+    this.components.merge(existing, values);
+    await this.components.save(existing);
+    return existing;
   }
 
   async categories() {

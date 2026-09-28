@@ -12,6 +12,7 @@ export class AppService {
         'GET /components',
         'GET /components/categories',
         'GET /components/:slug',
+        'PATCH /components/:slug',
       ],
     };
   }

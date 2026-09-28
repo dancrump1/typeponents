@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common';
 import { ComponentQuery, LibraryService } from './library.service';
 
 @Controller('components')
@@ -28,15 +28,23 @@ export class LibraryController {
       source: source?.trim() || undefined,
       gated: parseOptionalBoolean(gated),
       hidden: hidden === 'all' ? 'all' : parseOptionalBoolean(hidden),
-      limit: clampInt(limit, 50, 1, 200),
+      limit: clampInt(limit, 50, 1, 1000),
       offset: clampInt(offset, 0, 0, 100_000),
     };
     return this.library.findPage(query);
   }
 
   @Get(':slug')
-  findOne(@Param('slug') slug: string) {
-    return this.library.findOne(slug);
+  findOne(
+    @Param('slug') slug: string,
+    @Query('sources') sources?: string,
+  ) {
+    return this.library.findOne(slug, { sources: sources === 'true' });
+  }
+
+  @Patch(':slug')
+  update(@Param('slug') slug: string, @Body() body: unknown) {
+    return this.library.update(slug, body);
   }
 }
 

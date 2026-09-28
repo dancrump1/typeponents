@@ -2,7 +2,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 
 import { CatalogBrowser } from "@/components/library/catalog-browser";
-import { buildFacets, catalogForRequest, gatedCount } from "@/lib/registry";
+import { catalogWithStoredValues } from "@/lib/library-db";
+import { buildFacets, gatedCount } from "@/lib/registry";
+import { isLibraryUnlocked } from "@/lib/gate-server";
 
 export const metadata: Metadata = {
 	title: "Component library",
@@ -11,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function LibraryPage() {
-	const { entries, unlocked } = await catalogForRequest();
+	const unlocked = await isLibraryUnlocked();
+	const entries = await catalogWithStoredValues(unlocked);
 	const facets = buildFacets(entries);
 
 	return (

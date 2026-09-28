@@ -10,8 +10,9 @@ import { DemoFrame } from "@/components/library/demo-frame";
 import { InstallTabs } from "@/components/library/install-tabs";
 import { PropsTable } from "@/components/library/props-table";
 import { isLibraryUnlocked } from "@/lib/gate-server";
+import { EditComponentButton } from "@/components/library/edit-component-button";
+import { entryWithStoredValues } from "@/lib/library-db";
 import {
-	catalogBySlug,
 	neighbours,
 	readAgentDoc,
 	readDemos,
@@ -30,7 +31,7 @@ export async function generateMetadata({
 	params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
 	const { slug } = await params;
-	const entry = catalogBySlug.get(slug);
+	const entry = await entryWithStoredValues(slug);
 	if (!entry) return {};
 	if (entry.gated && !(await isLibraryUnlocked())) {
 		return { title: "Unlock", robots: { index: false, follow: false } };
@@ -48,7 +49,7 @@ export default async function ComponentPage({
 	params: Promise<{ slug: string }>;
 }) {
 	const { slug } = await params;
-	const entry = catalogBySlug.get(slug);
+	const entry = await entryWithStoredValues(slug);
 	if (!entry || entry.hidden) notFound();
 
 	const unlocked = await isLibraryUnlocked();
@@ -92,7 +93,10 @@ export default async function ComponentPage({
 					) : null}
 				</div>
 
-				<h1 className="text-2xl font-semibold tracking-tight">{entry.title}</h1>
+				<div className="flex items-start justify-between gap-4">
+					<h1 className="text-2xl font-semibold tracking-tight">{entry.title}</h1>
+					<EditComponentButton entry={entry} appearance="page" />
+				</div>
 
 				{entry.description ? (
 					<p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">

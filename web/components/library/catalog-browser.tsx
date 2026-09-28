@@ -19,6 +19,7 @@ import type { CatalogEntry } from "@/registry/types";
 import { cn } from "@/lib/utils";
 
 import { CatalogPreview } from "./demo-frame";
+import { EditComponentButton } from "./edit-component-button";
 import { SourceBadge } from "./source-badge";
 
 type Facet = { value: string; label: string; count: number };
@@ -390,65 +391,72 @@ function FacetGroup({
 }
 
 function ComponentCard({ entry, index }: { entry: CatalogEntry; index: number }) {
+	const href = `/library/${entry.slug}`;
 	return (
-		<Link
-			href={`/library/${entry.slug}`}
-			className="group relative flex flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/30"
-		>
-			<div className="relative h-64 overflow-hidden border-b bg-muted/20">
-				{/*
-				  Demos must not receive pointer events here: the card is a link,
-				  and many demos capture wheel/touch which is what made scrolling
-				  the catalog feel like wading through treacle.
-				*/}
-				<CatalogPreview
-					slug={entry.slug}
-					title={entry.title}
-					risk={entry.risk}
-				/>
-			</div>
+		<article className="group relative flex flex-col overflow-hidden rounded-lg border bg-card transition-colors hover:border-foreground/30">
+			<Link href={href} className="block">
+				<div className="relative h-64 overflow-hidden border-b bg-muted/20">
+					{/*
+					  Demos must not receive pointer events here: the card is a link,
+					  and many demos capture wheel/touch which is what made scrolling
+					  the catalog feel like wading through treacle.
+					*/}
+					<CatalogPreview
+						slug={entry.slug}
+						title={entry.title}
+						risk={entry.risk}
+					/>
+				</div>
+			</Link>
 
 			<div className="flex flex-1 flex-col gap-1.5 p-3">
 				<div className="flex items-start justify-between gap-2">
-					<h3 className="text-sm font-medium leading-tight">
-						<span className="mr-1.5 tabular-nums text-muted-foreground/60">
-							{String(index).padStart(2, "0")}
-						</span>
-						{entry.title}
-					</h3>
-					{entry.status !== "stable" ? (
-						<Badge variant="outline" className="shrink-0 text-[10px] font-normal">
-							{entry.status === "draft" ? "draft" : "review"}
-						</Badge>
-					) : null}
+					<Link href={href} className="min-w-0">
+						<h3 className="text-sm font-medium leading-tight">
+							<span className="mr-1.5 tabular-nums text-muted-foreground/60">
+								{String(index).padStart(2, "0")}
+							</span>
+							{entry.title}
+						</h3>
+					</Link>
+					<span className="flex shrink-0 items-center gap-1">
+						{entry.status !== "stable" ? (
+							<Badge variant="outline" className="shrink-0 text-[10px] font-normal">
+								{entry.status === "draft" ? "draft" : "review"}
+							</Badge>
+						) : null}
+						<EditComponentButton entry={entry} />
+					</span>
 				</div>
 
-				{entry.description ? (
-					<p className="line-clamp-2 text-xs text-muted-foreground">{entry.description}</p>
-				) : (
-					<p className="text-xs italic text-muted-foreground/60">
-						No description yet
-					</p>
-				)}
+				<Link href={href} className="flex flex-1 flex-col gap-1.5">
+					{entry.description ? (
+						<p className="line-clamp-2 text-xs text-muted-foreground">{entry.description}</p>
+					) : (
+						<p className="text-xs italic text-muted-foreground/60">
+							No description yet
+						</p>
+					)}
 
-				<div className="mt-auto flex flex-wrap items-center gap-1 pt-1.5">
-					<SourceBadge inspiration={entry.inspiration} />
-					{entry.gated ? (
-						<span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
-							<Lock className="size-2.5" aria-hidden />
-							Internal
-						</span>
-					) : null}
-					{entry.tags.slice(0, 2).map((tag) => (
-						<span
-							key={tag}
-							className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
-						>
-							{tag}
-						</span>
-					))}
-				</div>
+					<div className="mt-auto flex flex-wrap items-center gap-1 pt-1.5">
+						<SourceBadge inspiration={entry.inspiration} />
+						{entry.gated ? (
+							<span className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] text-muted-foreground">
+								<Lock className="size-2.5" aria-hidden />
+								Internal
+							</span>
+						) : null}
+						{entry.tags.slice(0, 2).map((tag) => (
+							<span
+								key={tag}
+								className="rounded-full bg-muted px-2 py-0.5 text-[11px] text-muted-foreground"
+							>
+								{tag}
+							</span>
+						))}
+					</div>
+				</Link>
 			</div>
-		</Link>
+		</article>
 	);
 }
