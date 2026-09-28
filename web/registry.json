@@ -20887,6 +20887,45 @@
       }
     },
     {
+      "name": "magic-marquee",
+      "type": "registry:ui",
+      "title": "Marquee",
+      "description": "An infinite scrolling component that can be used to display text, images, or videos.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/magic-marquee/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/magic-marquee.tsx"
+        }
+      ],
+      "meta": {
+        "categories": [
+          "Carousels"
+        ],
+        "tags": [],
+        "interaction": "",
+        "inspiration": {
+          "source": "Magic UI",
+          "url": "https://magicui.design/docs/components/marquee",
+          "authorUrl": "https://magicui.design",
+          "relationship": "port"
+        },
+        "props": [],
+        "risk": {
+          "heavy": false,
+          "fullscreen": false,
+          "clientOnly": false
+        },
+        "rating": 5,
+        "status": "draft",
+        "hidden": false,
+        "gated": false,
+        "importPath": "@/components/ui/magic-marquee"
+      }
+    },
+    {
       "name": "magnet-button",
       "type": "registry:ui",
       "title": "Magnet Button",

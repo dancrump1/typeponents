@@ -16,7 +16,15 @@
 
 # next.js
 /.next/
+/.next-staging/
+/.next-incoming/
+/.next-previous/
 /out/
+
+# Designer intake publish handshake
+/.intake.lock
+/.intake-publish-ready
+/.intake-publish-status.json
 
 # production
 /build

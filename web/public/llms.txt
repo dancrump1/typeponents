@@ -1,6 +1,6 @@
 # DriveBrandStudio component registry
 
-> 450 React components for Tailwind CSS v4, distributed as a shadcn registry.
+> 451 React components for Tailwind CSS v4, distributed as a shadcn registry.
 
 Install any component with the shadcn CLI. It rewrites imports to match the target project's `components.json`, so `cn` resolves to whatever the project already uses:
 
@@ -188,6 +188,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Infinite Scrolling Logos Animation](https://components.drivedev.net/docs/infinite-scrolling-logos-animation.md)
 - [Logo Carousel](https://components.drivedev.net/docs/logo-carousel.md)
 - [Logo Loop](https://components.drivedev.net/docs/logo-loop.md)
+- [Marquee](https://components.drivedev.net/docs/magic-marquee.md) — An infinite scrolling component that can be used to display text, images, or videos.
 - [Morph Slider](https://components.drivedev.net/docs/morph-slider.md)
 - [Parallax Carousel](https://components.drivedev.net/docs/parallax-carousel.md)
 - [Pixelated Carousel](https://components.drivedev.net/docs/pixelated-carousel.md) — A carousel that shows images with a pixelated effect. Images change with a grid animation that makes them look blocky.

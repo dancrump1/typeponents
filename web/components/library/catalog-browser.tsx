@@ -149,11 +149,17 @@ export function CatalogBrowser({
 	return (
 		<div className="flex min-h-svh w-full">
 			<aside className="sticky top-0 hidden h-svh w-72 shrink-0 flex-col overflow-y-auto border-r px-4 py-5 lg:flex">
-				<Link href="/library" className="mb-4 block">
+				<Link href="/library" className="mb-1 block">
 					<p className="text-sm font-semibold tracking-tight">Component library</p>
 					<p className="text-xs text-muted-foreground">
 						{entries.length} components
 					</p>
+				</Link>
+				<Link
+					href="/library/intake"
+					className="mb-4 mt-2 inline-flex text-xs text-muted-foreground hover:text-foreground"
+				>
+					Add a component
 				</Link>
 
 				{lockedCount > 0 ? (
@@ -249,22 +255,30 @@ export function CatalogBrowser({
 							Previews play while they&apos;re on screen
 						</p>
 					</div>
-					<div className="flex items-center gap-1 rounded-md border p-0.5">
-						{SORTS.map((sort) => (
-							<button
-								key={sort}
-								type="button"
-								onClick={() => setFilters({ sort })}
-								className={cn(
-									"rounded px-2 py-1 text-xs capitalize transition-colors",
-									filters.sort === sort
-										? "bg-foreground text-background"
-										: "text-muted-foreground hover:text-foreground"
-								)}
-							>
-								{sort === "curated" ? "Curated" : "A–Z"}
-							</button>
-						))}
+					<div className="flex items-center gap-3">
+						<Link
+							href="/library/intake"
+							className="text-xs text-muted-foreground hover:text-foreground lg:hidden"
+						>
+							Add a component
+						</Link>
+						<div className="flex items-center gap-1 rounded-md border p-0.5">
+							{SORTS.map((sort) => (
+								<button
+									key={sort}
+									type="button"
+									onClick={() => setFilters({ sort })}
+									className={cn(
+										"rounded px-2 py-1 text-xs capitalize transition-colors",
+										filters.sort === sort
+											? "bg-foreground text-background"
+											: "text-muted-foreground hover:text-foreground"
+									)}
+								>
+									{sort === "curated" ? "Curated" : "A–Z"}
+								</button>
+							))}
+						</div>
 					</div>
 				</header>
 

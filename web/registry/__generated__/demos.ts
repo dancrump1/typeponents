@@ -271,6 +271,7 @@ export const demoLoaders: Record<string, DemoLoader> = {
 	"macbook": () => import("@/registry/components/macbook/demo"),
 	"macbook-mockup": () => import("@/registry/components/macbook-mockup/demo"),
 	"magic-bento": () => import("@/registry/components/magic-bento/demo"),
+	"magic-marquee": () => import("@/registry/components/magic-marquee/demo"),
 	"magnet-button": () => import("@/registry/components/magnet-button/demo"),
 	"magnet-lines": () => import("@/registry/components/magnet-lines/demo"),
 	"magnet-tabs": () => import("@/registry/components/magnet-tabs/demo"),

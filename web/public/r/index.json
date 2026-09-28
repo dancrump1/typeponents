@@ -5741,6 +5741,27 @@
       "docs": "https://components.drivedev.net/docs/magic-bento.md"
     },
     {
+      "name": "magic-marquee",
+      "title": "Marquee",
+      "description": "An infinite scrolling component that can be used to display text, images, or videos.",
+      "categories": [
+        "Carousels"
+      ],
+      "tags": [],
+      "rating": 5,
+      "status": "draft",
+      "inspiration": {
+        "source": "Magic UI",
+        "url": "https://magicui.design/docs/components/marquee",
+        "authorUrl": "https://magicui.design",
+        "relationship": "port"
+      },
+      "dependencies": [],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/magic-marquee.json",
+      "url": "https://components.drivedev.net/r/magic-marquee.json",
+      "docs": "https://components.drivedev.net/docs/magic-marquee.md"
+    },
+    {
       "name": "magnet-button",
       "title": "Magnet Button",
       "description": "Magnet Button",
