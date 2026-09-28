@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stack-scroll",
+  "type": "registry:ui",
+  "title": "Stack Scroll",
+  "description": "A scrollable component that displays images in a stacked card layout. As you scroll, the cards animate with smooth transitions, scaling, and positioning effects to create an engaging visual experience.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/stack-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/stack-scroll.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useRef } from 'react';\r\nimport Image from 'next/image';\r\nimport { motion, MotionValue, useScroll, useTransform } from 'framer-motion';\r\n\r\nconst StackScrollItem = ({\r\n  image,\r\n  index,\r\n  isLeft,\r\n  scrollYProgress,\r\n  totalItems\r\n}: {\r\n  image: string;\r\n  index: number;\r\n  isLeft: boolean;\r\n  scrollYProgress: MotionValue<number>;\r\n  totalItems: number;\r\n}) => {\r\n  const direction = isLeft ? -1 : 1;\r\n  const position = index / (totalItems / 2);\r\n  const isFirst = index === 0;\r\n  const isLast = index === totalItems / 2 - 1;\r\n\r\n  const exitGap = 0.04;\r\n\r\n  const translateY = useTransform(\r\n    scrollYProgress,\r\n    [0, position, position + exitGap, 1],\r\n    [0, 0, ...(isLast ? [0, 0] : [-50, -50])]\r\n  );\r\n  const translateX = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [isFirst ? 0 : index * 20 * direction, 0, isLast ? 0 : -index * 20 * direction]\r\n  );\r\n  const scale = useTransform(\r\n    scrollYProgress,\r\n    [0, position, ...(isLast ? [1] : [position + exitGap, 1])],\r\n    [1 - index * 0.1, 1, ...(isLast ? [1] : [1.2, 1.2])]\r\n  );\r\n  const opacity = useTransform(\r\n    scrollYProgress,\r\n    [0, position, ...(isLast ? [1] : [position + exitGap, 1])],\r\n    [1, 1, ...(isLast ? [1] : [0, 0])]\r\n  );\r\n  const blur = useTransform(\r\n    scrollYProgress,\r\n    [0, position, ...(isLast ? [1] : [position + exitGap, 1])],\r\n    [2, 0, ...(isLast ? [0] : [10, 10])]\r\n  );\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        translateX,\r\n        translateY,\r\n        scaleY: scale,\r\n        opacity,\r\n        filter: useTransform(blur, (value) => `blur(${value}px)`),\r\n        zIndex: totalItems - index\r\n      }}\r\n      className=\"h-[300px] max-w-sm w-full absolute rounded-xl overflow-hidden\"\r\n    >\r\n      <Image\r\n        src={image}\r\n        alt={image}\r\n        width={1000}\r\n        height={1000}\r\n        className=\"object-cover h-full w-full\"\r\n      />\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst StackScroll = ({ items }: { items: { image: string }[] }) => {\r\n  const ref = useRef<HTMLDivElement>(null);\r\n\r\n  const { scrollYProgress } = useScroll({\r\n    container: ref,\r\n    offset: ['start start', 'end end']\r\n  });\r\n\r\n  return (\r\n    <div\r\n      ref={ref}\r\n      className=\"h-full w-full overflow-y-auto relative\"\r\n      style={{ minHeight: '400px' }}\r\n    >\r\n      <div className=\"h-full w-full absolute top-0 left-0\">\r\n        <div\r\n          className=\"w-full\"\r\n          style={{\r\n            height: (items.length / 2 + 2) * 300\r\n          }}\r\n        />\r\n      </div>\r\n      <div className=\"grid grid-cols-2 gap-12 h-full w-full sticky top-0 left-0\">\r\n        <div className=\"flex flex-col h-full justify-center w-full items-end relative\">\r\n          {items.slice(0, items.length / 2).map((image, index) => (\r\n            <StackScrollItem\r\n              key={`left-column-image-${index}`}\r\n              image={image.image}\r\n              index={index}\r\n              isLeft={true}\r\n              scrollYProgress={scrollYProgress}\r\n              totalItems={items.length}\r\n            />\r\n          ))}\r\n        </div>\r\n        <div className=\"flex flex-col h-full justify-center w-full items-start relative\">\r\n          {items.slice(items.length / 2).map((image, index) => (\r\n            <StackScrollItem\r\n              key={`right-column-image-${index}`}\r\n              image={image.image}\r\n              index={index}\r\n              isLeft={false}\r\n              scrollYProgress={scrollYProgress}\r\n              totalItems={items.length}\r\n            />\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default StackScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Cards scale and restack as you scroll, like a deck being dealt.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/stackScroll",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; }[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/stack-scroll"
+  }
+}

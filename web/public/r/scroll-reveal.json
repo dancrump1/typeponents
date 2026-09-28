@@ -1,0 +1,103 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-reveal",
+  "type": "registry:ui",
+  "title": "Scroll Reveal",
+  "description": "Large block of heading text that sits at a slight tilt and straightens as it scrolls into view, its words going from faint and blurred to solid.",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-reveal.tsx",
+      "content": "import React, { ReactNode, RefObject, useEffect, useMemo, useRef } from \"react\";\n\nimport { gsap } from \"gsap\";\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\n\ngsap.registerPlugin(ScrollTrigger);\n\ninterface ScrollRevealProps {\n\tchildren: ReactNode;\n\tscrollContainerRef?: RefObject<HTMLElement>;\n\tenableBlur?: boolean;\n\tbaseOpacity?: number;\n\tbaseRotation?: number;\n\tblurStrength?: number;\n\tcontainerClassName?: string;\n\ttextClassName?: string;\n\trotationEnd?: string;\n\twordAnimationEnd?: string;\n}\n\nconst ScrollReveal: React.FC<ScrollRevealProps> = ({\n\tchildren,\n\tscrollContainerRef,\n\tenableBlur = true,\n\tbaseOpacity = 0.1,\n\tbaseRotation = 3,\n\tblurStrength = 4,\n\tcontainerClassName = \"\",\n\ttextClassName = \"\",\n\trotationEnd = \"bottom bottom\",\n\twordAnimationEnd = \"bottom bottom\",\n}) => {\n\tconst containerRef = useRef<HTMLHeadingElement>(null);\n\n\tconst splitText = useMemo(() => {\n\t\tconst text = typeof children === \"string\" ? children : \"\";\n\t\treturn text.split(/(\\s+)/).map((word, index) => {\n\t\t\tif (word.match(/^\\s+$/)) return word;\n\t\t\treturn (\n\t\t\t\t<span className=\"inline-block\" key={index + \"scroll-reveal\"}>\n\t\t\t\t\t{word}\n\t\t\t\t</span>\n\t\t\t);\n\t\t});\n\t}, [children]);\n\n\tuseEffect(() => {\n\t\tconst el = containerRef.current;\n\t\tif (!el) return;\n\n\t\tconst scroller =\n\t\t\tscrollContainerRef && scrollContainerRef.current\n\t\t\t\t? scrollContainerRef.current\n\t\t\t\t: window;\n\n\t\tgsap.fromTo(\n\t\t\tel,\n\t\t\t{ transformOrigin: \"0% 50%\", rotate: baseRotation },\n\t\t\t{\n\t\t\t\tease: \"none\",\n\t\t\t\trotate: 0,\n\t\t\t\tscrollTrigger: {\n\t\t\t\t\ttrigger: el,\n\t\t\t\t\tscroller,\n\t\t\t\t\tstart: \"top bottom\",\n\t\t\t\t\tend: rotationEnd,\n\t\t\t\t\tscrub: true,\n\t\t\t\t},\n\t\t\t}\n\t\t);\n\n\t\tconst wordElements = el.querySelectorAll<HTMLElement>(\".word\");\n\n\t\tgsap.fromTo(\n\t\t\twordElements,\n\t\t\t{ opacity: baseOpacity, willChange: \"opacity\" },\n\t\t\t{\n\t\t\t\tease: \"none\",\n\t\t\t\topacity: 1,\n\t\t\t\tstagger: 0.05,\n\t\t\t\tscrollTrigger: {\n\t\t\t\t\ttrigger: el,\n\t\t\t\t\tscroller,\n\t\t\t\t\tstart: \"top bottom-=20%\",\n\t\t\t\t\tend: wordAnimationEnd,\n\t\t\t\t\tscrub: true,\n\t\t\t\t},\n\t\t\t}\n\t\t);\n\n\t\tif (enableBlur) {\n\t\t\tgsap.fromTo(\n\t\t\t\twordElements,\n\t\t\t\t{ filter: `blur(${blurStrength}px)` },\n\t\t\t\t{\n\t\t\t\t\tease: \"none\",\n\t\t\t\t\tfilter: \"blur(0px)\",\n\t\t\t\t\tstagger: 0.05,\n\t\t\t\t\tscrollTrigger: {\n\t\t\t\t\t\ttrigger: el,\n\t\t\t\t\t\tscroller,\n\t\t\t\t\t\tstart: \"top bottom-=20%\",\n\t\t\t\t\t\tend: wordAnimationEnd,\n\t\t\t\t\t\tscrub: true,\n\t\t\t\t\t},\n\t\t\t\t}\n\t\t\t);\n\t\t}\n\n\t\treturn () => {\n\t\t\tScrollTrigger.getAll().forEach((trigger) => trigger.kill());\n\t\t};\n\t}, [\n\t\tscrollContainerRef,\n\t\tenableBlur,\n\t\tbaseRotation,\n\t\tbaseOpacity,\n\t\trotationEnd,\n\t\twordAnimationEnd,\n\t\tblurStrength,\n\t]);\n\n\treturn (\n\t\t<h2 ref={containerRef} className={`my-5 ${containerClassName}`}>\n\t\t\t<p\n\t\t\t\tclassName={`text-[clamp(1.6rem,4vw,3rem)] leading-normal font-semibold ${textClassName}`}\n\t\t\t>\n\t\t\t\t{splitText}\n\t\t\t</p>\n\t\t</h2>\n\t);\n};\n\nexport default ScrollReveal;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Scrolling is the only trigger: the text rotates upright as it enters the viewport, and the words clear up one after another from left to right, reversing if you scroll back up.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "scrollContainerRef",
+        "type": "React.RefObject<HTMLElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableBlur",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "baseOpacity",
+        "type": "number",
+        "default": "0.1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "baseRotation",
+        "type": "number",
+        "default": "3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blurStrength",
+        "type": "number",
+        "default": "4",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rotationEnd",
+        "type": "string",
+        "default": "\"bottom bottom\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "wordAnimationEnd",
+        "type": "string",
+        "default": "\"bottom bottom\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-reveal"
+  }
+}

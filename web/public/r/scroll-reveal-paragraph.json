@@ -1,0 +1,59 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-reveal-paragraph",
+  "type": "registry:ui",
+  "title": "Scroll Reveal Paragraph",
+  "description": "Paragraph printed in faint grey that fills in to full contrast one word at a time, tied to how far it has scrolled up the screen.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-reveal-paragraph.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-reveal-paragraph.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useRef } from \"react\";\r\n\r\nimport { motion, useScroll, useTransform } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://smoothui.dev/doc/text/scroll-reveal-paragraph\r\n\r\ninterface ScrollRevealParagraphProps {\r\n\tparagraph: string;\r\n\tclassName?: string;\r\n}\r\n\r\nexport default function ScrollRevealParagraph({\r\n\tparagraph,\r\n\tclassName = \"\",\r\n}: ScrollRevealParagraphProps) {\r\n\tconst container = useRef<HTMLParagraphElement>(null);\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: container,\r\n\t\toffset: [\"start 0.9\", \"start 0.25\"],\r\n\t});\r\n\r\n\tconst words = paragraph.split(\" \");\r\n\r\n\treturn (\r\n\t\t<p ref={container} className={`text-lg leading-relaxed ${className}`}>\r\n\t\t\t{words.map((word, i) => {\r\n\t\t\t\tconst start = i / words.length;\r\n\t\t\t\tconst end = start + 1 / words.length;\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<Word\r\n\t\t\t\t\t\tkey={`word-${i}-${word.slice(0, 3)}`}\r\n\t\t\t\t\t\tprogress={scrollYProgress}\r\n\t\t\t\t\t\trange={[start, end]}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{word}\r\n\t\t\t\t\t</Word>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t</p>\r\n\t);\r\n}\r\n\r\ninterface WordProps {\r\n\tchildren: string;\r\n\tprogress: any;\r\n\trange: [number, number];\r\n}\r\n\r\nconst Word = ({ children, progress, range }: WordProps) => {\r\n\tconst opacity = useTransform(progress, range, [0, 1]);\r\n\r\n\treturn (\r\n\t\t<span className=\"relative mr-2 inline-block\">\r\n\t\t\t<span className=\"text-foreground/10\">{children}</span>\r\n\t\t\t<motion.span\r\n\t\t\t\tclassName=\"text-foreground absolute inset-0\"\r\n\t\t\t\tstyle={{ opacity }}\r\n\t\t\t>\r\n\t\t\t\t{children}\r\n\t\t\t</motion.span>\r\n\t\t</span>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Scrolling drives the whole effect: words light up left to right as the paragraph rises through the upper half of the screen, and dim again if you scroll back down.",
+    "inspiration": {
+      "source": "SmoothUI",
+      "url": "https://smoothui.dev/doc/text/scroll-reveal-paragraph",
+      "authorUrl": "https://smoothui.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "paragraph",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "draft",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-reveal-paragraph"
+  }
+}

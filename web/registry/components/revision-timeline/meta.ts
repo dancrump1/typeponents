@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "revision-timeline",
+	title: "Revision Timeline",
+	description: "A premium interactive document revision history log timeline featuring Gaussian-weighted dial scale indicators, spring-based sliding position centering, and parsed markdown log lists.",
+	interaction: "Gaussian scaling sliders, date hover indicators, paging click navigation, and markdown syntax parsers.",
+	categories: ["Cards"],
+	tags: ["spring", "hover", "responsive"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/revision-timeline",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "revisions", type: "TimelineRevision[]", required: true },
+		{ name: "defaultActiveId", type: "string" },
+		{ name: "className", type: "string" },
+		{ name: "showNavigation", type: "boolean", default: "true" },
+		{ name: "showDateLabel", type: "boolean", default: "true" },
+		{ name: "pastPaddingDays", type: "number", default: "31" },
+		{ name: "futurePaddingDays", type: "number", default: "30" },
+		{ name: "height", type: "string | number", default: "\"420px\"" },
+		{ name: "onActiveIdChange", type: "((activeId: string) => void)" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

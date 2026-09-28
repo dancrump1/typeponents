@@ -1,0 +1,109 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dialog-form",
+  "type": "registry:ui",
+  "title": "Dialog Form",
+  "description": "An interactive form component that transforms from a button into a modal dialog with smooth animations. Features form validation, loading states, and success feedback with beautiful visual effects.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react",
+    "usehooks-ts"
+  ],
+  "registryDependencies": [
+    "input",
+    "textarea"
+  ],
+  "files": [
+    {
+      "path": "components/ui/dialog-form.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dialog-form.tsx",
+      "content": "'use client';\r\n\r\nimport { cn } from '@/lib/utils';\r\nimport { AnimatePresence, motion } from 'framer-motion';\r\nimport { LoaderCircle, X } from 'lucide-react';\r\nimport React, { RefObject, useRef, useState } from 'react';\r\nimport { useOnClickOutside } from 'usehooks-ts';\r\n\r\ninterface SubmitDialogFormButtonProps {\r\n  onClick?: () =>\r\n    | Promise<{ success: boolean; message: string }>\r\n    | { success: boolean; message: string };\r\n  state?: 'idle' | 'loading' | 'success' | 'error';\r\n}\r\n\r\nexport const SubmitDialogFormButton = ({\r\n  onClick,\r\n  state = 'idle'\r\n}: SubmitDialogFormButtonProps) => {\r\n  const handleClick = async () => {\r\n    if (onClick) {\r\n      return await onClick();\r\n    }\r\n  };\r\n\r\n  const buttonVariants = {\r\n    idle: {\r\n      label: 'Submit',\r\n      icon: null,\r\n      animate: {\r\n        backgroundColor: '#3b82f6',\r\n        color: '#ffffff'\r\n      }\r\n    },\r\n    loading: {\r\n      label: null,\r\n      icon: <LoaderCircle className=\"animate-spin\" size={20} />,\r\n      animate: {\r\n        backgroundColor: '#1e40af',\r\n        color: '#ffffff'\r\n      }\r\n    },\r\n    success: {\r\n      label: 'Submitted',\r\n      icon: null,\r\n      animate: {\r\n        backgroundColor: '#059669',\r\n        color: '#ffffff'\r\n      }\r\n    },\r\n    error: {\r\n      label: 'Try Again',\r\n      icon: null,\r\n      animate: {\r\n        x: [0, 2, -2, 0, -2, 2, 0, -2, 2, 0, -2, 2, 0],\r\n        backgroundColor: '#dc2626',\r\n        color: '#ffffff'\r\n      }\r\n    }\r\n  };\r\n\r\n  const entryExitAnimation = {\r\n    initial: {\r\n      opacity: 0,\r\n      y: '-100%'\r\n    },\r\n    animate: {\r\n      opacity: 1,\r\n      y: 0\r\n    },\r\n    exit: {\r\n      opacity: 0,\r\n      y: '100%'\r\n    },\r\n    transition: {\r\n      type: 'spring',\r\n      stiffness: 600,\r\n      damping: 30\r\n    }\r\n  };\r\n\r\n  return (\r\n    <button\r\n      type=\"button\"\r\n      disabled={state === 'loading' || state === 'success'}\r\n      className=\"disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.97] disabled:active:scale-100\"\r\n    >\r\n      <AnimatePresence initial={false} mode=\"popLayout\">\r\n        <motion.div\r\n          animate={buttonVariants[state].animate}\r\n          transition={{\r\n            duration: 0.3,\r\n            ease: 'easeInOut'\r\n          }}\r\n          onClick={handleClick}\r\n          className=\"text-sm px-3 py-1.5 rounded-md flex items-center gap-1 min-w-[100px] justify-center overflow-hidden text-white bg-blue-600 hover:shadow-lg transition-shadow cursor-pointer\"\r\n        >\r\n          {buttonVariants[state].label && (\r\n            <motion.span key={`label-${state}`} {...entryExitAnimation}>\r\n              {buttonVariants[state].label}\r\n            </motion.span>\r\n          )}\r\n          {buttonVariants[state].icon && (\r\n            <motion.span key={`icon-${state}`} {...entryExitAnimation}>\r\n              {buttonVariants[state].icon}\r\n            </motion.span>\r\n          )}\r\n        </motion.div>\r\n      </AnimatePresence>\r\n    </button>\r\n  );\r\n};\r\n\r\ninterface DialogFormProps {\r\n  label: string;\r\n  successText: string;\r\n  successIcon: React.ReactNode;\r\n  icon?: React.ReactNode;\r\n  buttonClassName?: string;\r\n  containerClassName?: string;\r\n  childComponent?: React.ReactNode;\r\n  onSubmit?: () =>\r\n    | Promise<{ success: boolean; message: string }>\r\n    | { success: boolean; message: string };\r\n  onClose?: () => void;\r\n}\r\n\r\nconst DialogForm = ({\r\n  label,\r\n  successText,\r\n  successIcon,\r\n  icon,\r\n  buttonClassName,\r\n  containerClassName,\r\n  childComponent = null,\r\n  onSubmit,\r\n  onClose\r\n}: DialogFormProps) => {\r\n  const [open, setOpen] = useState(false);\r\n  const [formState, setFormState] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');\r\n  const [error, setError] = useState<string | null>(null);\r\n\r\n  const handleClose = () => {\r\n    if (formState === 'loading') return;\r\n\r\n    onClose?.();\r\n    setOpen(false);\r\n    setError(null);\r\n    setFormState('idle');\r\n  };\r\n\r\n  const dialogRef = useRef<HTMLDivElement>(null);\r\n  useOnClickOutside(dialogRef as RefObject<HTMLDivElement>, () => handleClose());\r\n\r\n  const handleSubmit = async () => {\r\n    let res = { success: false, message: 'Something went wrong.' };\r\n    setFormState('loading');\r\n    setError(null);\r\n\r\n    if (onSubmit) {\r\n      try {\r\n        res = await onSubmit();\r\n\r\n        if (res.success === true) {\r\n          setFormState('success');\r\n          setTimeout(() => {\r\n            handleClose();\r\n          }, 1500);\r\n        } else {\r\n          setFormState('error');\r\n          setError((res as { message: string }).message);\r\n        }\r\n      } catch (error) {\r\n        console.error(error);\r\n        setFormState('error');\r\n        setError('Something went wrong.');\r\n      }\r\n    } else {\r\n      setFormState('idle');\r\n    }\r\n\r\n    return res;\r\n  };\r\n\r\n  return (\r\n    <div>\r\n      <AnimatePresence mode=\"wait\">\r\n        {!open ? (\r\n          <motion.button\r\n            layout\r\n            layoutId=\"form-container\"\r\n            transition={{\r\n              type: 'spring',\r\n              duration: 0.3,\r\n              bounce: 0.05\r\n            }}\r\n            whileTap={{\r\n              scale: 0.97\r\n            }}\r\n            type=\"button\"\r\n            onClick={() => setOpen(true)}\r\n            className={cn(\r\n              'border border-white/10 hover:border-white/20 bg-black px-4 py-2.5 rounded-xl',\r\n              buttonClassName\r\n            )}\r\n          >\r\n            <motion.p layout layoutId=\"form-label\" className=\"flex items-center gap-2 text-sm\">\r\n              {icon} {label}\r\n            </motion.p>\r\n          </motion.button>\r\n        ) : (\r\n          <motion.div\r\n            ref={dialogRef}\r\n            layout\r\n            layoutId=\"form-container\"\r\n            transition={{\r\n              layout: {\r\n                type: 'spring',\r\n                duration: 0.4,\r\n                bounce: 0.05\r\n              }\r\n            }}\r\n            key=\"form-container\"\r\n            className={cn(\r\n              'shadow-md rounded-2xl flex flex-col min-w-[400px] bg-[#111111] overflow-hidden relative',\r\n              containerClassName\r\n            )}\r\n          >\r\n            <div className=\"p-4\">\r\n              <div className=\"flex items-center justify-between\">\r\n                <motion.p\r\n                  layout\r\n                  layoutId=\"form-label\"\r\n                  transition={{\r\n                    layout: {\r\n                      type: 'spring',\r\n                      duration: 0.6,\r\n                      bounce: 0.05\r\n                    }\r\n                  }}\r\n                  className=\"flex items-center gap-2 text-sm\"\r\n                >\r\n                  {icon} {label}\r\n                </motion.p>\r\n                <button\r\n                  type=\"button\"\r\n                  onClick={() => handleClose()}\r\n                  className=\"p-1 hover:bg-white/5\"\r\n                >\r\n                  <X size={16} />\r\n                </button>\r\n              </div>\r\n              <AnimatePresence mode=\"popLayout\">\r\n                {childComponent && (\r\n                  <motion.div\r\n                    key=\"child-component\"\r\n                    initial={{ opacity: 0 }}\r\n                    animate={{ opacity: 1 }}\r\n                    exit={{ opacity: 0 }}\r\n                    className=\"mt-4\"\r\n                  >\r\n                    {childComponent}\r\n                  </motion.div>\r\n                )}\r\n                <motion.div\r\n                  key=\"submit-button\"\r\n                  initial={{ opacity: 0 }}\r\n                  animate={{ opacity: 1 }}\r\n                  exit={{ opacity: 0 }}\r\n                  className=\"flex justify-between mt-3\"\r\n                >\r\n                  <p className=\"text-sm text-red-500\">{error}</p>\r\n                  <SubmitDialogFormButton onClick={handleSubmit} state={formState} />\r\n                </motion.div>\r\n              </AnimatePresence>\r\n              {open && formState === 'success' && (\r\n                <>\r\n                  <motion.div\r\n                    key=\"shine-effect\"\r\n                    initial={{\r\n                      x: '-100%'\r\n                    }}\r\n                    animate={{\r\n                      x: '100%'\r\n                    }}\r\n                    transition={{\r\n                      duration: 1.2,\r\n                      ease: [0.4, 0, 0.2, 1],\r\n                      delay: 0.1\r\n                    }}\r\n                    className=\"absolute inset-0 z-30 pointer-events-none\"\r\n                  >\r\n                    <div className=\"w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12\" />\r\n                  </motion.div>\r\n\r\n                  <motion.div\r\n                    key=\"secondary-shine\"\r\n                    initial={{\r\n                      x: '-100%'\r\n                    }}\r\n                    animate={{\r\n                      x: '100%'\r\n                    }}\r\n                    transition={{\r\n                      duration: 0.8,\r\n                      ease: [0.4, 0, 0.2, 1],\r\n                      delay: 0.3\r\n                    }}\r\n                    className=\"absolute inset-0 z-30 pointer-events-none\"\r\n                  >\r\n                    <div className=\"w-full h-full bg-gradient-to-r from-transparent via-green-400/30 to-transparent -skew-x-12\" />\r\n                  </motion.div>\r\n\r\n                  <motion.div\r\n                    initial={{ opacity: 0 }}\r\n                    animate={{ opacity: 1 }}\r\n                    exit={{ opacity: 0 }}\r\n                    transition={{\r\n                      duration: 0.1,\r\n                      ease: 'easeOut'\r\n                    }}\r\n                    key=\"blur-effect\"\r\n                    className=\"backdrop-blur-sm absolute inset-0 z-10 rounded-3xl\"\r\n                  />\r\n                  <motion.div\r\n                    initial={{ opacity: 0, scale: 0.8 }}\r\n                    animate={{ opacity: 1, scale: 1 }}\r\n                    exit={{ opacity: 0, scale: 0.8 }}\r\n                    transition={{\r\n                      duration: 0.3,\r\n                      ease: [0.4, 0, 0.2, 1],\r\n                      delay: 0.1\r\n                    }}\r\n                    key=\"success-content\"\r\n                    className=\"p-4 flex flex-col items-center justify-center absolute inset-0 z-20\"\r\n                  >\r\n                    <motion.div\r\n                      initial={{ scale: 0, rotate: -180 }}\r\n                      animate={{ scale: 1, rotate: 0 }}\r\n                      transition={{\r\n                        duration: 0.5,\r\n                        ease: [0.4, 0, 0.2, 1],\r\n                        delay: 0.4\r\n                      }}\r\n                    >\r\n                      {successIcon}\r\n                    </motion.div>\r\n                    <motion.p\r\n                      initial={{ opacity: 0, y: 10 }}\r\n                      animate={{ opacity: 1, y: 0 }}\r\n                      transition={{\r\n                        duration: 0.3,\r\n                        ease: 'easeOut',\r\n                        delay: 0.6\r\n                      }}\r\n                      className=\"mt-2 font-medium\"\r\n                    >\r\n                      {successText}\r\n                    </motion.p>\r\n                  </motion.div>\r\n                </>\r\n              )}\r\n            </div>\r\n          </motion.div>\r\n        )}\r\n      </AnimatePresence>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default DialogForm;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "A button morphs into a modal form, then plays a success or error state on submit.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/dialogform",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "successText",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "successIcon",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "icon",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "buttonClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "childComponent",
+        "type": "React.ReactNode",
+        "default": "null",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSubmit",
+        "type": "(() => Promise<{ success: boolean; message: string; }> | …",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClose",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dialog-form"
+  }
+}

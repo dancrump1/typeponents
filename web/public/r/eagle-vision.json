@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "eagle-vision",
+  "type": "registry:ui",
+  "title": "Eagle Vision",
+  "description": "A visual effect inspired by Assassin's Creed that shows rotating rings following your mouse cursor. The rings get smaller and turn green when you hover over target elements, creating an immersive gaming-style interface.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/eagle-vision.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/eagle-vision.tsx",
+      "content": "'use client';\n\nimport { useSpring, useTransform, MotionValue, motion, useMotionValue } from 'framer-motion';\r\nimport React, { useEffect } from 'react';\r\nimport { createPortal } from 'react-dom';\r\n\r\ninterface RingProps {\r\n  x: MotionValue<number>;\r\n  y: MotionValue<number>;\r\n  size: MotionValue<number>;\r\n  borderRadius: MotionValue<number>;\r\n  distanceBetweenRings: MotionValue<number>;\r\n}\r\n\r\nconst MAX_DISTANCE = 1440;\r\nconst MIN_DISTANCE = 100;\r\nconst CORRECT_DISTANCE = 76;\r\n\r\nconst Ring = ({ x, y, size, borderRadius, distanceBetweenRings }: RingProps) => {\r\n  console.log(size);\r\n  return (\r\n    <motion.span\r\n      className=\"fixed z-10\"\r\n      style={{\r\n        transform: useTransform([x, y], ([x, y]: number[]) => `translate(${x}px, ${y}px)`),\r\n        height: size,\r\n        width: size\r\n      }}\r\n    >\r\n      <span className=\"absolute inset-0 flex items-center justify-center\">\r\n        <motion.span\r\n          style={{\r\n            width: size,\r\n            height: size,\r\n            borderColor: useTransform(size, (value) =>\r\n              value < CORRECT_DISTANCE ? '#00ff00' : 'white'\r\n            ),\r\n            borderRadius: useTransform(borderRadius, (value) => `${value}px`)\r\n          }}\r\n          className=\"absolute border spin-circle-reverse\"\r\n        ></motion.span>\r\n        <motion.span\r\n          style={{\r\n            width: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size - distanceBetweenRings + 3\r\n            ),\r\n            height: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size - distanceBetweenRings + 3\r\n            ),\r\n            borderColor: useTransform(size, (value) =>\r\n              value < CORRECT_DISTANCE ? '#00ff00' : 'white'\r\n            ),\r\n            borderRadius: useTransform(borderRadius, (value) => `${value}px`)\r\n          }}\r\n          className=\"absolute border spin-circle-reverse\"\r\n        ></motion.span>\r\n        <motion.span\r\n          style={{\r\n            width: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size - distanceBetweenRings * 1 - 10\r\n            ),\r\n            height: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size - distanceBetweenRings * 1 - 10\r\n            ),\r\n            borderColor: useTransform(size, (value) =>\r\n              value < CORRECT_DISTANCE ? '#00ff00' : 'white'\r\n            ),\r\n            borderRadius: useTransform(borderRadius, (value) => `${value}px`)\r\n          }}\r\n          className=\"absolute border border-dashed spin-circle\"\r\n        ></motion.span>\r\n        <motion.span\r\n          style={{\r\n            width: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size + distanceBetweenRings - 7\r\n            ),\r\n            height: useTransform(\r\n              [size, distanceBetweenRings],\r\n              ([size, distanceBetweenRings]: number[]) => size + distanceBetweenRings - 7\r\n            ),\r\n            borderColor: useTransform(size, (value) =>\r\n              value < CORRECT_DISTANCE ? '#00ff00' : 'white'\r\n            ),\r\n            borderRadius: useTransform(borderRadius, (value) => `${value}px`)\r\n          }}\r\n          className=\"absolute border border-dashed spin-circle\"\r\n        ></motion.span>\r\n      </span>\r\n    </motion.span>\r\n  );\r\n};\r\n\r\nconst EagleVision = () => {\r\n  const mouseX = useSpring(0, { duration: 0.1 });\r\n  const mouseY = useSpring(0, { duration: 0.1 });\r\n\r\n  const distanceFromTarget = useMotionValue(MAX_DISTANCE);\r\n  const size = useTransform(distanceFromTarget, [MIN_DISTANCE, MAX_DISTANCE], [75, 400]);\r\n  const borderRadius = useTransform(distanceFromTarget, [MIN_DISTANCE, MAX_DISTANCE], [40, 150]);\r\n  const distanceBetweenRings = useTransform(distanceFromTarget, [0, MIN_DISTANCE + 100], [0, 15]);\r\n\r\n  useEffect(() => {\r\n    const handleMouseMove = (e: MouseEvent) => {\r\n      const target = document.getElementById('eagle-vision-target');\r\n      if (target) {\r\n        const targetRect = target?.getBoundingClientRect();\r\n        const calculatedDistance = Math.sqrt(\r\n          (e.clientX - targetRect.left - targetRect.width / 2) ** 2 +\r\n            (e.clientY - targetRect.top - targetRect.height / 2) ** 2\r\n        );\r\n        distanceFromTarget.set(calculatedDistance);\r\n      }\r\n\r\n      mouseX.set(e.clientX - size.get() / 2);\r\n      mouseY.set(e.clientY - size.get() / 2);\r\n    };\r\n    window.addEventListener('mousemove', handleMouseMove);\r\n\r\n    return () => {\r\n      window.removeEventListener('mousemove', handleMouseMove);\r\n    };\r\n  }, [mouseX, mouseY, size]);\r\n\r\n  return createPortal(\r\n    <div className=\"fixed z-[99999] top-0 left-0 inset-0 pointer-events-none\">\r\n      <style>\r\n        {`\r\n            @keyframes rotate {\r\n                from {\r\n                    transform: rotate(0deg);\r\n                }\r\n                to {\r\n                    transform: rotate(360deg);\r\n                }\r\n            }\r\n            .spin-circle {\r\n                animation: rotate 2s linear infinite;\r\n            }\r\n            .spin-circle-reverse {\r\n                animation: rotate 2s linear infinite;\r\n                animation-direction: reverse;\r\n            }\r\n        `}\r\n      </style>\r\n      <Ring\r\n        x={mouseX}\r\n        y={mouseY}\r\n        size={size}\r\n        borderRadius={borderRadius}\r\n        distanceBetweenRings={distanceBetweenRings}\r\n      />\r\n    </div>,\r\n    document.body\r\n  );\r\n};\r\n\r\nconst Target = ({ children }: { children: React.ReactNode }) => {\r\n  return <div id=\"eagle-vision-target\">{children}</div>;\r\n};\r\n\r\nexport default EagleVision;\r\nexport { Target };\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "Rotating rings follow the cursor and tighten to green when they find a target.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/eagleVision",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/eagle-vision"
+  }
+}

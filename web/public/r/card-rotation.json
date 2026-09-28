@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-rotation",
+  "type": "registry:ui",
+  "title": "Card Rotation",
+  "description": "Draggable horizontal row of square cards seen in perspective, with the row fading out at both edges.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/card-rotation.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/card-rotation.tsx",
+      "content": "import React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\nconst cards = [\r\n\t{\r\n\t\tid: 1,\r\n\t\ticon: <div>test</div>,\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\ticon: <div>test</div>,\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\ticon: <div>test</div>,\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\ticon: <div>test</div>,\r\n\t},\r\n\t{\r\n\t\tid: 5,\r\n\t\ticon: <div>test</div>,\r\n\t},\r\n];\r\n\r\nconst cardVariants = {\r\n\tselected: {\r\n\t\trotateY: 180,\r\n\t\tscale: 1.1,\r\n\t\ttransition: { duration: 0.35 },\r\n\t\tzIndex: 10,\r\n\t\tboxShadow:\r\n\t\t\t\"rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px\",\r\n\t},\r\n\tnotSelected: (i: any) => ({\r\n\t\trotateY: i * 15,\r\n\t\tscale: 1 - Math.abs(i * 0.15),\r\n\t\tx: i ? i * 50 : 0,\r\n\t\topacity: 1 - Math.abs(i * 0.15),\r\n\t\tzIndex: 10 - Math.abs(i),\r\n\t\tboxShadow:\r\n\t\t\t\"rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px\",\r\n\t\ttransition: { duration: 0.35 },\r\n\t}),\r\n};\r\n\r\nexport const CardRotation = () => {\r\n\tconst [selectedCard, setSelectedCard] = useState(null);\r\n\tconst [{ startX, startScrollLeft, isDragging }, setDragStart] = useState({\r\n\t\tstartX: undefined as any,\r\n\t\tstartScrollLeft: undefined as any,\r\n\t\tisDragging: false as any,\r\n\t});\r\n\tconst containerRef = useRef<any>();\r\n\tconst cardRefs = useRef<any>(new Array());\r\n\tuseEffect(() => {\r\n\t\tconst { scrollWidth, clientWidth } = containerRef.current;\r\n\t\tconst halfScroll = (scrollWidth - clientWidth) / 2;\r\n\t\tcontainerRef.current.scrollLeft = halfScroll;\r\n\t}, [containerRef.current]);\r\n\tconst handleMouseDown = (e: any) => {\r\n\t\tsetDragStart({\r\n\t\t\tstartX: e.pageX - containerRef.current.offsetLeft,\r\n\t\t\tstartScrollLeft: containerRef.current.scrollLeft,\r\n\t\t\tisDragging: true,\r\n\t\t});\r\n\t};\r\n\tconst handleMouseMove = (e: any) => {\r\n\t\tif (!isDragging || selectedCard) return;\r\n\t\tconst x = e.pageX - containerRef.current.offsetLeft;\r\n\t\tconst walk = x - startX;\r\n\t\tcontainerRef.current.scrollLeft = startScrollLeft - walk;\r\n\t};\r\n\tconst selectCard = (card: any) => {\r\n\t\tsetSelectedCard(selectedCard ? null : card);\r\n\r\n\t\tif (card && !selectedCard) {\r\n\t\t\tcardRefs.current[card - 1].scrollIntoView({\r\n\t\t\t\tbehavior: \"smooth\",\r\n\t\t\t\tblock: \"nearest\",\r\n\t\t\t\tinline: \"center\",\r\n\t\t\t});\r\n\t\t}\r\n\t};\r\n\tconst handleCardMouseUp = (e: any, card: any) => {\r\n\t\tif (isDragging) {\r\n\t\t\tconst x = e.pageX - containerRef.current.offsetLeft;\r\n\t\t\tconst walk = x - startX;\r\n\t\t\tif (Math.abs(walk) < 5) selectCard(card);\r\n\t\t} else selectCard(card);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"h-full w-full flex items-center  max-w-2xl   relative\"\r\n\t\t\tonMouseDown={handleMouseDown}\r\n\t\t\tonMouseUp={() =>\r\n\t\t\t\tsetDragStart((prev) => ({ ...prev, isDragging: false }))\r\n\t\t\t}\r\n\t\t\tonMouseMove={handleMouseMove}\r\n\t\t>\r\n\t\t\t<div className=\"absolute left-0  w-32 bg-slate-900 mask-[linear-gradient(to_right,white,transparent)] h-full z-30\" />\r\n\t\t\t<div className=\"absolute right-0  w-32 bg-slate-900 mask-[linear-gradient(to_left,white,transparent)] h-full z-30\" />\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"max-w-full overflow-x-scroll w-full h-full no-visible-scrollbar relative\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\twhiteSpace: \"nowrap\",\r\n\t\t\t\t\tperspective: \"150px\",\r\n\t\t\t\t}}\r\n\t\t\t\tref={containerRef}\r\n\t\t\t>\r\n\t\t\t\t{cards.map((card, i) => (\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tclassName=\"card relative inline-block items-center justify-center h-40 w-40 bg-slate-800 m-10 rounded-md cursor-pointer\"\r\n\t\t\t\t\t\tkey={card.id}\r\n\t\t\t\t\t\tref={(el) => cardRefs.current.push(el)}\r\n\t\t\t\t\t\tonMouseUp={(e) => handleCardMouseUp(e, card.id)}\r\n\t\t\t\t\t\tvariants={cardVariants}\r\n\t\t\t\t\t\tanimate={\r\n\t\t\t\t\t\t\tselectedCard === card.id ? \"selected\" : \"notSelected\"\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\tcustom={selectedCard ? selectedCard - card.id : 0}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div className=\"h-full w-full flex items-center justify-center\">\r\n\t\t\t\t\t\t\t{card.icon}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "cursor-tracking"
+    ],
+    "interaction": "Press and drag sideways to scroll the row along; clicking a card flips it over and scales it up while the cards around it turn away, shrink and fade by distance, and clicking again returns the row to flat.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/card-rotation"
+  }
+}

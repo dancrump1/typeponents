@@ -1,0 +1,59 @@
+import type React from "react";
+import { useState } from "react";
+
+import { cn } from "@/lib/utils";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { motion } from "motion/react";
+
+// Credit:
+// https://starui.link/docs/components/stack-card
+
+export interface StackCard extends React.ComponentPropsWithRef<"div"> {
+	cards: React.ReactNode[];
+}
+
+export function StackCard({ cards, className, ...props }: StackCard) {
+	const [current, setCurrent] = useState(0);
+
+	return (
+		<div className={cn("flex flex-col", className)} {...props}>
+			<div className="relative">
+				{cards.map((card, index) => (
+					<motion.div
+						key={index + "carousel-stack"}
+						initial={false}
+						className={cn(
+							index > 0 && "absolute bottom-0 left-0 w-full",
+							current < index && "pointer-events-none"
+						)}
+						animate={{
+							opacity: index <= current ? 1 : 0,
+							y: (index - current) * 28,
+							scale: 1 + (index - current) * 0.08,
+						}}
+					>
+						{card}
+					</motion.div>
+				))}
+			</div>
+			<div className="mt-5 flex items-center justify-center gap-5">
+				<button
+					type="button"
+					className="bg-background text-foreground rounded-full p-2 disabled:bg-background disabled:cursor-not-allowed active:scale-90 transition-transform disabled:active:scale-100"
+					disabled={current === 0}
+					onClick={() => setCurrent((prev) => prev - 1)}
+				>
+					<ArrowLeft size={20} />
+				</button>
+				<button
+					type="button"
+					className="bg-background text-foreground rounded-full p-2 disabled:bg-background disabled:cursor-not-allowed active:scale-90 transition-transform disabled:active:scale-100"
+					disabled={current === cards.length - 1}
+					onClick={() => setCurrent((prev) => prev + 1)}
+				>
+					<ArrowRight size={20} />
+				</button>
+			</div>
+		</div>
+	);
+}

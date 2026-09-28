@@ -1,0 +1,37 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "interactive-cta",
+	title: "Interactive CTA",
+	description: "A floating call-to-action component that expands from a compact icon to reveal contact information and navigation links. Features smooth animations, customizable positioning, and dynamic content.",
+	interaction: "A compact icon expands into a contact card with animated navigation links.",
+	categories: ["Buttons"],
+	tags: ["spring", "hover"],
+	inspiration: {
+		source: "StackBits",
+		url: "https://stackbits.dev/docs/interactivecta",
+		author: "Samit Kapoor",
+		authorUrl: "https://github.com/samitkapoor",
+		license: "MIT",
+		relationship: "port",
+	},
+	dependencies: ["@tabler/icons-react", "framer-motion", "lucide-react"],
+	registryDependencies: [],
+	props: [
+		{ name: "heading", type: "string", default: "'Want something custom made?'" },
+		{ name: "subheading", type: "string", default: "\"Let's talk\"" },
+		{ name: "avatar", type: "React.ReactNode" },
+		{ name: "navigationLinks", type: "NavigationLink[]", default: "DEFAULT_NAVIGATION_LINKS" },
+		{ name: "initialOpen", type: "boolean", default: "true" },
+		{ name: "className", type: "string" },
+		{ name: "openIcon", type: "React.ReactNode" },
+		{ name: "closeIcon", type: "React.ReactNode" },
+		{ name: "openWidth", type: "string", default: "'310px'" },
+		{ name: "closeWidth", type: "string", default: "'50px'" },
+		{ name: "openHeight", type: "string", default: "'155px'" },
+		{ name: "closeHeight", type: "string", default: "'50px'" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

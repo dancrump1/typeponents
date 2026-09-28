@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bubble-text",
+  "type": "registry:ui",
+  "title": "Bubble Text",
+  "description": "Oversized thin heading whose letters thicken and brighten under the pointer.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/bubble-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/bubble-text.tsx",
+      "content": "import React, { useEffect } from \"react\";\r\n\r\n// www.hover.dev/components/text#bubble-text\r\n\r\n// DONT FORGET THE CSS\r\n\r\nconst BubbleText = ({ text }: { text: string }) => {\r\n\tuseEffect(() => {\r\n\t\tconst spans = document.querySelectorAll(\r\n\t\t\t\".hover-text span\"\r\n\t\t) as NodeListOf<HTMLSpanElement>;\r\n\r\n\t\tspans.forEach((span) => {\r\n\t\t\tspan.addEventListener(\"mouseenter\", function (this: typeof span) {\r\n\t\t\t\tthis.style.fontWeight = \"900\";\r\n\t\t\t\tthis.style.color = \"rgb(238, 242, 255)\";\r\n\r\n\t\t\t\tconst leftNeighbor = this.previousElementSibling as HTMLSpanElement;\r\n\t\t\t\tconst rightNeighbor = this.nextElementSibling as HTMLSpanElement;\r\n\r\n\t\t\t\tif (leftNeighbor) {\r\n\t\t\t\t\tleftNeighbor.style.fontWeight = \"500\";\r\n\t\t\t\t\tleftNeighbor.style.color = \"rgb(199, 210, 254)\";\r\n\t\t\t\t}\r\n\t\t\t\tif (rightNeighbor) {\r\n\t\t\t\t\trightNeighbor.style.fontWeight = \"500\";\r\n\t\t\t\t\trightNeighbor.style.color = \"rgb(199, 210, 254)\";\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tspan.addEventListener(\"mouseleave\", function (this: typeof span) {\r\n\t\t\t\tthis.style.fontWeight = \"100\";\r\n\t\t\t\tthis.style.color = \"rgb(165, 180, 252)\";\r\n\r\n\t\t\t\tconst leftNeighbor = this.previousElementSibling as HTMLSpanElement;\r\n\t\t\t\tconst rightNeighbor = this.nextElementSibling as HTMLSpanElement;\r\n\r\n\t\t\t\tif (leftNeighbor) {\r\n\t\t\t\t\tleftNeighbor.style.fontWeight = \"100\";\r\n\t\t\t\t\tleftNeighbor.style.color = \"rgb(165, 180, 252)\";\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (rightNeighbor) {\r\n\t\t\t\t\trightNeighbor.style.fontWeight = \"100\";\r\n\t\t\t\t\trightNeighbor.style.color = \"rgb(165, 180, 252)\";\r\n\t\t\t\t}\r\n\t\t\t});\r\n\t\t});\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<h2 className=\"hover-text text-center text-5xl font-thin text-indigo-300\">\r\n\t\t\t<Text>{text}</Text>\r\n\t\t</h2>\r\n\t);\r\n};\r\n\r\nconst Text = ({ children }: { children: string }) => {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{children.split(\"\").map((child, idx) => (\r\n\t\t\t\t<span\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\ttransition: \"0.35s font-weight, 0.35s color\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tkey={idx + \"bubble-text\"}\r\n\t\t\t\t>\r\n\t\t\t\t\t{child}\r\n\t\t\t\t</span>\r\n\t\t\t))}\r\n\t\t</>\r\n\t);\r\n};\r\n\r\nexport default BubbleText;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [],
+    "interaction": "Hovering a letter swells it to its heaviest weight and lightens its colour, with the two letters either side thickening partway, so a soft bulge follows the pointer along the word.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/bubble-text"
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tabs",
+  "type": "registry:ui",
+  "title": "Tabs",
+  "description": "Tabs",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tabs.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tabs.tsx",
+      "content": "\"use client\";\n\nimport React, { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// https://ui.aceternity.com/components/tabs\n\ntype Tab = {\n\ttitle: string;\n\tvalue: string;\n\tcontent?: string | React.ReactNode | any;\n};\n\nexport const Tabs = ({\n\ttabs: propTabs,\n\tcontainerClassName,\n\tactiveTabClassName,\n\ttabClassName,\n\tcontentClassName,\n}: {\n\ttabs: Tab[];\n\tcontainerClassName?: string;\n\tactiveTabClassName?: string;\n\ttabClassName?: string;\n\tcontentClassName?: string;\n}) => {\n\tconst [active, setActive] = useState<Tab>(propTabs[0]);\n\tconst [tabs, setTabs] = useState<Tab[]>(propTabs);\n\n\tconst moveSelectedTabToTop = (idx: number) => {\n\t\tconst newTabs = [...propTabs];\n\t\tconst selectedTab = newTabs.splice(idx, 1);\n\t\tnewTabs.unshift(selectedTab[0]);\n\t\tsetTabs(newTabs);\n\t\tsetActive(newTabs[0]);\n\t};\n\n\tconst [hovering, setHovering] = useState(false);\n\n\treturn (\n\t\t<>\n\t\t\t<div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex flex-row items-center justify-start perspective-[1000px] relative overflow-auto sm:overflow-visible no-visible-scrollbar max-w-full w-full\",\n\t\t\t\t\tcontainerClassName\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t{propTabs.map((tab, idx) => (\n\t\t\t\t\t<button\n\t\t\t\t\t\tkey={tab.title}\n\t\t\t\t\t\tonClick={() => {\n\t\t\t\t\t\t\tmoveSelectedTabToTop(idx);\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tonMouseEnter={() => setHovering(true)}\n\t\t\t\t\t\tonMouseLeave={() => setHovering(false)}\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\"relative px-4 py-2 rounded-full\",\n\t\t\t\t\t\t\ttabClassName\n\t\t\t\t\t\t)}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttransformStyle: \"preserve-3d\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t{active.value === tab.value && (\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tlayoutId=\"clickedbutton\"\n\t\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\t\t\t\tbounce: 0.3,\n\t\t\t\t\t\t\t\t\tduration: 0.6,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"absolute inset-0 bg-background dark:bg-background rounded-full \",\n\t\t\t\t\t\t\t\t\tactiveTabClassName\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t)}\n\n\t\t\t\t\t\t<span className=\"relative block text-foreground dark:text-foreground\">\n\t\t\t\t\t\t\t{tab.title}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</button>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t\t<FadeInDiv\n\t\t\t\ttabs={tabs}\n\t\t\t\tactive={active}\n\t\t\t\tkey={active.value}\n\t\t\t\thovering={hovering}\n\t\t\t\tclassName={cn(\"mt-32\", contentClassName)}\n\t\t\t/>\n\t\t</>\n\t);\n};\n\nexport const FadeInDiv = ({\n\tclassName,\n\ttabs,\n\thovering,\n}: {\n\tclassName?: string;\n\tkey?: string;\n\ttabs: Tab[];\n\tactive: Tab;\n\thovering?: boolean;\n}) => {\n\tconst isActive = (tab: Tab) => {\n\t\treturn tab.value === tabs[0].value;\n\t};\n\treturn (\n\t\t<div className=\"relative w-full h-full\">\n\t\t\t{tabs.map((tab, idx) => (\n\t\t\t\t<motion.div\n\t\t\t\t\tkey={tab.value}\n\t\t\t\t\tlayoutId={tab.value}\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tscale: 1 - idx * 0.1,\n\t\t\t\t\t\ttop: hovering ? idx * -50 : 0,\n\t\t\t\t\t\tzIndex: -idx,\n\t\t\t\t\t\topacity: idx < 3 ? 1 - idx * 0.1 : 0,\n\t\t\t\t\t}}\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\ty: isActive(tab) ? [0, 40, 0] : 0,\n\t\t\t\t\t}}\n\t\t\t\t\tclassName={cn(\"w-full h-full absolute top-0 left-0\", className)}\n\t\t\t\t>\n\t\t\t\t\t{tab.content}\n\t\t\t\t</motion.div>\n\t\t\t))}\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/tabs",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "tabs",
+        "type": "Tab[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "activeTabClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "tabClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "contentClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tabs"
+  }
+}

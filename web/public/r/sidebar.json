@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sidebar",
+  "type": "registry:ui",
+  "title": "Sidebar",
+  "description": "Collapsible sidebar navigation.",
+  "dependencies": [
+    "@tabler/icons-react",
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sidebar.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sidebar.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { createContext, useContext, useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\nimport Link, { LinkProps } from \"next/link\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { IconMenu2, IconX } from \"@tabler/icons-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\ninterface Links {\r\n\tlabel: string;\r\n\thref: string;\r\n\ticon: React.JSX.Element | React.ReactNode;\r\n}\r\n\r\ninterface SidebarContextProps {\r\n\topen: boolean;\r\n\tsetOpen: React.Dispatch<React.SetStateAction<boolean>>;\r\n\tanimate: boolean;\r\n}\r\n\r\nconst SidebarContext = createContext<SidebarContextProps | undefined>(\r\n\tundefined\r\n);\r\n\r\nexport const useSidebar = () => {\r\n\tconst context = useContext(SidebarContext);\r\n\tif (!context) {\r\n\t\tthrow new Error(\"useSidebar must be used within a SidebarProvider\");\r\n\t}\r\n\treturn context;\r\n};\r\n\r\nexport const SidebarProvider = ({\r\n\tchildren,\r\n\topen: openProp,\r\n\tsetOpen: setOpenProp,\r\n\tanimate = true,\r\n}: {\r\n\tchildren: React.ReactNode;\r\n\topen?: boolean;\r\n\tsetOpen?: React.Dispatch<React.SetStateAction<boolean>>;\r\n\tanimate?: boolean;\r\n}) => {\r\n\tconst [openState, setOpenState] = useState(false);\r\n\r\n\tconst open = openProp !== undefined ? openProp : openState;\r\n\tconst setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;\r\n\r\n\treturn (\r\n\t\t<SidebarContext.Provider value={{ open, setOpen, animate: animate }}>\r\n\t\t\t{children}\r\n\t\t</SidebarContext.Provider>\r\n\t);\r\n};\r\n\r\nexport const Sidebar = ({\r\n\tchildren,\r\n\topen,\r\n\tsetOpen,\r\n\tanimate,\r\n}: {\r\n\tchildren: React.ReactNode;\r\n\topen?: boolean;\r\n\tsetOpen?: React.Dispatch<React.SetStateAction<boolean>>;\r\n\tanimate?: boolean;\r\n}) => {\r\n\treturn (\r\n\t\t<SidebarProvider open={open} setOpen={setOpen} animate={animate}>\r\n\t\t\t{children}\r\n\t\t</SidebarProvider>\r\n\t);\r\n};\r\n\r\nexport const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t<DesktopSidebar {...props} />\r\n\t\t\t<MobileSidebar {...(props as React.ComponentProps<\"div\">)} />\r\n\t\t</>\r\n\t);\r\n};\r\n\r\nexport const DesktopSidebar = ({\r\n\tclassName,\r\n\tchildren,\r\n\t...props\r\n}: React.ComponentProps<typeof motion.div>) => {\r\n\tconst { open, setOpen, animate } = useSidebar();\r\n\treturn (\r\n\t\t<>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"h-full fixed top-0 left-0 px-4 z-50 cursor-pointer py-4 hidden  md:flex md:flex-col bg-background dark:bg-background w-[300px] shrink-0\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\tanimate={{\r\n\t\t\t\t\twidth: animate ? (open ? \"300px\" : \"60px\") : \"300px\",\r\n\t\t\t\t}}\r\n\t\t\t\t// onMouseEnter={() => setOpen(true)}\r\n\t\t\t\t// onMouseLeave={() => setOpen(false)}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<div onClick={() => setOpen(!open)}>{open ? \"<\" : \">\"}</div>\r\n\t\t\t\t{children}\r\n\t\t\t</motion.div>\r\n\t\t</>\r\n\t);\r\n};\r\n\r\nexport const MobileSidebar = ({\r\n\tclassName,\r\n\tchildren,\r\n\t...props\r\n}: React.ComponentProps<\"div\">) => {\r\n\tconst { open, setOpen } = useSidebar();\r\n\treturn (\r\n\t\t<>\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-background dark:bg-background\",\r\n\t\t\t\t\t!open && \"absolute top-0\"\r\n\t\t\t\t)}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<div className=\"flex justify-end z-20 w-full\">\r\n\t\t\t\t\t<IconMenu2\r\n\t\t\t\t\t\tclassName=\"text-foreground dark:text-foreground\"\r\n\t\t\t\t\t\tonClick={() => setOpen(!open)}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t{open && (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tinitial={{ x: \"-100%\", opacity: 0 }}\r\n\t\t\t\t\t\t\tanimate={{ x: 0, opacity: 1 }}\r\n\t\t\t\t\t\t\texit={{ x: \"-100%\", opacity: 0 }}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\tduration: 0.3,\r\n\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\"fixed h-full w-full inset-0 bg-background dark:bg-background p-10 z-100 flex flex-col justify-between\",\r\n\t\t\t\t\t\t\t\tclassName\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tclassName=\"absolute left-5 top-2 z-50 text-foreground dark:text-foreground\"\r\n\t\t\t\t\t\t\t\tonClick={() => setOpen(!open)}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<IconX />\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t{children}\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t)}\r\n\t\t\t\t</AnimatePresence>\r\n\t\t\t</div>\r\n\t\t</>\r\n\t);\r\n};\r\n\r\nexport const SidebarLink = ({\r\n\tlink,\r\n\tlabel,\r\n\ticon,\r\n\tclassName,\r\n\ttoggle,\r\n\tall,\r\n\t...props\r\n}: {\r\n\tlink: Links;\r\n\tclassName?: string;\r\n\tprops?: LinkProps;\r\n}) => {\r\n\tconst { open, animate } = useSidebar();\r\n\tif (toggle) {\r\n\t\treturn !all ? (\r\n\t\t\t<Link\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"flex items-center cursor-pointer justify-start gap-2  group/sidebar py-2\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\thref={\"/\"}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<Image src={icon} alt={\"\"} height={20} width={20} />\r\n\t\t\t\t<motion.span\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\tdisplay: animate\r\n\t\t\t\t\t\t\t? open\r\n\t\t\t\t\t\t\t\t? \"inline-block\"\r\n\t\t\t\t\t\t\t\t: \"none\"\r\n\t\t\t\t\t\t\t: \"inline-block\",\r\n\t\t\t\t\t\topacity: animate ? (open ? 1 : 0) : 1,\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName=\"text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{label}{\" \"}\r\n\t\t\t\t</motion.span>\r\n\t\t\t</Link>\r\n\t\t) : (\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"flex items-center cursor-pointer justify-start gap-2  group/sidebar py-2\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<Image src={icon} alt={\"\"} height={20} width={20} />\r\n\t\t\t\t<motion.span\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\tdisplay: animate\r\n\t\t\t\t\t\t\t? open\r\n\t\t\t\t\t\t\t\t? \"inline-block\"\r\n\t\t\t\t\t\t\t\t: \"none\"\r\n\t\t\t\t\t\t\t: \"inline-block\",\r\n\t\t\t\t\t\topacity: animate ? (open ? 1 : 0) : 1,\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName=\"text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{label}{\" \"}\r\n\t\t\t\t</motion.span>\r\n\t\t\t</div>\r\n\t\t);\r\n\t}\r\n\treturn (\r\n\t\t<Link\r\n\t\t\thref={all ? \"#\" + link || \"\" : link || \"\"}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"flex items-center justify-start gap-2  group/sidebar py-2\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<Image src={icon} alt={\"\"} height={20} width={20} />\r\n\t\t\t<motion.span\r\n\t\t\t\tanimate={{\r\n\t\t\t\t\tdisplay: animate\r\n\t\t\t\t\t\t? open\r\n\t\t\t\t\t\t\t? \"inline-block\"\r\n\t\t\t\t\t\t\t: \"none\"\r\n\t\t\t\t\t\t: \"inline-block\",\r\n\t\t\t\t\topacity: animate ? (open ? 1 : 0) : 1,\r\n\t\t\t\t}}\r\n\t\t\t\tclassName=\"text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!\"\r\n\t\t\t>\r\n\t\t\t\t{all && !toggle ? \"#\" + label : label}\r\n\t\t\t</motion.span>\r\n\t\t</Link>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Open and close the sidebar; nested items expand in place.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sidebar"
+  }
+}

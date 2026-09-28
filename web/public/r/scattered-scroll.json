@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scattered-scroll",
+  "type": "registry:ui",
+  "title": "Scattered Scroll",
+  "description": "Scattered Scroll",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scattered-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scattered-scroll.tsx",
+      "content": "\"use client\"\n\nimport { type MotionValue, motion, useScroll, useTransform } from \"motion/react\"\nimport {\n    Children,\n    type ComponentRef,\n    isValidElement,\n    type ReactNode,\n    type RefObject,\n    useLayoutEffect,\n    useMemo,\n    useRef,\n    useState,\n} from \"react\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/scroll/scattered-scroll\n\nexport type ScatteredScrollProps = {\n    children: ReactNode\n    scrollDistance?: number\n    overlap?: number\n}\n\n// (used instead of Math.random) Avoid hydration error on next.js\nfunction seededRandom(seed: number): number {\n    const x = Math.sin(seed + 1) * 10000\n    return x - Math.floor(x)\n}\nconst Item = ({\n    children,\n    progress,\n    xValue,\n    index,\n    itemRef,\n}: {\n    children: ReactNode\n    progress: MotionValue<number>\n    xValue: number\n    index: number\n    itemRef?: RefObject<HTMLDivElement | null>\n}) => {\n    /**\n     * Tweak options:\n     * xPercent: horizontal offset between x and x (30 and 40 default).\n     * rotation: random rotation between x and x (10 and 20 default).\n     * yOffset: vertical offset in px (90 default).\n     */\n    const { xPercent, rotation, yOffset } = useMemo(\n        () => ({\n            xPercent: (seededRandom(index * 2) * 10 + 30) * (index % 2 === 0 ? 1 : -1),\n            rotation: (seededRandom(index * 2 + 1) * 10 + 10) * (index % 2 === 0 ? 1 : -1),\n            yOffset: (index % 2 === 0 ? 1 : -1) * 90,\n        }),\n        [index],\n    )\n\n    const yTranslate = useTransform(progress, [0, 0.5, 1], [yOffset, 0, -yOffset])\n    const xTranslate = useTransform(progress, [0, 1], [xValue, -xValue])\n    const rotate = useTransform(progress, [0, 1], [rotation, -rotation])\n    const xPercentValue = useTransform(progress, [0, 1], [xPercent, -xPercent])\n\n    const scatteredX = useTransform(\n        [xTranslate, xPercentValue],\n        ([px, percent]) => `calc(${px}px + ${percent}%)`,\n    )\n\n    return (\n        <motion.div\n            className=\"will-change-transform\"\n            ref={itemRef}\n            style={{\n                x: scatteredX,\n                rotate: rotate,\n                y: yTranslate,\n            }}\n        >\n            {children}\n        </motion.div>\n    )\n}\n\nexport default function ScatteredScroll({\n    children,\n    scrollDistance = 200,\n    overlap = 0,\n}: ScatteredScrollProps) {\n    const childrenArray = Children.toArray(children).filter(isValidElement)\n    const firstItemRef = useRef<ComponentRef<\"div\">>(null)\n    const ownTargetRef = useRef<ComponentRef<\"section\">>(null)\n    const [xValue, setXValue] = useState(0)\n\n    useLayoutEffect(() => {\n        if (typeof window === \"undefined\") return\n\n        const update = () => {\n            const containerWidth = window.innerWidth * 0.5\n            const itemWidth = firstItemRef.current?.getBoundingClientRect().width ?? 0\n            setXValue(containerWidth + itemWidth * 0.5 * childrenArray.length)\n        }\n\n        update()\n        window.addEventListener(\"resize\", update)\n        return () => window.removeEventListener(\"resize\", update)\n    }, [childrenArray.length])\n\n    const { scrollYProgress } = useScroll({\n        offset: [\"start start\", \"end end\"],\n        target: ownTargetRef,\n    })\n\n    const items = childrenArray.map((child, index) => (\n        <Item\n            xValue={xValue}\n            progress={scrollYProgress}\n            index={index}\n            key={index}\n            itemRef={index === 0 ? firstItemRef : undefined}\n        >\n            {child}\n        </Item>\n    ))\n\n    return (\n        <section\n            ref={ownTargetRef}\n            className=\"relative overflow-x-clip\"\n            style={{ height: `${scrollDistance + 100}vh`, margin: `${-overlap / 2}vh 0` }}\n        >\n            <div className=\"sticky top-0 flex h-screen items-center justify-center gap-2\">\n                {items}\n            </div>\n        </section>\n    )\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Atelier UI",
+      "url": "https://www.atelier-ui.com/en/docs/components/scroll/scattered-scroll",
+      "authorUrl": "https://www.atelier-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "scrollDistance",
+        "type": "number",
+        "default": "200",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "overlap",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scattered-scroll"
+  }
+}

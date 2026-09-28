@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spinning-ring",
+  "type": "registry:ui",
+  "title": "Spinning Ring",
+  "description": "Spinning Ring",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spinning-ring.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spinning-ring.tsx",
+      "content": "'use client'\n\nimport { motion } from 'framer-motion'\n\n// Credit:\n// https://www.animitives.com/components/perspective\n\ninterface AnimatedRingTextProps {\n    text?: string\n    radius?: number\n}\n\nexport const SpinningRingText: React.FC<AnimatedRingTextProps> = ({\n    text = 'Animated Ring Text ',\n    radius = 80,\n}) => {\n    const letters = text.split('')\n\n    return (\n        <div className=\"flex h-96 w-full items-center justify-center\">\n            <motion.div\n                className=\"relative flex items-center justify-center\"\n                initial={{\n                    rotateX: -110,\n                }}\n                animate={{\n                    rotateZ: 360,\n                }}\n                transition={{\n                    duration: 8,\n                    ease: 'linear',\n                    repeat: Infinity,\n                }}\n                style={{\n                    perspective: '1000px',\n                    transformStyle: 'preserve-3d',\n                    transformOrigin: 'center center',\n                }}\n            >\n                {letters.map((letter, index) => {\n                    const angle = (index / letters.length) * 360\n                    const transform = `rotate(${angle}deg) translateY(-${radius}px) rotateX(90deg)`\n\n                    return (\n                        <motion.div\n                            key={index}\n                            className=\"absolute\"\n                            style={{\n                                transform,\n                            }}\n                        >\n                            <span className=\"text-3xl font-bold uppercase text-black dark:text-white\">\n                                {letter}\n                            </span>\n                        </motion.div>\n                    )\n                })}\n            </motion.div>\n        </div>\n    )\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "animitives.com",
+      "url": "https://www.animitives.com/components/perspective",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "'Animated Ring Text '",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "default": "80",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spinning-ring"
+  }
+}

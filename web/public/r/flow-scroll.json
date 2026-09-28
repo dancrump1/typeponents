@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flow-scroll",
+  "type": "registry:ui",
+  "title": "Flow Scroll",
+  "description": "A scrollable component that displays images in a flowing grid layout as you scroll. Each image smoothly scales and slides into view, creating a dynamic waterfall effect where images flow from the sides and center themselves, making your gallery feel alive and responsive to every scroll movement.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/flow-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/flow-scroll.tsx",
+      "content": "'use client';\n\nimport { motion, MotionValue, useScroll, useTransform } from 'framer-motion';\r\nimport Image from 'next/image';\r\nimport React, { useRef } from 'react';\r\n\r\ninterface FlowScrollCardProps {\r\n  image: string;\r\n  index: number;\r\n  scrollYProgress: MotionValue<number>;\r\n  totalItems: number;\r\n}\r\n\r\nconst FlowScrollCard = ({ image, index, scrollYProgress, totalItems }: FlowScrollCardProps) => {\r\n  const ITEMS_PER_ROW = 3;\r\n  const prev = Math.max(0, index - ITEMS_PER_ROW);\r\n  const next = Math.min(totalItems - 1, index + ITEMS_PER_ROW);\r\n\r\n  const previousRow = Math.floor(prev / ITEMS_PER_ROW);\r\n  const currentRow = Math.floor(index / ITEMS_PER_ROW);\r\n  const nextRow = Math.floor(next / ITEMS_PER_ROW);\r\n\r\n  const totalRows = Math.floor(totalItems / ITEMS_PER_ROW);\r\n\r\n  const scrollRangePerRow = 1 / totalRows;\r\n\r\n  const entryAnimation = previousRow / totalRows - scrollRangePerRow;\r\n  const currPosition = currentRow / totalRows;\r\n  const holdAnimationStart = currPosition;\r\n  const holdAnimationEnd = currPosition;\r\n  const exitAnimation = nextRow / totalRows + scrollRangePerRow * 2;\r\n\r\n  const offsetToAdd = (scrollRangePerRow / totalItems) * (currentRow + 2);\r\n  const range = [\r\n    0,\r\n    entryAnimation - offsetToAdd,\r\n    holdAnimationStart - offsetToAdd,\r\n    holdAnimationEnd - offsetToAdd,\r\n    exitAnimation - offsetToAdd,\r\n    1\r\n  ];\r\n\r\n  const scale = useTransform(scrollYProgress, range, [0.5, 0.5, 1, 1, 0.5, 0.5]);\r\n\r\n  const isLeft = index % ITEMS_PER_ROW === 0;\r\n  const isRight = index % ITEMS_PER_ROW === 2;\r\n  const xTransform = useTransform(scrollYProgress, range, [\r\n    isLeft ? '100%' : isRight ? '-100%' : '0%',\r\n    isLeft ? '100%' : isRight ? '-100%' : '0%',\r\n    '0%',\r\n    '0%',\r\n    '0%',\r\n    '0%'\r\n  ]);\r\n  const rotate = useTransform(scrollYProgress, range, [\r\n    isLeft ? -20 : isRight ? 20 : 0,\r\n    isLeft ? -20 : isRight ? 20 : 0,\r\n    0,\r\n    0,\r\n    0,\r\n    0\r\n  ]);\r\n  const shadowY = useTransform(scrollYProgress, range, [50, 50, 25, 25, -50, -50]);\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        scale,\r\n        x: xTransform,\r\n        rotate,\r\n        zIndex: !isLeft && !isRight ? 1 : 0,\r\n        boxShadow: useTransform(shadowY, (value) => `0px ${value}px 40px 10px rgba(0, 0, 0, 0.1)`)\r\n      }}\r\n      className=\"w-full sm:max-w-48 md:max-w-60 h-32 sm:h-60 md:h-72 overflow-hidden rounded-2xl\"\r\n    >\r\n      <Image\r\n        src={image}\r\n        alt={image}\r\n        width={1000}\r\n        height={1000}\r\n        className=\"h-full w-full object-cover\"\r\n      />\r\n    </motion.div>\r\n  );\r\n};\r\n\r\ninterface FlowScrollProps {\r\n  images: string[];\r\n}\r\n\r\nconst FlowScroll = ({ images }: FlowScrollProps) => {\r\n  const ref = useRef<HTMLDivElement>(null);\r\n  const { scrollYProgress } = useScroll({\r\n    container: ref,\r\n    offset: ['start start', 'end end']\r\n  });\r\n\r\n  return (\r\n    <div ref={ref} className=\"w-full h-full overflow-y-auto flex justify-center py-36 pb-96\">\r\n      <div className=\"grid grid-cols-3 gap-4 md:gap-6 lg:gap-12 h-max\">\r\n        {images.map((image, index) => (\r\n          <FlowScrollCard\r\n            key={`sphere-scroll-card-${index}`}\r\n            image={image}\r\n            index={index}\r\n            scrollYProgress={scrollYProgress}\r\n            totalItems={images.length}\r\n          />\r\n        ))}\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default FlowScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Images scale and slide into a flowing grid as you scroll past them.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/flowScroll",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/flow-scroll"
+  }
+}

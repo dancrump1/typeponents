@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-557",
+  "type": "registry:component",
+  "title": "Comp 557",
+  "description": "Comp 557",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-557.tsx",
+      "content": "import {\r\n\tCropper,\r\n\tCropperCropArea,\r\n\tCropperDescription,\r\n\tCropperImage,\r\n} from \"@/components/ui/cropper\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"flex flex-col items-center gap-2\">\r\n\t\t\t<Cropper\r\n\t\t\t\tclassName=\"h-80\"\r\n\t\t\t\timage=\"https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/cropper-03_uym8r0.jpg\"\r\n\t\t\t>\r\n\t\t\t\t<CropperDescription />\r\n\t\t\t\t<CropperImage />\r\n\t\t\t\t<CropperCropArea className=\"border-blue-500\" />\r\n\t\t\t</Cropper>\r\n\r\n\t\t\t<p\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t>\r\n\t\t\t\tCropper with custom crop area color ∙{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\thref=\"https://github.com/origin-space/image-cropper\"\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t>\r\n\t\t\t\t\tAPI\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

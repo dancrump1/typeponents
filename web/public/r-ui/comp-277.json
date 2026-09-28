@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-277",
+  "type": "registry:component",
+  "title": "Comp 277",
+  "description": "Comp 277",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-277.tsx",
+      "content": "import { CircleAlertIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"rounded-md border px-4 py-3\">\r\n      <div className=\"flex gap-3\">\r\n        <CircleAlertIcon\r\n          className=\"mt-0.5 shrink-0 text-red-500 opacity-60\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        <div className=\"grow space-y-1\">\r\n          <p className=\"text-sm font-medium\">\r\n            Password does not meet requirements:\r\n          </p>\r\n          <ul className=\"text-muted-foreground list-inside list-disc text-sm\">\r\n            <li>Minimum 8 characters</li>\r\n            <li>Inlcude a special character</li>\r\n          </ul>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

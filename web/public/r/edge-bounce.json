@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "edge-bounce",
+  "type": "registry:ui",
+  "title": "Edge Bounce",
+  "description": "Wrapper that makes whatever sits inside it flinch away from the cursor the moment the pointer touches it.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/edge-bounce.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/edge-bounce.tsx",
+      "content": "\"use client\"\n\nimport { useAnimate, useMotionValue, useVelocity } from \"motion/react\"\nimport type React from \"react\"\nimport { type ComponentRef, type ReactNode, useEffect, useRef } from \"react\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/cursor/edge-bounce\n\nconst MAX_BOUNCE_SPEED = 1500\n\nexport type EdgeBounceProps = {\n    children: ReactNode\n    className?: string\n    pause?: number\n    outDuration?: number\n    inDuration?: number\n    bounce?: number\n    distance?: number\n    rotation?: number\n}\n\nexport function EdgeBounce({\n    children,\n    className,\n    pause = 0,\n    outDuration = 0.35,\n    inDuration = 1,\n    bounce = 0.3,\n    distance = 35,\n    rotation = 25,\n}: EdgeBounceProps) {\n    const [scope, animate] = useAnimate<ComponentRef<\"div\">>()\n    const isBouncing = useRef(false)\n    const touchInside = useRef(false)\n    const pointerX = useMotionValue(0)\n    const pointerY = useMotionValue(0)\n    const velocityX = useVelocity(pointerX)\n    const velocityY = useVelocity(pointerY)\n\n    const bounceFrom = async (fromX: number, fromY: number) => {\n        const element = scope.current\n        if (!element || isBouncing.current) return\n\n        const velX = velocityX.get()\n        const velY = velocityY.get()\n        const speed = Math.hypot(velX, velY)\n        const speedRatio = Math.min(speed / MAX_BOUNCE_SPEED, 1)\n\n        const rect = element.getBoundingClientRect()\n        const deltaX = rect.left + rect.width / 2 - fromX\n        const deltaY = rect.top + rect.height / 2 - fromY\n        const distanceFromCenter = Math.hypot(deltaX, deltaY)\n\n        if (distanceFromCenter === 0 || speed === 0) return\n\n        const tilt = (deltaY * velX - deltaX * velY) / (distanceFromCenter * speed)\n\n        isBouncing.current = true\n        await animate(\n            element,\n            {\n                x: (deltaX / distanceFromCenter) * distance * speedRatio,\n                y: (deltaY / distanceFromCenter) * distance * speedRatio,\n                rotate: tilt * rotation * speedRatio,\n            },\n            { duration: outDuration, ease: \"circOut\" },\n        )\n        isBouncing.current = false\n\n        animate(\n            element,\n            { x: 0, y: 0, rotate: 0 },\n            { type: \"spring\", duration: inDuration, bounce, delay: pause },\n        )\n    }\n\n    useEffect(() => {\n        const isOver = (event: PointerEvent) => {\n            const rect = scope.current?.getBoundingClientRect()\n            if (!rect) return false\n\n            return (\n                event.clientX >= rect.left &&\n                event.clientX <= rect.right &&\n                event.clientY >= rect.top &&\n                event.clientY <= rect.bottom\n            )\n        }\n\n        const handlePointerDown = (event: PointerEvent) => {\n            if (event.pointerType === \"touch\") touchInside.current = isOver(event)\n        }\n\n        const handlePointerMove = (event: PointerEvent) => {\n            pointerX.set(event.clientX)\n            pointerY.set(event.clientY)\n\n            if (event.pointerType !== \"touch\") return\n\n            const inside = isOver(event)\n            if (inside && !touchInside.current) bounceFrom(event.clientX, event.clientY)\n            touchInside.current = inside\n        }\n\n        window.addEventListener(\"pointerdown\", handlePointerDown)\n        window.addEventListener(\"pointermove\", handlePointerMove)\n\n        return () => {\n            window.removeEventListener(\"pointerdown\", handlePointerDown)\n            window.removeEventListener(\"pointermove\", handlePointerMove)\n        }\n    })\n\n    const handlePointerEnter = (event: React.PointerEvent<HTMLDivElement>) => {\n        if (event.pointerType !== \"touch\") bounceFrom(event.clientX, event.clientY)\n    }\n\n    return (\n        <div\n            ref={scope}\n            className={`table will-change-transform ${className ?? \"\"}`}\n            onPointerEnter={handlePointerEnter}\n        >\n            {children}\n        </div>\n    )\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "When the pointer crosses into the element it darts away from the entry point and tilts in the direction you were moving, further the faster you approached, then springs back to its resting place.",
+    "inspiration": {
+      "source": "Atelier UI",
+      "url": "https://www.atelier-ui.com/en/docs/components/cursor/edge-bounce",
+      "authorUrl": "https://www.atelier-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pause",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "outDuration",
+        "type": "number",
+        "default": "0.35",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "inDuration",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "bounce",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distance",
+        "type": "number",
+        "default": "35",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rotation",
+        "type": "number",
+        "default": "25",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/edge-bounce"
+  }
+}

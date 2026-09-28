@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-248",
+  "type": "registry:component",
+  "title": "Comp 248",
+  "description": "Comp 248",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-248.tsx",
+      "content": "import { Label } from \"@/components/ui/label\";\r\nimport { Slider } from \"@/components/ui/slider\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-4\">\r\n\t\t\t<Label>Slider with labels</Label>\r\n\t\t\t<div>\r\n\t\t\t\t<span\r\n\t\t\t\t\tclassName=\"text-muted-foreground mb-3 flex w-full items-center justify-between gap-2 text-xs font-medium\"\r\n\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<span>Low</span>\r\n\t\t\t\t\t<span>High</span>\r\n\t\t\t\t</span>\r\n\t\t\t\t<Slider\r\n\t\t\t\t\tdefaultValue={[50]}\r\n\t\t\t\t\tstep={10}\r\n\t\t\t\t\taria-label=\"Slider with labels\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/slider.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as SliderPrimitive from \"@radix-ui/react-slider\";\r\n\r\nconst Slider = React.forwardRef<\r\n\tReact.ElementRef<typeof SliderPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<SliderPrimitive.Root\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"relative flex w-full touch-none select-none items-center\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t>\r\n\t\t<SliderPrimitive.Track className=\"relative h-2 w-full grow overflow-hidden rounded-full bg-secondary\">\r\n\t\t\t<SliderPrimitive.Range className=\"absolute h-full bg-primary\" />\r\n\t\t</SliderPrimitive.Track>\r\n\t\t<SliderPrimitive.Thumb className=\"block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50\" />\r\n\t\t<SliderPrimitive.Thumb className=\"block h-5 w-5 rounded-full border-2 border-primary bg-background ring-offset-background transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50\" />\r\n\t</SliderPrimitive.Root>\r\n));\r\nSlider.displayName = SliderPrimitive.Root.displayName;\r\n\r\nexport { Slider };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

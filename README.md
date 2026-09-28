@@ -1,18 +1,21 @@
 # typeponents
 
-NestJS API that mirrors the component registry in `~/Testing/shadcn-style-lib` into a local SQLite database with TypeORM.
+The component library and the API that stores it, in one repo.
 
-The React library stays the place you edit components. This app reads the generated catalog and each component folder, then stores metadata and source so you can query them over HTTP.
+- `web/` is the Next.js registry. `/browse` redirects to `/library`, which is the catalog UI.
+- The NestJS app in this folder uses TypeORM and a local SQLite database (`data/typeponents.sqlite`).
 
-## Setup
+## Run both
 
 ```bash
 npm install
-npm run seed
-npm run start:dev
+npm install --prefix web
+npm run dev
 ```
 
-`npm run seed` replaces the local database with the current library. Point it somewhere else with `LIBRARY_PATH`. The database file defaults to `data/typeponents.sqlite` (`DATABASE_PATH`).
+That starts the API on port 3000 and the library on port 3008. Open http://localhost:3008/library.
+
+`npm run seed` reloads SQLite from `web/registry`. Override the library location with `LIBRARY_PATH` and the database file with `DATABASE_PATH`.
 
 ## API
 

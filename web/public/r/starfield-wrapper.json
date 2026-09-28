@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "starfield-wrapper",
+  "type": "registry:ui",
+  "title": "Starfield Wrapper",
+  "description": "A wrapper that puts your content over a starfield flying toward the viewer, with pale blue stars streaming out from the centre.",
+  "dependencies": [
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/starfield-wrapper.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/starfield-wrapper.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\n\n// Credit:\n// https://zenui.net/animations/background-animations\n\nconst StarfieldWarp = ({ children }) => {\n\tconst wrapperRef = useRef(null);\n\tconst canvasRef = useRef(null);\n\tconst [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });\n\tconst [dimensions, setDimensions] = useState({ width: 0, height: 0 });\n\tconst starsRef = useRef([]);\n\tconst warpSpeedRef = useRef(0);\n\tconst animationRef = useRef(null);\n\n\tuseEffect(() => {\n\t\tconst canvas = canvasRef.current;\n\t\tconst ctx = canvas.getContext(\"2d\");\n\n\t\tconst handleResize = () => {\n\t\t\tif (!wrapperRef.current) return;\n\n\t\t\tconst rect = wrapperRef.current.getBoundingClientRect();\n\t\t\tconst { width, height } = rect;\n\t\t\tconst devicePixelRatio = window.devicePixelRatio || 1;\n\n\t\t\tcanvas.width = width * devicePixelRatio;\n\t\t\tcanvas.height = height * devicePixelRatio;\n\n\t\t\tcanvas.style.width = `${width}px`;\n\t\t\tcanvas.style.height = `${height}px`;\n\n\t\t\tctx.setTransform(1, 0, 0, 1, 0, 0);\n\t\t\tctx.scale(devicePixelRatio, devicePixelRatio);\n\n\t\t\tsetDimensions({ width, height });\n\n\t\t\tinitStars(width, height);\n\t\t};\n\n\t\tconst initStars = (width, height) => {\n\t\t\tconst starCount = width < 768 ? 300 : 500;\n\t\t\tconst stars = [];\n\n\t\t\tfor (let i = 0; i < starCount; i++) {\n\t\t\t\tstars.push({\n\t\t\t\t\tx: Math.random() * width - width / 2,\n\t\t\t\t\ty: Math.random() * height - height / 2,\n\t\t\t\t\tz: Math.random() * 1000,\n\t\t\t\t\tsize: Math.random() * 2 + 1,\n\t\t\t\t\tcolor: `hsl(${Math.random() * 60 + 200}, 100%, ${Math.random() * 30 + 70}%)`,\n\t\t\t\t});\n\t\t\t}\n\n\t\t\tstarsRef.current = stars;\n\t\t\twarpSpeedRef.current = 0;\n\t\t};\n\n\t\thandleResize();\n\t\twindow.addEventListener(\"resize\", handleResize);\n\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"resize\", handleResize);\n\t\t\tif (animationRef.current) {\n\t\t\t\tcancelAnimationFrame(animationRef.current);\n\t\t\t}\n\t\t};\n\t}, []);\n\n\tuseEffect(() => {\n\t\tconst handleMouseMove = (e) => {\n\t\t\tif (!wrapperRef.current) return;\n\n\t\t\tconst rect = wrapperRef.current.getBoundingClientRect();\n\t\t\tsetMousePosition({\n\t\t\t\tx: e.clientX - rect.left,\n\t\t\t\ty: e.clientY - rect.top,\n\t\t\t});\n\t\t};\n\n\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\n\t\treturn () => window.removeEventListener(\"mousemove\", handleMouseMove);\n\t}, []);\n\n\tuseEffect(() => {\n\t\tif (!dimensions.width || !dimensions.height) return;\n\n\t\tconst canvas = canvasRef.current;\n\t\tconst ctx = canvas.getContext(\"2d\");\n\n\t\tconst animate = () => {\n\t\t\tctx.fillStyle = \"rgba(10, 10, 20, 0.2)\";\n\t\t\tctx.fillRect(0, 0, dimensions.width, dimensions.height);\n\n\t\t\tconst stars = starsRef.current;\n\t\t\tconst centerX = dimensions.width / 2;\n\t\t\tconst centerY = dimensions.height / 2;\n\n\t\t\tconst dx = mousePosition.x - centerX;\n\t\t\tconst dy = mousePosition.y - centerY;\n\t\t\tconst distance = Math.sqrt(dx * dx + dy * dy);\n\t\t\tconst maxDistance = Math.sqrt(centerX * centerX + centerY * centerY);\n\t\t\tconst targetWarpSpeed = Math.min(1, distance / maxDistance) * 15;\n\n\t\t\twarpSpeedRef.current +=\n\t\t\t\t(targetWarpSpeed - warpSpeedRef.current) * 0.05;\n\n\t\t\tfor (const star of stars) {\n\t\t\t\tstar.z -= warpSpeedRef.current;\n\n\t\t\t\tif (star.z <= 0 || star.z > 1000) {\n\t\t\t\t\tstar.x = Math.random() * dimensions.width - centerX;\n\t\t\t\t\tstar.y = Math.random() * dimensions.height - centerY;\n\t\t\t\t\tstar.z = 1000;\n\t\t\t\t\tstar.size = Math.random() * 2 + 1;\n\t\t\t\t}\n\n\t\t\t\tconst projectedX = (star.x / star.z) * 500 + centerX;\n\t\t\t\tconst projectedY = (star.y / star.z) * 500 + centerY;\n\t\t\t\tconst projectedSize = star.size * (1 - star.z / 1000);\n\n\t\t\t\tif (\n\t\t\t\t\tprojectedX < -10 ||\n\t\t\t\t\tprojectedX > dimensions.width + 10 ||\n\t\t\t\t\tprojectedY < -10 ||\n\t\t\t\t\tprojectedY > dimensions.height + 10\n\t\t\t\t)\n\t\t\t\t\tcontinue;\n\n\t\t\t\tif (warpSpeedRef.current > 5 && star.z < 500) {\n\t\t\t\t\tconst prevX =\n\t\t\t\t\t\t(star.x / (star.z + warpSpeedRef.current * 2)) * 500 +\n\t\t\t\t\t\tcenterX;\n\t\t\t\t\tconst prevY =\n\t\t\t\t\t\t(star.y / (star.z + warpSpeedRef.current * 2)) * 500 +\n\t\t\t\t\t\tcenterY;\n\n\t\t\t\t\tctx.beginPath();\n\t\t\t\t\tctx.moveTo(projectedX, projectedY);\n\t\t\t\t\tctx.lineTo(prevX, prevY);\n\t\t\t\t\tctx.strokeStyle = star.color;\n\t\t\t\t\tctx.lineWidth = projectedSize;\n\t\t\t\t\tctx.stroke();\n\t\t\t\t} else {\n\t\t\t\t\tctx.beginPath();\n\t\t\t\t\tctx.arc(projectedX, projectedY, projectedSize, 0, Math.PI * 2);\n\t\t\t\t\tctx.fillStyle = star.color;\n\t\t\t\t\tctx.fill();\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (warpSpeedRef.current > 1) {\n\t\t\t\tconst gradient = ctx.createRadialGradient(\n\t\t\t\t\tcenterX,\n\t\t\t\t\tcenterY,\n\t\t\t\t\t0,\n\t\t\t\t\tcenterX,\n\t\t\t\t\tcenterY,\n\t\t\t\t\t100 * warpSpeedRef.current\n\t\t\t\t);\n\t\t\t\tgradient.addColorStop(\n\t\t\t\t\t0,\n\t\t\t\t\t`rgba(100, 200, 255, ${warpSpeedRef.current * 0.05})`\n\t\t\t\t);\n\t\t\t\tgradient.addColorStop(1, \"rgba(100, 200, 255, 0)\");\n\n\t\t\t\tctx.fillStyle = gradient;\n\t\t\t\tctx.beginPath();\n\t\t\t\tctx.arc(\n\t\t\t\t\tcenterX,\n\t\t\t\t\tcenterY,\n\t\t\t\t\t100 * warpSpeedRef.current,\n\t\t\t\t\t0,\n\t\t\t\t\tMath.PI * 2\n\t\t\t\t);\n\t\t\t\tctx.fill();\n\t\t\t}\n\n\t\t\tanimationRef.current = requestAnimationFrame(animate);\n\t\t};\n\n\t\tanimate();\n\n\t\treturn () => {\n\t\t\tif (animationRef.current) {\n\t\t\t\tcancelAnimationFrame(animationRef.current);\n\t\t\t}\n\t\t};\n\t}, [dimensions, mousePosition]);\n\n\treturn (\n\t\t<div\n\t\t\tref={wrapperRef}\n\t\t\tclassName=\"relative w-full min-h-[500px] flex items-center justify-center flex-col overflow-hidden rounded-high bg-background\"\n\t\t>\n\t\t\t<canvas ref={canvasRef} className=\"absolute inset-0 w-full h-full\" />\n\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n\nexport default StarfieldWarp;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "The stars drift on their own, and moving the pointer away from the centre speeds the flight up until the stars stretch into streaks and a soft blue glow blooms behind them. Bringing the pointer back to the middle eases it to a crawl.",
+    "inspiration": {
+      "source": "ZenUI",
+      "url": "https://zenui.net/animations/background-animations",
+      "authorUrl": "https://zenui.net",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/starfield-wrapper"
+  }
+}

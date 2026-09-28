@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "inner-glow",
+  "type": "registry:ui",
+  "title": "Inner Glow",
+  "description": "Inner Glow",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/inner-glow.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/inner-glow.tsx",
+      "content": "import { cn } from \"@/lib/utils\";\n\n// Credit:\n// https://starui.link/docs/components/inner-glow\n\n// add to scss file\n// @property --hue-rotation {\n//   syntax: \"<angle>\";\n//   initial-value: 0turn;\n//   inherits: false;\n// }\n\n// @theme {\n//   --animate-inner-glow: inner-glow 4s linear infinite;\n//   @keyframes inner-glow {\n//     from {\n//       --hue-rotation: 0turn;\n//     }\n//     to {\n//       --hue-rotation: 1turn;\n//     }\n//   }\n// }\ninterface InnerGlowProps extends React.HTMLAttributes<HTMLDivElement> {}\n\nfunction InnerGlow({ className, ...props }: InnerGlowProps) {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"absolute -inset-3 border-10 pointer-events-none blur-md [border-image:conic-gradient(from_var(--hue-rotation)_in_hsl_longer_hue,red-600,red-600)_1] animate-inner-glow\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\t{...props}\n\t\t/>\n\t);\n}\n\nexport { InnerGlow };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/inner-glow",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/inner-glow"
+  }
+}

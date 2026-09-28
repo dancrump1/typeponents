@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "3d-card",
+  "type": "registry:ui",
+  "title": "3D Card",
+  "description": "Card wrapper that tilts in 3D toward the pointer, with its text and image layered at different depths.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/3d-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/3d-card.tsx",
+      "content": "\"use client\";\n\nimport React, {\n\tcreateContext,\n\tuseContext,\n\tuseEffect,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// https://ui.aceternity.com/components/3d-card-effect\n\nconst MouseEnterContext = createContext<\n\t[boolean, React.Dispatch<React.SetStateAction<boolean>>] | undefined\n>(undefined);\n\nexport const CardContainer = ({\n\tchildren,\n\tclassName,\n\tcontainerClassName,\n\tid,\n\ttitle,\n}: {\n\tchildren?: React.ReactNode;\n\tclassName?: string;\n\tcontainerClassName?: string;\n\tid?: string;\n\ttitle?: string;\n}) => {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst [isMouseEntered, setIsMouseEntered] = useState(false);\n\n\tconst handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {\n\t\tif (!containerRef.current) return;\n\t\tconst { left, top, width, height } =\n\t\t\tcontainerRef.current.getBoundingClientRect();\n\t\tconst x = (e.clientX - left - width / 2) / 25;\n\t\tconst y = (e.clientY - top - height / 2) / 25;\n\t\tcontainerRef.current.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;\n\t};\n\n\tconst handleMouseEnter = () => {\n\t\tsetIsMouseEntered(true);\n\t\tif (!containerRef.current) return;\n\t};\n\n\tconst handleMouseLeave = () => {\n\t\tif (!containerRef.current) return;\n\t\tsetIsMouseEntered(false);\n\t\tcontainerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;\n\t};\n\treturn (\n\t\t<MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>\n\t\t\t<div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"pt-20 flex items-center justify-center\",\n\t\t\t\t\tcontainerClassName\n\t\t\t\t)}\n\t\t\t\tstyle={{\n\t\t\t\t\tperspective: \"1000px\",\n\t\t\t\t}}\n\t\t\t\tid={id}\n\t\t\t\ttitle={title}\n\t\t\t>\n\t\t\t\t<div\n\t\t\t\t\tref={containerRef}\n\t\t\t\t\tonMouseEnter={handleMouseEnter}\n\t\t\t\t\tonMouseMove={handleMouseMove}\n\t\t\t\t\tonMouseLeave={handleMouseLeave}\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"flex items-center justify-center relative transition-transform duration-200 ease-linear\",\n\t\t\t\t\t\tclassName\n\t\t\t\t\t)}\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttransformStyle: \"preserve-3d\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{children}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</MouseEnterContext.Provider>\n\t);\n};\n\nexport const CardBody = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"transform-3d  *:transform-3d\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n\nexport const CardItem = ({\n\tas: Tag = \"div\",\n\tchildren,\n\tclassName,\n\ttranslateX = 0,\n\ttranslateY = 0,\n\ttranslateZ = 0,\n\trotateX = 0,\n\trotateY = 0,\n\trotateZ = 0,\n\t...rest\n}: {\n\tas?: React.ElementType;\n\tchildren: React.ReactNode;\n\tclassName?: string;\n\ttranslateX?: number | string;\n\ttranslateY?: number | string;\n\ttranslateZ?: number | string;\n\trotateX?: number | string;\n\trotateY?: number | string;\n\trotateZ?: number | string;\n\t[key: string]: any;\n}) => {\n\tconst ref = useRef<HTMLDivElement>(null);\n\tconst [isMouseEntered] = useMouseEnter();\n\n\tuseEffect(() => {\n\t\thandleAnimations();\n\t}, [isMouseEntered]);\n\n\tconst handleAnimations = () => {\n\t\tif (!ref.current) return;\n\t\tif (isMouseEntered) {\n\t\t\tref.current.style.transform = `translateX(${translateX}px) translateY(${translateY}px) translateZ(${translateZ}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) rotateZ(${rotateZ}deg)`;\n\t\t} else {\n\t\t\tref.current.style.transform = `translateX(0px) translateY(0px) translateZ(0px) rotateX(0deg) rotateY(0deg) rotateZ(0deg)`;\n\t\t}\n\t};\n\n\treturn (\n\t\t<Tag\n\t\t\tref={ref}\n\t\t\tclassName={cn(\"transition duration-200 ease-linear\", className)}\n\t\t\t{...rest}\n\t\t>\n\t\t\t{children}\n\t\t</Tag>\n\t);\n};\n\n// Create a hook to use the context\nexport const useMouseEnter = () => {\n\tconst context = useContext(MouseEnterContext);\n\tif (context === undefined) {\n\t\tthrow new Error(\"useMouseEnter must be used within a MouseEnterProvider\");\n\t}\n\treturn context;\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards",
+      "3D & Canvas"
+    ],
+    "tags": [
+      "featured",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "Moving the pointer across the card tilts it to follow, and the title, image and buttons lift forward off the surface; the card snaps flat again when the pointer leaves.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/3d-card-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "id",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 9,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/3d-card"
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "galaxy-button",
+  "type": "registry:ui",
+  "title": "Galaxy Button",
+  "description": "Pill button filled with a colour gradient, ringed by tiny stars that stream inward past the label.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/galaxy-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/galaxy-button.tsx",
+      "content": "import React, { useEffect, useMemo, useRef, useState } from \"react\";\n\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://eclairui.gopx.dev/components/buttons/galaxy-button\n\ninterface Star {\n\tid: number;\n\tx: number;\n\ty: number;\n\tsize: number;\n\tangle: number;\n\tdistance: number;\n\tspeed: number;\n}\n\ninterface GalaxyButtonProps {\n\ttext: string;\n\tgradientColors: string[];\n\tshimmerColor?: string;\n\ttextColor?: string;\n\tfontSize?: string;\n\tpadding?: string;\n\tstarCount?: number;\n\tclassName?: string;\n\tonClick?: () => void;\n}\n\nfunction useIsHovered() {\n\tconst [isHovered, setIsHovered] = useState(false);\n\treturn {\n\t\tisHovered,\n\t\thandleMouseEnter: () => setIsHovered(true),\n\t\thandleMouseLeave: () => setIsHovered(false),\n\t};\n}\n\nconst shiverVariants = {\n\thover: {\n\t\tx: [0, -1, 1, -1, 1, 0],\n\t\ty: [0, 1, -1, 1, -1, 0],\n\t\ttransition: {\n\t\t\tx: { repeat: Infinity, repeatType: \"mirror\", duration: 0.4 },\n\t\t\ty: {\n\t\t\t\trepeat: Infinity,\n\t\t\t\trepeatType: \"mirror\",\n\t\t\t\tduration: 0.4,\n\t\t\t\tdelay: 0.1,\n\t\t\t},\n\t\t},\n\t},\n};\n\nexport default function GalaxyButton({\n\ttext,\n\tgradientColors,\n\tshimmerColor = \"white\",\n\ttextColor = \"white\",\n\tfontSize = \"1rem\",\n\tpadding = \"0.875rem 2.5rem\",\n\tstarCount = 100,\n\tclassName = \"\",\n\tonClick,\n}: GalaxyButtonProps) {\n\tconst buttonRef = useRef<HTMLButtonElement>(null);\n\tconst [stars, setStars] = useState<Star[]>([]);\n\tconst { isHovered, handleMouseEnter, handleMouseLeave } = useIsHovered();\n\n\tconst shadowStyles = useMemo(() => {\n\t\tconst createShadow = (opacity: number) =>\n\t\t\tgradientColors\n\t\t\t\t.map(\n\t\t\t\t\t(color) =>\n\t\t\t\t\t\t`inset 0 0 10px ${color}${Math.round(opacity * 255)\n\t\t\t\t\t\t\t.toString(16)\n\t\t\t\t\t\t\t.padStart(2, \"0\")}`\n\t\t\t\t)\n\t\t\t\t.join(\",\");\n\n\t\treturn {\n\t\t\tdefault: createShadow(0.5),\n\t\t\thover: createShadow(0.7),\n\t\t\tactive: createShadow(0.9),\n\t\t};\n\t}, [gradientColors]);\n\n\tuseEffect(() => {\n\t\tconst generateStars = () => {\n\t\t\tif (buttonRef.current) {\n\t\t\t\tconst { width, height } = buttonRef.current.getBoundingClientRect();\n\t\t\t\tconst centerX = width / 2;\n\t\t\t\tconst centerY = height / 2;\n\t\t\t\tsetStars(\n\t\t\t\t\tArray.from({ length: starCount }, (_, i) => {\n\t\t\t\t\t\tconst angle = Math.random() * 2 * Math.PI;\n\t\t\t\t\t\tconst distance = Math.max(width, height) / 2;\n\t\t\t\t\t\treturn {\n\t\t\t\t\t\t\tid: i,\n\t\t\t\t\t\t\tx: centerX + Math.cos(angle) * distance,\n\t\t\t\t\t\t\ty: centerY + Math.sin(angle) * distance,\n\t\t\t\t\t\t\tsize: Math.random() * 2 + 1,\n\t\t\t\t\t\t\tangle,\n\t\t\t\t\t\t\tdistance,\n\t\t\t\t\t\t\tspeed: Math.random() * 0.5 + 0.5,\n\t\t\t\t\t\t};\n\t\t\t\t\t})\n\t\t\t\t);\n\t\t\t}\n\t\t};\n\t\tgenerateStars();\n\t\twindow.addEventListener(\"resize\", generateStars);\n\t\treturn () => window.removeEventListener(\"resize\", generateStars);\n\t}, [starCount]);\n\n\tconst renderStars = (duration: (star: Star) => number) =>\n\t\tstars.map((star) => (\n\t\t\t<motion.div\n\t\t\t\tkey={star.id}\n\t\t\t\tclassName=\"absolute rounded-full bg-background\"\n\t\t\t\tstyle={{\n\t\t\t\t\tleft: star.x,\n\t\t\t\t\ttop: star.y,\n\t\t\t\t\twidth: star.size,\n\t\t\t\t\theight: star.size,\n\t\t\t\t}}\n\t\t\t\tanimate={{\n\t\t\t\t\tx: -Math.cos(star.angle) * star.distance * star.speed,\n\t\t\t\t\ty: -Math.sin(star.angle) * star.distance * star.speed,\n\t\t\t\t\tscale: [1, 0],\n\t\t\t\t\topacity: [1, 0],\n\t\t\t\t}}\n\t\t\t\ttransition={{\n\t\t\t\t\tduration: duration(star),\n\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\tease: \"linear\",\n\t\t\t\t\tdelay: Math.random() * 2,\n\t\t\t\t}}\n\t\t\t/>\n\t\t));\n\n\tconst gradientStyle = `linear-gradient(to right, ${gradientColors.join(\n\t\t\", \"\n\t)})`;\n\n\treturn (\n\t\t<motion.button\n\t\t\tref={buttonRef}\n\t\t\tclassName={`group relative z-0 overflow-hidden rounded-full focus:outline-hidden ${className}`}\n\t\t\tstyle={\n\t\t\t\t{\n\t\t\t\t\t\"--spread\": \"90deg\",\n\t\t\t\t\t\"--shimmer-color\": shimmerColor,\n\t\t\t\t\t\"--radius\": \"9999px\",\n\t\t\t\t\t\"--speed\": \"3s\",\n\t\t\t\t\t\"--cut\": \"0.05em\",\n\t\t\t\t\t\"--bg\": \"white\",\n\t\t\t\t\tbackground: gradientStyle,\n\t\t\t\t\tpadding: padding,\n\t\t\t\t\tfontSize: fontSize,\n\t\t\t\t\tcolor: textColor,\n\t\t\t\t} as React.CSSProperties\n\t\t\t}\n\t\t\twhileTap={{ scale: 0.95 }}\n\t\t\twhileHover={{\n\t\t\t\tboxShadow: `0 0 40px ${gradientColors[0]}70, 0 0 40px ${gradientColors[1]}50, 0 0 60px ${gradientColors[2]}30`,\n\t\t\t}}\n\t\t\tonMouseEnter={handleMouseEnter}\n\t\t\tonMouseLeave={handleMouseLeave}\n\t\t\tonClick={onClick}\n\t\t>\n\t\t\t<div className=\"absolute inset-0.5 rounded-full bg-background\" />\n\n\t\t\t<div className=\"absolute inset-0 -z-30 overflow-visible blur-[0px] @container-[size]\">\n\t\t\t\t<div className=\"absolute inset-0 h-[100cqh] animate-slide aspect-[1] rounded-none [mask:none]\">\n\t\t\t\t\t<div className=\"animate-spin-around absolute -inset-full w-auto rotate-0 [background:conic-gradient(from_calc(270deg-(var(--spread)*0.5)),transparent_0,var(--shimmer-color)_var(--spread),transparent_var(--spread))] [translate:0_0]\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div\n\t\t\t\tclassName=\"absolute inset-0 rounded-full transition-shadow duration-300 ease-in-out\"\n\t\t\t\tstyle={{\n\t\t\t\t\tboxShadow: shadowStyles.default,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<div\n\t\t\t\tclassName=\"absolute inset-0 rounded-full opacity-0 transition-[box-shadow,opacity] duration-300 ease-in-out group-hover:opacity-100\"\n\t\t\t\tstyle={{\n\t\t\t\t\tboxShadow: shadowStyles.hover,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<div\n\t\t\t\tclassName=\"absolute inset-0 rounded-full opacity-0 transition-[box-shadow,opacity] duration-300 ease-in-out group-active:opacity-100\"\n\t\t\t\tstyle={{\n\t\t\t\t\tboxShadow: shadowStyles.active,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<div className=\"absolute inset-0 overflow-hidden rounded-full\">\n\t\t\t\t<div className=\"absolute -inset-full animate-galaxy-glare bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_50%)] opacity-0 group-hover:opacity-100 transition-opacity duration-1000\" />\n\t\t\t</div>\n\n\t\t\t<div className=\"absolute inset-0 opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100\">\n\t\t\t\t{renderStars((star) => star.speed)}\n\t\t\t</div>\n\n\t\t\t<div className=\"absolute inset-0 opacity-100 transition-opacity duration-300 ease-in-out group-hover:opacity-0\">\n\t\t\t\t{renderStars((star) => 2 / star.speed)}\n\t\t\t</div>\n\n\t\t\t<motion.span\n\t\t\t\tclassName=\"relative z-10 font-light inline-block\"\n\t\t\t\tvariants={shiverVariants}\n\t\t\t\tanimate={isHovered ? \"hover\" : \"initial\"}\n\t\t\t>\n\t\t\t\t<span className=\"relative z-10 font-light inline-block transition-transform duration-500 ease-in-out group-hover:scale-90 group-hover:animate-shiver\">\n\t\t\t\t\t{text}\n\t\t\t\t</span>\n\t\t\t</motion.span>\n\t\t</motion.button>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering speeds the stars up, wraps the button in a coloured glow and makes the label shrink and jitter in place; pressing it sinks the button slightly and deepens the inner glow.",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/buttons/galaxy-button",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "gradientColors",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "shimmerColor",
+        "type": "string",
+        "default": "\"white\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textColor",
+        "type": "string",
+        "default": "\"white\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontSize",
+        "type": "string",
+        "default": "\"1rem\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "padding",
+        "type": "string",
+        "default": "\"0.875rem 2.5rem\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "starCount",
+        "type": "number",
+        "default": "100",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/galaxy-button"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-217",
+  "type": "registry:component",
+  "title": "Comp 217",
+  "description": "Comp 217",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-217.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport {\r\n\tSelect,\r\n\tSelectContent,\r\n\tSelectItem,\r\n\tSelectTrigger,\r\n\tSelectValue,\r\n} from \"@/components/ui/select\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"border-input bg-background focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive relative rounded-md border shadow-2xs transition-[color,box-shadow] outline-hidden focus-within:ring-[3px] has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 *:has-[input:is(:disabled)]:pointer-events-none\">\r\n\t\t\t<label\r\n\t\t\t\thtmlFor={id}\r\n\t\t\t\tclassName=\"text-foreground block px-3 pt-2 text-xs font-medium\"\r\n\t\t\t>\r\n\t\t\t\tSelect with inset label\r\n\t\t\t</label>\r\n\t\t\t<Select>\r\n\t\t\t\t<SelectTrigger\r\n\t\t\t\t\tid={id}\r\n\t\t\t\t\tclassName=\"border-none bg-transparent shadow-none focus:ring-0 focus:ring-offset-0\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<SelectValue placeholder=\"Select framework\" />\r\n\t\t\t\t</SelectTrigger>\r\n\t\t\t\t<SelectContent>\r\n\t\t\t\t\t<SelectItem value=\"1\">React</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"2\">Next.js</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"3\">Astro</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"4\">Gatsby</SelectItem>\r\n\t\t\t\t</SelectContent>\r\n\t\t\t</Select>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

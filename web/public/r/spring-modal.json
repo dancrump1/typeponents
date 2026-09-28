@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spring-modal",
+  "type": "registry:ui",
+  "title": "Spring Modal",
+  "description": "Spring Modal",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spring-modal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spring-modal.tsx",
+      "content": "import { Dispatch, SetStateAction, useState } from \"react\";\n\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// www.hover.dev/components/modals#spring-modal\n\nconst ExampleWrapper = () => {\n\tconst [isOpen, setIsOpen] = useState(false);\n\treturn (\n\t\t<div className=\"px-4 py-64 bg-slate-900 grid place-content-center\">\n\t\t\t<button\n\t\t\t\tonClick={() => setIsOpen(true)}\n\t\t\t\tclassName=\"bg-linear-to-r from-violet-600 to-indigo-600 text-foreground font-medium px-4 py-2 rounded hover:opacity-90 transition-opacity\"\n\t\t\t>\n\t\t\t\tOpen Modal\n\t\t\t</button>\n\t\t\t<SpringModal isOpen={isOpen} setIsOpen={setIsOpen} />\n\t\t</div>\n\t);\n};\n\nexport const SpringModal = ({\n\tisOpen,\n\tsetIsOpen,\n\tchildren,\n}: {\n\tchildren: any;\n\tisOpen: boolean;\n\tsetIsOpen: Dispatch<SetStateAction<boolean>>;\n}) => {\n\treturn (\n\t\t<AnimatePresence>\n\t\t\t{isOpen && (\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\t\texit={{ opacity: 0 }}\n\t\t\t\t\tonClick={() => setIsOpen(false)}\n\t\t\t\t\tclassName=\"bg-slate-900/20 backdrop-blur-sm p-8 fixed inset-0 z-50 grid place-items-center overflow-y-scroll cursor-pointer\"\n\t\t\t\t>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tinitial={{ scale: 0, rotate: \"12.5deg\" }}\n\t\t\t\t\t\tanimate={{ scale: 1, rotate: \"0deg\" }}\n\t\t\t\t\t\texit={{ scale: 0, rotate: \"0deg\" }}\n\t\t\t\t\t\tonClick={(e) => e.stopPropagation()}\n\t\t\t\t\t\tclassName=\"bg-linear-to-br from-violet-600 to-indigo-600 text-foreground p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<div className=\"relative z-10\">{children}</div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t</motion.div>\n\t\t\t)}\n\t\t</AnimatePresence>\n\t);\n};\n\nexport default ExampleWrapper;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spring-modal"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-272",
+  "type": "registry:component",
+  "title": "Comp 272",
+  "description": "Comp 272",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-272.tsx",
+      "content": "import { CircleCheckIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"rounded-md border border-emerald-500/50 px-4 py-3 text-emerald-600\">\r\n      <p className=\"text-sm\">\r\n        <CircleCheckIcon\r\n          className=\"me-3 -mt-0.5 inline-flex opacity-60\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        Completed successfully!\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

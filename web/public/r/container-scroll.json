@@ -1,0 +1,59 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "container-scroll",
+  "type": "registry:ui",
+  "title": "Container Scroll",
+  "description": "Heading above a large device-style frame, tipped back in 3D, holding a grid of profile cards.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/container-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/container-scroll.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useRef } from \"react\";\r\n\r\nimport { motion, useScroll, useTransform } from \"motion/react\";\r\n\r\n// https://ui.aceternity.com/components/container-scroll-animation\r\n\r\nexport const ContainerScroll = ({\r\n\tusers,\r\n\ttitleComponent,\r\n}: {\r\n\tusers: {\r\n\t\tname: string;\r\n\t\tdesignation: string;\r\n\t\timage: string;\r\n\t\tbadge?: string;\r\n\t}[];\r\n\ttitleComponent: string | React.ReactNode;\r\n}) => {\r\n\tconst containerRef = useRef<any>(null);\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: containerRef,\r\n\t});\r\n\tconst [isMobile, setIsMobile] = React.useState(false);\r\n\r\n\tReact.useEffect(() => {\r\n\t\tconst checkMobile = () => {\r\n\t\t\tsetIsMobile(window.innerWidth <= 768);\r\n\t\t};\r\n\t\tcheckMobile();\r\n\t\twindow.addEventListener(\"resize\", checkMobile);\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"resize\", checkMobile);\r\n\t\t};\r\n\t}, []);\r\n\r\n\tconst scaleDimensions = () => {\r\n\t\treturn isMobile ? [0.7, 0.9] : [1.05, 1];\r\n\t};\r\n\r\n\tconst rotate = useTransform(scrollYProgress, [0, 1], [20, 0]);\r\n\tconst scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());\r\n\tconst translate = useTransform(scrollYProgress, [0, 1], [0, -100]);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"h-240 md:h-320 flex items-center justify-center relative p-2 md:p-20\"\r\n\t\t\tref={containerRef}\r\n\t\t>\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"py-10 md:py-40 w-full relative\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tperspective: \"1000px\",\r\n\t\t\t\t}}\r\n\t\t\t>\r\n\t\t\t\t<Header translate={translate} titleComponent={titleComponent} />\r\n\t\t\t\t<Card\r\n\t\t\t\t\trotate={rotate}\r\n\t\t\t\t\ttranslate={translate}\r\n\t\t\t\t\tscale={scale}\r\n\t\t\t\t\tusers={users}\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport const Header = ({ translate, titleComponent }: any) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tstyle={{\r\n\t\t\t\ttranslateY: translate,\r\n\t\t\t}}\r\n\t\t\tclassName=\"div max-w-5xl mx-auto text-center\"\r\n\t\t>\r\n\t\t\t{titleComponent}\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport const Card = ({\r\n\trotate,\r\n\tscale,\r\n\ttranslate,\r\n\tusers = [\r\n\t\t{\r\n\t\t\tbadge: \"something\",\r\n\t\t\timage: \"itjustworks.jpg\",\r\n\t\t\tname: \"oogity boogity\",\r\n\t\t\tdesignation: \"designated drinker\",\r\n\t\t},\r\n\t],\r\n}: {\r\n\trotate: any;\r\n\tscale: any;\r\n\ttranslate: any;\r\n\tusers: {\r\n\t\tname: string;\r\n\t\tdesignation: string;\r\n\t\timage: string;\r\n\t\tbadge?: string;\r\n\t}[];\r\n}) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tstyle={{\r\n\t\t\t\trotateX: rotate, // rotate in X-axis\r\n\t\t\t\tscale,\r\n\t\t\t\tboxShadow:\r\n\t\t\t\t\t\"0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003\",\r\n\t\t\t}}\r\n\t\t\tclassName=\"max-w-5xl -mt-12 mx-auto h-120 md:h-160 w-full border-4 border-[#6C6C6C] p-6 bg-background rounded-[30px] shadow-2xl\"\r\n\t\t>\r\n\t\t\t<div className=\"bg-background h-full w-full rounded-2xl grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 overflow-hidden p-4\">\r\n\t\t\t\t{users.map((user, idx: number) => (\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tkey={`user-${idx}`}\r\n\t\t\t\t\t\tclassName=\"bg-background rounded-md cursor-pointer relative\"\r\n\t\t\t\t\t\tstyle={{ translateY: translate }}\r\n\t\t\t\t\t\twhileHover={{\r\n\t\t\t\t\t\t\tboxShadow:\r\n\t\t\t\t\t\t\t\t\"0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div className=\"absolute top-2 right-2 rounded-full text-xs font-bold bg-background px-2 py-1\">\r\n\t\t\t\t\t\t\t{user.badge}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tsrc={user.image}\r\n\t\t\t\t\t\t\tclassName=\"rounded-tr-md rounded-tl-md text-sm \"\r\n\t\t\t\t\t\t\talt=\"thumbnail\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<div className=\"p-4\">\r\n\t\t\t\t\t\t\t<h1 className=\"font-semibold text-sm \">{user.name}</h1>\r\n\t\t\t\t\t\t\t<h2 className=\" text-foreground text-xs \">\r\n\t\t\t\t\t\t\t\t{user.designation}\r\n\t\t\t\t\t\t\t</h2>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "As you scroll past the section the frame rotates up from tipped-back toward flat and grows to fill the space, while the heading and the cards inside drift upward, as if the screen were standing up to face you.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/container-scroll-animation",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "users",
+        "type": "{ name: string; designation: string; image: string; badge…",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "titleComponent",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/container-scroll"
+  }
+}

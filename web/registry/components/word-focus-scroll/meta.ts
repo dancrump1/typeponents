@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "word-focus-scroll",
+	title: "Word Focus Scroll",
+	description: "A scroll-driven text focusing component where individual words scale up, unblur, and fade in sequentially on scroll and lock into focus.",
+	interaction: "Words dynamically focus (fade in, scale up, and unblur) one by one in a staggered sequence relative to scroll progress, remaining fully focused once revealed.",
+	categories: ["Text Animations"],
+	tags: ["scroll-driven"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/word-focus-scroll",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "text", type: "string", default: "\"\"" },
+		{ name: "minScale", type: "number", default: "0.85" },
+		{ name: "maxBlur", type: "number", default: "6" },
+		{ name: "minOpacity", type: "number", default: "0" },
+		{ name: "staggerFactor", type: "number", default: "0.8" },
+		{ name: "wordDuration", type: "number", default: "0.1" },
+		{ name: "itemClassName", type: "string" },
+		{ name: "scrollContainerRef", type: "React.RefObject<HTMLElement | null>" },
+		{ name: "offset", type: "((number | (`${number}` | (\"start\" | \"end\" | \"center\") | …", default: "[\"start 90%\", \"end 60%\"]" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

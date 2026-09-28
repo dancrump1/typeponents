@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-446",
+  "type": "registry:component",
+  "title": "Comp 446",
+  "description": "Comp 446",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-446.tsx",
+      "content": "import {\r\n\tBreadcrumb,\r\n\tBreadcrumbEllipsis,\r\n\tBreadcrumbItem,\r\n\tBreadcrumbLink,\r\n\tBreadcrumbList,\r\n\tBreadcrumbPage,\r\n\tBreadcrumbSeparator,\r\n} from \"@/components/ui/breadcrumb\";\r\nimport {\r\n\tDropdownMenu,\r\n\tDropdownMenuContent,\r\n\tDropdownMenuItem,\r\n\tDropdownMenuTrigger,\r\n} from \"@/components/ui/dropdown-menu\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Breadcrumb>\r\n\t\t\t<BreadcrumbList>\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">Home</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<DropdownMenu>\r\n\t\t\t\t\t\t<DropdownMenuTrigger className=\"hover:text-foreground\">\r\n\t\t\t\t\t\t\t<BreadcrumbEllipsis />\r\n\t\t\t\t\t\t\t<span className=\"sr-only\">Toggle menu</span>\r\n\t\t\t\t\t\t</DropdownMenuTrigger>\r\n\t\t\t\t\t\t<DropdownMenuContent align=\"start\">\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">Documentation</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">Themes</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">GitHub</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t</DropdownMenuContent>\r\n\t\t\t\t\t</DropdownMenu>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">Components</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbPage>Breadcrumb</BreadcrumbPage>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t</BreadcrumbList>\r\n\t\t</Breadcrumb>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

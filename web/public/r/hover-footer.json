@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-footer",
+  "type": "registry:ui",
+  "title": "Hover Footer",
+  "description": "Hover Footer",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/text-hover.json",
+    "text-hover"
+  ],
+  "files": [
+    {
+      "path": "components/ui/hover-footer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-footer.tsx",
+      "content": "import React from \"react\";\n\nimport {\n\tDribbble,\n\tFacebook,\n\tGlobe,\n\tInstagram,\n\tMail,\n\tMapPin,\n\tPhone,\n\tTwitter,\n} from \"lucide-react\";\n\nimport { TextHoverEffect } from \"@/components/ui/text-hover\";\n\n// Credit:\n// https://nurui.vercel.app/docs/hover-footer\n\nfunction HoverFooter() {\n\treturn (\n\t\t<footer className=\"bg-[#0F0F11]/10 relative h-fit rounded-3xl overflow-hidden m-8\">\n\t\t\t<div className=\"max-w-7xl mx-auto p-14 z-40 relative\">\n\t\t\t\t{/* Main grid for the footer content */}\n\n\t\t\t\t<div className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 lg:gap-16 pb-12\">\n\t\t\t\t\t{/* Section 1: Pollen brand and description */}\n\n\t\t\t\t\t<div className=\"flex flex-col space-y-4\">\n\t\t\t\t\t\t<div className=\"flex items-center space-x-2\">\n\t\t\t\t\t\t\t<span className=\"text-[#3ca2fa] text-3xl font-extrabold\">\n\t\t\t\t\t\t\t\t&hearts;\n\t\t\t\t\t\t\t</span>\n\n\t\t\t\t\t\t\t<span className=\"text-white text-3xl font-bold\">\n\t\t\t\t\t\t\t\tNur/ui\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t<p className=\"text-sm leading-relaxed\">\n\t\t\t\t\t\t\tNur UI is a modern React and Next.js based UI component\n\t\t\t\t\t\t\tlibrary.\n\t\t\t\t\t\t</p>\n\t\t\t\t\t</div>\n\n\t\t\t\t\t{/* Section 2: About Us links */}\n\n\t\t\t\t\t<div>\n\t\t\t\t\t\t<h4 className=\"text-white text-lg font-semibold mb-6\">\n\t\t\t\t\t\t\tAbout Us\n\t\t\t\t\t\t</h4>\n\n\t\t\t\t\t\t<ul className=\"space-y-3\">\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tCompany History\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tMeet the Team\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tEmployee Handbook\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tCareers\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</div>\n\n\t\t\t\t\t{/* Section 3: Helpful Links */}\n\n\t\t\t\t\t<div>\n\t\t\t\t\t\t<h4 className=\"text-white text-lg font-semibold mb-6\">\n\t\t\t\t\t\t\tHelpful Links\n\t\t\t\t\t\t</h4>\n\n\t\t\t\t\t\t<ul className=\"space-y-3\">\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tFAQs\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tSupport\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors relative\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\tLive Chat\n\t\t\t\t\t\t\t\t\t<span className=\"absolute top-0 right-[-10px] w-2 h-2 rounded-full bg-[#3ca2fa] animate-pulse\"></span>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</div>\n\n\t\t\t\t\t{/* Section 4: Contact Us */}\n\n\t\t\t\t\t<div>\n\t\t\t\t\t\t<h4 className=\"text-white text-lg font-semibold mb-6\">\n\t\t\t\t\t\t\tContact Us\n\t\t\t\t\t\t</h4>\n\n\t\t\t\t\t\t<ul className=\"space-y-4\">\n\t\t\t\t\t\t\t<li className=\"flex items-center space-x-3\">\n\t\t\t\t\t\t\t\t<Mail size={18} className=\"text-[#3ca2fa]\" />\n\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"mailto:hello@Pollen.com\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\thello@nurui.com\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li className=\"flex items-center space-x-3\">\n\t\t\t\t\t\t\t\t<Phone size={18} className=\"text-[#3ca2fa]\" />\n\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\thref=\"tel:+918637373116\"\n\t\t\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t+91 86373 73116\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\n\t\t\t\t\t\t\t<li className=\"flex items-center space-x-3\">\n\t\t\t\t\t\t\t\t<MapPin size={18} className=\"text-[#3ca2fa]\" />\n\n\t\t\t\t\t\t\t\t<span className=\"hover:text-[#3ca2fa] transition-colors\">\n\t\t\t\t\t\t\t\t\tSylhet, Bangladesh\n\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t{/* Separator line */}\n\n\t\t\t\t<hr className=\"border-t border-gray-700 my-8\" />\n\n\t\t\t\t{/* Bottom section: social media and copyright */}\n\n\t\t\t\t<div className=\"flex flex-col md:flex-row justify-between items-center text-sm space-y-4 md:space-y-0\">\n\t\t\t\t\t{/* Social Media Icons */}\n\n\t\t\t\t\t<div className=\"flex space-x-6 text-gray-400\">\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\taria-label=\"Facebook\"\n\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors relative\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Facebook size={20} />\n\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\taria-label=\"Instagram\"\n\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Instagram size={20} />\n\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\taria-label=\"Twitter\"\n\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Twitter size={20} />\n\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\taria-label=\"Dribbble\"\n\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Dribbble size={20} />\n\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\taria-label=\"Globe\"\n\t\t\t\t\t\t\tclassName=\"hover:text-[#3ca2fa] transition-colors\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Globe size={20} />\n\t\t\t\t\t\t</a>\n\t\t\t\t\t</div>\n\n\t\t\t\t\t{/* Copyright text */}\n\n\t\t\t\t\t<div className=\"text-center md:text-left\">\n\t\t\t\t\t\t<p>&copy; 2025 Nurui. All rights reserved.</p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\n\t\t\t<div className=\"lg:flex hidden h-120 -mt-52 -mb-36\">\n\t\t\t\t<TextHoverEffect text=\"Drive Components\" />\n\t\t\t</div>\n\t\t</footer>\n\t);\n}\n\nexport default HoverFooter;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "nurui.vercel.app",
+      "url": "https://nurui.vercel.app/docs/hover-footer",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-footer"
+  }
+}

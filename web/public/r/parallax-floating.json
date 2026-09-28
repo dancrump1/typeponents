@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "parallax-floating",
+  "type": "registry:ui",
+  "title": "Parallax Floating",
+  "description": "Parallax Floating",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "text-rotate"
+  ],
+  "files": [
+    {
+      "path": "components/ui/parallax-floating.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/parallax-floating.tsx",
+      "content": "\"use client\";\n\nimport {\n\tcreateContext,\n\tReactNode,\n\tuseCallback,\n\tuseContext,\n\tuseEffect,\n\tuseRef,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { useMousePositionRef } from \"@/hooks/use-mouse-position\";\nimport { useAnimationFrame } from \"motion/react\";\n\n// Credit:\n// https://www.fancycomponents.dev/docs/components/image/parallax-floating\n\ninterface FloatingContextType {\n\tregisterElement: (\n\t\tid: string,\n\t\telement: HTMLDivElement,\n\t\tdepth: number\n\t) => void;\n\tunregisterElement: (id: string) => void;\n}\n\nconst FloatingContext = createContext<FloatingContextType | null>(null);\n\ninterface FloatingProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n\tsensitivity?: number;\n\teasingFactor?: number;\n}\n\nconst Floating = ({\n\tchildren,\n\tclassName,\n\tsensitivity = 1,\n\teasingFactor = 0.05,\n\t...props\n}: FloatingProps) => {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst elementsMap = useRef(\n\t\tnew Map<\n\t\t\tstring,\n\t\t\t{\n\t\t\t\telement: HTMLDivElement;\n\t\t\t\tdepth: number;\n\t\t\t\tcurrentPosition: { x: number; y: number };\n\t\t\t}\n\t\t>()\n\t);\n\tconst mousePositionRef = useMousePositionRef(containerRef);\n\n\tconst registerElement = useCallback(\n\t\t(id: string, element: HTMLDivElement, depth: number) => {\n\t\t\telementsMap.current.set(id, {\n\t\t\t\telement,\n\t\t\t\tdepth,\n\t\t\t\tcurrentPosition: { x: 0, y: 0 },\n\t\t\t});\n\t\t},\n\t\t[]\n\t);\n\n\tconst unregisterElement = useCallback((id: string) => {\n\t\telementsMap.current.delete(id);\n\t}, []);\n\n\tuseAnimationFrame(() => {\n\t\tif (!containerRef.current) return;\n\n\t\telementsMap.current.forEach((data) => {\n\t\t\tconst strength = (data.depth * sensitivity) / 20;\n\n\t\t\t// Calculate new target position\n\t\t\tconst newTargetX = mousePositionRef.current.x * strength;\n\t\t\tconst newTargetY = mousePositionRef.current.y * strength;\n\n\t\t\t// Check if we need to update\n\t\t\tconst dx = newTargetX - data.currentPosition.x;\n\t\t\tconst dy = newTargetY - data.currentPosition.y;\n\n\t\t\t// Update position only if we're still moving\n\t\t\tdata.currentPosition.x += dx * easingFactor;\n\t\t\tdata.currentPosition.y += dy * easingFactor;\n\n\t\t\tdata.element.style.transform = `translate3d(${data.currentPosition.x}px, ${data.currentPosition.y}px, 0)`;\n\t\t});\n\t});\n\n\treturn (\n\t\t<FloatingContext.Provider value={{ registerElement, unregisterElement }}>\n\t\t\t<div\n\t\t\t\tref={containerRef}\n\t\t\t\tclassName={cn(\"absolute top-0 left-0 w-full h-full\", className)}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</FloatingContext.Provider>\n\t);\n};\n\nexport default Floating;\n\ninterface FloatingElementProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n\tdepth?: number;\n}\n\nexport const FloatingElement = ({\n\tchildren,\n\tclassName,\n\tdepth = 1,\n}: FloatingElementProps) => {\n\tconst elementRef = useRef<HTMLDivElement>(null);\n\tconst idRef = useRef(Math.random().toString(36).substring(7));\n\tconst context = useContext(FloatingContext);\n\n\tuseEffect(() => {\n\t\tif (!elementRef.current || !context) return;\n\n\t\tconst nonNullDepth = depth ?? 0.01;\n\n\t\tcontext.registerElement(idRef.current, elementRef.current, nonNullDepth);\n\t\treturn () => context.unregisterElement(idRef.current);\n\t}, [depth]);\n\n\treturn (\n\t\t<div\n\t\t\tref={elementRef}\n\t\t\tclassName={cn(\"absolute will-change-transform\", className)}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n"
+    },
+    {
+      "path": "hooks/use-mouse-position.ts",
+      "type": "registry:hook",
+      "target": "hooks/use-mouse-position.ts",
+      "content": "import { RefObject, useEffect, useRef } from \"react\";\r\n\r\nexport const useMousePositionRef = (\r\n\tcontainerRef?: RefObject<HTMLElement | SVGElement>\r\n) => {\r\n\tconst positionRef = useRef({ x: 0, y: 0 });\r\n\r\n\tuseEffect(() => {\r\n\t\tconst updatePosition = (x: number, y: number) => {\r\n\t\t\tif (containerRef && containerRef.current) {\r\n\t\t\t\tconst rect = containerRef.current.getBoundingClientRect();\r\n\t\t\t\tconst relativeX = x - rect.left;\r\n\t\t\t\tconst relativeY = y - rect.top;\r\n\r\n\t\t\t\t// Calculate relative position even when outside the container\r\n\t\t\t\tpositionRef.current = { x: relativeX, y: relativeY };\r\n\t\t\t} else {\r\n\t\t\t\tpositionRef.current = { x, y };\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tconst handleMouseMove = (ev: MouseEvent) => {\r\n\t\t\tupdatePosition(ev.clientX, ev.clientY);\r\n\t\t};\r\n\r\n\t\tconst handleTouchMove = (ev: TouchEvent) => {\r\n\t\t\tconst touch = ev.touches[0];\r\n\t\t\tupdatePosition(touch.clientX, touch.clientY);\r\n\t\t};\r\n\r\n\t\t// Listen for both mouse and touch events\r\n\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\r\n\t\twindow.addEventListener(\"touchmove\", handleTouchMove);\r\n\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\twindow.removeEventListener(\"touchmove\", handleTouchMove);\r\n\t\t};\r\n\t}, [containerRef]);\r\n\r\n\r\n\treturn positionRef;\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries",
+      "Images",
+      "Cursor & Pointer Effects",
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/image/parallax-floating",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "sensitivity",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "easingFactor",
+        "type": "number",
+        "default": "0.05",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/parallax-floating"
+  }
+}

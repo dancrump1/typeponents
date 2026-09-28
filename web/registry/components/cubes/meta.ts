@@ -1,0 +1,31 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "cubes",
+	title: "Cubes",
+	description: "",
+	interaction: "",
+	categories: ["3D & Canvas"],
+	tags: ["cursor-tracking", "autoplay"],
+	dependencies: ["gsap"],
+	registryDependencies: [],
+	props: [
+		{ name: "gridSize", type: "number", default: "10" },
+		{ name: "cubeSize", type: "number" },
+		{ name: "maxAngle", type: "number", default: "45" },
+		{ name: "radius", type: "number", default: "3" },
+		{ name: "easing", type: "gsap.EaseString", default: "\"power3.out\"" },
+		{ name: "duration", type: "Duration", default: "{ enter: 0.3, leave: 0.6 }" },
+		{ name: "cellGap", type: "number | Gap" },
+		{ name: "borderStyle", type: "string", default: "\"1px solid #fff\"" },
+		{ name: "faceColor", type: "string", default: "\"#060010\"" },
+		{ name: "shadow", type: "string | boolean", default: "false" },
+		{ name: "autoAnimate", type: "boolean", default: "true" },
+		{ name: "rippleOnClick", type: "boolean", default: "true" },
+		{ name: "rippleColor", type: "string", default: "\"#fff\"" },
+		{ name: "rippleSpeed", type: "number", default: "2" },
+	],
+	risk: { heavy: true, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

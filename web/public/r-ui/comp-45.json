@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-45",
+  "type": "registry:component",
+  "title": "Comp 45",
+  "description": "Comp 45",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-45.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport { OTPInput, SlotProps } from \"input-otp\";\r\nimport { MinusIcon } from \"lucide-react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<Label htmlFor={id}>OTP input double</Label>\r\n\t\t\t<OTPInput\r\n\t\t\t\tid={id}\r\n\t\t\t\tcontainerClassName=\"flex items-center gap-3 has-disabled:opacity-50\"\r\n\t\t\t\tmaxLength={6}\r\n\t\t\t\trender={({ slots }) => (\r\n\t\t\t\t\t<>\r\n\t\t\t\t\t\t<div className=\"flex\">\r\n\t\t\t\t\t\t\t{slots.slice(0, 3).map((slot, idx) => (\r\n\t\t\t\t\t\t\t\t<Slot key={idx} {...slot} />\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div className=\"text-muted-foreground/80\">\r\n\t\t\t\t\t\t\t<MinusIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t<div className=\"flex\">\r\n\t\t\t\t\t\t\t{slots.slice(3).map((slot, idx) => (\r\n\t\t\t\t\t\t\t\t<Slot key={idx} {...slot} />\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</>\r\n\t\t\t\t)}\r\n\t\t\t/>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tBuilt with{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\thref=\"https://github.com/guilhermerodz/input-otp\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener nofollow\"\r\n\t\t\t\t>\r\n\t\t\t\t\tInput OTP\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nfunction Slot(props: SlotProps) {\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"border-input bg-background text-foreground relative -ms-px flex size-9 items-center justify-center border font-medium shadow-2xs transition-[color,box-shadow] first:ms-0 first:rounded-s-md last:rounded-e-md\",\r\n\t\t\t\t{ \"border-ring ring-ring/50 z-10 ring-[3px]\": props.isActive }\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t{props.char !== null && <div>{props.char}</div>}\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

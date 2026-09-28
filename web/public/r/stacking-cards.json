@@ -1,0 +1,64 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stacking-cards",
+  "type": "registry:ui",
+  "title": "Stacking Cards",
+  "description": "A column of full-height cards that pin to the top of the screen and pile up on each other as you scroll.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/stacking-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/stacking-cards.tsx",
+      "content": "\"use client\";\n\nimport {\n\tcreateContext,\n\tuseContext,\n\tuseRef,\n\ttype HTMLAttributes,\n\ttype PropsWithChildren,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tmotion,\n\tuseScroll,\n\tuseTransform,\n\ttype MotionValue,\n} from \"motion/react\";\n\n// Credit\n// https://www.fancycomponents.dev/docs/components/blocks/stacking-cards\n\ninterface StackingCardsProps\n\textends PropsWithChildren,\n\t\tHTMLAttributes<HTMLDivElement> {\n\tscrollOptons?: any;\n\tscaleMultiplier?: number;\n\ttotalCards: number;\n}\n\ninterface StackingCardItemProps\n\textends HTMLAttributes<HTMLDivElement>,\n\t\tPropsWithChildren {\n\tindex: number;\n\ttopPosition?: string;\n}\n\nexport default function StackingCards({\n\tchildren,\n\tclassName,\n\tscrollOptons,\n\tscaleMultiplier,\n\ttotalCards,\n\t...props\n}: StackingCardsProps) {\n\tconst targetRef = useRef<HTMLDivElement>(null);\n\tconst { scrollYProgress } = useScroll({\n\t\toffset: [\"start start\", \"end end\"],\n\t\t...scrollOptons,\n\t\ttarget: targetRef,\n\t});\n\n\treturn (\n\t\t<StackingCardsContext.Provider\n\t\t\tvalue={{ progress: scrollYProgress, scaleMultiplier, totalCards }}\n\t\t>\n\t\t\t<div className={cn(className)} ref={targetRef} {...props}>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</StackingCardsContext.Provider>\n\t);\n}\n\nconst StackingCardItem = ({\n\tindex,\n\ttopPosition,\n\tclassName,\n\tchildren,\n\t...props\n}: StackingCardItemProps) => {\n\tconst {\n\t\tprogress,\n\t\tscaleMultiplier,\n\t\ttotalCards = 0,\n\t} = useStackingCardsContext(); // Get from Context\n\tconst scaleTo = 1 - (totalCards - index) * (scaleMultiplier ?? 0.03);\n\tconst rangeScale = [index * (1 / totalCards), 1];\n\tconst scale = useTransform(progress, rangeScale, [1, scaleTo]);\n\tconst top = topPosition ?? `${5 + index * 3}%`;\n\n\treturn (\n\t\t<div className={cn(\"h-full sticky top-0\", className)} {...props}>\n\t\t\t<motion.div\n\t\t\t\tclassName={\"origin-top relative h-full\"}\n\t\t\t\tstyle={{ top, scale }}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\nconst StackingCardsContext = createContext<{\n\tprogress: MotionValue<number>;\n\tscaleMultiplier?: number;\n\ttotalCards?: number;\n} | null>(null);\n\nexport const useStackingCardsContext = () => {\n\tconst context = useContext(StackingCardsContext);\n\tif (!context)\n\t\tthrow new Error(\"StackingCardItem must be used within StackingCards\");\n\treturn context;\n};\n\nexport { StackingCardItem };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Scrolling holds each card in place while the next one slides over it; the cards underneath shrink slightly so the stack looks like a deck growing behind the one you are reading.",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/blocks/stacking-cards",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "totalCards",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "scrollOptons",
+        "type": "any",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scaleMultiplier",
+        "type": "number",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/stacking-cards"
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fluid-glass",
+  "type": "registry:ui",
+  "title": "Fluid Glass",
+  "description": "Fluid Glass",
+  "dependencies": [
+    "@react-three/drei",
+    "@react-three/fiber",
+    "maath",
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fluid-glass.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fluid-glass.tsx",
+      "content": "\"use client\";\n\nimport React, { memo, ReactNode, useEffect, useRef, useState } from \"react\";\n\nimport {\n\tImage,\n\tMeshTransmissionMaterial,\n\tPreload,\n\tScroll,\n\tScrollControls,\n\tText,\n\tuseFBO,\n\tuseGLTF,\n\tuseScroll,\n} from \"@react-three/drei\";\nimport {\n\tCanvas,\n\tcreatePortal,\n\tThreeElements,\n\tuseFrame,\n\tuseThree,\n} from \"@react-three/fiber\";\nimport { easing } from \"maath\";\nimport * as THREE from \"three\";\n\n// Credit:\n// https://reactbits.dev/components/fluid-glass\n\ntype Mode = \"lens\" | \"bar\" | \"cube\";\n\ninterface NavItem {\n\tlabel: string;\n\tlink: string;\n}\n\ntype ModeProps = Record<string, unknown>;\n\ninterface FluidGlassProps {\n\tmode?: Mode;\n\tlensProps?: ModeProps;\n\tbarProps?: ModeProps;\n\tcubeProps?: ModeProps;\n}\n\nexport default function FluidGlass({\n\tmode = \"lens\",\n\tlensProps = {},\n\tbarProps = {},\n\tcubeProps = {},\n}: FluidGlassProps) {\n\tconst Wrapper = mode === \"bar\" ? Bar : mode === \"cube\" ? Cube : Lens;\n\tconst rawOverrides =\n\t\tmode === \"bar\" ? barProps : mode === \"cube\" ? cubeProps : lensProps;\n\n\tconst {\n\t\tnavItems = [\n\t\t\t{ label: \"Home\", link: \"\" },\n\t\t\t{ label: \"About\", link: \"\" },\n\t\t\t{ label: \"Contact\", link: \"\" },\n\t\t],\n\t\t...modeProps\n\t} = rawOverrides;\n\n\treturn (\n\t\t<Canvas camera={{ position: [0, 0, 20], fov: 15 }} gl={{ alpha: true }}>\n\t\t\t<ScrollControls damping={0.2} pages={3} distance={0.4}>\n\t\t\t\t{mode === \"bar\" && <NavItems items={navItems as NavItem[]} />}\n\t\t\t\t<Wrapper modeProps={modeProps}>\n\t\t\t\t\t<Scroll>\n\t\t\t\t\t\t<Typography />\n\t\t\t\t\t\t<Images />\n\t\t\t\t\t</Scroll>\n\t\t\t\t\t<Scroll html />\n\t\t\t\t\t<Preload />\n\t\t\t\t</Wrapper>\n\t\t\t</ScrollControls>\n\t\t</Canvas>\n\t);\n}\n\ntype MeshProps = ThreeElements[\"mesh\"];\n\ninterface ModeWrapperProps extends MeshProps {\n\tchildren?: ReactNode;\n\tglb: string;\n\tgeometryKey: string;\n\tlockToBottom?: boolean;\n\tfollowPointer?: boolean;\n\tmodeProps?: ModeProps;\n}\n\ninterface ZoomMaterial extends THREE.Material {\n\tzoom: number;\n}\n\ninterface ZoomMesh extends THREE.Mesh<THREE.BufferGeometry, ZoomMaterial> {}\n\ntype ZoomGroup = THREE.Group & { children: ZoomMesh[] };\n\nconst ModeWrapper = memo(function ModeWrapper({\n\tchildren,\n\tglb,\n\tgeometryKey,\n\tlockToBottom = false,\n\tfollowPointer = true,\n\tmodeProps = {},\n\t...props\n}: ModeWrapperProps) {\n\tconst ref = useRef<THREE.Mesh>(null!);\n\tconst { nodes } = useGLTF(glb);\n\tconst buffer = useFBO();\n\tconst { viewport: vp } = useThree();\n\tconst [scene] = useState<THREE.Scene>(() => new THREE.Scene());\n\tconst geoWidthRef = useRef<number>(1);\n\n\tuseEffect(() => {\n\t\tconst geo = (nodes[geometryKey] as THREE.Mesh)?.geometry;\n\t\tgeo.computeBoundingBox();\n\t\tgeoWidthRef.current =\n\t\t\tgeo.boundingBox!.max.x - geo.boundingBox!.min.x || 1;\n\t}, [nodes, geometryKey]);\n\n\tuseFrame((state, delta) => {\n\t\tconst { gl, viewport, pointer, camera } = state;\n\t\tconst v = viewport.getCurrentViewport(camera, [0, 0, 15]);\n\n\t\tconst destX = followPointer ? (pointer.x * v.width) / 2 : 0;\n\t\tconst destY = lockToBottom\n\t\t\t? -v.height / 2 + 0.2\n\t\t\t: followPointer\n\t\t\t\t? (pointer.y * v.height) / 2\n\t\t\t\t: 0;\n\t\teasing.damp3(ref.current.position, [destX, destY, 15], 0.15, delta);\n\n\t\tif ((modeProps as { scale?: number }).scale == null) {\n\t\t\tconst maxWorld = v.width * 0.9;\n\t\t\tconst desired = maxWorld / geoWidthRef.current;\n\t\t\tref.current.scale.setScalar(Math.min(0.15, desired));\n\t\t}\n\n\t\tgl.setRenderTarget(buffer);\n\t\tgl.render(scene, camera);\n\t\tgl.setRenderTarget(null);\n\t\tgl.setClearColor(0x5227ff, 1);\n\t});\n\n\tconst {\n\t\tscale,\n\t\tior,\n\t\tthickness,\n\t\tanisotropy,\n\t\tchromaticAberration,\n\t\t...extraMat\n\t} = modeProps as {\n\t\tscale?: number;\n\t\tior?: number;\n\t\tthickness?: number;\n\t\tanisotropy?: number;\n\t\tchromaticAberration?: number;\n\t\t[key: string]: unknown;\n\t};\n\n\treturn (\n\t\t<>\n\t\t\t{createPortal(children, scene)}\n\t\t\t<mesh scale={[vp.width, vp.height, 1]}>\n\t\t\t\t<planeGeometry />\n\t\t\t\t<meshBasicMaterial map={buffer.texture} transparent />\n\t\t\t</mesh>\n\t\t\t<mesh\n\t\t\t\tref={ref}\n\t\t\t\tscale={scale ?? 0.15}\n\t\t\t\trotation-x={Math.PI / 2}\n\t\t\t\tgeometry={(nodes[geometryKey] as THREE.Mesh)?.geometry}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t<MeshTransmissionMaterial\n\t\t\t\t\tbuffer={buffer.texture}\n\t\t\t\t\tior={ior ?? 1.15}\n\t\t\t\t\tthickness={thickness ?? 5}\n\t\t\t\t\tanisotropy={anisotropy ?? 0.01}\n\t\t\t\t\tchromaticAberration={chromaticAberration ?? 0.1}\n\t\t\t\t\t{...(typeof extraMat === \"object\" && extraMat !== null\n\t\t\t\t\t\t? extraMat\n\t\t\t\t\t\t: {})}\n\t\t\t\t/>\n\t\t\t</mesh>\n\t\t</>\n\t);\n});\n\nfunction Lens({ modeProps, ...p }: { modeProps?: ModeProps } & MeshProps) {\n\treturn (\n\t\t<ModeWrapper\n\t\t\tglb=\"/lens.glb\"\n\t\t\tgeometryKey=\"Cylinder\"\n\t\t\tfollowPointer\n\t\t\tmodeProps={modeProps}\n\t\t\t{...p}\n\t\t/>\n\t);\n}\n\nfunction Cube({ modeProps, ...p }: { modeProps?: ModeProps } & MeshProps) {\n\treturn (\n\t\t<ModeWrapper\n\t\t\tglb=\"/assets/3d/cube.glb\"\n\t\t\tgeometryKey=\"Cube\"\n\t\t\tfollowPointer\n\t\t\tmodeProps={modeProps}\n\t\t\t{...p}\n\t\t/>\n\t);\n}\n\nfunction Bar({ modeProps = {}, ...p }: { modeProps?: ModeProps } & MeshProps) {\n\tconst defaultMat = {\n\t\ttransmission: 1,\n\t\troughness: 0,\n\t\tthickness: 10,\n\t\tior: 1.15,\n\t\tcolor: \"#ffffff\",\n\t\tattenuationColor: \"#ffffff\",\n\t\tattenuationDistance: 0.25,\n\t};\n\n\treturn (\n\t\t<ModeWrapper\n\t\t\tglb=\"/assets/3d/bar.glb\"\n\t\t\tgeometryKey=\"Cube\"\n\t\t\tlockToBottom\n\t\t\tfollowPointer={false}\n\t\t\tmodeProps={{ ...defaultMat, ...modeProps }}\n\t\t\t{...p}\n\t\t/>\n\t);\n}\n\nfunction NavItems({ items }: { items: NavItem[] }) {\n\tconst group = useRef<THREE.Group>(null!);\n\tconst { viewport, camera } = useThree();\n\n\tconst DEVICE = {\n\t\tmobile: { max: 639, spacing: 0.2, fontSize: 0.035 },\n\t\ttablet: { max: 1023, spacing: 0.24, fontSize: 0.045 },\n\t\tdesktop: { max: Infinity, spacing: 0.3, fontSize: 0.045 },\n\t};\n\tconst getDevice = () => {\n\t\tconst w = window.innerWidth;\n\t\treturn w <= DEVICE.mobile.max\n\t\t\t? \"mobile\"\n\t\t\t: w <= DEVICE.tablet.max\n\t\t\t\t? \"tablet\"\n\t\t\t\t: \"desktop\";\n\t};\n\n\tconst [device, setDevice] = useState<keyof typeof DEVICE>(getDevice());\n\n\tuseEffect(() => {\n\t\tconst onResize = () => setDevice(getDevice());\n\t\twindow.addEventListener(\"resize\", onResize);\n\t\treturn () => window.removeEventListener(\"resize\", onResize);\n\t}, []);\n\n\tconst { spacing, fontSize } = DEVICE[device];\n\n\tuseFrame(() => {\n\t\tif (!group.current) return;\n\t\tconst v = viewport.getCurrentViewport(camera, [0, 0, 15]);\n\t\tgroup.current.position.set(0, -v.height / 2 + 0.2, 15.1);\n\n\t\tgroup.current.children.forEach((child, i) => {\n\t\t\tchild.position.x = (i - (items.length - 1) / 2) * spacing;\n\t\t});\n\t});\n\n\tconst handleNavigate = (link: string) => {\n\t\tif (!link) return;\n\t\tlink.startsWith(\"#\")\n\t\t\t? (window.location.hash = link)\n\t\t\t: (window.location.href = link);\n\t};\n\n\treturn (\n\t\t<group ref={group} renderOrder={10}>\n\t\t\t{items.map(({ label, link }) => (\n\t\t\t\t<Text\n\t\t\t\t\tkey={label}\n\t\t\t\t\tfontSize={fontSize}\n\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\tanchorX=\"center\"\n\t\t\t\t\tanchorY=\"middle\"\n\t\t\t\t\tfont=\"/assets/fonts/figtreeblack.ttf\"\n\t\t\t\t\toutlineWidth={0}\n\t\t\t\t\toutlineBlur=\"20%\"\n\t\t\t\t\toutlineColor=\"#000\"\n\t\t\t\t\toutlineOpacity={0.5}\n\t\t\t\t\trenderOrder={10}\n\t\t\t\t\tonClick={(e) => {\n\t\t\t\t\t\te.stopPropagation();\n\t\t\t\t\t\thandleNavigate(link);\n\t\t\t\t\t}}\n\t\t\t\t\tonPointerOver={() => (document.body.style.cursor = \"pointer\")}\n\t\t\t\t\tonPointerOut={() => (document.body.style.cursor = \"auto\")}\n\t\t\t\t>\n\t\t\t\t\t{label}\n\t\t\t\t</Text>\n\t\t\t))}\n\t\t</group>\n\t);\n}\n\nfunction Images() {\n\tconst group = useRef<ZoomGroup>(null!);\n\tconst data = useScroll();\n\tconst { height } = useThree((s) => s.viewport);\n\n\tuseFrame(() => {\n\t\tgroup.current.children[0].material.zoom = 1 + data.range(0, 1 / 3) / 3;\n\t\tgroup.current.children[1].material.zoom = 1 + data.range(0, 1 / 3) / 3;\n\t\tgroup.current.children[2].material.zoom =\n\t\t\t1 + data.range(1.15 / 3, 1 / 3) / 2;\n\t\tgroup.current.children[3].material.zoom =\n\t\t\t1 + data.range(1.15 / 3, 1 / 3) / 2;\n\t\tgroup.current.children[4].material.zoom =\n\t\t\t1 + data.range(1.15 / 3, 1 / 3) / 2;\n\t});\n\n\treturn (\n\t\t<group ref={group}>\n\t\t\t<Image\n\t\t\t\tposition={[-2, 0, 0]}\n\t\t\t\tscale={[3, height / 1.1]}\n\t\t\t\turl=\"https://images.unsplash.com/photo-1595001354022-29103be3b73a?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\n\t\t\t/>\n\t\t\t<Image\n\t\t\t\tposition={[2, 0, 3]}\n\t\t\t\tscale={3}\n\t\t\t\turl=\"https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\n\t\t\t/>\n\t\t\t<Image\n\t\t\t\tposition={[-2.05, -height, 6]}\n\t\t\t\tscale={[1, 3]}\n\t\t\t\turl=\"https://images.unsplash.com/photo-1513682121497-80211f36a7d3?q=80&w=3388&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\n\t\t\t/>\n\t\t\t<Image\n\t\t\t\tposition={[-0.6, -height, 9]}\n\t\t\t\tscale={[1, 2]}\n\t\t\t\turl=\"https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?q=80&w=2843&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\n\t\t\t/>\n\t\t\t<Image\n\t\t\t\tposition={[0.75, -height, 10.5]}\n\t\t\t\tscale={1.5}\n\t\t\t\turl=\"https://images.unsplash.com/photo-1505069190533-da1c9af13346?q=80&w=3387&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\n\t\t\t/>\n\t\t</group>\n\t);\n}\n\nfunction Typography() {\n\tconst DEVICE = {\n\t\tmobile: { fontSize: 0.2 },\n\t\ttablet: { fontSize: 0.4 },\n\t\tdesktop: { fontSize: 0.7 },\n\t};\n\tconst getDevice = () => {\n\t\tconst w = window.innerWidth;\n\t\treturn w <= 639 ? \"mobile\" : w <= 1023 ? \"tablet\" : \"desktop\";\n\t};\n\n\tconst [device, setDevice] = useState<keyof typeof DEVICE>(getDevice());\n\n\tuseEffect(() => {\n\t\tconst onResize = () => setDevice(getDevice());\n\t\twindow.addEventListener(\"resize\", onResize);\n\t\treturn () => window.removeEventListener(\"resize\", onResize);\n\t}, []);\n\n\tconst { fontSize } = DEVICE[device];\n\n\treturn (\n\t\t<Text\n\t\t\tposition={[0, 0, 12]}\n\t\t\tfontSize={fontSize}\n\t\t\tletterSpacing={-0.05}\n\t\t\toutlineWidth={0}\n\t\t\toutlineBlur=\"20%\"\n\t\t\toutlineColor=\"#000\"\n\t\t\toutlineOpacity={0.5}\n\t\t\tcolor=\"white\"\n\t\t\tanchorX=\"center\"\n\t\t\tanchorY=\"middle\"\n\t\t>\n\t\t\tDrive Brand studio\n\t\t</Text>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://reactbits.dev/components/fluid-glass",
+      "authorUrl": "https://reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "mode",
+        "type": "Mode",
+        "default": "\"lens\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "lensProps",
+        "type": "ModeProps",
+        "default": "{}",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "barProps",
+        "type": "ModeProps",
+        "default": "{}",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cubeProps",
+        "type": "ModeProps",
+        "default": "{}",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fluid-glass"
+  }
+}

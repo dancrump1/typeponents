@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-53",
+  "type": "registry:component",
+  "title": "Comp 53",
+  "description": "Comp 53",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-53.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useId, useRef, useState } from \"react\";\r\n\r\nimport { Input } from \"@/components/ui/input\";\r\nimport { Label } from \"@/components/ui/label\";\r\nimport {\r\n\tTooltip,\r\n\tTooltipContent,\r\n\tTooltipProvider,\r\n\tTooltipTrigger,\r\n} from \"@/components/ui/tooltip\";\r\nimport { CheckIcon, CopyIcon } from \"lucide-react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\tconst [copied, setCopied] = useState<boolean>(false);\r\n\tconst inputRef = useRef<HTMLInputElement>(null);\r\n\r\n\tconst handleCopy = () => {\r\n\t\tif (inputRef.current) {\r\n\t\t\tnavigator.clipboard.writeText(inputRef.current.value);\r\n\t\t\tsetCopied(true);\r\n\t\t\tsetTimeout(() => setCopied(false), 1500);\r\n\t\t}\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<Label htmlFor={id}>Copy to clipboard</Label>\r\n\t\t\t<div className=\"relative\">\r\n\t\t\t\t<Input\r\n\t\t\t\t\tref={inputRef}\r\n\t\t\t\t\tid={id}\r\n\t\t\t\t\tclassName=\"pe-9\"\r\n\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\tdefaultValue=\"pnpm install origin-ui\"\r\n\t\t\t\t\treadOnly\r\n\t\t\t\t/>\r\n\t\t\t\t<TooltipProvider delayDuration={0}>\r\n\t\t\t\t\t<Tooltip>\r\n\t\t\t\t\t\t<TooltipTrigger asChild>\r\n\t\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\t\tonClick={handleCopy}\r\n\t\t\t\t\t\t\t\tclassName=\"text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 inset-e-0 flex h-full w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-hidden focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed\"\r\n\t\t\t\t\t\t\t\taria-label={copied ? \"Copied\" : \"Copy to clipboard\"}\r\n\t\t\t\t\t\t\t\tdisabled={copied}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\"transition-all\",\r\n\t\t\t\t\t\t\t\t\t\tcopied\r\n\t\t\t\t\t\t\t\t\t\t\t? \"scale-100 opacity-100\"\r\n\t\t\t\t\t\t\t\t\t\t\t: \"scale-0 opacity-0\"\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<CheckIcon\r\n\t\t\t\t\t\t\t\t\t\tclassName=\"stroke-emerald-500\"\r\n\t\t\t\t\t\t\t\t\t\tsize={16}\r\n\t\t\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\"absolute transition-all\",\r\n\t\t\t\t\t\t\t\t\t\tcopied\r\n\t\t\t\t\t\t\t\t\t\t\t? \"scale-0 opacity-0\"\r\n\t\t\t\t\t\t\t\t\t\t\t: \"scale-100 opacity-100\"\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<CopyIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</button>\r\n\t\t\t\t\t\t</TooltipTrigger>\r\n\t\t\t\t\t\t<TooltipContent className=\"px-2 py-1 text-xs\">\r\n\t\t\t\t\t\t\tCopy to clipboard\r\n\t\t\t\t\t\t</TooltipContent>\r\n\t\t\t\t\t</Tooltip>\r\n\t\t\t\t</TooltipProvider>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/input.tsx",
+      "content": "// SHADCN UI GENERATED CODE\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport interface InputProps\n\textends React.InputHTMLAttributes<HTMLInputElement> {}\n\nconst Input = React.forwardRef<HTMLInputElement, InputProps>(\n\t({ className, type, ...props }, ref) => {\n\t\treturn (\n\t\t\t<input\n\t\t\t\ttype={type}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t/>\n\t\t);\n\t}\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

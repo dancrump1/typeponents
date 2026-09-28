@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scaling-button",
+  "type": "registry:ui",
+  "title": "Scaling Button",
+  "description": "Scaling Button",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/scaling-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scaling-button.tsx",
+      "content": "import * as React from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { motion } from \"motion/react\";\n\ntype ScalingButtonProps = {\n\tspringTransition?: {\n\t\ttype: string;\n\t\tstiffness: number;\n\t\tdamping: number;\n\t};\n};\n\nconst springTransitionDefault = {\n\ttype: \"spring\",\n\tstiffness: 400,\n\tdamping: 12,\n};\n\nexport const ScalingButton = React.forwardRef<\n\tHTMLButtonElement,\n\tScalingButtonProps\n>(({ children, springTransition = springTransitionDefault, ...props }, ref) => {\n\treturn (\n\t\t<motion.div\n\t\t\twhileHover={{ scale: 1.1 }}\n\t\t\twhileTap={{ scale: 0.9 }}\n\t\t\ttransition={springTransition}\n\t\t>\n\t\t\t<Button ref={ref} {...props}>\n\t\t\t\t{children}\n\t\t\t</Button>\n\t\t</motion.div>\n\t);\n});\n\nScalingButton.displayName = \"ScalingButton\";\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scaling-button"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-horizontal",
+  "type": "registry:ui",
+  "title": "Scroll Horizontal",
+  "description": "Scroll Horizontal",
+  "dependencies": [
+    "lenis",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-horizontal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-horizontal.tsx",
+      "content": "// @ts-nocheck\n\"use client\";\n\nimport { useEffect, useRef } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { ReactLenis } from \"lenis/react\";\nimport { animate, scroll, spring } from \"motion\";\n\n// Credit:\n// https://www.ui-layouts.com/components/horizontal-scroll\n\nexport default function HorizontalScroll(): JSX.Element {\n\tconst ulRef = useRef<HTMLUListElement | null>();\n\n\tuseEffect(() => {\n\t\tconst items = document.querySelectorAll(\".scroll-item\");\n\n\t\tif (ulRef.current) {\n\t\t\tconst controls = animate(\n\t\t\t\tulRef.current,\n\t\t\t\t{\n\t\t\t\t\ttransform: [\"none\", `translateX(-${items.length - 1}00vw)`],\n\t\t\t\t},\n\t\t\t\t{ easing: spring() }\n\t\t\t);\n\t\t\tscroll(controls, { target: document.querySelector(\"section\") });\n\t\t}\n\n\t\tconst segmentLength = 1 / items.length;\n\t\titems.forEach((item, i) => {\n\t\t\tconst header = item.querySelector(\"h2\");\n\n\t\t\tscroll(animate([header], { x: [800, -800] }), {\n\t\t\t\ttarget: document.querySelector(\"section\"),\n\t\t\t\toffset: [\n\t\t\t\t\t[i * segmentLength, 1],\n\t\t\t\t\t[(i + 1) * segmentLength, 0],\n\t\t\t\t],\n\t\t\t});\n\t\t});\n\t}, []);\n\n\treturn (\n\t\t<ReactLenis root>\n\t\t\t<main>\n\t\t\t\t<article>\n\t\t\t\t\t<header className=\"text-foreground relative  w-full bg-slate-950  grid place-content-center  h-[80vh]\">\n\t\t\t\t\t\t<div className=\"absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]\"></div>\n\n\t\t\t\t\t\t<h1 className=\"text-6xl font-bold text-center tracking-tight\">\n\t\t\t\t\t\t\tI know You Love to Scroll <br />\n\t\t\t\t\t\t\tSo Scroll\n\t\t\t\t\t\t</h1>\n\t\t\t\t\t</header>\n\t\t\t\t\t<section className=\"h-[500vh] relative\">\n\t\t\t\t\t\t<ul ref={ulRef} className=\"flex sticky top-0\">\n\t\t\t\t\t\t\t<li className=\"scroll-item h-screen w-screen bg-red-400 flex flex-col justify-center overflow-hidden  items-center\">\n\t\t\t\t\t\t\t\t<h2 className=\"text-[20vw] font-semibold relative bottom-5 inline-block text-foreground\">\n\t\t\t\t\t\t\t\t\tPASSION\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\t\tclassName=\"2xl:w-[550px] w-[380px] absolute bottom-0\"\n\t\t\t\t\t\t\t\t\twidth={500}\n\t\t\t\t\t\t\t\t\theight={500}\n\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t<li className=\"scroll-item h-screen w-screen bg-blue-400 flex flex-col justify-center overflow-hidden  items-center\">\n\t\t\t\t\t\t\t\t<h2 className=\"text-[20vw] font-semibold relative bottom-5 inline-block text-foreground\">\n\t\t\t\t\t\t\t\t\tWORK\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\t\tclassName=\"2xl:w-[550px] w-[380px] absolute bottom-0\"\n\t\t\t\t\t\t\t\t\twidth={500}\n\t\t\t\t\t\t\t\t\theight={500}\n\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t<li className=\"scroll-item h-screen w-screen bg-orange-400 flex flex-col justify-center overflow-hidden  items-center\">\n\t\t\t\t\t\t\t\t<h2 className=\"text-[20vw] font-semibold relative bottom-5 inline-block text-foreground\">\n\t\t\t\t\t\t\t\t\tMOTIVATION\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\t\tclassName=\"2xl:w-[550px] w-[380px] absolute bottom-0\"\n\t\t\t\t\t\t\t\t\twidth={500}\n\t\t\t\t\t\t\t\t\theight={500}\n\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t<li className=\"scroll-item h-screen w-screen bg-yellow-400 flex flex-col justify-center overflow-hidden  items-center\">\n\t\t\t\t\t\t\t\t<h2 className=\"text-[20vw] font-semibold relative bottom-5 inline-block text-foreground\">\n\t\t\t\t\t\t\t\t\tINSPIRATION\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\t\tclassName=\"2xl:w-[550px] w-[380px] absolute bottom-0\"\n\t\t\t\t\t\t\t\t\twidth={500}\n\t\t\t\t\t\t\t\t\theight={500}\n\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t<li className=\"scroll-item h-screen w-screen bg-green-400 flex flex-col justify-center overflow-hidden  items-center\">\n\t\t\t\t\t\t\t\t<h2 className=\"text-[20vw] font-semibold relative bottom-5 inline-block text-foreground\">\n\t\t\t\t\t\t\t\t\tBELIVE\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\t\tclassName=\"2xl:w-[550px] w-[380px] absolute bottom-0\"\n\t\t\t\t\t\t\t\t\twidth={500}\n\t\t\t\t\t\t\t\t\theight={500}\n\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t</ul>\n\t\t\t\t\t</section>\n\t\t\t\t\t<footer className=\"bg-red-600 text-foreground grid place-content-center h-[80vh]\">\n\t\t\t\t\t\t<p>\n\t\t\t\t\t\t\tCreated By{\" \"}\n\t\t\t\t\t\t\t<a target=\"_blank\" href=\"https://twitter.com/mattgperry\">\n\t\t\t\t\t\t\t\tMatt Perry\n\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t</p>\n\t\t\t\t\t</footer>\n\t\t\t\t</article>\n\t\t\t\t<div className=\"progress fixed left-0 right-0  h-2 rounded-full bg-red-600 bottom-[50px] scale-x-0\"></div>\n\t\t\t</main>\n\t\t</ReactLenis>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "UI Layouts",
+      "url": "https://www.ui-layouts.com/components/horizontal-scroll",
+      "authorUrl": "https://www.ui-layouts.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-horizontal"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "grid-distortion",
+  "type": "registry:ui",
+  "title": "Grid Distortion",
+  "description": "Grid Distortion",
+  "dependencies": [
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/grid-distortion.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/grid-distortion.tsx",
+      "content": "import { useEffect, useRef } from \"react\";\n\nimport * as THREE from \"three\";\n\n// Credit:\n// https://www.reactbits.dev/backgrounds/grid-distortion\n\n// Example Usage\n{\n\t/* <div style={{ width: \"100%\", height: \"600px\", position: \"relative\" }}>\n\t<GridDistortion\n\t\timageSrc=\"https://picsum.photos/1920/1080?grayscale\"\n\t\tgrid={10}\n\t\tmouse={0.1}\n\t\tstrength={0.15}\n\t\trelaxation={0.9}\n\t\tclassName=\"custom-class\"\n\t/>\n</div>; */\n}\n\nconst vertexShader = `\nuniform float time;\nvarying vec2 vUv;\nvarying vec3 vPosition;\n\nvoid main() {\n  vUv = uv;\n  vPosition = position;\n  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n}`;\n\nconst fragmentShader = `\nuniform sampler2D uDataTexture;\nuniform sampler2D uTexture;\nuniform vec4 resolution;\nvarying vec2 vUv;\n\nvoid main() {\n  vec2 uv = vUv;\n  vec4 offset = texture2D(uDataTexture, vUv);\n  gl_FragColor = texture2D(uTexture, uv - 0.02 * offset.rg);\n}`;\n\nconst GridDistortion = ({\n\tgrid = 15,\n\tmouse = 0.1,\n\tstrength = 0.15,\n\trelaxation = 0.9,\n\timageSrc,\n\tclassName = \"\",\n}) => {\n\tconst containerRef = useRef(null);\n\tconst imageAspectRef = useRef(1);\n\tconst cameraRef = useRef(null);\n\tconst initialDataRef = useRef(null);\n\n\tuseEffect(() => {\n\t\tif (!containerRef.current) return;\n\n\t\tconst container = containerRef.current;\n\t\tconst scene = new THREE.Scene();\n\t\tconst renderer = new THREE.WebGLRenderer({\n\t\t\tantialias: true,\n\t\t\talpha: true,\n\t\t\tpowerPreference: \"high-performance\",\n\t\t});\n\t\trenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));\n\t\tcontainer.appendChild(renderer.domElement);\n\n\t\tconst camera = new THREE.OrthographicCamera(0, 0, 0, 0, -1000, 1000);\n\t\tcamera.position.z = 2;\n\t\tcameraRef.current = camera;\n\n\t\tconst uniforms = {\n\t\t\ttime: { value: 0 },\n\t\t\tresolution: { value: new THREE.Vector4() },\n\t\t\tuTexture: { value: null },\n\t\t\tuDataTexture: { value: null },\n\t\t};\n\n\t\tconst textureLoader = new THREE.TextureLoader();\n\t\ttextureLoader.load(imageSrc, (texture) => {\n\t\t\ttexture.minFilter = THREE.LinearFilter;\n\t\t\timageAspectRef.current = texture.image.width / texture.image.height;\n\t\t\tuniforms.uTexture.value = texture;\n\t\t\thandleResize();\n\t\t});\n\n\t\tconst size = grid;\n\t\tconst data = new Float32Array(4 * size * size);\n\t\tfor (let i = 0; i < size * size; i++) {\n\t\t\tdata[i * 4] = Math.random() * 255 - 125;\n\t\t\tdata[i * 4 + 1] = Math.random() * 255 - 125;\n\t\t}\n\n\t\tinitialDataRef.current = new Float32Array(data);\n\n\t\tconst dataTexture = new THREE.DataTexture(\n\t\t\tdata,\n\t\t\tsize,\n\t\t\tsize,\n\t\t\tTHREE.RGBAFormat,\n\t\t\tTHREE.FloatType\n\t\t);\n\t\tdataTexture.needsUpdate = true;\n\t\tuniforms.uDataTexture.value = dataTexture;\n\n\t\tconst material = new THREE.ShaderMaterial({\n\t\t\tside: THREE.DoubleSide,\n\t\t\tuniforms,\n\t\t\tvertexShader,\n\t\t\tfragmentShader,\n\t\t});\n\t\tconst geometry = new THREE.PlaneGeometry(1, 1, size - 1, size - 1);\n\t\tconst plane = new THREE.Mesh(geometry, material);\n\t\tscene.add(plane);\n\n\t\tconst handleResize = () => {\n\t\t\tconst width = container.offsetWidth;\n\t\t\tconst height = container.offsetHeight;\n\t\t\tconst containerAspect = width / height;\n\t\t\tconst imageAspect = imageAspectRef.current;\n\n\t\t\trenderer.setSize(width, height);\n\n\t\t\tconst scale = Math.max(containerAspect / imageAspect, 1);\n\t\t\tplane.scale.set(imageAspect * scale, scale, 1);\n\n\t\t\tconst frustumHeight = 1;\n\t\t\tconst frustumWidth = frustumHeight * containerAspect;\n\t\t\tcamera.left = -frustumWidth / 2;\n\t\t\tcamera.right = frustumWidth / 2;\n\t\t\tcamera.top = frustumHeight / 2;\n\t\t\tcamera.bottom = -frustumHeight / 2;\n\t\t\tcamera.updateProjectionMatrix();\n\n\t\t\tuniforms.resolution.value.set(width, height, 1, 1);\n\t\t};\n\n\t\tconst mouseState = { x: 0, y: 0, prevX: 0, prevY: 0, vX: 0, vY: 0 };\n\n\t\tconst handleMouseMove = (e) => {\n\t\t\tconst rect = container.getBoundingClientRect();\n\t\t\tconst x = (e.clientX - rect.left) / rect.width;\n\t\t\tconst y = 1 - (e.clientY - rect.top) / rect.height;\n\t\t\tmouseState.vX = x - mouseState.prevX;\n\t\t\tmouseState.vY = y - mouseState.prevY;\n\t\t\tObject.assign(mouseState, { x, y, prevX: x, prevY: y });\n\t\t};\n\n\t\tconst handleMouseLeave = () => {\n\t\t\tdataTexture.needsUpdate = true;\n\t\t\tObject.assign(mouseState, {\n\t\t\t\tx: 0,\n\t\t\t\ty: 0,\n\t\t\t\tprevX: 0,\n\t\t\t\tprevY: 0,\n\t\t\t\tvX: 0,\n\t\t\t\tvY: 0,\n\t\t\t});\n\t\t};\n\n\t\tcontainer.addEventListener(\"mousemove\", handleMouseMove);\n\t\tcontainer.addEventListener(\"mouseleave\", handleMouseLeave);\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\thandleResize();\n\n\t\tconst animate = () => {\n\t\t\trequestAnimationFrame(animate);\n\t\t\tuniforms.time.value += 0.05;\n\n\t\t\tconst data = dataTexture.image.data;\n\t\t\tfor (let i = 0; i < size * size; i++) {\n\t\t\t\tdata[i * 4] *= relaxation;\n\t\t\t\tdata[i * 4 + 1] *= relaxation;\n\t\t\t}\n\n\t\t\tconst gridMouseX = size * mouseState.x;\n\t\t\tconst gridMouseY = size * mouseState.y;\n\t\t\tconst maxDist = size * mouse;\n\n\t\t\tfor (let i = 0; i < size; i++) {\n\t\t\t\tfor (let j = 0; j < size; j++) {\n\t\t\t\t\tconst distance =\n\t\t\t\t\t\tMath.pow(gridMouseX - i, 2) + Math.pow(gridMouseY - j, 2);\n\t\t\t\t\tif (distance < maxDist * maxDist) {\n\t\t\t\t\t\tconst index = 4 * (i + size * j);\n\t\t\t\t\t\tconst power = Math.min(maxDist / Math.sqrt(distance), 10);\n\t\t\t\t\t\tdata[index] += strength * 100 * mouseState.vX * power;\n\t\t\t\t\t\tdata[index + 1] -= strength * 100 * mouseState.vY * power;\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tdataTexture.needsUpdate = true;\n\t\t\trenderer.render(scene, camera);\n\t\t};\n\t\tanimate();\n\n\t\treturn () => {\n\t\t\tcontainer.removeEventListener(\"mousemove\", handleMouseMove);\n\t\t\tcontainer.removeEventListener(\"mouseleave\", handleMouseLeave);\n\t\t\twindow.removeEventListener(\"resize\", handleResize);\n\t\t\trenderer.dispose();\n\t\t\tgeometry.dispose();\n\t\t\tmaterial.dispose();\n\t\t\tdataTexture.dispose();\n\t\t\tif (uniforms.uTexture.value) uniforms.uTexture.value.dispose();\n\t\t};\n\t}, [grid, mouse, strength, relaxation, imageSrc]);\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName={`w-full h-full overflow-hidden ${className}`}\n\t\t/>\n\t);\n};\n\nexport default GridDistortion;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/backgrounds/grid-distortion",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/grid-distortion"
+  }
+}

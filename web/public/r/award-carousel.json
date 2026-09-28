@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "award-carousel",
+  "type": "registry:ui",
+  "title": "Award Carousel",
+  "description": "Row of laurel-wreath award badges above the matching quote and a row of dots.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/award-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/award-carousel.tsx",
+      "content": "\"use client\";\n\nimport React, { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://ui.noxhd.com/components/awards-carousel/\n\nconst AwardsCarousel = ({ Award }) => {\n\tconst [currents, setCurrents] = useState(0);\n\tconst [currents2, setCurrents2] = useState(0);\n\n\tconst onHoverStart = (index) => {\n\t\tchangeStateGradually(currents, index);\n\t};\n\n\tconst onHoverStart2 = (index) => {\n\t\tsetCurrents2(index);\n\t};\n\n\tconst changeStateGradually = (start, end) => {\n\t\tif (start === end) return;\n\n\t\tconst step = start < end ? 1 : -1;\n\t\tlet current = start;\n\n\t\tconst interval = setInterval(() => {\n\t\t\tcurrent += step;\n\t\t\tsetCurrents(current);\n\n\t\t\tif (current === end) {\n\t\t\t\tclearInterval(interval);\n\t\t\t}\n\t\t}, 100);\n\t};\n\n\treturn (\n\t\t<div className=\"flex flex-col justify-center items-center h-full w-full\">\n\t\t\t<div className=\"flex gap-x-14\">\n\t\t\t\t{Award.map((award, index) => (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tonMouseEnter={() => {\n\t\t\t\t\t\t\tonHoverStart2(index);\n\t\t\t\t\t\t\tonHoverStart(index);\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tkey={index + \"award-carousel\"}\n\t\t\t\t\t\tclassName=\"flex\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"flex transition-opacity duration-300\",\n\t\t\t\t\t\t\t\tcurrents2 === index ? \"opacity-100\" : \"opacity-25\"\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Awards />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"text-sm flex flex-col justify-center items-center w-28\",\n\t\t\t\t\t\t\t\t\"transition-opacity duration-300\",\n\t\t\t\t\t\t\t\tcurrents2 === index ? \"opacity-100\" : \"opacity-25\"\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<h1 className=\"font-bold\">{award.Brand}</h1>\n\t\t\t\t\t\t\t<h1>{award.Award}</h1>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"flex scale-x-[-1] transition-opacity duration-300\",\n\t\t\t\t\t\t\t\tcurrents2 === index ? \"opacity-100\" : \"opacity-25\"\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Awards />\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t))}\n\t\t\t</div>\n\n\t\t\t<div\n\t\t\t\tclassName=\"overflow-hidden w-full pt-10\"\n\t\t\t\tstyle={{\n\t\t\t\t\twidth: \"100%\",\n\t\t\t\t\tmaskImage:\n\t\t\t\t\t\t\"linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1) 30%, rgba(0,0,0,1) 80%, rgba(0,0,0,0))\",\n\t\t\t\t\tWebkitMaskImage:\n\t\t\t\t\t\t\"linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,1) 30%, rgba(0,0,0,1) 80%, rgba(0,0,0,0))\",\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<motion.div\n\t\t\t\t\tclassName=\"flex w-full\"\n\t\t\t\t\tanimate={{ translateX: `-${currents * 100}%` }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\tstiffness: 505,\n\t\t\t\t\t\tdamping: 35,\n\t\t\t\t\t\tmass: 1,\n\t\t\t\t\t\tbounce: 0.1,\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{Award.map((award, index) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tkey={index + \"award\"}\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"flex-none w-full text-center text-xl px-48\",\n\t\t\t\t\t\t\t\tcurrents === index\n\t\t\t\t\t\t\t\t\t? \"opacity-100\"\n\t\t\t\t\t\t\t\t\t: \"opacity-0 transition duration-75\"\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{award.Saying}\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</motion.div>\n\t\t\t</div>\n\t\t\t<div className=\"flex justify-center content-center mt-10 group mask-[linear-gradient(to_right,rgba(0,0,0,0),rgba(0,0,0,1)_50%,rgba(0,0,0,1)_50%,rgba(0,0,0,0))]\">\n\t\t\t\t<motion.div\n\t\t\t\t\tclassName=\"flex w-full\"\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\ttranslateX: `calc(47% - ${currents * 22}% - 0.75rem)`,\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\tstiffness: 505,\n\t\t\t\t\t\tdamping: 35,\n\t\t\t\t\t\tmass: 1,\n\t\t\t\t\t\tbounce: 0.1,\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{Award.map((image, index) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\taria-current={currents === index}\n\t\t\t\t\t\t\tkey={index + \"award-image\"}\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"w-2 h-2 mx-1 rounded-full transition-[background-color]\",\n\t\t\t\t\t\t\t\tcurrents === index ? \"bg-background w-4\" : \"bg-stone-500\"\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t></motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</motion.div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nconst Awards = () => {\n\treturn (\n\t\t<div className=\"h-max w-10\">\n\t\t\t<svg viewBox=\"0 0 17 24\" className=\"invert\">\n\t\t\t\t<path d=\"M11.3408 21.1946C12.5848 21.8886 13.8222 22.5826 15.0661 23.2766C15.4262 23.4795 15.7994 23.6629 16.2708 23.9116C15.3411 24.3241 12.6109 23.2831 9.86118 21.1553C7.99526 19.7084 6.46325 17.836 4.78065 16.1534C4.76756 16.029 4.76101 15.9046 4.74792 15.7867C3.48433 12.8667 3.15043 10.7127 3.60872 8.29688C3.73967 9.64557 3.7855 10.9877 4.02119 12.2971C4.39437 14.3987 5.35025 16.2581 6.77751 17.8491C7.07867 18.1895 7.51733 18.4056 7.89706 18.6805C8.00181 18.8115 8.10002 18.9424 8.20477 19.0668C9.1541 19.7215 10.0969 20.3762 11.0462 21.0309C11.1444 21.0899 11.2426 21.1422 11.3408 21.2012V21.1946Z\"></path>\n\t\t\t\t<path d=\"M7.95681 0C7.79313 2.09506 6.37241 4.27524 4.35592 5.63048C3.42623 3.30627 5.08264 0.64816 7.95681 0Z\"></path>\n\t\t\t\t<path d=\"M4.75412 15.7891C4.76722 15.9135 4.77377 16.0379 4.78686 16.1557C4.57735 16.2998 4.33511 16.6009 4.15834 16.5682C1.69664 16.123 0.531263 14.7023 0.354492 11.8281C1.76866 12.6334 2.98642 13.4583 3.82444 14.7939C4.06014 15.1737 4.44641 15.4618 4.76067 15.7957L4.75412 15.7891Z\"></path>\n\t\t\t\t<path d=\"M1.65723 17.2109C4.02072 17.4532 5.88664 18.3305 7.37282 20.0065C5.21229 21.1392 3.14341 20.1506 1.65723 17.2109Z\"></path>\n\t\t\t\t<path d=\"M11.3999 22.5513C8.57807 24.1226 7.09189 23.9262 4.9248 21.6806C7.19009 21.1896 9.27206 21.3205 11.3999 22.5513Z\"></path>\n\t\t\t\t<path d=\"M2.93481 12.2319C0.381454 10.9683 -0.207783 9.53448 0.538584 6.39844C2.21463 8.03521 2.92827 9.9404 2.94136 12.2319H2.93481Z\"></path>\n\t\t\t\t<path d=\"M3.05805 7.52187C1.04155 5.20421 0.982624 4.32036 2.54083 1.28906C3.65383 2.60502 3.86988 4.94888 3.06459 7.52187H3.05805Z\"></path>\n\t\t\t\t<path d=\"M4.42773 7.99354C4.84675 5.45328 6.19544 4.41884 8.63095 4.80512C7.72746 6.53355 6.32639 7.46323 4.42773 7.99354Z\"></path>\n\t\t\t\t<path d=\"M4.40706 12.0743C4.01424 9.38996 4.81953 8.1722 7.30741 7.64844C7.05208 9.57328 6.04383 10.922 4.40706 12.0743Z\"></path>\n\t\t\t\t<path d=\"M11.3412 21.1934C11.243 21.1344 11.1448 21.0821 11.0466 21.0231C9.18064 19.131 9.10863 18.915 9.63239 16.6562C10.8632 17.2455 12.2119 19.5762 11.9893 20.8398C11.9631 20.9904 11.5638 21.0755 11.3412 21.1934Z\"></path>\n\t\t\t\t<path d=\"M8.21101 19.0607C8.10625 18.9298 8.00805 18.7988 7.90329 18.6744C6.51532 16.5663 6.50877 15.5842 7.92294 13.7969C8.92464 15.4009 8.99011 17.077 8.61038 18.8185C8.58419 18.9232 8.3485 18.9822 8.21101 19.0607Z\"></path>\n\t\t\t\t<path d=\"M5.72328 15.8126C4.45315 13.3313 4.81323 11.8058 6.84283 10.6797C7.18327 12.5456 6.94103 14.2151 5.72328 15.8126Z\"></path>\n\t\t\t</svg>\n\t\t</div>\n\t);\n};\n\nexport default AwardsCarousel;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "Hovering a badge brings it to full strength and dims the others, then steps the quote underneath across to that award one item at a time, with the dots sliding along to match.",
+    "inspiration": {
+      "source": "ui.noxhd.com",
+      "url": "https://ui.noxhd.com/components/awards-carousel/",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/award-carousel"
+  }
+}

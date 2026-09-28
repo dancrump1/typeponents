@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-513",
+  "type": "registry:component",
+  "title": "Comp 513",
+  "description": "Comp 513",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-513.tsx",
+      "content": "import {\r\n\tStepper,\r\n\tStepperIndicator,\r\n\tStepperItem,\r\n\tStepperSeparator,\r\n\tStepperTrigger,\r\n} from \"@/components/ui/stepper\";\r\n\r\nconst steps = [1, 2, 3, 4];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"mx-auto max-w-xl space-y-8 text-center\">\r\n\t\t\t<Stepper defaultValue={2}>\r\n\t\t\t\t{steps.map((step) => (\r\n\t\t\t\t\t<StepperItem key={step} step={step} className=\"not-last:flex-1\">\r\n\t\t\t\t\t\t<StepperTrigger>\r\n\t\t\t\t\t\t\t<StepperIndicator asChild>{step}</StepperIndicator>\r\n\t\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t\t{step < steps.length && <StepperSeparator />}\r\n\t\t\t\t\t</StepperItem>\r\n\t\t\t\t))}\r\n\t\t\t</Stepper>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tStepper with numbers only\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

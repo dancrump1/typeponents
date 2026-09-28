@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "slide-button",
+  "type": "registry:ui",
+  "title": "Slide Button",
+  "description": "Slide Button",
+  "dependencies": [
+    "lucide-react",
+    "motion",
+    "uuid"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/slide-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/slide-button.tsx",
+      "content": "\"use client\";\n\nimport React, {\n\tforwardRef,\n\tuseCallback,\n\tuseMemo,\n\tuseRef,\n\tuseState,\n\ttype JSX,\n} from \"react\";\n\nimport { Button, ButtonProps } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\nimport { Check, Loader2, SendHorizontal, X } from \"lucide-react\";\nimport {\n\tAnimatePresence,\n\tmotion,\n\tuseMotionValue,\n\tuseSpring,\n\tuseTransform,\n\ttype PanInfo,\n} from \"motion/react\";\nimport { v4 as uuidv4 } from \"uuid\";\n\n// Credit:\n// https://skiper-ui.com/docs/components/slide-button\n\nconst DRAG_CONSTRAINTS = { left: 0, right: 155 };\nconst DRAG_THRESHOLD = 0.9;\n\nconst BUTTON_STATES = {\n\tinitial: { width: \"12rem\" },\n\tcompleted: { width: \"8rem\" },\n};\n\nconst ANIMATION_CONFIG = {\n\tspring: {\n\t\ttype: \"spring\",\n\t\tstiffness: 400,\n\t\tdamping: 40,\n\t\tmass: 0.8,\n\t},\n};\n\ntype StatusIconProps = {\n\tstatus: string;\n};\n\nconst StatusIcon: React.FC<StatusIconProps> = ({ status }) => {\n\tconst iconMap: Record<StatusIconProps[\"status\"], JSX.Element> = useMemo(\n\t\t() => ({\n\t\t\tloading: <Loader2 className=\"animate-spin\" size={20} />,\n\t\t\tsuccess: <Check size={20} />,\n\t\t\terror: <X size={20} />,\n\t\t}),\n\t\t[]\n\t);\n\n\tif (!iconMap[status]) return null;\n\n\treturn (\n\t\t<motion.div\n\t\t\tkey={uuidv4()}\n\t\t\tinitial={{ opacity: 0, scale: 0.5 }}\n\t\t\tanimate={{ opacity: 1, scale: 1 }}\n\t\t\texit={{ opacity: 0 }}\n\t\t>\n\t\t\t{iconMap[status]}\n\t\t</motion.div>\n\t);\n};\n\nconst useButtonStatus = (resolveTo: \"success\" | \"error\") => {\n\tconst [status, setStatus] = useState<\n\t\t\"idle\" | \"loading\" | \"success\" | \"error\"\n\t>(\"idle\");\n\n\tconst handleSubmit = useCallback(() => {\n\t\tsetStatus(\"loading\");\n\t\tsetTimeout(() => {\n\t\t\tsetStatus(resolveTo);\n\t\t}, 2000);\n\t}, [resolveTo]);\n\n\treturn { status, handleSubmit };\n};\n\nconst SlideButton = forwardRef<HTMLButtonElement, ButtonProps>(\n\t({ className, ...props }, ref) => {\n\t\tconst [isDragging, setIsDragging] = useState(false);\n\t\tconst [completed, setCompleted] = useState(false);\n\t\tconst dragHandleRef = useRef<HTMLDivElement | null>(null);\n\t\tconst { status, handleSubmit } = useButtonStatus(\"success\");\n\n\t\tconst dragX = useMotionValue(0);\n\t\tconst springX = useSpring(dragX, ANIMATION_CONFIG.spring);\n\t\tconst dragProgress = useTransform(\n\t\t\tspringX,\n\t\t\t[0, DRAG_CONSTRAINTS.right],\n\t\t\t[0, 1]\n\t\t);\n\n\t\tconst handleDragStart = useCallback(() => {\n\t\t\tif (completed) return;\n\t\t\tsetIsDragging(true);\n\t\t}, [completed]);\n\n\t\tconst handleDragEnd = () => {\n\t\t\tif (completed) return;\n\t\t\tsetIsDragging(false);\n\n\t\t\tconst progress = dragProgress.get();\n\t\t\tif (progress >= DRAG_THRESHOLD) {\n\t\t\t\tsetCompleted(true);\n\t\t\t\thandleSubmit();\n\t\t\t} else {\n\t\t\t\tdragX.set(0);\n\t\t\t}\n\t\t};\n\n\t\tconst handleDrag = (\n\t\t\t_event: MouseEvent | TouchEvent | PointerEvent,\n\t\t\tinfo: PanInfo\n\t\t) => {\n\t\t\tif (completed) return;\n\t\t\tconst newX = Math.max(\n\t\t\t\t0,\n\t\t\t\tMath.min(info.offset.x, DRAG_CONSTRAINTS.right)\n\t\t\t);\n\t\t\tdragX.set(newX);\n\t\t};\n\n\t\tconst adjustedWidth = useTransform(springX, (x) => x + 10);\n\n\t\treturn (\n\t\t\t<motion.div\n\t\t\t\tanimate={\n\t\t\t\t\tcompleted ? BUTTON_STATES.completed : BUTTON_STATES.initial\n\t\t\t\t}\n\t\t\t\ttransition={ANIMATION_CONFIG.spring}\n\t\t\t\tclassName=\"shadow-button-inset dark:shadow-button-inset-dark relative flex h-9 items-center justify-center rounded-full bg-background\"\n\t\t\t>\n\t\t\t\t{!completed && (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\twidth: adjustedWidth,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"absolute inset-y-0 left-0 z-0 rounded-full bg-accent\"\n\t\t\t\t\t/>\n\t\t\t\t)}\n\t\t\t\t<AnimatePresence key={uuidv4()}>\n\t\t\t\t\t{!completed && (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tref={dragHandleRef}\n\t\t\t\t\t\t\tdrag=\"x\"\n\t\t\t\t\t\t\tdragConstraints={DRAG_CONSTRAINTS}\n\t\t\t\t\t\t\tdragElastic={0.05}\n\t\t\t\t\t\t\tdragMomentum={false}\n\t\t\t\t\t\t\tonDragStart={handleDragStart}\n\t\t\t\t\t\t\tonDragEnd={handleDragEnd}\n\t\t\t\t\t\t\tonDrag={handleDrag}\n\t\t\t\t\t\t\tstyle={{ x: springX }}\n\t\t\t\t\t\t\tclassName=\"absolute -left-4 z-10 flex cursor-grab items-center justify-start active:cursor-grabbing\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Button\n\t\t\t\t\t\t\t\tref={ref}\n\t\t\t\t\t\t\t\tdisabled={status === \"loading\"}\n\t\t\t\t\t\t\t\t{...props}\n\t\t\t\t\t\t\t\tsize=\"icon\"\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"shadow-button rounded-full drop-shadow-xl\",\n\t\t\t\t\t\t\t\t\tisDragging && \"scale-105 transition-transform\",\n\t\t\t\t\t\t\t\t\tclassName\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<SendHorizontal className=\"size-4\" />\n\t\t\t\t\t\t\t</Button>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\n\t\t\t\t<AnimatePresence key={uuidv4()}>\n\t\t\t\t\t{completed && (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tclassName=\"absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\t\t\t\texit={{ opacity: 0 }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<Button\n\t\t\t\t\t\t\t\tref={ref}\n\t\t\t\t\t\t\t\tdisabled={status === \"loading\"}\n\t\t\t\t\t\t\t\t{...props}\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"size-full rounded-full transition-all duration-300\",\n\t\t\t\t\t\t\t\t\tclassName\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<AnimatePresence key={uuidv4()} mode=\"wait\">\n\t\t\t\t\t\t\t\t\t<StatusIcon status={status} />\n\t\t\t\t\t\t\t\t</AnimatePresence>\n\t\t\t\t\t\t\t</Button>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t</motion.div>\n\t\t);\n\t}\n);\n\nSlideButton.displayName = \"SlideButton\";\n\nexport default SlideButton;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "drag"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "skiper-ui.com",
+      "url": "https://skiper-ui.com/docs/components/slide-button",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/slide-button"
+  }
+}

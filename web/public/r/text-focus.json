@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-focus",
+  "type": "registry:ui",
+  "title": "Text Focus",
+  "description": "Blurred sentence with one word held sharp inside a glowing camera-style focus bracket.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-focus.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-focus.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\n\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://www.reactbits.dev/text-animations/true-focus\ninterface TrueFocusProps {\n\tsentence?: string;\n\tmanualMode?: boolean;\n\tblurAmount?: number;\n\tborderColor?: string;\n\tglowColor?: string;\n\tanimationDuration?: number;\n\tpauseBetweenAnimations?: number;\n}\n\ninterface FocusRect {\n\tx: number;\n\ty: number;\n\twidth: number;\n\theight: number;\n}\n\nconst TextFocus: React.FC<TrueFocusProps> = ({\n\tsentence = \"True Focus\",\n\tmanualMode = false,\n\tblurAmount = 5,\n\tborderColor = \"green\",\n\tglowColor = \"rgba(0, 255, 0, 0.6)\",\n\tanimationDuration = 0.5,\n\tpauseBetweenAnimations = 1,\n}) => {\n\tconst words = sentence.split(\" \");\n\tconst [currentIndex, setCurrentIndex] = useState<number>(0);\n\tconst [lastActiveIndex, setLastActiveIndex] = useState<number | null>(null);\n\tconst containerRef = useRef<HTMLDivElement | null>(null);\n\tconst wordRefs = useRef<(HTMLSpanElement | null)[]>([]);\n\tconst [focusRect, setFocusRect] = useState<FocusRect>({\n\t\tx: 0,\n\t\ty: 0,\n\t\twidth: 0,\n\t\theight: 0,\n\t});\n\n\tuseEffect(() => {\n\t\tif (!manualMode) {\n\t\t\tconst interval = setInterval(\n\t\t\t\t() => {\n\t\t\t\t\tsetCurrentIndex((prev) => (prev + 1) % words.length);\n\t\t\t\t},\n\t\t\t\t(animationDuration + pauseBetweenAnimations) * 1000\n\t\t\t);\n\n\t\t\treturn () => clearInterval(interval);\n\t\t}\n\t}, [manualMode, animationDuration, pauseBetweenAnimations, words.length]);\n\n\tuseEffect(() => {\n\t\tif (currentIndex === null || currentIndex === -1) return;\n\t\tif (!wordRefs.current[currentIndex] || !containerRef.current) return;\n\n\t\tconst parentRect = containerRef.current.getBoundingClientRect();\n\t\tconst activeRect =\n\t\t\twordRefs.current[currentIndex]!.getBoundingClientRect();\n\n\t\tsetFocusRect({\n\t\t\tx: activeRect.left - parentRect.left,\n\t\t\ty: activeRect.top - parentRect.top,\n\t\t\twidth: activeRect.width,\n\t\t\theight: activeRect.height,\n\t\t});\n\t}, [currentIndex, words.length]);\n\n\tconst handleMouseEnter = (index: number) => {\n\t\tif (manualMode) {\n\t\t\tsetLastActiveIndex(index);\n\t\t\tsetCurrentIndex(index);\n\t\t}\n\t};\n\n\tconst handleMouseLeave = () => {\n\t\tif (manualMode) {\n\t\t\tsetCurrentIndex(lastActiveIndex!);\n\t\t}\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName=\"relative flex gap-4 justify-center items-center flex-wrap\"\n\t\t\tref={containerRef}\n\t\t>\n\t\t\t{words.map((word, index) => {\n\t\t\t\tconst isActive = index === currentIndex;\n\t\t\t\treturn (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={index + \"text-focus\"}\n\t\t\t\t\t\tref={(el) => (wordRefs.current[index] = el)}\n\t\t\t\t\t\tclassName=\"relative text-[3rem] font-black cursor-pointer\"\n\t\t\t\t\t\tstyle={\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tfilter: manualMode\n\t\t\t\t\t\t\t\t\t? isActive\n\t\t\t\t\t\t\t\t\t\t? `blur(0px)`\n\t\t\t\t\t\t\t\t\t\t: `blur(${blurAmount}px)`\n\t\t\t\t\t\t\t\t\t: isActive\n\t\t\t\t\t\t\t\t\t\t? `blur(0px)`\n\t\t\t\t\t\t\t\t\t\t: `blur(${blurAmount}px)`,\n\t\t\t\t\t\t\t\ttransition: `filter ${animationDuration}s ease`,\n\t\t\t\t\t\t\t} as React.CSSProperties\n\t\t\t\t\t\t}\n\t\t\t\t\t\tonMouseEnter={() => handleMouseEnter(index)}\n\t\t\t\t\t\tonMouseLeave={handleMouseLeave}\n\t\t\t\t\t>\n\t\t\t\t\t\t{word}\n\t\t\t\t\t</span>\n\t\t\t\t);\n\t\t\t})}\n\n\t\t\t<motion.div\n\t\t\t\tclassName=\"absolute top-0 left-0 pointer-events-none box-border border-0\"\n\t\t\t\tanimate={{\n\t\t\t\t\tx: focusRect.x,\n\t\t\t\t\ty: focusRect.y,\n\t\t\t\t\twidth: focusRect.width,\n\t\t\t\t\theight: focusRect.height,\n\t\t\t\t\topacity: currentIndex >= 0 ? 1 : 0,\n\t\t\t\t}}\n\t\t\t\ttransition={{\n\t\t\t\t\tduration: animationDuration,\n\t\t\t\t}}\n\t\t\t\tstyle={\n\t\t\t\t\t{\n\t\t\t\t\t\t\"--border-color\": borderColor,\n\t\t\t\t\t\t\"--glow-color\": glowColor,\n\t\t\t\t\t} as React.CSSProperties\n\t\t\t\t}\n\t\t\t>\n\t\t\t\t<span\n\t\t\t\t\tclassName=\"absolute w-4 h-4 border-[3px] rounded-[3px] top-[-10px] left-[-10px] border-r-0 border-b-0\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tborderColor: \"var(--border-color)\",\n\t\t\t\t\t\tfilter: \"drop-shadow(0 0 4px var(--border-color))\",\n\t\t\t\t\t}}\n\t\t\t\t></span>\n\t\t\t\t<span\n\t\t\t\t\tclassName=\"absolute w-4 h-4 border-[3px] rounded-[3px] top-[-10px] right-[-10px] border-l-0 border-b-0\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tborderColor: \"var(--border-color)\",\n\t\t\t\t\t\tfilter: \"drop-shadow(0 0 4px var(--border-color))\",\n\t\t\t\t\t}}\n\t\t\t\t></span>\n\t\t\t\t<span\n\t\t\t\t\tclassName=\"absolute w-4 h-4 border-[3px] rounded-[3px] bottom-[-10px] left-[-10px] border-r-0 border-t-0\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tborderColor: \"var(--border-color)\",\n\t\t\t\t\t\tfilter: \"drop-shadow(0 0 4px var(--border-color))\",\n\t\t\t\t\t}}\n\t\t\t\t></span>\n\t\t\t\t<span\n\t\t\t\t\tclassName=\"absolute w-4 h-4 border-[3px] rounded-[3px] bottom-[-10px] right-[-10px] border-l-0 border-t-0\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tborderColor: \"var(--border-color)\",\n\t\t\t\t\t\tfilter: \"drop-shadow(0 0 4px var(--border-color))\",\n\t\t\t\t\t}}\n\t\t\t\t></span>\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\nexport default TextFocus;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "The focus bracket travels from word to word on its own, sharpening each word as it arrives and blurring the rest; in manual mode it follows whichever word you hover instead.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/text-animations/true-focus",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "sentence",
+        "type": "string",
+        "default": "\"True Focus\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "manualMode",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blurAmount",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderColor",
+        "type": "string",
+        "default": "\"green\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "glowColor",
+        "type": "string",
+        "default": "\"rgba(0, 255, 0, 0.6)\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDuration",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pauseBetweenAnimations",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-focus"
+  }
+}

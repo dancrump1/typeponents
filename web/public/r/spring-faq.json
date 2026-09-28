@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spring-faq",
+  "type": "registry:ui",
+  "title": "Spring FAQ",
+  "description": "Spring FAQ",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spring-faq.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spring-faq.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useMemo, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { ChevronDown, Code, Heart, Sparkles } from \"lucide-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit\r\n// https://starui.link/docs/components/faq-spring\r\n\r\nconst data = [\r\n\t{\r\n\t\tid: \"one\",\r\n\t\ticon: <Sparkles className=\"size-5 text-foreground\" />,\r\n\t\ttitle: \"What is Star UI?\",\r\n\t\tcontent:\r\n\t\t\t\"Star UI is a powerful React animation component library that allows you to create smooth, interactive animations with minimal code. It provides a simple API for creating complex animations and transitions.\",\r\n\t},\r\n\t{\r\n\t\tid: \"two\",\r\n\t\ticon: <Code className=\"size-5 text-foreground\" />,\r\n\t\ttitle: \"How do I get started?\",\r\n\t\tcontent: `Head to the “Quick start” guide in the docs. If you’ve used unstyled libraries before, you’ll feel at home.`,\r\n\t},\r\n\t{\r\n\t\tid: \"three\",\r\n\t\ticon: <Heart className=\"size-5 text-foreground\" />,\r\n\t\ttitle: \"Can I use it for my project?\",\r\n\t\tcontent: \"Of course! Star UI is free and open source.\",\r\n\t},\r\n];\r\n\r\nfunction FAQSpring() {\r\n\tconst [value, setValue] = useState(\"\");\r\n\tconst currentIndex = useMemo(() => {\r\n\t\treturn data.findIndex((item) => item.id === value);\r\n\t}, [value]);\r\n\r\n\tconst getRadius = (id: string, index: number) => {\r\n\t\tconst dataLength = data.length;\r\n\t\tconst radius = \"--radius-lg\";\r\n\t\tconst isStart = index === 0;\r\n\t\tconst isEnd = index === dataLength - 1;\r\n\t\tconst isExpended = id === value;\r\n\t\tconst isPrev = index === currentIndex - 1;\r\n\t\tconst isNext = index === currentIndex + 1;\r\n\r\n\t\tif (!value) {\r\n\t\t\tif (isStart) return `var(${radius}) var(${radius}) 0 0`;\r\n\t\t\tif (isEnd) return `0 0 var(${radius}) var(${radius})`;\r\n\t\t\treturn \"0 0 0 0\";\r\n\t\t} else {\r\n\t\t\tif (isExpended || (isPrev && isStart) || (isNext && isEnd)) {\r\n\t\t\t\treturn `var(${radius})`;\r\n\t\t\t}\r\n\t\t\tif (isNext) return `var(${radius}) var(${radius}) 0 0`;\r\n\t\t\tif (isPrev) return `0 0 var(${radius}) var(${radius}`;\r\n\t\t}\r\n\t};\r\n\r\n\tconst getMargin = (id: string, index: number) => {\r\n\t\tconst dataLength = data.length;\r\n\t\tconst isExpended = id === value;\r\n\t\tconst isStart = index === 0;\r\n\t\tconst isEnd = index === dataLength - 1;\r\n\t\tconst margin = \"calc(var(--spacing) * 5)\";\r\n\t\tif (isExpended && isEnd) {\r\n\t\t\treturn `${margin} 0`;\r\n\t\t}\r\n\t\tif (isExpended && isStart) {\r\n\t\t\treturn `0 ${margin}`;\r\n\t\t}\r\n\t\tif (isExpended && !isStart && !isEnd) {\r\n\t\t\treturn margin;\r\n\t\t}\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"max-w-sm w-full\">\r\n\t\t\t{data.map((item, index) => (\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tinitial={false}\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"bg-background border-x border-neutral-200 overflow-hidden transition\",\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\"border-t\":\r\n\t\t\t\t\t\t\t\tindex === 0 ||\r\n\t\t\t\t\t\t\t\tvalue === item.id ||\r\n\t\t\t\t\t\t\t\tcurrentIndex + 1 === index,\r\n\t\t\t\t\t\t\t\"border-b\":\r\n\t\t\t\t\t\t\t\tindex === data.length - 1 ||\r\n\t\t\t\t\t\t\t\tvalue === item.id ||\r\n\t\t\t\t\t\t\t\tcurrentIndex - 1 === index,\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t)}\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\tborderRadius: getRadius(item.id, index),\r\n\t\t\t\t\t\tmarginBlock: getMargin(item.id, index),\r\n\t\t\t\t\t}}\r\n\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t<h3>\r\n\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\tonClick={() => {\r\n\t\t\t\t\t\t\t\tsetValue(value === item.id ? \"\" : item.id);\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tclassName=\"font-medium cursor-pointer px-3 py-2 w-full flex items-center justify-between gap-4\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div className=\"flex items-center gap-2\">\r\n\t\t\t\t\t\t\t\t{item.icon}\r\n\t\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<ChevronDown\r\n\t\t\t\t\t\t\t\tclassName={cn(\"size-4 transition-transform\", {\r\n\t\t\t\t\t\t\t\t\t\"rotate-180\": value === item.id,\r\n\t\t\t\t\t\t\t\t})}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t</h3>\r\n\r\n\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t{value === item.id && (\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0, height: 0 }}\r\n\t\t\t\t\t\t\t\tanimate={{ opacity: 1, height: \"auto\" }}\r\n\t\t\t\t\t\t\t\texit={{ opacity: 0, height: 0 }}\r\n\t\t\t\t\t\t\t\tclassName=\"text-sm\"\r\n\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 100,\r\n\t\t\t\t\t\t\t\t\tdamping: 10,\r\n\t\t\t\t\t\t\t\t\tmass: 1,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<p className=\"pb-3 px-3\">{item.content}</p>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t</motion.div>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nexport { FAQSpring };\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Accordions"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/faq-spring",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spring-faq"
+  }
+}

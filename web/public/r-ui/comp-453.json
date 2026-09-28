@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-453",
+  "type": "registry:component",
+  "title": "Comp 453",
+  "description": "Comp 453",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-453.tsx",
+      "content": "import {\r\n\tBreadcrumb,\r\n\tBreadcrumbItem,\r\n\tBreadcrumbLink,\r\n\tBreadcrumbList,\r\n\tBreadcrumbSeparator,\r\n} from \"@/components/ui/breadcrumb\";\r\nimport {\r\n\tSelect,\r\n\tSelectContent,\r\n\tSelectItem,\r\n\tSelectTrigger,\r\n\tSelectValue,\r\n} from \"@/components/ui/select\";\r\nimport { DatabaseIcon } from \"lucide-react\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Breadcrumb>\r\n\t\t\t<BreadcrumbList>\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">Databases</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<Select defaultValue=\"1\">\r\n\t\t\t\t\t\t<SelectTrigger\r\n\t\t\t\t\t\t\tid=\"select-database\"\r\n\t\t\t\t\t\t\tclassName=\"relative gap-2 ps-9\"\r\n\t\t\t\t\t\t\taria-label=\"Select database\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div className=\"text-muted-foreground/80 pointer-events-none absolute inset-y-0 inset-s-0 flex items-center justify-center ps-3 group-has-[select[disabled]]:opacity-50\">\r\n\t\t\t\t\t\t\t\t<DatabaseIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<SelectValue placeholder=\"Select database\" />\r\n\t\t\t\t\t\t</SelectTrigger>\r\n\t\t\t\t\t\t<SelectContent>\r\n\t\t\t\t\t\t\t<SelectItem value=\"1\">Orion</SelectItem>\r\n\t\t\t\t\t\t\t<SelectItem value=\"2\">Sigma</SelectItem>\r\n\t\t\t\t\t\t\t<SelectItem value=\"3\">Dorado</SelectItem>\r\n\t\t\t\t\t\t</SelectContent>\r\n\t\t\t\t\t</Select>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t</BreadcrumbList>\r\n\t\t</Breadcrumb>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

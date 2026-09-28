@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-216",
+  "type": "registry:component",
+  "title": "Comp 216",
+  "description": "Comp 216",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-216.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport {\r\n\tSelect,\r\n\tSelectContent,\r\n\tSelectItem,\r\n\tSelectTrigger,\r\n\tSelectValue,\r\n} from \"@/components/ui/select\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"group relative\">\r\n\t\t\t<label\r\n\t\t\t\thtmlFor={id}\r\n\t\t\t\tclassName=\"bg-background text-foreground absolute inset-s-1 top-0 z-10 block -translate-y-1/2 px-2 text-xs font-medium group-has-disabled:opacity-50\"\r\n\t\t\t>\r\n\t\t\t\tSelect with overlapping label\r\n\t\t\t</label>\r\n\t\t\t<Select>\r\n\t\t\t\t<SelectTrigger id={id}>\r\n\t\t\t\t\t<SelectValue placeholder=\"Select framework\" />\r\n\t\t\t\t</SelectTrigger>\r\n\t\t\t\t<SelectContent>\r\n\t\t\t\t\t<SelectItem value=\"1\">React</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"2\">Next.js</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"3\">Astro</SelectItem>\r\n\t\t\t\t\t<SelectItem value=\"4\">Gatsby</SelectItem>\r\n\t\t\t\t</SelectContent>\r\n\t\t\t</Select>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

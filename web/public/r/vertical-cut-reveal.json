@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "vertical-cut-reveal",
+  "type": "registry:ui",
+  "title": "Vertical Cut Reveal",
+  "description": "Vertical Cut Reveal",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/vertical-cut-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/vertical-cut-reveal.tsx",
+      "content": "\"use client\";\n\nimport {\n\tforwardRef,\n\tuseCallback,\n\tuseEffect,\n\tuseImperativeHandle,\n\tuseMemo,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { DynamicAnimationOptions, motion } from \"motion/react\";\n\n// Credit:\n// https://www.fancycomponents.dev/docs/components/text/vertical-cut-reveal\n\ninterface TextProps {\n\tchildren: React.ReactNode;\n\treverse?: boolean;\n\ttransition?: DynamicAnimationOptions;\n\tsplitBy?: \"words\" | \"characters\" | \"lines\" | string;\n\tstaggerDuration?: number;\n\tstaggerFrom?: \"first\" | \"last\" | \"center\" | \"random\" | number;\n\tcontainerClassName?: string;\n\twordLevelClassName?: string;\n\telementLevelClassName?: string;\n\tonClick?: () => void;\n\tonStart?: () => void;\n\tonComplete?: () => void;\n\tautoStart?: boolean; // Whether to start the animation automatically\n}\n\n// Ref interface to allow external control of the animation\nexport interface VerticalCutRevealRef {\n\tstartAnimation: () => void;\n\treset: () => void;\n}\n\ninterface WordObject {\n\tcharacters: string[];\n\tneedsSpace: boolean;\n}\n\nconst VerticalCutReveal = forwardRef<VerticalCutRevealRef, TextProps>(\n\t(\n\t\t{\n\t\t\tchildren,\n\t\t\treverse = false,\n\t\t\ttransition = {\n\t\t\t\ttype: \"spring\",\n\t\t\t\tstiffness: 190,\n\t\t\t\tdamping: 22,\n\t\t\t},\n\t\t\tsplitBy = \"words\",\n\t\t\tstaggerDuration = 0.2,\n\t\t\tstaggerFrom = \"first\",\n\t\t\tcontainerClassName,\n\t\t\twordLevelClassName,\n\t\t\telementLevelClassName,\n\t\t\tonClick,\n\t\t\tonStart,\n\t\t\tonComplete,\n\t\t\tautoStart = true,\n\t\t\t...props\n\t\t},\n\t\tref\n\t) => {\n\t\tconst containerRef = useRef<HTMLSpanElement>(null);\n\t\tconst text =\n\t\t\ttypeof children === \"string\" ? children : children?.toString() || \"\";\n\t\tconst [isAnimating, setIsAnimating] = useState(false);\n\n\t\t// handy function to split text into characters with support for unicode and emojis\n\t\tconst splitIntoCharacters = (text: string): string[] => {\n\t\t\tif (typeof Intl !== \"undefined\" && \"Segmenter\" in Intl) {\n\t\t\t\tconst segmenter = new Intl.Segmenter(\"en\", {\n\t\t\t\t\tgranularity: \"grapheme\",\n\t\t\t\t});\n\t\t\t\treturn Array.from(\n\t\t\t\t\tsegmenter.segment(text),\n\t\t\t\t\t({ segment }) => segment\n\t\t\t\t);\n\t\t\t}\n\t\t\t// Fallback for browsers that don't support Intl.Segmenter\n\t\t\treturn Array.from(text);\n\t\t};\n\n\t\t// Split text based on splitBy parameter\n\t\tconst elements = useMemo(() => {\n\t\t\tconst words = text.split(\" \");\n\t\t\tif (splitBy === \"characters\") {\n\t\t\t\treturn words.map((word, i) => ({\n\t\t\t\t\tcharacters: splitIntoCharacters(word),\n\t\t\t\t\tneedsSpace: i !== words.length - 1,\n\t\t\t\t}));\n\t\t\t}\n\t\t\treturn splitBy === \"words\"\n\t\t\t\t? text.split(\" \")\n\t\t\t\t: splitBy === \"lines\"\n\t\t\t\t\t? text.split(\"\\n\")\n\t\t\t\t\t: text.split(splitBy);\n\t\t}, [text, splitBy]);\n\n\t\t// Calculate stagger delays based on staggerFrom\n\t\tconst getStaggerDelay = useCallback(\n\t\t\t(index: number) => {\n\t\t\t\tconst total =\n\t\t\t\t\tsplitBy === \"characters\"\n\t\t\t\t\t\t? elements.reduce(\n\t\t\t\t\t\t\t\t(acc, word) =>\n\t\t\t\t\t\t\t\t\tacc +\n\t\t\t\t\t\t\t\t\t(typeof word === \"string\"\n\t\t\t\t\t\t\t\t\t\t? 1\n\t\t\t\t\t\t\t\t\t\t: word.characters.length +\n\t\t\t\t\t\t\t\t\t\t\t(word.needsSpace ? 1 : 0)),\n\t\t\t\t\t\t\t\t0\n\t\t\t\t\t\t\t)\n\t\t\t\t\t\t: elements.length;\n\t\t\t\tif (staggerFrom === \"first\") return index * staggerDuration;\n\t\t\t\tif (staggerFrom === \"last\")\n\t\t\t\t\treturn (total - 1 - index) * staggerDuration;\n\t\t\t\tif (staggerFrom === \"center\") {\n\t\t\t\t\tconst center = Math.floor(total / 2);\n\t\t\t\t\treturn Math.abs(center - index) * staggerDuration;\n\t\t\t\t}\n\t\t\t\tif (staggerFrom === \"random\") {\n\t\t\t\t\tconst randomIndex = Math.floor(Math.random() * total);\n\t\t\t\t\treturn Math.abs(randomIndex - index) * staggerDuration;\n\t\t\t\t}\n\t\t\t\treturn Math.abs(staggerFrom - index) * staggerDuration;\n\t\t\t},\n\t\t\t[elements.length, staggerFrom, staggerDuration]\n\t\t);\n\n\t\tconst startAnimation = useCallback(() => {\n\t\t\tsetIsAnimating(true);\n\t\t\tonStart?.();\n\t\t}, [onStart]);\n\n\t\t// Expose the startAnimation function via ref\n\t\tuseImperativeHandle(ref, () => ({\n\t\t\tstartAnimation,\n\t\t\treset: () => setIsAnimating(false),\n\t\t}));\n\n\t\t// Auto start animation\n\t\tuseEffect(() => {\n\t\t\tif (autoStart) {\n\t\t\t\tstartAnimation();\n\t\t\t}\n\t\t}, [autoStart]);\n\n\t\tconst variants = {\n\t\t\thidden: { y: reverse ? \"-100%\" : \"100%\" },\n\t\t\tvisible: (i: number) => ({\n\t\t\t\ty: 0,\n\t\t\t\ttransition: {\n\t\t\t\t\t...transition,\n\t\t\t\t\tdelay: ((transition?.delay as number) || 0) + getStaggerDelay(i),\n\t\t\t\t},\n\t\t\t}),\n\t\t};\n\n\t\treturn (\n\t\t\t<span\n\t\t\t\tclassName={cn(\n\t\t\t\t\tcontainerClassName,\n\t\t\t\t\t\"flex flex-wrap whitespace-pre-wrap\",\n\t\t\t\t\tsplitBy === \"lines\" && \"flex-col\"\n\t\t\t\t)}\n\t\t\t\tonClick={onClick}\n\t\t\t\tref={containerRef}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t<span className=\"sr-only\">{text}</span>\n\n\t\t\t\t{(splitBy === \"characters\"\n\t\t\t\t\t? (elements as WordObject[])\n\t\t\t\t\t: (elements as string[]).map((el, i) => ({\n\t\t\t\t\t\t\tcharacters: [el],\n\t\t\t\t\t\t\tneedsSpace: i !== elements.length - 1,\n\t\t\t\t\t\t}))\n\t\t\t\t).map((wordObj, wordIndex, array) => {\n\t\t\t\t\tconst previousCharsCount = array\n\t\t\t\t\t\t.slice(0, wordIndex)\n\t\t\t\t\t\t.reduce((sum, word) => sum + word.characters.length, 0);\n\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<span\n\t\t\t\t\t\t\tkey={wordIndex}\n\t\t\t\t\t\t\taria-hidden=\"true\"\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"inline-flex overflow-hidden\",\n\t\t\t\t\t\t\t\twordLevelClassName\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{wordObj.characters.map((char, charIndex) => (\n\t\t\t\t\t\t\t\t<span\n\t\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\telementLevelClassName,\n\t\t\t\t\t\t\t\t\t\t\"whitespace-pre-wrap relative\"\n\t\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t\t\tkey={charIndex}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\t\t\t\tcustom={previousCharsCount + charIndex}\n\t\t\t\t\t\t\t\t\t\tinitial=\"hidden\"\n\t\t\t\t\t\t\t\t\t\tanimate={isAnimating ? \"visible\" : \"hidden\"}\n\t\t\t\t\t\t\t\t\t\tvariants={variants}\n\t\t\t\t\t\t\t\t\t\tonAnimationComplete={\n\t\t\t\t\t\t\t\t\t\t\twordIndex === elements.length - 1 &&\n\t\t\t\t\t\t\t\t\t\t\tcharIndex === wordObj.characters.length - 1\n\t\t\t\t\t\t\t\t\t\t\t\t? onComplete\n\t\t\t\t\t\t\t\t\t\t\t\t: undefined\n\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\tclassName=\"inline-block\"\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t{char}\n\t\t\t\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t{wordObj.needsSpace && <span> </span>}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</span>\n\t\t);\n\t}\n);\n\nVerticalCutReveal.displayName = \"VerticalCutReveal\";\nexport default VerticalCutReveal;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/vertical-cut-reveal",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/vertical-cut-reveal"
+  }
+}

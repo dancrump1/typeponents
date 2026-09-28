@@ -1,0 +1,32 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "marquee-along-svg",
+	title: "Marquee Along SVG",
+	description: "",
+	interaction: "",
+	categories: ["Media Galleries"],
+	tags: ["spring", "scroll-driven", "hover", "autoplay", "responsive"],
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "path", type: "string", required: true },
+		{ name: "baseVelocity", type: "number", default: "5" },
+		{ name: "repeat", type: "number", default: "0" },
+		{ name: "zIndexBase", type: "number", default: "1" },
+		{ name: "enableRollingZIndex", type: "boolean" },
+		{ name: "scrollContainerRef", type: "React.RefObject<HTMLDivElement | null>" },
+		{ name: "scrollContainer", type: "React.RefObject<HTMLDivElement>" },
+		{ name: "className", type: "string" },
+		{ name: "direction", type: "\"normal\" | \"reverse\"", default: "\"normal\"" },
+		{ name: "slowDownSpringConfig", type: "{ damping: number; stiffness: number; }", default: "{ damping: 50, stiffness: 400 }" },
+		{ name: "useScrollVelocity", type: "boolean", default: "false" },
+		{ name: "scrollSpringConfig", type: "{ damping: number; stiffness: number; }", default: "{ damping: 50, stiffness: 400 }" },
+		{ name: "width", type: "string | number" },
+		{ name: "height", type: "string | number" },
+		{ name: "showPath", type: "boolean" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

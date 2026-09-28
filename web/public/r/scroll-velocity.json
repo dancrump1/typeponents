@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-velocity",
+  "type": "registry:ui",
+  "title": "Scroll Velocity",
+  "description": "Marquee rows of repeating text or logos that slide sideways forever, with the page scroll acting as a throttle.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-velocity.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-velocity.tsx",
+      "content": "\"use client\";\n\nimport React, { useContext, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tmotion,\n\tuseAnimationFrame,\n\tuseMotionValue,\n\tuseScroll,\n\tuseSpring,\n\tuseTransform,\n\tuseVelocity,\n} from \"motion/react\";\nimport type { MotionValue } from \"motion/react\";\n\ninterface ScrollVelocityRowProps extends React.HTMLAttributes<HTMLDivElement> {\n\tchildren: React.ReactNode;\n\tbaseVelocity?: number;\n\tdirection?: 1 | -1;\n}\n\nexport const wrap = (min: number, max: number, v: number) => {\n\tconst rangeSize = max - min;\n\treturn ((((v - min) % rangeSize) + rangeSize) % rangeSize) + min;\n};\n\nconst ScrollVelocityContext = React.createContext<MotionValue<number> | null>(\n\tnull\n);\n\nexport function ScrollVelocityContainer({\n\tchildren,\n\tclassName,\n\t...props\n}: React.HTMLAttributes<HTMLDivElement>) {\n\tconst { scrollY } = useScroll();\n\tconst scrollVelocity = useVelocity(scrollY);\n\tconst smoothVelocity = useSpring(scrollVelocity, {\n\t\tdamping: 50,\n\t\tstiffness: 400,\n\t});\n\tconst velocityFactor = useTransform(smoothVelocity, (v) => {\n\t\tconst sign = v < 0 ? -1 : 1;\n\t\tconst magnitude = Math.min(5, (Math.abs(v) / 1000) * 5);\n\t\treturn sign * magnitude;\n\t});\n\n\treturn (\n\t\t<ScrollVelocityContext.Provider value={velocityFactor}>\n\t\t\t<div className={cn(\"relative w-full\", className)} {...props}>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</ScrollVelocityContext.Provider>\n\t);\n}\n\nexport function ScrollVelocityRow(props: ScrollVelocityRowProps) {\n\tconst sharedVelocityFactor = useContext(ScrollVelocityContext);\n\tif (sharedVelocityFactor) {\n\t\treturn (\n\t\t\t<ScrollVelocityRowImpl\n\t\t\t\t{...props}\n\t\t\t\tvelocityFactor={sharedVelocityFactor}\n\t\t\t/>\n\t\t);\n\t}\n\treturn <ScrollVelocityRowLocal {...props} />;\n}\n\ninterface ScrollVelocityRowImplProps extends ScrollVelocityRowProps {\n\tvelocityFactor: MotionValue<number>;\n}\n\nfunction ScrollVelocityRowImpl({\n\tchildren,\n\tbaseVelocity = 5,\n\tdirection = 1,\n\tclassName,\n\tvelocityFactor,\n\t...props\n}: ScrollVelocityRowImplProps) {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst blockRef = useRef<HTMLDivElement>(null);\n\tconst [numCopies, setNumCopies] = useState(1);\n\n\tconst baseX = useMotionValue(0);\n\tconst baseDirectionRef = useRef<number>(direction >= 0 ? 1 : -1);\n\tconst currentDirectionRef = useRef<number>(direction >= 0 ? 1 : -1);\n\tconst unitWidth = useMotionValue(0);\n\n\tconst isInViewRef = useRef(true);\n\tconst isPageVisibleRef = useRef(true);\n\tconst prefersReducedMotionRef = useRef(false);\n\n\tuseEffect(() => {\n\t\tconst container = containerRef.current;\n\t\tconst block = blockRef.current;\n\t\tif (!container || !block) return;\n\n\t\tconst updateSizes = () => {\n\t\t\tconst cw = container.offsetWidth || 0;\n\t\t\tconst bw = block.scrollWidth || 0;\n\t\t\tunitWidth.set(bw);\n\t\t\tconst nextCopies = bw > 0 ? Math.max(3, Math.ceil(cw / bw) + 2) : 1;\n\t\t\tsetNumCopies((prev) => (prev === nextCopies ? prev : nextCopies));\n\t\t};\n\n\t\tupdateSizes();\n\n\t\tconst ro = new ResizeObserver(updateSizes);\n\t\tro.observe(container);\n\t\tro.observe(block);\n\n\t\tconst io = new IntersectionObserver(([entry]) => {\n\t\t\tisInViewRef.current = entry.isIntersecting;\n\t\t});\n\t\tio.observe(container);\n\n\t\tconst handleVisibility = () => {\n\t\t\tisPageVisibleRef.current = document.visibilityState === \"visible\";\n\t\t};\n\t\tdocument.addEventListener(\"visibilitychange\", handleVisibility, {\n\t\t\tpassive: true,\n\t\t});\n\t\thandleVisibility();\n\n\t\tconst mq = window.matchMedia(\"(prefers-reduced-motion: reduce)\");\n\t\tconst handlePRM = () => {\n\t\t\tprefersReducedMotionRef.current = mq.matches;\n\t\t};\n\t\tmq.addEventListener(\"change\", handlePRM);\n\t\thandlePRM();\n\n\t\treturn () => {\n\t\t\tro.disconnect();\n\t\t\tio.disconnect();\n\t\t\tdocument.removeEventListener(\"visibilitychange\", handleVisibility);\n\t\t\tmq.removeEventListener(\"change\", handlePRM);\n\t\t};\n\t}, [children, unitWidth]);\n\n\tconst x = useTransform([baseX, unitWidth], ([v, bw]) => {\n\t\tconst width = Number(bw) || 1;\n\t\tconst offset = Number(v) || 0;\n\t\treturn `${-wrap(0, width, offset)}px`;\n\t});\n\n\tuseAnimationFrame((_, delta) => {\n\t\tif (!isInViewRef.current || !isPageVisibleRef.current) return;\n\t\tconst dt = delta / 1000;\n\t\tconst vf = velocityFactor.get();\n\t\tconst absVf = Math.min(5, Math.abs(vf));\n\t\tconst speedMultiplier = prefersReducedMotionRef.current ? 1 : 1 + absVf;\n\n\t\tif (absVf > 0.1) {\n\t\t\tconst scrollDirection = vf >= 0 ? 1 : -1;\n\t\t\tcurrentDirectionRef.current =\n\t\t\t\tbaseDirectionRef.current * scrollDirection;\n\t\t}\n\n\t\tconst bw = unitWidth.get() || 0;\n\t\tif (bw <= 0) return;\n\t\tconst pixelsPerSecond = (bw * baseVelocity) / 100;\n\t\tconst moveBy =\n\t\t\tcurrentDirectionRef.current * pixelsPerSecond * speedMultiplier * dt;\n\t\tbaseX.set(baseX.get() + moveBy);\n\t});\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName={cn(\"w-full overflow-hidden whitespace-nowrap\", className)}\n\t\t\t{...props}\n\t\t>\n\t\t\t<motion.div\n\t\t\t\tclassName=\"inline-flex items-center will-change-transform transform-gpu select-none\"\n\t\t\t\tstyle={{ x }}\n\t\t\t>\n\t\t\t\t{Array.from({ length: numCopies }).map((_, i) => (\n\t\t\t\t\t<div\n\t\t\t\t\t\tkey={i}\n\t\t\t\t\t\tref={i === 0 ? blockRef : null}\n\t\t\t\t\t\taria-hidden={i !== 0}\n\t\t\t\t\t\tclassName=\"inline-flex shrink-0 items-center\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{children}\n\t\t\t\t\t</div>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n}\n\nfunction ScrollVelocityRowLocal(props: ScrollVelocityRowProps) {\n\tconst { scrollY } = useScroll();\n\tconst localVelocity = useVelocity(scrollY);\n\tconst localSmoothVelocity = useSpring(localVelocity, {\n\t\tdamping: 50,\n\t\tstiffness: 400,\n\t});\n\tconst localVelocityFactor = useTransform(localSmoothVelocity, (v) => {\n\t\tconst sign = v < 0 ? -1 : 1;\n\t\tconst magnitude = Math.min(5, (Math.abs(v) / 1000) * 5);\n\t\treturn sign * magnitude;\n\t});\n\treturn (\n\t\t<ScrollVelocityRowImpl {...props} velocityFactor={localVelocityFactor} />\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "Each row drifts at a steady pace on its own; scrolling the page pushes it faster, scrolling the other way flips its direction, and it eases back to the base drift once you stop.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-velocity"
+  }
+}

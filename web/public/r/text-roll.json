@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-roll",
+  "type": "registry:ui",
+  "title": "Text Roll",
+  "description": "Text Roll",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-roll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-roll.tsx",
+      "content": "\"use client\";\r\n\r\nimport {\r\n\tmotion,\r\n\tTarget,\r\n\tTargetAndTransition,\r\n\tTransition,\r\n\tVariantLabels,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://motion-primitives.com/docs/text-roll\r\n\r\nexport type TextRollProps = {\r\n\tchildren: string;\r\n\tduration?: number;\r\n\tgetEnterDelay?: (index: number) => number;\r\n\tgetExitDelay?: (index: number) => number;\r\n\tclassName?: string;\r\n\ttransition?: Transition;\r\n\tvariants?: {\r\n\t\tenter: {\r\n\t\t\tinitial: Target | VariantLabels | boolean;\r\n\t\t\tanimate: TargetAndTransition | VariantLabels;\r\n\t\t};\r\n\t\texit: {\r\n\t\t\tinitial: Target | VariantLabels | boolean;\r\n\t\t\tanimate: TargetAndTransition | VariantLabels;\r\n\t\t};\r\n\t};\r\n\tonAnimationComplete?: () => void;\r\n};\r\n\r\nexport function TextRoll({\r\n\tchildren,\r\n\tduration = 0.5,\r\n\tgetEnterDelay = (i) => i * 0.1,\r\n\tgetExitDelay = (i) => i * 0.1 + 0.2,\r\n\tclassName,\r\n\ttransition = { ease: \"easeIn\" },\r\n\tvariants,\r\n\tonAnimationComplete,\r\n}: TextRollProps) {\r\n\tconst defaultVariants = {\r\n\t\tenter: {\r\n\t\t\tinitial: { rotateX: 0 },\r\n\t\t\tanimate: { rotateX: 90 },\r\n\t\t},\r\n\t\texit: {\r\n\t\t\tinitial: { rotateX: 90 },\r\n\t\t\tanimate: { rotateX: 0 },\r\n\t\t},\r\n\t} as const;\r\n\r\n\tconst letters = children.split(\"\");\r\n\r\n\treturn (\r\n\t\t<span className={className}>\r\n\t\t\t{letters.map((letter, i) => {\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<span\r\n\t\t\t\t\t\tkey={i + \"text-roll\"}\r\n\t\t\t\t\t\tclassName=\"relative inline-block perspective-[10000px] transform-3d w-auto\"\r\n\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\tclassName=\"absolute inline-block backface-hidden origin-[50%_25%]\"\r\n\t\t\t\t\t\t\tinitial={\r\n\t\t\t\t\t\t\t\tvariants?.enter?.initial ??\r\n\t\t\t\t\t\t\t\tdefaultVariants.enter.initial\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tanimate={\r\n\t\t\t\t\t\t\t\tvariants?.enter?.animate ??\r\n\t\t\t\t\t\t\t\tdefaultVariants.enter.animate\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t...transition,\r\n\t\t\t\t\t\t\t\tduration,\r\n\t\t\t\t\t\t\t\tdelay: getEnterDelay(i),\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{letter === \" \" ? \"\\u00A0\" : letter}\r\n\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\tclassName=\"absolute inline-block backface-hidden origin-[50%_100%]\"\r\n\t\t\t\t\t\t\tinitial={\r\n\t\t\t\t\t\t\t\tvariants?.exit?.initial ?? defaultVariants.exit.initial\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\tanimate={\r\n\t\t\t\t\t\t\t\tvariants?.exit?.animate ?? defaultVariants.exit.animate\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t...transition,\r\n\t\t\t\t\t\t\t\tduration,\r\n\t\t\t\t\t\t\t\tdelay: getExitDelay(i),\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tonAnimationComplete={\r\n\t\t\t\t\t\t\t\tletters.length === i + 1\r\n\t\t\t\t\t\t\t\t\t? onAnimationComplete\r\n\t\t\t\t\t\t\t\t\t: undefined\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{letter === \" \" ? \"\\u00A0\" : letter}\r\n\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t<span className=\"invisible\">\r\n\t\t\t\t\t\t\t{letter === \" \" ? \"\\u00A0\" : letter}\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</span>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t\t<span className=\"sr-only\">{children}</span>\r\n\t\t</span>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Motion Primitives",
+      "url": "https://motion-primitives.com/docs/text-roll",
+      "authorUrl": "https://motion-primitives.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "getEnterDelay",
+        "type": "((index: number) => number)",
+        "default": "(i) => i * 0.1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "getExitDelay",
+        "type": "((index: number) => number)",
+        "default": "(i) => i * 0.1 + 0.2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "Transition",
+        "default": "{ ease: \"easeIn\" }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variants",
+        "type": "{ enter: { initial: Target | VariantLabels | boolean; ani…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onAnimationComplete",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-roll"
+  }
+}

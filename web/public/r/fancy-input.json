@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fancy-input",
+  "type": "registry:ui",
+  "title": "Fancy Input",
+  "description": "Fancy Input",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fancy-input.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fancy-input.tsx",
+      "content": "\"use client\";\r\n\r\nimport type React from \"react\";\r\nimport { useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { Loader } from \"lucide-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://starui.link/docs/components/subscribe\r\n\r\nfunction Subscribe() {\r\n\tconst [email, setEmail] = useState(\"\");\r\n\tconst [focus, setFocus] = useState(false);\r\n\tconst [status, setStatus] = useState<\"idle\" | \"loading\" | \"success\">(\"idle\");\r\n\tconst label = \"your@email.com\";\r\n\tconst letters = label.split(\"\");\r\n\r\n\tconst show = focus || email;\r\n\r\n\tconst onSubmit = (event: React.FormEvent) => {\r\n\t\tevent.preventDefault();\r\n\t\tsetStatus(\"loading\");\r\n\r\n\t\tsetTimeout(() => {\r\n\t\t\tsetStatus(\"success\");\r\n\t\t}, 3000);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<form onSubmit={onSubmit} className=\"grow flex justify-center\">\r\n\t\t\t<div className=\"relative max-w-96 w-full bg-background\">\r\n\t\t\t\t<label\r\n\t\t\t\t\thtmlFor=\"email\"\r\n\t\t\t\t\tclassName=\"absolute inset-0 flex items-center z-10 pointer-events-none\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<span className=\"flex\">\r\n\t\t\t\t\t\t{letters.map((letter, index) => (\r\n\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\taria-hidden\r\n\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\"inline-block\",\r\n\t\t\t\t\t\t\t\t\tshow ? \"text-amber-500\" : \"text-foreground\"\r\n\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\tkey={index + \"fancy-input\"}\r\n\t\t\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\tx: 20,\r\n\t\t\t\t\t\t\t\t\ty: show ? -40 : 0,\r\n\t\t\t\t\t\t\t\t\topacity: status === \"success\" ? 0 : 1,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tduration: 0.4,\r\n\t\t\t\t\t\t\t\t\tdelay: index * 0.01,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{letter}\r\n\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t<span className=\"sr-only\">{label}</span>\r\n\t\t\t\t\t</span>\r\n\t\t\t\t</label>\r\n\r\n\t\t\t\t<div\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"h-12 w-full transition-[border] border-2 flex items-center gap-2 rounded-full my-2 pl-5 relative overflow-hidden\",\r\n\t\t\t\t\t\tshow ? \"border-amber-500\" : \"border-neutral-300\"\r\n\t\t\t\t\t)}\r\n\t\t\t\t>\r\n\t\t\t\t\t<input\r\n\t\t\t\t\t\tid=\"email\"\r\n\t\t\t\t\t\tname=\"email\"\r\n\t\t\t\t\t\ttype=\"email\"\r\n\t\t\t\t\t\ttitle=\"email\"\r\n\t\t\t\t\t\tclassName=\"border-none grow outline-hidden\"\r\n\t\t\t\t\t\tplaceholder=\"\"\r\n\t\t\t\t\t\trequired\r\n\t\t\t\t\t\tautoComplete=\"off\"\r\n\t\t\t\t\t\tspellCheck=\"false\"\r\n\t\t\t\t\t\tvalue={email}\r\n\t\t\t\t\t\tonChange={(e) => setEmail(e.target.value)}\r\n\t\t\t\t\t\tonFocus={() => setFocus(true)}\r\n\t\t\t\t\t\tonBlur={() => setFocus(false)}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tclassName=\"absolute\"\r\n\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\tright: 4,\r\n\t\t\t\t\t\t\tx: show ? \"calc(0% + 0px)\" : \"calc(100% + 4px)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\ttransition={{ type: \"spring\", bounce: 0.3 }}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.button\r\n\t\t\t\t\t\t\tlayoutId=\"button\"\r\n\t\t\t\t\t\t\ttype=\"submit\"\r\n\t\t\t\t\t\t\tstyle={{ borderRadius: 999 }}\r\n\t\t\t\t\t\t\tclassName=\"px-6 h-10 bg-linear-to-b from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 font-semibold shrink-0 transition-colors text-foreground border-none\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\tSubscribe\r\n\t\t\t\t\t\t</motion.button>\r\n\t\t\t\t\t</motion.div>\r\n\r\n\t\t\t\t\t<AnimatePresence mode=\"popLayout\">\r\n\t\t\t\t\t\t{status === \"loading\" && (\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tlayoutId=\"button\"\r\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 z-10 bg-linear-to-b from-amber-400 to-amber-500 flex items-center justify-center text-foreground\"\r\n\t\t\t\t\t\t\t\tstyle={{ borderRadius: 999 }}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<Loader size={18} className=\"animate-spin\" />\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t)}\r\n\r\n\t\t\t\t\t\t{status === \"success\" && (\r\n\t\t\t\t\t\t\t<div className=\"absolute inset-0 z-10 bg-linear-to-b from-amber-400 to-amber-500 flex items-center justify-center font-semibold text-foreground\">\r\n\t\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\t\tinitial={{ y: -20, filter: \"blur(4px)\" }}\r\n\t\t\t\t\t\t\t\t\tanimate={{ y: 0, filter: \"blur(0px)\" }}\r\n\t\t\t\t\t\t\t\t\ttransition={{ type: \"spring\" }}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\tYour email has been subscribed!\r\n\t\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</form>\r\n\t);\r\n}\r\n\r\nexport { Subscribe };\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/subscribe",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fancy-input"
+  }
+}

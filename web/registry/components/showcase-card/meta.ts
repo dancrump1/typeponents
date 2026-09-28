@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "showcase-card",
+	title: "Showcase Card",
+	description: "",
+	interaction: "",
+	categories: ["Cards"],
+	tags: ["featured", "spring", "hover", "cursor-tracking"],
+	inspiration: {
+		source: "Componentry",
+		url: "https://www.componentry.fun/docs/components/showcase-card",
+		authorUrl: "https://www.componentry.fun",
+		relationship: "adaptation",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "heading", type: "string", description: "Main heading text", required: true },
+		{ name: "imageUrl", type: "string", description: "Image URL for the hero section", required: true },
+		{ name: "tagline", type: "string", description: "Top tagline text" },
+		{ name: "description", type: "string", description: "Description text below heading" },
+		{ name: "imageAlt", type: "string", default: "\"Showcase image\"", description: "Alt text for the image" },
+		{ name: "ctaText", type: "string", description: "CTA button text" },
+		{ name: "onCtaClick", type: "(() => void)", description: "CTA button click handler" },
+		{ name: "brandName", type: "string", description: "Brand name or logo text" },
+		{ name: "services", type: "string[]", default: "[]", description: "Array of service tags" },
+		{ name: "className", type: "string", description: "Custom class name" },
+		{ name: "enableTilt", type: "boolean", default: "true", description: "Enable 3D tilt effect on hover" },
+		{ name: "maxTilt", type: "number", default: "8", description: "Maximum tilt angle in degrees" },
+		{ name: "enableParallax", type: "boolean", default: "true", description: "Enable parallax effect on image" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 9,
+	status: "needs-review",
+});

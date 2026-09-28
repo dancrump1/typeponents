@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mask-cursor-effect",
+  "type": "registry:ui",
+  "title": "Mask Cursor Effect",
+  "description": "A component that reveals hidden content through a circular mask that follows your mouse. Perfect for creating interactive reveal effects.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/mask-cursor-effect.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/mask-cursor-effect.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useEffect, useRef, useState } from 'react';\r\nimport { motion } from 'framer-motion';\r\nimport { cn } from '@/lib/utils';\r\n\r\nconst getMaskDataUrl = () => {\r\n  const svgString = `<svg width=\"526\" height=\"526\" viewBox=\"0 0 526 526\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\r\n    <circle cx=\"263\" cy=\"263\" r=\"263\" fill=\"black\" />\r\n  </svg>`;\r\n  return `data:image/svg+xml;base64,${btoa(svgString)}`;\r\n};\r\n\r\nconst MaskCursorEffect = ({\r\n  children,\r\n  hiddenComponent,\r\n  className,\r\n  compressedMaskSize = 40,\r\n  expandedMaskSize = 350\r\n}: {\r\n  children: React.ReactNode;\r\n  hiddenComponent?: React.ReactNode;\r\n  className?: string;\r\n  compressedMaskSize?: number;\r\n  expandedMaskSize?: number;\r\n}) => {\r\n  const [mousePosition, setMousePosition] = useState({ x: 20, y: 20 });\r\n  const [isHovered, setIsHovered] = useState(false);\r\n  const wrapperRef = useRef<HTMLDivElement>(null);\r\n\r\n  const MASK_SIZE = isHovered ? expandedMaskSize : compressedMaskSize;\r\n\r\n  useEffect(() => {\r\n    const handleMouseMove = (e: MouseEvent) => {\r\n      const { left, top } = wrapperRef.current?.getBoundingClientRect() || {\r\n        left: 0,\r\n        top: 0\r\n      };\r\n      setMousePosition({ x: e.clientX - left, y: e.clientY - top });\r\n    };\r\n    wrapperRef.current?.addEventListener('mousemove', handleMouseMove);\r\n    return () => wrapperRef.current?.removeEventListener('mousemove', handleMouseMove);\r\n  }, [wrapperRef]);\r\n\r\n  return (\r\n    <div ref={wrapperRef} className=\"h-full w-full relative flex flex-col\">\r\n      <motion.div\r\n        animate={{\r\n          WebkitMaskPosition: `${mousePosition.x - MASK_SIZE / 2}px ${\r\n            mousePosition.y - MASK_SIZE / 2\r\n          }px`,\r\n          maskSize: `${MASK_SIZE}px ${MASK_SIZE}px`\r\n        }}\r\n        style={{\r\n          maskImage: `url(\"${getMaskDataUrl()}\")`,\r\n          WebkitMaskImage: `url(\"${getMaskDataUrl()}\")`,\r\n          maskRepeat: 'no-repeat',\r\n          WebkitMaskRepeat: 'no-repeat',\r\n          backgroundColor: '#EA5A47',\r\n\r\n          color: 'black'\r\n        }}\r\n        transition={{\r\n          type: 'tween',\r\n          ease: 'backOut'\r\n        }}\r\n        className={cn(\r\n          'h-[800px] w-full flex items-center justify-center absolute z-10 ',\r\n          className\r\n        )}\r\n      >\r\n        <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>\r\n          {hiddenComponent}\r\n        </div>\r\n      </motion.div>\r\n      <div\r\n        className={cn('h-[800px] w-full flex items-center justify-center text-white/70', className)}\r\n      >\r\n        {children}\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default MaskCursorEffect;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "A circular mask follows the pointer and reveals hidden copy underneath.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/maskcursoreffect",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "hiddenComponent",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "compressedMaskSize",
+        "type": "number",
+        "default": "40",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "expandedMaskSize",
+        "type": "number",
+        "default": "350",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/mask-cursor-effect"
+  }
+}

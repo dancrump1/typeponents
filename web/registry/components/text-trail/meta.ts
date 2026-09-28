@@ -1,0 +1,30 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "text-trail",
+	title: "Text Trail",
+	description: "",
+	interaction: "",
+	categories: ["Text", "Text Animations"],
+	tags: ["webgl", "canvas", "cursor-tracking", "autoplay", "responsive"],
+	dependencies: ["three"],
+	registryDependencies: [],
+	props: [
+		{ name: "text", type: "string", default: "\"Vibe\"" },
+		{ name: "fontFamily", type: "string", default: "\"Figtree\"" },
+		{ name: "fontWeight", type: "string | number", default: "\"900\"" },
+		{ name: "noiseFactor", type: "number", default: "1" },
+		{ name: "noiseScale", type: "number", default: "0.0005" },
+		{ name: "rgbPersistFactor", type: "number", default: "0.98" },
+		{ name: "alphaPersistFactor", type: "number", default: "0.95" },
+		{ name: "animateColor", type: "boolean", default: "false" },
+		{ name: "startColor", type: "string", default: "\"#ffffff\"" },
+		{ name: "textColor", type: "string", default: "\"#ffffff\"" },
+		{ name: "backgroundColor", type: "string | number", default: "0x271e37" },
+		{ name: "colorCycleInterval", type: "number", default: "3000" },
+		{ name: "supersample", type: "number", default: "2" },
+	],
+	risk: { heavy: true, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

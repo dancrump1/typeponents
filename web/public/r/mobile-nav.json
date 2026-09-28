@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mobile-nav",
+  "type": "registry:ui",
+  "title": "Mobile Nav",
+  "description": "Mobile Nav",
+  "dependencies": [
+    "@radix-ui/react-accordion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/mobile-nav.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/mobile-nav.tsx",
+      "content": "import React, { useRef } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as AccordionPrimitive from \"@radix-ui/react-accordion\";\r\n\r\nconst NavAccordion = AccordionPrimitive.Root;\r\n\r\nconst NavAccordionItem = React.forwardRef<\r\n\tReact.ElementRef<typeof AccordionPrimitive.Item>,\r\n\tReact.ComponentPropsWithoutRef<typeof AccordionPrimitive.Item>\r\n>(({ className, ...props }, ref) => (\r\n\t<AccordionPrimitive.Item\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"border-b border-background last:border-none py-4 grid\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nNavAccordionItem.displayName = \"AccordionItem\";\r\n\r\nconst NavAccordionTrigger = React.forwardRef<\r\n\tReact.ElementRef<typeof AccordionPrimitive.Trigger>,\r\n\tReact.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>\r\n>(({ className, children, ...props }, ref) => (\r\n\t<AccordionPrimitive.Header className=\"flex justify-self-center\">\r\n\t\t<AccordionPrimitive.Trigger\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"flex flex-1 items-center justify-between font-medium transition-all\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t{children}\r\n\t\t</AccordionPrimitive.Trigger>\r\n\t</AccordionPrimitive.Header>\r\n));\r\nNavAccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;\r\n\r\nconst NavAccordionContent = React.forwardRef<\r\n\tReact.ElementRef<typeof AccordionPrimitive.Content>,\r\n\tReact.ComponentPropsWithoutRef<typeof AccordionPrimitive.Content>\r\n>(({ className, children, ...props }, ref) => (\r\n\t<AccordionPrimitive.Content\r\n\t\tref={ref}\r\n\t\tclassName=\"overflow-hidden text-sm transition-all data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down\"\r\n\t\t{...props}\r\n\t>\r\n\t\t<div className={cn(\"pb-4 pt-0\", className)}>{children}</div>\r\n\t</AccordionPrimitive.Content>\r\n));\r\n\r\nNavAccordionContent.displayName = AccordionPrimitive.Content.displayName;\r\n\r\nexport {\r\n\tNavAccordion,\r\n\tNavAccordionContent,\r\n\tNavAccordionItem,\r\n\tNavAccordionTrigger,\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/mobile-nav"
+  }
+}

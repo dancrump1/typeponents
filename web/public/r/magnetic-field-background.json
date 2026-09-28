@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magnetic-field-background",
+  "type": "registry:ui",
+  "title": "Magnetic Field Background",
+  "description": "Magnetic Field Background",
+  "dependencies": [
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/magnetic-field-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/magnetic-field-background.tsx",
+      "content": "import { useRef, useEffect, useState } from \"react\"\n\n// Credit:\n// https://zenui.net/animations/background-animations\n\nconst MagneticField = ({ children }) => {\n    const canvasRef = useRef(null)\n    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })\n    const animationRef = useRef(null)\n    const devicePixelRatio = typeof window !== \"undefined\" ? window.devicePixelRatio || 1 : 1\n\n    useEffect(() => {\n        const canvas = canvasRef.current\n        const ctx = canvas.getContext(\"2d\")\n\n        const handleResize = () => {\n            const width = window.innerWidth\n            const height = window.innerHeight\n\n            canvas.width = width * devicePixelRatio\n            canvas.height = height * devicePixelRatio\n            canvas.style.width = `${width}px`\n            canvas.style.height = `${height}px`\n\n            ctx.setTransform(1, 0, 0, 1, 0, 0)\n            ctx.scale(devicePixelRatio, devicePixelRatio)\n        }\n\n        handleResize()\n        window.addEventListener(\"resize\", handleResize)\n\n        return () => {\n            window.removeEventListener(\"resize\", handleResize)\n            if (animationRef.current) {\n                cancelAnimationFrame(animationRef.current)\n            }\n        }\n    }, [])\n\n    useEffect(() => {\n        const handleMouseMove = (e) => {\n            const rect = canvasRef.current.getBoundingClientRect()\n            setMousePosition({\n                x: e.clientX - rect.left,\n                y: e.clientY - rect.top,\n            })\n        }\n\n        window.addEventListener(\"mousemove\", handleMouseMove)\n        return () => window.removeEventListener(\"mousemove\", handleMouseMove)\n    }, [])\n\n    useEffect(() => {\n        const canvas = canvasRef.current\n        const ctx = canvas.getContext(\"2d\")\n\n        const drawMagneticField = () => {\n            const width = canvas.width / devicePixelRatio\n            const height = canvas.height / devicePixelRatio\n\n            ctx.clearRect(0, 0, width, height)\n\n            const lineSpacing = width < 768 ? 40 : 30\n            const fieldStrength = 150\n            const lineLength = 15\n\n            for (let x = 0; x < width; x += lineSpacing) {\n                for (let y = 0; y < height; y += lineSpacing) {\n                    const dx = x - mousePosition.x\n                    const dy = y - mousePosition.y\n                    const distance = Math.sqrt(dx * dx + dy * dy)\n\n                    if (distance < 30) continue\n\n                    let angle = Math.atan2(dy, dx)\n                    angle += Math.sin(x / 100) * 0.2 + Math.cos(y / 100) * 0.2\n\n                    const strength = Math.min(1, fieldStrength / distance)\n\n                    const startX = x - Math.cos(angle) * lineLength * strength\n                    const startY = y - Math.sin(angle) * lineLength * strength\n                    const endX = x + Math.cos(angle) * lineLength * strength\n                    const endY = y + Math.sin(angle) * lineLength * strength\n\n                    ctx.beginPath()\n                    ctx.moveTo(startX, startY)\n                    ctx.lineTo(endX, endY)\n\n                    const hue = ((angle * 180) / Math.PI + 180) % 360\n                    const opacity = 0.2 + strength * 0.8\n                    ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${opacity})`\n                    ctx.lineWidth = strength * 2\n                    ctx.stroke()\n\n                    ctx.beginPath()\n                    ctx.arc(x, y, 1, 0, Math.PI * 2)\n                    ctx.fillStyle = `hsla(${hue}, 70%, 60%, ${opacity * 0.7})`\n                    ctx.fill()\n                }\n            }\n\n            const gradient = ctx.createRadialGradient(\n                mousePosition.x,\n                mousePosition.y,\n                0,\n                mousePosition.x,\n                mousePosition.y,\n                50,\n            )\n            gradient.addColorStop(0, \"rgba(33,33,33,0.2)\")\n            gradient.addColorStop(1, \"rgba(0, 0, 0, 0.1)\")\n\n            ctx.beginPath()\n            ctx.arc(mousePosition.x, mousePosition.y, 50, 0, Math.PI * 2)\n            ctx.fillStyle = gradient\n            ctx.fill()\n\n            animationRef.current = requestAnimationFrame(drawMagneticField)\n        }\n\n        drawMagneticField()\n\n        return () => {\n            if (animationRef.current) {\n                cancelAnimationFrame(animationRef.current)\n            }\n        }\n    }, [mousePosition])\n\n    return (\n        <div\n            className=\"relative w-full min-h-[500px] flex items-center justify-center flex-col overflow-hidden rounded-high bg-gray-900\">\n\n            <canvas ref={canvasRef} className=\"absolute inset-0 w-full h-full\" />\n\n            {children}\n        </div>\n    )\n}\n\nexport default MagneticField;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "ZenUI",
+      "url": "https://zenui.net/animations/background-animations",
+      "authorUrl": "https://zenui.net",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/magnetic-field-background"
+  }
+}

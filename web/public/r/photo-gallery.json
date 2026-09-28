@@ -1,0 +1,84 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "photo-gallery",
+  "type": "registry:ui",
+  "title": "Photo Gallery",
+  "description": "An interactive photo gallery with smooth animations and layout transitions. Features a masonry-style grid with alternating row offsets, click-to-expand functionality, and elegant vignette effects for a premium visual experience.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/photo-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/photo-gallery.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useState, memo, useRef } from 'react';\r\nimport { cn } from '@/lib/utils';\r\nimport Image from 'next/image';\r\nimport { motion } from 'framer-motion';\r\n\r\nexport interface Photo {\r\n  url: string;\r\n  title?: string;\r\n}\r\n\r\nconst DUMMY_PHOTOS: Photo[] = [\r\n  {\r\n    url: \"https://picsum.photos/seed/powerpuffpng/400/400\",\r\n    title: 'Powerpuff Girls'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/buggbunnyjpg/400/400\",\r\n    title: 'Bugs Bunny'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/tazjpg/400/400\",\r\n    title: 'Taz The Tazmanian Devil'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/johnnybravojpg/400/400\",\r\n    title: 'Johnny Bravo'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/couragejpg/400/400\",\r\n    title: 'Courage The Cowardly Dog'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/kickjpg/400/400\",\r\n    title: 'Kick Buttowski'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/phineasjpg/400/400\",\r\n    title: 'Phineas'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/platypusjpg/400/400\",\r\n    title: 'Platypus Perry'\r\n  },\r\n  {\r\n    url: \"https://picsum.photos/seed/dexterjpg/400/400\",\r\n    title: 'Dexter'\r\n  }\r\n];\r\n\r\nconst Vignette = memo(() => {\r\n  return (\r\n    <div\r\n      className=\"absolute inset-0 z-20 pointer-events-none\"\r\n      style={{\r\n        background:\r\n          'linear-gradient(to right, #111111 0%, transparent 10%, transparent 90%, #111111 100%)',\r\n        willChange: 'auto'\r\n      }}\r\n    ></div>\r\n  );\r\n});\r\nVignette.displayName = 'Vignette';\r\n\r\nconst SelectedPhotoItem = memo(\r\n  ({\r\n    selectedPhoto,\r\n    setSelectedPhoto,\r\n    photos,\r\n    selectedPhotoIndex\r\n  }: {\r\n    selectedPhoto: { rowIndex: number; index: number };\r\n    setSelectedPhoto: (photo: { rowIndex: number; index: number } | null) => void;\r\n    photos: Photo[];\r\n    selectedPhotoIndex: number;\r\n  }) => {\r\n    return (\r\n      <motion.div\r\n        initial={{ opacity: 0.1 }}\r\n        animate={{ opacity: 1 }}\r\n        transition={{ duration: 0.2 }}\r\n        onClick={() => setSelectedPhoto(null)}\r\n        className=\"absolute inset-0 z-10 bg-black/50 backdrop-blur-sm flex flex-col items-center justify-center\"\r\n      >\r\n        <motion.div\r\n          layout\r\n          layoutId={`photo-${selectedPhoto.rowIndex}-${selectedPhoto.index}`}\r\n          transition={{ duration: 0.15, ease: 'easeOut' }}\r\n          className=\"relative w-72 h-72 overflow-hidden z-20\"\r\n        >\r\n          <Image\r\n            src={photos[selectedPhotoIndex].url}\r\n            alt={photos[selectedPhotoIndex].title || 'Untitled Image'}\r\n            fill\r\n            className=\"object-cover rounded-3xl border-[8px] border-white\"\r\n          />\r\n        </motion.div>\r\n        {photos[selectedPhotoIndex].title && (\r\n          <div className=\"max-w-72 w-full text-center mt-2 font-medium text-xl flex items-center justify-center\">\r\n            <motion.span\r\n              initial={{ opacity: 0.1, y: 10 }}\r\n              animate={{ opacity: 1, y: 0 }}\r\n              exit={{ opacity: 0.1, y: 10 }}\r\n              key={`photo-title-${selectedPhoto.rowIndex}-${selectedPhoto.index}`}\r\n              transition={{ duration: 0.2 }}\r\n            >\r\n              {photos[selectedPhotoIndex].title}\r\n            </motion.span>\r\n          </div>\r\n        )}\r\n      </motion.div>\r\n    );\r\n  }\r\n);\r\nSelectedPhotoItem.displayName = 'SelectedPhotoItem';\r\n\r\nconst PhotoItem = ({\r\n  rowIndex,\r\n  photo,\r\n  index,\r\n  setSelectedPhoto\r\n}: {\r\n  rowIndex: number;\r\n  photo: Photo;\r\n  index: number;\r\n  setSelectedPhoto: (photo: { rowIndex: number; index: number }) => void;\r\n}) => {\r\n  const [loading, setLoading] = useState(true);\r\n  const [inView, setInView] = useState(false);\r\n  const itemRef = useRef<HTMLDivElement>(null);\r\n\r\n  // Use Intersection Observer instead of framer-motion's viewport detection\r\n  React.useEffect(() => {\r\n    const observer = new IntersectionObserver(\r\n      ([entry]) => {\r\n        setInView(entry.isIntersecting);\r\n      },\r\n      { threshold: 0.1, rootMargin: '50px' }\r\n    );\r\n\r\n    if (itemRef.current) {\r\n      observer.observe(itemRef.current);\r\n    }\r\n\r\n    return () => observer.disconnect();\r\n  }, []);\r\n\r\n  return (\r\n    <motion.div\r\n      ref={itemRef}\r\n      layout\r\n      layoutId={`photo-${rowIndex}-${index}`}\r\n      key={`photo-${rowIndex}-${index}`}\r\n      initial={{ opacity: 0, y: 20 }}\r\n      whileInView={{\r\n        opacity: 1,\r\n        y: 0,\r\n        transition: { duration: 0.2, delay: 0.05 }\r\n      }}\r\n      transition={{ duration: 0.15, ease: 'easeOut' }}\r\n      className=\"h-20 w-20 rounded-xl relative overflow-hidden shrink-0 border-[2px] border-zinc-900 hover:border-zinc-100 cursor-pointer transition-colors duration-75\"\r\n      style={{ willChange: 'transform, opacity' }}\r\n      onClick={() => setSelectedPhoto({ rowIndex, index })}\r\n      viewport={{ once: true }}\r\n    >\r\n      {loading && <div className=\"w-full h-full bg-zinc-800 animate-pulse\"></div>}\r\n      {inView && (\r\n        <Image\r\n          src={photo.url}\r\n          alt={photo.title || 'Untitled Image'}\r\n          fill\r\n          className=\"object-cover\"\r\n          onLoad={() => setLoading(false)}\r\n          loading=\"lazy\"\r\n        />\r\n      )}\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst PhotoGallery = ({\r\n  photos = Array.from({ length: 80 }).map((_, index) => DUMMY_PHOTOS[index % DUMMY_PHOTOS.length]),\r\n  rows = 5,\r\n  className = '',\r\n  vignette = true,\r\n  title = 'POV: You had a great childhood'\r\n}: {\r\n  photos?: Photo[];\r\n  rows?: number;\r\n  className?: string;\r\n  vignette?: boolean;\r\n  title?: string;\r\n}) => {\r\n  const [selectedPhoto, setSelectedPhoto] = useState<{ rowIndex: number; index: number } | null>(\r\n    null\r\n  );\r\n  const displayPhotos = photos;\r\n  const scrollContainerRef = useRef<HTMLDivElement>(null);\r\n\r\n  const selectedPhotoIndex = selectedPhoto\r\n    ? Math.floor((selectedPhoto.rowIndex * photos.length) / rows) + selectedPhoto.index\r\n    : 0;\r\n\r\n  return (\r\n    <div className=\"flex flex-col gap-6 h-full w-full items-center justify-center\">\r\n      <h1 className=\"text-lg lg:text-xl\">{title}</h1>\r\n      <div className=\"relative h-full w-full overflow-y-hidden p-0\">\r\n        {vignette && <Vignette />}\r\n        {selectedPhoto && (\r\n          <SelectedPhotoItem\r\n            selectedPhoto={selectedPhoto}\r\n            setSelectedPhoto={setSelectedPhoto}\r\n            photos={displayPhotos}\r\n            selectedPhotoIndex={selectedPhotoIndex}\r\n          />\r\n        )}\r\n        <div\r\n          ref={scrollContainerRef}\r\n          className={cn('flex flex-col gap-2 w-full overflow-x-auto h-full relative', className)}\r\n        >\r\n          {Array.from({ length: rows }).map((_, rowIndex) => {\r\n            const currentPhotos = displayPhotos.slice(\r\n              (rowIndex * displayPhotos.length) / rows,\r\n              ((rowIndex + 1) * displayPhotos.length) / rows\r\n            );\r\n            return (\r\n              <div\r\n                key={`row-${rowIndex}`}\r\n                className={cn(\r\n                  'flex items-center gap-2 relative w-full',\r\n                  rowIndex % 2 === 0 ? '-translate-x-8' : ''\r\n                )}\r\n              >\r\n                {currentPhotos.map((photo, index) => (\r\n                  <PhotoItem\r\n                    key={`photo-${rowIndex}-${index}`}\r\n                    rowIndex={rowIndex}\r\n                    photo={photo}\r\n                    index={index}\r\n                    setSelectedPhoto={setSelectedPhoto}\r\n                  />\r\n                ))}\r\n              </div>\r\n            );\r\n          })}\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default PhotoGallery;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "Scroll a staggered masonry; click a photo and it expands in place.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/photogallery",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "photos",
+        "type": "Photo[]",
+        "default": "Array.from({ length: 80 }).map((_, in…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rows",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "''",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "vignette",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "default": "'POV: You had a great childhood'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/photo-gallery"
+  }
+}

@@ -1,0 +1,45 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "specular-button",
+	title: "Specular Button",
+	description:
+		"Button with a specular highlight that follows the pointer.",
+	interaction:
+		"Hover moves a light streak across the face of the button.",
+	categories: ["Buttons"],
+	tags: ["webgl", "cursor-tracking", "autoplay", "responsive"],
+	inspiration: {
+		source: "React Bits",
+		url: "https://reactbits.dev/components/specular-button",
+		authorUrl: "https://reactbits.dev",
+		relationship: "adaptation",
+	},
+	dependencies: ["ogl"],
+	registryDependencies: [],
+	props: [
+		{ name: "size", type: "ButtonSize", default: "'lg'" },
+		{ name: "radius", type: "number", default: "18" },
+		{ name: "tint", type: "string", default: "'#ffffff'" },
+		{ name: "tintOpacity", type: "number", default: "0" },
+		{ name: "blur", type: "number", default: "0" },
+		{ name: "textColor", type: "string", default: "'#f5f5f5'" },
+		{ name: "lineColor", type: "string", default: "'#ffffff'" },
+		{ name: "baseColor", type: "string", default: "'#525252'" },
+		{ name: "intensity", type: "number", default: "1" },
+		{ name: "shineSize", type: "number", default: "10" },
+		{ name: "shineFade", type: "number", default: "40" },
+		{ name: "thickness", type: "number", default: "1" },
+		{ name: "speed", type: "number", default: "0.35" },
+		{ name: "followMouse", type: "boolean", default: "true" },
+		{ name: "proximity", type: "number", default: "250" },
+		{ name: "autoAnimate", type: "boolean", default: "false" },
+		{ name: "disabled", type: "boolean", default: "false" },
+		{ name: "onClick", type: "MouseEventHandler<HTMLButtonElement>" },
+		{ name: "className", type: "string", default: "''" },
+		{ name: "type", type: "\"button\" | \"submit\" | \"reset\"", default: "'button'" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

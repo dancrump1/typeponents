@@ -1,0 +1,50 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "layout-grid",
+  "type": "registry:ui",
+  "title": "Layout Grid",
+  "description": "Layout Grid",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/layout-grid.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/layout-grid.tsx",
+      "content": "\"use client\";\n\nimport React, { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// https://ui.aceternity.com/components/layout-grid\n\ntype Card = {\n\tid: number;\n\tcontent: JSX.Element | React.ReactNode | string;\n\tclassName: string;\n\tthumbnail: string;\n};\n\nexport const LayoutGrid = ({ cards }: { cards: Card[] }) => {\n\tconst [selected, setSelected] = useState<Card | null>(null);\n\tconst [lastSelected, setLastSelected] = useState<Card | null>(null);\n\n\tconst handleClick = (card: Card) => {\n\t\tsetLastSelected(selected);\n\t\tsetSelected(card);\n\t};\n\n\tconst handleOutsideClick = () => {\n\t\tsetLastSelected(selected);\n\t\tsetSelected(null);\n\t};\n\n\treturn (\n\t\t<div className=\"relative w-full h-full p-10 grid grid-cols-1 md:grid-cols-3 max-w-7xl mx-auto gap-4 \">\n\t\t\t{cards.map((card, i) => (\n\t\t\t\t<div key={i + \"layout-grid\"} className={cn(card.className, \"\")}>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tonClick={() => handleClick(card)}\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\tcard.className,\n\t\t\t\t\t\t\t\"relative overflow-hidden\",\n\t\t\t\t\t\t\tselected?.id === card.id\n\t\t\t\t\t\t\t\t? \"rounded-lg cursor-pointer absolute inset-0 h-1/2 w-full md:w-1/2 m-auto z-40 flex justify-center items-center flex-wrap flex-col\"\n\t\t\t\t\t\t\t\t: lastSelected?.id === card.id\n\t\t\t\t\t\t\t\t\t? \"z-40 bg-background rounded-xl h-full w-full\"\n\t\t\t\t\t\t\t\t\t: \"bg-background rounded-xl h-full w-full\"\n\t\t\t\t\t\t)}\n\t\t\t\t\t\tlayout\n\t\t\t\t\t>\n\t\t\t\t\t\t{selected?.id === card.id && (\n\t\t\t\t\t\t\t<SelectedCard selected={selected} />\n\t\t\t\t\t\t)}\n\t\t\t\t\t\t<BlurImage card={card} />\n\t\t\t\t\t</motion.div>\n\t\t\t\t</div>\n\t\t\t))}\n\t\t\t<motion.div\n\t\t\t\tonClick={handleOutsideClick}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"absolute h-full w-full left-0 top-0 bg-background opacity-0 z-10\",\n\t\t\t\t\tselected?.id ? \"pointer-events-auto\" : \"pointer-events-none\"\n\t\t\t\t)}\n\t\t\t\tanimate={{ opacity: selected?.id ? 0.3 : 0 }}\n\t\t\t/>\n\t\t</div>\n\t);\n};\n\nconst BlurImage = ({ card }: { card: Card }) => {\n\treturn (\n\t\t<img\n\t\t\tsrc={card.thumbnail}\n\t\t\theight=\"500\"\n\t\t\twidth=\"500\"\n\t\t\tclassName={\n\t\t\t\t\"blur-none object-cover object-top absolute inset-0 h-full w-full transition duration-200\"\n\t\t\t}\n\t\t\talt=\"thumbnail\"\n\t\t/>\n\t);\n};\n\nconst SelectedCard = ({ selected }: { selected: Card | null }) => {\n\treturn (\n\t\t<div className=\"bg-transparent h-full w-full flex flex-col justify-end rounded-lg shadow-2xl relative z-60\">\n\t\t\t<motion.div\n\t\t\t\tinitial={{\n\t\t\t\t\topacity: 0,\n\t\t\t\t}}\n\t\t\t\tanimate={{\n\t\t\t\t\topacity: 0.6,\n\t\t\t\t}}\n\t\t\t\tclassName=\"absolute inset-0 h-full w-full bg-background opacity-60 z-10\"\n\t\t\t/>\n\t\t\t<motion.div\n\t\t\t\tinitial={{\n\t\t\t\t\topacity: 0,\n\t\t\t\t\ty: 100,\n\t\t\t\t}}\n\t\t\t\tanimate={{\n\t\t\t\t\topacity: 1,\n\t\t\t\t\ty: 0,\n\t\t\t\t}}\n\t\t\t\ttransition={{\n\t\t\t\t\tduration: 0.3,\n\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t}}\n\t\t\t\tclassName=\"relative px-8 pb-4 z-70\"\n\t\t\t>\n\t\t\t\t{selected?.content}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/layout-grid",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "cards",
+        "type": "Card[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/layout-grid"
+  }
+}

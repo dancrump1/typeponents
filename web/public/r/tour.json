@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tour",
+  "type": "registry:ui",
+  "title": "Tour",
+  "description": "Tour",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tour.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tour.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, {\r\n\tcreateContext,\r\n\tuseContext,\r\n\tuseEffect,\r\n\tuseMemo,\r\n\tuseRef,\r\n\tuseState,\r\n} from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { createPortal } from \"react-dom\";\r\n\r\n// Credit:\r\n// https://nyxbui.design/docs/components/tour\r\n\r\nexport interface TourContext<T extends string> {\r\n\tnodes: Map<\r\n\t\tstring,\r\n\t\t{\r\n\t\t\tref: HTMLElement;\r\n\t\t\trender: React.ReactNode;\r\n\t\t\tname: T;\r\n\t\t}\r\n\t>;\r\n\tshow: boolean;\r\n\tcurrent: number;\r\n\tnext: () => void;\r\n\tprevious: () => void;\r\n\tclose: () => void;\r\n\topen: () => void;\r\n}\r\n\r\nexport interface TourProps {\r\n\tchildren?: React.ReactNode;\r\n}\r\n\r\nexport interface TourFocusProps<T extends string> {\r\n\tchildren: React.ReactNode;\r\n\ttourRender: React.ReactNode;\r\n\tname: T;\r\n}\r\n\r\nexport default function TourFactory<T extends string>(order: T[]) {\r\n\tconst tourContext = createContext<TourContext<T>>({\r\n\t\tnodes: new Map(),\r\n\t\tshow: false,\r\n\t\tcurrent: 0,\r\n\t\tnext: () => {\r\n\t\t\tconsole.log(\"empty\");\r\n\t\t},\r\n\t\tprevious: () => {\r\n\t\t\tconsole.log(\"empty\");\r\n\t\t},\r\n\t\tclose: () => {\r\n\t\t\tconsole.log(\"empty\");\r\n\t\t},\r\n\t\topen: () => {\r\n\t\t\tconsole.log(\"empty\");\r\n\t\t},\r\n\t});\r\n\r\n\tfunction TourPortal() {\r\n\t\tconst ctx = useContext(tourContext);\r\n\r\n\t\tconst ref = useRef<HTMLDivElement>(null);\r\n\t\tconst [, forceUpdate] = React.useState({});\r\n\r\n\t\tconst currentElement = useMemo(\r\n\t\t\t() => ctx.nodes.get(order[ctx.current] ?? \"\"),\r\n\t\t\t[ctx]\r\n\t\t);\r\n\r\n\t\tuseEffect(() => {\r\n\t\t\tconst handleResize = () => {\r\n\t\t\t\tforceUpdate({});\r\n\t\t\t};\r\n\r\n\t\t\twindow.addEventListener(\"resize\", handleResize);\r\n\t\t\twindow.addEventListener(\"scroll\", handleResize);\r\n\r\n\t\t\treturn () => {\r\n\t\t\t\twindow.removeEventListener(\"resize\", handleResize);\r\n\t\t\t\twindow.removeEventListener(\"scroll\", handleResize);\r\n\t\t\t};\r\n\t\t}, []);\r\n\r\n\t\tuseEffect(() => {\r\n\t\t\tif (ctx.show) forceUpdate({});\r\n\t\t}, [ctx.show]);\r\n\r\n\t\tif (!currentElement) return <></>;\r\n\r\n\t\tconst currentElementRect = currentElement.ref.getBoundingClientRect();\r\n\r\n\t\tconst height = ref.current?.getBoundingClientRect().height ?? 0;\r\n\t\tconst width = ref.current?.getBoundingClientRect().width ?? 0;\r\n\r\n\t\tconst closest = (): React.CSSProperties => {\r\n\t\t\tconst isCloseToTop = currentElementRect.top < height;\r\n\t\t\tconst isCloseToLeft = currentElementRect.left < width;\r\n\t\t\tconst isCloseToRight =\r\n\t\t\t\tcurrentElementRect.right > window.innerWidth - width;\r\n\r\n\t\t\tif (isCloseToLeft) {\r\n\t\t\t\treturn {\r\n\t\t\t\t\tleft: currentElementRect.x + currentElementRect.width,\r\n\t\t\t\t\ttop:\r\n\t\t\t\t\t\tcurrentElementRect.y -\r\n\t\t\t\t\t\theight / 2 +\r\n\t\t\t\t\t\tcurrentElementRect.height / 2,\r\n\t\t\t\t};\r\n\t\t\t}\r\n\r\n\t\t\tif (isCloseToRight) {\r\n\t\t\t\treturn {\r\n\t\t\t\t\tleft: currentElementRect.x - width,\r\n\t\t\t\t\ttop:\r\n\t\t\t\t\t\tcurrentElementRect.y -\r\n\t\t\t\t\t\theight / 2 +\r\n\t\t\t\t\t\tcurrentElementRect.height / 2,\r\n\t\t\t\t};\r\n\t\t\t}\r\n\r\n\t\t\tif (isCloseToTop) {\r\n\t\t\t\treturn {\r\n\t\t\t\t\tleft:\r\n\t\t\t\t\t\tcurrentElementRect.x -\r\n\t\t\t\t\t\twidth / 2 +\r\n\t\t\t\t\t\tcurrentElementRect.width / 2,\r\n\t\t\t\t\ttop: currentElementRect.y + currentElementRect.height,\r\n\t\t\t\t};\r\n\t\t\t}\r\n\r\n\t\t\treturn {\r\n\t\t\t\tleft:\r\n\t\t\t\t\tcurrentElementRect.x - width / 2 + currentElementRect.width / 2,\r\n\t\t\t\ttop: currentElementRect.y - height,\r\n\t\t\t};\r\n\t\t};\r\n\r\n\t\treturn createPortal(\r\n\t\t\t<div\r\n\t\t\t\tid=\"tour\"\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"pointer-events-auto fixed left-0 top-0 h-screen w-screen transition-none\",\r\n\t\t\t\t\t!ctx.show ? \"invisible\" : \"visible\"\r\n\t\t\t\t)}\r\n\t\t\t>\r\n\t\t\t\t<div\r\n\t\t\t\t\tref={ref}\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t`absolute z-50 transition-all duration-500 ease-in-out`\r\n\t\t\t\t\t)}\r\n\t\t\t\t\tstyle={{ ...closest() }}\r\n\t\t\t\t>\r\n\t\t\t\t\t{currentElement.render}\r\n\t\t\t\t</div>\r\n\t\t\t\t<div\r\n\t\t\t\t\tclassName=\"absolute z-40 h-screen w-screen overflow-hidden opacity-80 shadow-[0_0_0_100vw_rgba(0,0,0,.99)] transition-all duration-500 ease-in-out\"\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\theight: currentElementRect.height,\r\n\t\t\t\t\t\twidth: currentElementRect.width,\r\n\t\t\t\t\t\tleft: currentElementRect.x,\r\n\t\t\t\t\t\ttop: currentElementRect.y,\r\n\t\t\t\t\t}}\r\n\t\t\t\t/>\r\n\t\t\t</div>,\r\n\t\t\tdocument.body\r\n\t\t);\r\n\t}\r\n\r\n\treturn {\r\n\t\tTourProvider: function TourProvider(props: TourProps) {\r\n\t\t\tconst nodes = useRef<TourContext<T>[\"nodes\"]>(new Map());\r\n\r\n\t\t\tconst [show, setShow] = useState(false);\r\n\t\t\tconst [current, setCurrent] = useState(0);\r\n\r\n\t\t\tconst getNextIndex = (currIndex: number, nextDiff: number): number => {\r\n\t\t\t\tconst lookAheadIndex = currIndex + nextDiff;\r\n\t\t\t\tif (lookAheadIndex >= order.length || lookAheadIndex < 0)\r\n\t\t\t\t\treturn currIndex;\r\n\r\n\t\t\t\tif (!nodes.current.has(order[lookAheadIndex]))\r\n\t\t\t\t\treturn getNextIndex(lookAheadIndex, nextDiff);\r\n\r\n\t\t\t\treturn lookAheadIndex;\r\n\t\t\t};\r\n\r\n\t\t\treturn (\r\n\t\t\t\t<tourContext.Provider\r\n\t\t\t\t\tvalue={{\r\n\t\t\t\t\t\tnodes: nodes.current,\r\n\t\t\t\t\t\tcurrent,\r\n\t\t\t\t\t\tshow,\r\n\t\t\t\t\t\tnext: () => {\r\n\t\t\t\t\t\t\tsetCurrent((state) =>\r\n\t\t\t\t\t\t\t\tMath.min(getNextIndex(state, 1), order.length - 1)\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tprevious: () => {\r\n\t\t\t\t\t\t\tsetCurrent((state) =>\r\n\t\t\t\t\t\t\t\tMath.max(getNextIndex(state, -1), 0)\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tclose: () => {\r\n\t\t\t\t\t\t\tsetShow(false);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\topen: () => {\r\n\t\t\t\t\t\t\tsetShow(true);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t<TourPortal />\r\n\t\t\t\t\t{props.children}\r\n\t\t\t\t</tourContext.Provider>\r\n\t\t\t);\r\n\t\t},\r\n\t\tcontext: tourContext,\r\n\t\tuseContext: () => useContext(tourContext),\r\n\t\tTourFocus: function TourFocus(props: TourFocusProps<T>) {\r\n\t\t\tconst ctx = useContext(tourContext);\r\n\t\t\treturn (\r\n\t\t\t\t<div\r\n\t\t\t\t\tref={(divRef) => {\r\n\t\t\t\t\t\tif (divRef && !ctx.nodes.has(props.name)) {\r\n\t\t\t\t\t\t\tctx.nodes.set(props.name, {\r\n\t\t\t\t\t\t\t\tref: divRef,\r\n\t\t\t\t\t\t\t\trender: props.tourRender,\r\n\t\t\t\t\t\t\t\tname: props.name,\r\n\t\t\t\t\t\t\t});\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t{props.children}\r\n\t\t\t\t</div>\r\n\t\t\t);\r\n\t\t},\r\n\t};\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "nyxbui.design",
+      "url": "https://nyxbui.design/docs/components/tour",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tour"
+  }
+}

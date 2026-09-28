@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "rich-popover",
+	title: "Rich Popover",
+	description: "",
+	interaction: "",
+	categories: ["Navigation"],
+	tags: ["spring", "hover"],
+	inspiration: {
+		source: "SmoothUI",
+		url: "https://smoothui.dev/doc/components/rich-popover",
+		authorUrl: "https://smoothui.dev",
+		relationship: "adaptation",
+	},
+	dependencies: ["@radix-ui/react-popover", "lucide-react", "motion"],
+	registryDependencies: ["icons"],
+	props: [
+		{ name: "trigger", type: "React.ReactNode", required: true },
+		{ name: "title", type: "string", required: true },
+		{ name: "description", type: "string" },
+		{ name: "icon", type: "React.ReactNode" },
+		{ name: "href", type: "string" },
+		{ name: "actionLabel", type: "string" },
+		{ name: "actionHref", type: "string" },
+		{ name: "onActionClick", type: "(() => void)" },
+		{ name: "meta", type: "string" },
+		{ name: "className", type: "string", default: "\"\"" },
+		{ name: "side", type: "\"top\" | \"bottom\" | \"left\" | \"right\"", default: "\"top\"" },
+		{ name: "align", type: "\"start\" | \"center\" | \"end\"", default: "\"center\"" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

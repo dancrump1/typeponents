@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-447",
+  "type": "registry:component",
+  "title": "Comp 447",
+  "description": "Comp 447",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-447.tsx",
+      "content": "import {\r\n\tBreadcrumb,\r\n\tBreadcrumbItem,\r\n\tBreadcrumbLink,\r\n\tBreadcrumbList,\r\n\tBreadcrumbPage,\r\n\tBreadcrumbSeparator,\r\n} from \"@/components/ui/breadcrumb\";\r\nimport {\r\n\tDropdownMenu,\r\n\tDropdownMenuContent,\r\n\tDropdownMenuItem,\r\n\tDropdownMenuTrigger,\r\n} from \"@/components/ui/dropdown-menu\";\r\nimport { FoldersIcon } from \"lucide-react\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Breadcrumb>\r\n\t\t\t<BreadcrumbList>\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">Home</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<DropdownMenu>\r\n\t\t\t\t\t\t<DropdownMenuTrigger className=\"hover:text-foreground\">\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\trole=\"presentation\"\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\tclassName=\"flex size-5 items-center justify-center\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<FoldersIcon size={16} />\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t<span className=\"sr-only\">Toggle menu</span>\r\n\t\t\t\t\t\t</DropdownMenuTrigger>\r\n\t\t\t\t\t\t<DropdownMenuContent align=\"start\">\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">Documentation</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">Themes</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t\t<DropdownMenuItem asChild>\r\n\t\t\t\t\t\t\t\t<a href=\"#\">GitHub</a>\r\n\t\t\t\t\t\t\t</DropdownMenuItem>\r\n\t\t\t\t\t\t</DropdownMenuContent>\r\n\t\t\t\t\t</DropdownMenu>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbPage>Breadcrumb</BreadcrumbPage>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t</BreadcrumbList>\r\n\t\t</Breadcrumb>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

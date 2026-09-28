@@ -1,0 +1,69 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mask-effect",
+  "type": "registry:ui",
+  "title": "Mask Effect",
+  "description": "Mask Effect",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/mask-effect.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/mask-effect.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion } from \"motion/react\";\r\n\r\nexport const MaskContainer = ({\r\n\tchildren,\r\n\trevealText,\r\n\tsize = 10,\r\n\trevealSize = 600,\r\n\tclassName,\r\n}: {\r\n\tchildren?: string | React.ReactNode;\r\n\trevealText?: string | React.ReactNode;\r\n\tsize?: number;\r\n\trevealSize?: number;\r\n\tclassName?: string;\r\n}) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\tconst [mousePosition, setMousePosition] = useState<any>({\r\n\t\tx: null,\r\n\t\ty: null,\r\n\t});\r\n\tconst containerRef = useRef<any>(null);\r\n\tconst updateMousePosition = (e: any) => {\r\n\t\tconst rect = containerRef.current.getBoundingClientRect();\r\n\t\tsetMousePosition({ x: e.clientX - rect.left, y: e.clientY - rect.top });\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\tcontainerRef.current.addEventListener(\"mousemove\", updateMousePosition);\r\n\t\treturn () => {\r\n\t\t\tif (containerRef.current) {\r\n\t\t\t\tcontainerRef.current.removeEventListener(\r\n\t\t\t\t\t\"mousemove\",\r\n\t\t\t\t\tupdateMousePosition\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t};\r\n\t}, []);\r\n\tlet maskSize = isHovered ? revealSize : size;\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tref={containerRef}\r\n\t\t\tclassName={cn(\"h-screen relative\", className)}\r\n\t\t\tanimate={{\r\n\t\t\t\tbackgroundColor: isHovered ? \"var(--slate-900)\" : \"var(--white)\",\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"w-full h-full flex items-center justify-center text-6xl absolute bg-background bg-grid-white/[0.2] text-foreground mask-[url(/mask.svg)] mask-size-[40px] mask-no-repeat\"\r\n\t\t\t\tanimate={{\r\n\t\t\t\t\tWebkitMaskPosition: `${mousePosition.x - maskSize / 2}px ${\r\n\t\t\t\t\t\tmousePosition.y - maskSize / 2\r\n\t\t\t\t\t}px`,\r\n\t\t\t\t\tWebkitMaskSize: `${maskSize}px`,\r\n\t\t\t\t}}\r\n\t\t\t\ttransition={{ type: \"tween\", ease: \"backOut\", duration: 0.1 }}\r\n\t\t\t>\r\n\t\t\t\t<div className=\"absolute inset-0 bg-background h-full w-full z-0 opacity-50\" />\r\n\t\t\t\t<div\r\n\t\t\t\t\tonMouseEnter={() => {\r\n\t\t\t\t\t\tsetIsHovered(true);\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tonMouseLeave={() => {\r\n\t\t\t\t\t\tsetIsHovered(false);\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName=\"max-w-4xl mx-auto text-center text-foreground  text-4xl font-bold relative z-20\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{children}\r\n\t\t\t\t</div>\r\n\t\t\t</motion.div>\r\n\r\n\t\t\t<div className=\"w-full h-full flex items-center justify-center  text-foreground\">\r\n\t\t\t\t{revealText}\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images",
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "revealText",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "default": "10",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "revealSize",
+        "type": "number",
+        "default": "600",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/mask-effect"
+  }
+}

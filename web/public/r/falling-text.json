@@ -1,0 +1,106 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "falling-text",
+  "type": "registry:ui",
+  "title": "Falling Text",
+  "description": "Falling Text",
+  "dependencies": [
+    "matter-js"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/falling-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/falling-text.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\n\nimport Matter from \"matter-js\";\n\n// Credit:\n// https://www.reactbits.dev/text-animations/falling-text\n\n// Example usage\n{\n\t/* <FallingText\n  text={`React Bits is a library of animated and interactive React components designed to streamline UI development and simplify your workflow.`}\n  highlightWords={[\"React\", \"Bits\", \"animated\", \"components\", \"simplify\"]}\n  highlightClass=\"highlighted\"\n  trigger=\"hover\"\n  backgroundColor=\"transparent\"\n  wireframes={false}\n  gravity={0.56}\n  fontSize=\"2rem\"\n  mouseConstraintStiffness={0.9}\n/> */\n}\n\ninterface FallingTextProps {\n\ttext?: string;\n\thighlightWords?: string[];\n\ttrigger?: \"auto\" | \"scroll\" | \"click\" | \"hover\";\n\tbackgroundColor?: string;\n\twireframes?: boolean;\n\tgravity?: number;\n\tmouseConstraintStiffness?: number;\n\tfontSize?: string;\n}\n\nconst FallingText: React.FC<FallingTextProps> = ({\n\ttext = \"\",\n\thighlightWords = [],\n\ttrigger = \"auto\",\n\tbackgroundColor = \"transparent\",\n\twireframes = false,\n\tgravity = 1,\n\tmouseConstraintStiffness = 0.2,\n\tfontSize = \"1rem\",\n}) => {\n\tconst containerRef = useRef<HTMLDivElement | null>(null);\n\tconst textRef = useRef<HTMLDivElement | null>(null);\n\tconst canvasContainerRef = useRef<HTMLDivElement | null>(null);\n\n\tconst [effectStarted, setEffectStarted] = useState(false);\n\n\tuseEffect(() => {\n\t\tif (!textRef.current) return;\n\t\tconst words = text.split(\" \");\n\n\t\tconst newHTML = words\n\t\t\t.map((word) => {\n\t\t\t\tconst isHighlighted = highlightWords.some((hw) =>\n\t\t\t\t\tword.startsWith(hw)\n\t\t\t\t);\n\t\t\t\treturn `<span\n          class=\"inline-block mx-[2px] select-none ${\n\t\t\t\t\tisHighlighted ? \"text-cyan-500 font-bold\" : \"\"\n\t\t\t\t}\"\n        >\n          ${word}\n        </span>`;\n\t\t\t})\n\t\t\t.join(\" \");\n\n\t\ttextRef.current.innerHTML = newHTML;\n\t}, [text, highlightWords]);\n\n\tuseEffect(() => {\n\t\tif (trigger === \"auto\") {\n\t\t\tsetEffectStarted(true);\n\t\t\treturn;\n\t\t}\n\t\tif (trigger === \"scroll\" && containerRef.current) {\n\t\t\tconst observer = new IntersectionObserver(\n\t\t\t\t([entry]) => {\n\t\t\t\t\tif (entry.isIntersecting) {\n\t\t\t\t\t\tsetEffectStarted(true);\n\t\t\t\t\t\tobserver.disconnect();\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t\t{ threshold: 0.1 }\n\t\t\t);\n\t\t\tobserver.observe(containerRef.current);\n\t\t\treturn () => observer.disconnect();\n\t\t}\n\t}, [trigger]);\n\n\tuseEffect(() => {\n\t\tif (!effectStarted) return;\n\n\t\tconst { Engine, Render, World, Bodies, Runner, Mouse, MouseConstraint } =\n\t\t\tMatter;\n\n\t\tif (!containerRef.current || !canvasContainerRef.current) return;\n\n\t\tconst containerRect = containerRef.current.getBoundingClientRect();\n\t\tconst width = containerRect.width;\n\t\tconst height = containerRect.height;\n\n\t\tif (width <= 0 || height <= 0) return;\n\n\t\tconst engine = Engine.create();\n\t\tengine.world.gravity.y = gravity;\n\n\t\tconst render = Render.create({\n\t\t\telement: canvasContainerRef.current,\n\t\t\tengine,\n\t\t\toptions: {\n\t\t\t\twidth,\n\t\t\t\theight,\n\t\t\t\tbackground: backgroundColor,\n\t\t\t\twireframes,\n\t\t\t},\n\t\t});\n\n\t\tconst boundaryOptions = {\n\t\t\tisStatic: true,\n\t\t\trender: { fillStyle: \"transparent\" },\n\t\t};\n\t\tconst floor = Bodies.rectangle(\n\t\t\twidth / 2,\n\t\t\theight + 25,\n\t\t\twidth,\n\t\t\t50,\n\t\t\tboundaryOptions\n\t\t);\n\t\tconst leftWall = Bodies.rectangle(\n\t\t\t-25,\n\t\t\theight / 2,\n\t\t\t50,\n\t\t\theight,\n\t\t\tboundaryOptions\n\t\t);\n\t\tconst rightWall = Bodies.rectangle(\n\t\t\twidth + 25,\n\t\t\theight / 2,\n\t\t\t50,\n\t\t\theight,\n\t\t\tboundaryOptions\n\t\t);\n\t\tconst ceiling = Bodies.rectangle(\n\t\t\twidth / 2,\n\t\t\t-25,\n\t\t\twidth,\n\t\t\t50,\n\t\t\tboundaryOptions\n\t\t);\n\n\t\tif (!textRef.current) return;\n\t\tconst wordSpans = textRef.current.querySelectorAll(\"span\");\n\t\tconst wordBodies = [...wordSpans].map((elem) => {\n\t\t\tconst rect = elem.getBoundingClientRect();\n\n\t\t\tconst x = rect.left - containerRect.left + rect.width / 2;\n\t\t\tconst y = rect.top - containerRect.top + rect.height / 2;\n\n\t\t\tconst body = Bodies.rectangle(x, y, rect.width, rect.height, {\n\t\t\t\trender: { fillStyle: \"transparent\" },\n\t\t\t\trestitution: 0.8,\n\t\t\t\tfrictionAir: 0.01,\n\t\t\t\tfriction: 0.2,\n\t\t\t});\n\t\t\tMatter.Body.setVelocity(body, {\n\t\t\t\tx: (Math.random() - 0.5) * 5,\n\t\t\t\ty: 0,\n\t\t\t});\n\t\t\tMatter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.05);\n\n\t\t\treturn { elem, body };\n\t\t});\n\n\t\twordBodies.forEach(({ elem, body }) => {\n\t\t\telem.style.position = \"absolute\";\n\t\t\telem.style.left = `${\n\t\t\t\tbody.position.x - body.bounds.max.x + body.bounds.min.x / 2\n\t\t\t}px`;\n\t\t\telem.style.top = `${\n\t\t\t\tbody.position.y - body.bounds.max.y + body.bounds.min.y / 2\n\t\t\t}px`;\n\t\t\telem.style.transform = \"none\";\n\t\t});\n\n\t\tconst mouse = Mouse.create(containerRef.current);\n\t\tconst mouseConstraint = MouseConstraint.create(engine, {\n\t\t\tmouse,\n\t\t\tconstraint: {\n\t\t\t\tstiffness: mouseConstraintStiffness,\n\t\t\t\trender: { visible: false },\n\t\t\t},\n\t\t});\n\t\trender.mouse = mouse;\n\n\t\tWorld.add(engine.world, [\n\t\t\tfloor,\n\t\t\tleftWall,\n\t\t\trightWall,\n\t\t\tceiling,\n\t\t\tmouseConstraint,\n\t\t\t...wordBodies.map((wb) => wb.body),\n\t\t]);\n\n\t\tconst runner = Runner.create();\n\t\tRunner.run(runner, engine);\n\t\tRender.run(render);\n\n\t\tconst updateLoop = () => {\n\t\t\twordBodies.forEach(({ body, elem }) => {\n\t\t\t\tconst { x, y } = body.position;\n\t\t\t\tconst w = body.bounds.max.x - body.bounds.min.x;\n\t\t\t\tconst h = body.bounds.max.y - body.bounds.min.y;\n\t\t\t\telem.style.left = `${x - w / 2}px`;\n\t\t\t\telem.style.top = `${y - h / 2}px`;\n\t\t\t\telem.style.transform = `rotate(${body.angle}rad)`;\n\t\t\t});\n\t\t\tMatter.Engine.update(engine);\n\t\t\trequestAnimationFrame(updateLoop);\n\t\t};\n\t\tupdateLoop();\n\n\t\treturn () => {\n\t\t\tRender.stop(render);\n\t\t\tRunner.stop(runner);\n\t\t\tif (render.canvas && canvasContainerRef.current) {\n\t\t\t\tcanvasContainerRef.current.removeChild(render.canvas);\n\t\t\t}\n\t\t\tWorld.clear(engine.world, false);\n\t\t\tEngine.clear(engine);\n\t\t};\n\t}, [\n\t\teffectStarted,\n\t\tgravity,\n\t\twireframes,\n\t\tbackgroundColor,\n\t\tmouseConstraintStiffness,\n\t]);\n\n\tconst handleTrigger = () => {\n\t\tif (!effectStarted && (trigger === \"click\" || trigger === \"hover\")) {\n\t\t\tsetEffectStarted(true);\n\t\t}\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName=\"relative z-1 w-full h-full cursor-pointer text-center overflow-hidden\"\n\t\t\tonClick={trigger === \"click\" ? handleTrigger : undefined}\n\t\t\tonMouseOver={trigger === \"hover\" ? handleTrigger : undefined}\n\t\t>\n\t\t\t<div\n\t\t\t\tref={textRef}\n\t\t\t\tclassName=\"inline-block\"\n\t\t\t\tstyle={{\n\t\t\t\t\tfontSize,\n\t\t\t\t\tlineHeight: 1.4,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<div className=\"absolute top-0 left-0 z-0\" ref={canvasContainerRef} />\n\t\t</div>\n\t);\n};\n\nexport default FallingText;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "featured",
+      "spring",
+      "scroll-driven",
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/text-animations/falling-text",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "highlightWords",
+        "type": "string[]",
+        "default": "[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "trigger",
+        "type": "\"auto\" | \"scroll\" | \"click\" | \"hover\"",
+        "default": "\"auto\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "default": "\"transparent\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "wireframes",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "gravity",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mouseConstraintStiffness",
+        "type": "number",
+        "default": "0.2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontSize",
+        "type": "string",
+        "default": "\"1rem\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 9,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/falling-text"
+  }
+}

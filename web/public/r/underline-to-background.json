@@ -1,0 +1,93 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "underline-to-background",
+  "type": "registry:ui",
+  "title": "Underline To Background",
+  "description": "Underline To Background",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/underline-to-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/underline-to-background.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useRef } from \"react\";\r\n\r\nimport { motion, ValueAnimationTransition } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.fancycomponents.dev/docs/components/text/underline-to-background\r\n\r\ninterface UnderlineProps {\r\n\tlabel: string;\r\n\tclassName?: string;\r\n\ttransition?: ValueAnimationTransition;\r\n\tonClick?: () => void;\r\n\ttargetTextColor: string;\r\n\tunderlineHeightRatio?: number;\r\n\tunderlinePaddingRatio?: number;\r\n}\r\n\r\nconst UnderlineToBackground = ({\r\n\tlabel,\r\n\tclassName,\r\n\tonClick,\r\n\ttransition = { type: \"spring\", damping: 30, stiffness: 300 },\r\n\tunderlineHeightRatio = 0.1, // Default to 10% of font size\r\n\tunderlinePaddingRatio = 0.01, // Default to 1% of font size\r\n\ttargetTextColor = \"#fef\",\r\n\t...props\r\n}: UnderlineProps) => {\r\n\tconst textRef = useRef<HTMLSpanElement>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst updateUnderlineStyles = () => {\r\n\t\t\tif (textRef.current) {\r\n\t\t\t\tconst fontSize = parseFloat(\r\n\t\t\t\t\tgetComputedStyle(textRef.current).fontSize\r\n\t\t\t\t);\r\n\t\t\t\tconst underlineHeight = fontSize * underlineHeightRatio;\r\n\t\t\t\tconst underlinePadding = fontSize * underlinePaddingRatio;\r\n\t\t\t\ttextRef.current.style.setProperty(\r\n\t\t\t\t\t\"--underline-height\",\r\n\t\t\t\t\t`${underlineHeight}px`\r\n\t\t\t\t);\r\n\t\t\t\ttextRef.current.style.setProperty(\r\n\t\t\t\t\t\"--underline-padding\",\r\n\t\t\t\t\t`${underlinePadding}px`\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tupdateUnderlineStyles();\r\n\t\twindow.addEventListener(\"resize\", updateUnderlineStyles);\r\n\r\n\t\treturn () => window.removeEventListener(\"resize\", updateUnderlineStyles);\r\n\t}, [underlineHeightRatio, underlinePaddingRatio]);\r\n\r\n\tconst underlineVariants = {\r\n\t\tinitial: {\r\n\t\t\theight: \"var(--underline-height)\",\r\n\t\t},\r\n\t\ttarget: {\r\n\t\t\theight: \"100%\",\r\n\t\t\ttransition: transition,\r\n\t\t},\r\n\t};\r\n\r\n\tconst textVariants = {\r\n\t\tinitial: {\r\n\t\t\tcolor: \"currentColor\",\r\n\t\t},\r\n\t\ttarget: {\r\n\t\t\tcolor: targetTextColor,\r\n\t\t\ttransition: transition,\r\n\t\t},\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.span\r\n\t\t\tclassName={`relative inline-block cursor-pointer ${className}`}\r\n\t\t\twhileHover=\"target\"\r\n\t\t\tonClick={onClick}\r\n\t\t\tref={textRef}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"absolute bg-current w-full\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\theight: \"var(--underline-height)\",\r\n\t\t\t\t\tbottom: \"calc(-1 * var(--underline-padding))\",\r\n\t\t\t\t}}\r\n\t\t\t\tvariants={underlineVariants}\r\n\t\t\t\taria-hidden=\"true\"\r\n\t\t\t/>\r\n\t\t\t<motion.span variants={textVariants} className=\"text-current relative\">\r\n\t\t\t\t{label}\r\n\t\t\t</motion.span>\r\n\t\t</motion.span>\r\n\t);\r\n};\r\n\r\nexport default UnderlineToBackground;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/underline-to-background",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "ValueAnimationTransition<any>",
+        "default": "{ type: \"spring\", damping: 30, stiffn…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "targetTextColor",
+        "type": "string",
+        "default": "\"#fef\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "underlineHeightRatio",
+        "type": "number",
+        "default": "0.1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "underlinePaddingRatio",
+        "type": "number",
+        "default": "0.01",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/underline-to-background"
+  }
+}

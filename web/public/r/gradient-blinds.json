@@ -1,0 +1,153 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gradient-blinds",
+  "type": "registry:ui",
+  "title": "Gradient Blinds",
+  "description": "Gradient Blinds",
+  "dependencies": [
+    "ogl"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/gradient-blinds.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/gradient-blinds.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\n\nimport { Mesh, Program, Renderer, Triangle } from \"ogl\";\n\nexport interface GradientBlindsProps {\n\tclassName?: string;\n\tdpr?: number;\n\tpaused?: boolean;\n\tgradientColors?: string[];\n\tangle?: number;\n\tnoise?: number;\n\tblindCount?: number;\n\tblindMinWidth?: number;\n\tmouseDampening?: number;\n\tmirrorGradient?: boolean;\n\tspotlightRadius?: number;\n\tspotlightSoftness?: number;\n\tspotlightOpacity?: number;\n\tdistortAmount?: number;\n\tshineDirection?: \"left\" | \"right\";\n\tmixBlendMode?: string;\n}\n\nconst MAX_COLORS = 8;\nconst hexToRGB = (hex: string): [number, number, number] => {\n\tconst c = hex.replace(\"#\", \"\").padEnd(6, \"0\");\n\tconst r = parseInt(c.slice(0, 2), 16) / 255;\n\tconst g = parseInt(c.slice(2, 4), 16) / 255;\n\tconst b = parseInt(c.slice(4, 6), 16) / 255;\n\treturn [r, g, b];\n};\nconst prepStops = (stops?: string[]) => {\n\tconst base = (stops && stops.length ? stops : [\"#FF9FFC\", \"#5227FF\"]).slice(\n\t\t0,\n\t\tMAX_COLORS\n\t);\n\tif (base.length === 1) base.push(base[0]);\n\twhile (base.length < MAX_COLORS) base.push(base[base.length - 1]);\n\tconst arr: [number, number, number][] = [];\n\tfor (let i = 0; i < MAX_COLORS; i++) arr.push(hexToRGB(base[i]));\n\tconst count = Math.max(2, Math.min(MAX_COLORS, stops?.length ?? 2));\n\treturn { arr, count };\n};\n\nconst GradientBlinds: React.FC<GradientBlindsProps> = ({\n\tclassName,\n\tdpr,\n\tpaused = false,\n\tgradientColors,\n\tangle = 0,\n\tnoise = 0.3,\n\tblindCount = 16,\n\tblindMinWidth = 60,\n\tmouseDampening = 0.15,\n\tmirrorGradient = false,\n\tspotlightRadius = 0.5,\n\tspotlightSoftness = 1,\n\tspotlightOpacity = 1,\n\tdistortAmount = 0,\n\tshineDirection = \"left\",\n\tmixBlendMode = \"lighten\",\n}) => {\n\tconst containerRef = useRef<HTMLDivElement | null>(null);\n\tconst rafRef = useRef<number | null>(null);\n\tconst programRef = useRef<Program | null>(null);\n\tconst meshRef = useRef<Mesh<Triangle> | null>(null);\n\tconst geometryRef = useRef<Triangle | null>(null);\n\tconst rendererRef = useRef<Renderer | null>(null);\n\tconst mouseTargetRef = useRef<[number, number]>([0, 0]);\n\tconst lastTimeRef = useRef<number>(0);\n\tconst firstResizeRef = useRef<boolean>(true);\n\n\tuseEffect(() => {\n\t\tconst container = containerRef.current;\n\t\tif (!container) return;\n\n\t\tconst renderer = new Renderer({\n\t\t\tdpr:\n\t\t\t\tdpr ??\n\t\t\t\t(typeof window !== \"undefined\" ? window.devicePixelRatio || 1 : 1),\n\t\t\talpha: true,\n\t\t\tantialias: true,\n\t\t});\n\t\trendererRef.current = renderer;\n\t\tconst gl = renderer.gl;\n\t\tconst canvas = gl.canvas as HTMLCanvasElement;\n\n\t\tcanvas.style.width = \"100%\";\n\t\tcanvas.style.height = \"100%\";\n\t\tcanvas.style.display = \"block\";\n\t\tcontainer.appendChild(canvas);\n\n\t\tconst vertex = `\nattribute vec2 position;\nattribute vec2 uv;\nvarying vec2 vUv;\n\nvoid main() {\n  vUv = uv;\n  gl_Position = vec4(position, 0.0, 1.0);\n}\n`;\n\n\t\tconst fragment = `\n#ifdef GL_ES\nprecision mediump float;\n#endif\n\nuniform vec3  iResolution;\nuniform vec2  iMouse;\nuniform float iTime;\n\nuniform float uAngle;\nuniform float uNoise;\nuniform float uBlindCount;\nuniform float uSpotlightRadius;\nuniform float uSpotlightSoftness;\nuniform float uSpotlightOpacity;\nuniform float uMirror;\nuniform float uDistort;\nuniform float uShineFlip;\nuniform vec3  uColor0;\nuniform vec3  uColor1;\nuniform vec3  uColor2;\nuniform vec3  uColor3;\nuniform vec3  uColor4;\nuniform vec3  uColor5;\nuniform vec3  uColor6;\nuniform vec3  uColor7;\nuniform int   uColorCount;\n\nvarying vec2 vUv;\n\nfloat rand(vec2 co){\n  return fract(sin(dot(co, vec2(12.9898,78.233))) * 43758.5453);\n}\n\nvec2 rotate2D(vec2 p, float a){\n  float c = cos(a);\n  float s = sin(a);\n  return mat2(c, -s, s, c) * p;\n}\n\nvec3 getGradientColor(float t){\n  float tt = clamp(t, 0.0, 1.0);\n  int count = uColorCount;\n  if (count < 2) count = 2;\n  float scaled = tt * float(count - 1);\n  float seg = floor(scaled);\n  float f = fract(scaled);\n\n  if (seg < 1.0) return mix(uColor0, uColor1, f);\n  if (seg < 2.0 && count > 2) return mix(uColor1, uColor2, f);\n  if (seg < 3.0 && count > 3) return mix(uColor2, uColor3, f);\n  if (seg < 4.0 && count > 4) return mix(uColor3, uColor4, f);\n  if (seg < 5.0 && count > 5) return mix(uColor4, uColor5, f);\n  if (seg < 6.0 && count > 6) return mix(uColor5, uColor6, f);\n  if (seg < 7.0 && count > 7) return mix(uColor6, uColor7, f);\n  if (count > 7) return uColor7;\n  if (count > 6) return uColor6;\n  if (count > 5) return uColor5;\n  if (count > 4) return uColor4;\n  if (count > 3) return uColor3;\n  if (count > 2) return uColor2;\n  return uColor1;\n}\n\nvoid mainImage( out vec4 fragColor, in vec2 fragCoord )\n{\n    vec2 uv0 = fragCoord.xy / iResolution.xy;\n\n    float aspect = iResolution.x / iResolution.y;\n    vec2 p = uv0 * 2.0 - 1.0;\n    p.x *= aspect;\n    vec2 pr = rotate2D(p, uAngle);\n    pr.x /= aspect;\n    vec2 uv = pr * 0.5 + 0.5;\n\n    vec2 uvMod = uv;\n    if (uDistort > 0.0) {\n      float a = uvMod.y * 6.0;\n      float b = uvMod.x * 6.0;\n      float w = 0.01 * uDistort;\n      uvMod.x += sin(a) * w;\n      uvMod.y += cos(b) * w;\n    }\n    float t = uvMod.x;\n    if (uMirror > 0.5) {\n      t = 1.0 - abs(1.0 - 2.0 * fract(t));\n    }\n    vec3 base = getGradientColor(t);\n\n    vec2 offset = vec2(iMouse.x/iResolution.x, iMouse.y/iResolution.y);\n  float d = length(uv0 - offset);\n  float r = max(uSpotlightRadius, 1e-4);\n  float dn = d / r;\n  float spot = (1.0 - 2.0 * pow(dn, uSpotlightSoftness)) * uSpotlightOpacity;\n  vec3 cir = vec3(spot);\n  float stripe = fract(uvMod.x * max(uBlindCount, 1.0));\n  if (uShineFlip > 0.5) stripe = 1.0 - stripe;\n    vec3 ran = vec3(stripe);\n\n    vec3 col = cir + base - ran;\n    col += (rand(gl_FragCoord.xy + iTime) - 0.5) * uNoise;\n\n    fragColor = vec4(col, 1.0);\n}\n\nvoid main() {\n    vec4 color;\n    mainImage(color, vUv * iResolution.xy);\n    gl_FragColor = color;\n}\n`;\n\n\t\tconst { arr: colorArr, count: colorCount } = prepStops(gradientColors);\n\t\tconst uniforms: {\n\t\t\tiResolution: { value: [number, number, number] };\n\t\t\tiMouse: { value: [number, number] };\n\t\t\tiTime: { value: number };\n\t\t\tuAngle: { value: number };\n\t\t\tuNoise: { value: number };\n\t\t\tuBlindCount: { value: number };\n\t\t\tuSpotlightRadius: { value: number };\n\t\t\tuSpotlightSoftness: { value: number };\n\t\t\tuSpotlightOpacity: { value: number };\n\t\t\tuMirror: { value: number };\n\t\t\tuDistort: { value: number };\n\t\t\tuShineFlip: { value: number };\n\t\t\tuColor0: { value: [number, number, number] };\n\t\t\tuColor1: { value: [number, number, number] };\n\t\t\tuColor2: { value: [number, number, number] };\n\t\t\tuColor3: { value: [number, number, number] };\n\t\t\tuColor4: { value: [number, number, number] };\n\t\t\tuColor5: { value: [number, number, number] };\n\t\t\tuColor6: { value: [number, number, number] };\n\t\t\tuColor7: { value: [number, number, number] };\n\t\t\tuColorCount: { value: number };\n\t\t} = {\n\t\t\tiResolution: {\n\t\t\t\tvalue: [gl.drawingBufferWidth, gl.drawingBufferHeight, 1],\n\t\t\t},\n\t\t\tiMouse: { value: [0, 0] },\n\t\t\tiTime: { value: 0 },\n\t\t\tuAngle: { value: (angle * Math.PI) / 180 },\n\t\t\tuNoise: { value: noise },\n\t\t\tuBlindCount: { value: Math.max(1, blindCount) },\n\t\t\tuSpotlightRadius: { value: spotlightRadius },\n\t\t\tuSpotlightSoftness: { value: spotlightSoftness },\n\t\t\tuSpotlightOpacity: { value: spotlightOpacity },\n\t\t\tuMirror: { value: mirrorGradient ? 1 : 0 },\n\t\t\tuDistort: { value: distortAmount },\n\t\t\tuShineFlip: { value: shineDirection === \"right\" ? 1 : 0 },\n\t\t\tuColor0: { value: colorArr[0] },\n\t\t\tuColor1: { value: colorArr[1] },\n\t\t\tuColor2: { value: colorArr[2] },\n\t\t\tuColor3: { value: colorArr[3] },\n\t\t\tuColor4: { value: colorArr[4] },\n\t\t\tuColor5: { value: colorArr[5] },\n\t\t\tuColor6: { value: colorArr[6] },\n\t\t\tuColor7: { value: colorArr[7] },\n\t\t\tuColorCount: { value: colorCount },\n\t\t};\n\n\t\tconst program = new Program(gl, {\n\t\t\tvertex,\n\t\t\tfragment,\n\t\t\tuniforms,\n\t\t});\n\t\tprogramRef.current = program;\n\n\t\tconst geometry = new Triangle(gl);\n\t\tgeometryRef.current = geometry;\n\t\tconst mesh = new Mesh(gl, { geometry, program });\n\t\tmeshRef.current = mesh;\n\n\t\tconst resize = () => {\n\t\t\tconst rect = container.getBoundingClientRect();\n\t\t\trenderer.setSize(rect.width, rect.height);\n\t\t\tuniforms.iResolution.value = [\n\t\t\t\tgl.drawingBufferWidth,\n\t\t\t\tgl.drawingBufferHeight,\n\t\t\t\t1,\n\t\t\t];\n\n\t\t\tif (blindMinWidth && blindMinWidth > 0) {\n\t\t\t\tconst maxByMinWidth = Math.max(\n\t\t\t\t\t1,\n\t\t\t\t\tMath.floor(rect.width / blindMinWidth)\n\t\t\t\t);\n\n\t\t\t\tconst effective = blindCount\n\t\t\t\t\t? Math.min(blindCount, maxByMinWidth)\n\t\t\t\t\t: maxByMinWidth;\n\t\t\t\tuniforms.uBlindCount.value = Math.max(1, effective);\n\t\t\t} else {\n\t\t\t\tuniforms.uBlindCount.value = Math.max(1, blindCount);\n\t\t\t}\n\n\t\t\tif (firstResizeRef.current) {\n\t\t\t\tfirstResizeRef.current = false;\n\t\t\t\tconst cx = gl.drawingBufferWidth / 2;\n\t\t\t\tconst cy = gl.drawingBufferHeight / 2;\n\t\t\t\tuniforms.iMouse.value = [cx, cy];\n\t\t\t\tmouseTargetRef.current = [cx, cy];\n\t\t\t}\n\t\t};\n\n\t\tresize();\n\t\tconst ro = new ResizeObserver(resize);\n\t\tro.observe(container);\n\n\t\tconst onPointerMove = (e: PointerEvent) => {\n\t\t\tconst rect = canvas.getBoundingClientRect();\n\t\t\tconst scale = (renderer as unknown as { dpr?: number }).dpr || 1;\n\t\t\tconst x = (e.clientX - rect.left) * scale;\n\t\t\tconst y = (rect.height - (e.clientY - rect.top)) * scale;\n\t\t\tmouseTargetRef.current = [x, y];\n\t\t\tif (mouseDampening <= 0) {\n\t\t\t\tuniforms.iMouse.value = [x, y];\n\t\t\t}\n\t\t};\n\t\tcanvas.addEventListener(\"pointermove\", onPointerMove);\n\n\t\tconst loop = (t: number) => {\n\t\t\trafRef.current = requestAnimationFrame(loop);\n\t\t\tuniforms.iTime.value = t * 0.001;\n\t\t\tif (mouseDampening > 0) {\n\t\t\t\tif (!lastTimeRef.current) lastTimeRef.current = t;\n\t\t\t\tconst dt = (t - lastTimeRef.current) / 1000;\n\t\t\t\tlastTimeRef.current = t;\n\t\t\t\tconst tau = Math.max(1e-4, mouseDampening);\n\t\t\t\tlet factor = 1 - Math.exp(-dt / tau);\n\t\t\t\tif (factor > 1) factor = 1;\n\t\t\t\tconst target = mouseTargetRef.current;\n\t\t\t\tconst cur = uniforms.iMouse.value;\n\t\t\t\tcur[0] += (target[0] - cur[0]) * factor;\n\t\t\t\tcur[1] += (target[1] - cur[1]) * factor;\n\t\t\t} else {\n\t\t\t\tlastTimeRef.current = t;\n\t\t\t}\n\t\t\tif (!paused && programRef.current && meshRef.current) {\n\t\t\t\ttry {\n\t\t\t\t\trenderer.render({ scene: meshRef.current });\n\t\t\t\t} catch (e) {\n\t\t\t\t\tconsole.error(e);\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t\trafRef.current = requestAnimationFrame(loop);\n\n\t\treturn () => {\n\t\t\tif (rafRef.current) cancelAnimationFrame(rafRef.current);\n\t\t\tcanvas.removeEventListener(\"pointermove\", onPointerMove);\n\t\t\tro.disconnect();\n\t\t\tif (canvas.parentElement === container) {\n\t\t\t\tcontainer.removeChild(canvas);\n\t\t\t}\n\t\t\tconst callIfFn = <T extends object, K extends keyof T>(\n\t\t\t\tobj: T | null,\n\t\t\t\tkey: K\n\t\t\t) => {\n\t\t\t\tif (obj && typeof obj[key] === \"function\") {\n\t\t\t\t\t(obj[key] as unknown as () => void).call(obj);\n\t\t\t\t}\n\t\t\t};\n\t\t\tcallIfFn(programRef.current, \"remove\");\n\t\t\tcallIfFn(geometryRef.current, \"remove\");\n\t\t\tcallIfFn(\n\t\t\t\tmeshRef.current as unknown as { remove?: () => void },\n\t\t\t\t\"remove\"\n\t\t\t);\n\t\t\tcallIfFn(\n\t\t\t\trendererRef.current as unknown as { destroy?: () => void },\n\t\t\t\t\"destroy\"\n\t\t\t);\n\t\t\tprogramRef.current = null;\n\t\t\tgeometryRef.current = null;\n\t\t\tmeshRef.current = null;\n\t\t\trendererRef.current = null;\n\t\t};\n\t}, [\n\t\tdpr,\n\t\tpaused,\n\t\tgradientColors,\n\t\tangle,\n\t\tnoise,\n\t\tblindCount,\n\t\tblindMinWidth,\n\t\tmouseDampening,\n\t\tmirrorGradient,\n\t\tspotlightRadius,\n\t\tspotlightSoftness,\n\t\tspotlightOpacity,\n\t\tdistortAmount,\n\t\tshineDirection,\n\t]);\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName={`w-full h-full overflow-hidden relative ${className}`}\n\t\t\tstyle={{\n\t\t\t\t...(mixBlendMode && {\n\t\t\t\t\tmixBlendMode:\n\t\t\t\t\t\tmixBlendMode as React.CSSProperties[\"mixBlendMode\"],\n\t\t\t\t}),\n\t\t\t}}\n\t\t/>\n\t);\n};\n\nexport default GradientBlinds;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "dpr",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "paused",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "gradientColors",
+        "type": "string[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "angle",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "noise",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blindCount",
+        "type": "number",
+        "default": "16",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blindMinWidth",
+        "type": "number",
+        "default": "60",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mouseDampening",
+        "type": "number",
+        "default": "0.15",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mirrorGradient",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "spotlightRadius",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "spotlightSoftness",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "spotlightOpacity",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distortAmount",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "shineDirection",
+        "type": "\"left\" | \"right\"",
+        "default": "\"left\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mixBlendMode",
+        "type": "string",
+        "default": "\"lighten\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/gradient-blinds"
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lens",
+  "type": "registry:ui",
+  "title": "Lens",
+  "description": "Lens",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/lens.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/lens.tsx",
+      "content": "\"use client\";\n\nimport React, { useRef, useState } from \"react\";\n\nimport { AnimatePresence, motion } from \"motion/react\";\n\ninterface LensProps {\n\tchildren: React.ReactNode;\n\tzoomFactor?: number;\n\tlensSize?: number;\n\tposition?: {\n\t\tx: number;\n\t\ty: number;\n\t};\n\tisStatic?: boolean;\n\tisFocusing?: () => void;\n\t// hovering?: boolean;\n\t// setHovering?: (hovering: boolean) => void;\n}\n\nexport const Lens: React.FC<LensProps> = ({\n\tchildren,\n\tzoomFactor = 2,\n\tlensSize = 370,\n\tisStatic = false,\n\tposition = { x: 200, y: 150 },\n\t// hovering,\n\t// setHovering,\n}) => {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\n\tconst [hovering, setHovering] = useState(false);\n\tconst [mousePosition, setMousePosition] = useState({ x: 100, y: 100 });\n\n\tconst handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {\n\t\tconst rect = e.currentTarget.getBoundingClientRect();\n\t\tconst x = e.clientX - rect.left;\n\t\tconst y = e.clientY - rect.top;\n\t\tsetMousePosition({ x, y });\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName=\"relative overflow-hidden rounded-lg z-20\"\n\t\t\tonMouseEnter={() => {\n\t\t\t\tsetHovering(true);\n\t\t\t}}\n\t\t\tonMouseLeave={() => setHovering(false)}\n\t\t\tonMouseMove={handleMouseMove}\n\t\t>\n\t\t\t{children}\n\n\t\t\t{isStatic ? (\n\t\t\t\t<div>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tinitial={{ opacity: 0, scale: 0.58 }}\n\t\t\t\t\t\tanimate={{ opacity: 1, scale: 1 }}\n\t\t\t\t\t\texit={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\t\ttransition={{ duration: 0.3, ease: \"easeOut\" }}\n\t\t\t\t\t\tclassName=\"absolute inset-0 overflow-hidden\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tmaskImage: `radial-gradient(circle ${lensSize / 2}px at ${\n\t\t\t\t\t\t\t\tposition.x\n\t\t\t\t\t\t\t}px ${position.y}px, black 100%, transparent 100%)`,\n\t\t\t\t\t\t\tWebkitMaskImage: `radial-gradient(circle ${\n\t\t\t\t\t\t\t\tlensSize / 2\n\t\t\t\t\t\t\t}px at ${position.x}px ${\n\t\t\t\t\t\t\t\tposition.y\n\t\t\t\t\t\t\t}px, black 100%, transparent 100%)`,\n\t\t\t\t\t\t\ttransformOrigin: `${position.x}px ${position.y}px`,\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName=\"absolute inset-0\"\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\ttransform: `scale(${zoomFactor})`,\n\t\t\t\t\t\t\t\ttransformOrigin: `${position.x}px ${position.y}px`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{children}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t</div>\n\t\t\t) : (\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{hovering && (\n\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0, scale: 0.58 }}\n\t\t\t\t\t\t\t\tanimate={{ opacity: 1, scale: 1 }}\n\t\t\t\t\t\t\t\texit={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.3, ease: \"easeOut\" }}\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 overflow-hidden\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tmaskImage: `radial-gradient(circle ${\n\t\t\t\t\t\t\t\t\t\tlensSize / 2\n\t\t\t\t\t\t\t\t\t}px at ${mousePosition.x}px ${\n\t\t\t\t\t\t\t\t\t\tmousePosition.y\n\t\t\t\t\t\t\t\t\t}px, black 100%, transparent 100%)`,\n\t\t\t\t\t\t\t\t\tWebkitMaskImage: `radial-gradient(circle ${\n\t\t\t\t\t\t\t\t\t\tlensSize / 2\n\t\t\t\t\t\t\t\t\t}px at ${mousePosition.x}px ${\n\t\t\t\t\t\t\t\t\t\tmousePosition.y\n\t\t\t\t\t\t\t\t\t}px, black 100%, transparent 100%)`,\n\t\t\t\t\t\t\t\t\ttransformOrigin: `${mousePosition.x}px ${mousePosition.y}px`,\n\t\t\t\t\t\t\t\t\tzIndex: 50,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0\"\n\t\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\t\ttransform: `scale(${zoomFactor})`,\n\t\t\t\t\t\t\t\t\t\ttransformOrigin: `${mousePosition.x}px ${mousePosition.y}px`,\n\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t{children}\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t)}\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "zoomFactor",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "lensSize",
+        "type": "number",
+        "default": "370",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "position",
+        "type": "{ x: number; y: number; }",
+        "default": "{ x: 200, y: 150 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "isStatic",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "isFocusing",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/lens"
+  }
+}

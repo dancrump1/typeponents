@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "diamond-gallery",
+  "type": "registry:ui",
+  "title": "Diamond Gallery",
+  "description": "Diamond Gallery",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/diamond-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/diamond-gallery.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\ninterface ImageItem {\r\n\timage: string;\r\n\tisLink?: boolean;\r\n\thref?: string;\r\n\ttarget?: string;\r\n\trel?: string;\r\n}\r\n\r\ninterface DiamondGalleryProps {\r\n\timages: ImageItem[];\r\n}\r\n\r\nconst DiamondGallery = ({ images }: DiamondGalleryProps) => {\r\n\tconst [hoveredIndex, setHoveredIndex] = useState<number | null>(null);\r\n\r\n\tconst positions = [\r\n\t\t\"top-0 left-1/2 transform -translate-x-1/2 -translate-y-[5%]\",\r\n\t\t\"left-0 top-1/2 transform -translate-y-1/2 -translate-x-[5%]\",\r\n\t\t\"right-0 top-1/2 transform -translate-y-1/2 translate-x-[5%]\",\r\n\t\t\"bottom-0 left-1/2 transform -translate-x-1/2 translate-y-[5%]\",\r\n\t];\r\n\r\n\treturn (\r\n\t\t<div className=\"relative aspect-square h-full\">\r\n\t\t\t{images.slice(0, 4).map((img: ImageItem, idx: number) => {\r\n\t\t\t\tconst imageElement = (\r\n\t\t\t\t\t<Image\r\n\t\t\t\t\t\tsrc={img.image}\r\n\t\t\t\t\t\theight={100}\r\n\t\t\t\t\t\twidth={100}\r\n\t\t\t\t\t\talt={`Diamond Image ${idx + 1}`}\r\n\t\t\t\t\t\tclassName=\"size-full object-cover -rotate-45 scale-150\"\r\n\t\t\t\t\t\tonMouseEnter={() => setHoveredIndex(idx)}\r\n\t\t\t\t\t\tonMouseLeave={() => setHoveredIndex(null)}\r\n\t\t\t\t\t/>\r\n\t\t\t\t);\r\n\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName={`absolute w-1/2 h-1/2 rotate-45 rounded-lg transition-[transform,z-index] duration-500 overflow-hidden \r\n              ${positions[idx]}\r\n              ${hoveredIndex === idx ? \"scale-100 z-1\" : \"scale-75 z-0\"}\r\n              ${\r\n\t\t\t\t\t\thoveredIndex !== null && hoveredIndex !== idx\r\n\t\t\t\t\t\t\t? \"filter blur-xs grayscale\"\r\n\t\t\t\t\t\t\t: \"\"\r\n\t\t\t\t\t}`}\r\n\t\t\t\t\t\tkey={idx}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{img.isLink ? (\r\n\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\thref={img.href}\r\n\t\t\t\t\t\t\t\ttarget={img.target}\r\n\t\t\t\t\t\t\t\trel={img.rel}\r\n\t\t\t\t\t\t\t\tclassName=\"block size-full\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{imageElement}\r\n\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t) : (\r\n\t\t\t\t\t\t\timageElement\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default DiamondGallery;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "images",
+        "type": "ImageItem[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/diamond-gallery"
+  }
+}

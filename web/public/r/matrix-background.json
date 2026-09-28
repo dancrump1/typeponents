@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "matrix-background",
+  "type": "registry:ui",
+  "title": "Matrix Background",
+  "description": "Matrix Background",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/matrix-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/matrix-background.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\n\n// Credit:\n// https://eclairui.gopx.dev/components/backgrounds/matrix\n\ninterface MatrixBackgroundProps {\n\tcolor?: string;\n\tfontSize?: number;\n\tclassName?: string;\n\tspeed?: number;\n}\n\nconst MatrixBackground: React.FC<MatrixBackgroundProps> = ({\n\tcolor = \"#0F0\",\n\tfontSize = 14,\n\tclassName = \"\",\n\tspeed = 1,\n}) => {\n\tconst canvasRef = useRef<HTMLCanvasElement>(null);\n\n\tuseEffect(() => {\n\t\tconst canvas = canvasRef.current;\n\t\tif (!canvas) return;\n\n\t\tconst ctx = canvas.getContext(\"2d\");\n\t\tif (!ctx) return;\n\n\t\tconst resizeCanvas = () => {\n\t\t\tcanvas.width = window.innerWidth;\n\t\t\tcanvas.height = window.innerHeight;\n\t\t};\n\n\t\tresizeCanvas();\n\t\twindow.addEventListener(\"resize\", resizeCanvas);\n\n\t\tlet animationFrameId: number;\n\n\t\tconst columns = Math.floor(canvas.width / fontSize);\n\t\tconst drops: number[] = new Array(columns).fill(1);\n\n\t\tconst chars =\n\t\t\t\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$%^&*()_+\";\n\n\t\tlet lastTime = 0;\n\t\tconst interval = 33; // ~30 fps\n\n\t\tconst draw = (currentTime: number) => {\n\t\t\tanimationFrameId = requestAnimationFrame(draw);\n\n\t\t\tif (currentTime - lastTime < interval) return;\n\t\t\tlastTime = currentTime;\n\n\t\t\tctx.fillStyle = \"rgba(0, 0, 0, 0.05)\";\n\t\t\tctx.fillRect(0, 0, canvas.width, canvas.height);\n\n\t\t\tctx.fillStyle = color;\n\t\t\tctx.font = `${fontSize}px monospace`;\n\n\t\t\tfor (let i = 0; i < drops.length; i++) {\n\t\t\t\tconst text = chars[Math.floor(Math.random() * chars.length)];\n\t\t\t\tctx.fillText(text, i * fontSize, drops[i] * fontSize);\n\n\t\t\t\tif (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {\n\t\t\t\t\tdrops[i] = 0;\n\t\t\t\t}\n\t\t\t\tdrops[i] += speed; // Use the speed prop to control fall rate\n\t\t\t}\n\t\t};\n\n\t\tanimationFrameId = requestAnimationFrame(draw);\n\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"resize\", resizeCanvas);\n\t\t\tcancelAnimationFrame(animationFrameId);\n\t\t};\n\t}, [color, fontSize, speed]);\n\n\treturn (\n\t\t<canvas\n\t\t\tref={canvasRef}\n\t\t\tclassName={`pointer-events-none ${className}`}\n\t\t\tstyle={{\n\t\t\t\tposition: \"absolute\",\n\t\t\t\ttop: 0,\n\t\t\t\tleft: 0,\n\t\t\t\twidth: \"100%\",\n\t\t\t\theight: \"100%\",\n\t\t\t}}\n\t\t/>\n\t);\n};\n\nexport default MatrixBackground;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/backgrounds/matrix",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"#0F0\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontSize",
+        "type": "number",
+        "default": "14",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/matrix-background"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gif-text",
+  "type": "registry:ui",
+  "title": "Gif Text",
+  "description": "Heavy headline text with an animated GIF playing inside the letterforms instead of a flat colour.",
+  "dependencies": [
+    "class-variance-authority"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/gif-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/gif-text.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useMemo, useState, type CSSProperties } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { cn } from \"@/lib/utils\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\n// Credit:\n// https://www.cult-ui.com/docs/components/text-gif\n\n// Define text style variants\nconst textBaseVariants = cva(\"\", {\n\tvariants: {\n\t\tsize: {\n\t\t\tdefault: \"text-2xl sm:text-3xl lg:text-4xl\",\n\t\t\txxs: \"text-base sm:text-lg lg:text-lg\",\n\t\t\txs: \"text-lg sm:text-xl lg:text-2xl\",\n\t\t\tsm: \"text-xl sm:text-2xl lg:text-3xl\",\n\t\t\tmd: \"text-2xl sm:text-3xl lg:text-4xl\",\n\t\t\tlg: \"text-3xl sm:text-4xl lg:text-5xl\",\n\t\t\txl: \"text-4xl sm:text-5xl lg:text-6xl\",\n\t\t\txxl: \"text-[2.5rem] sm:text-6xl lg:text-[6rem]\",\n\t\t\txll: \"text-5xl sm:text-6xl lg:text-[7rem]\",\n\t\t\txxxl: \"text-[6rem] leading-5 lg:leading-8 sm:text-6xl lg:text-[8rem]\",\n\t\t},\n\t\tweight: {\n\t\t\tdefault: \"font-bold\",\n\t\t\tthin: \"font-thin\",\n\t\t\tbase: \"font-base\",\n\t\t\tsemi: \"font-semibold\",\n\t\t\tbold: \"font-bold\",\n\t\t\tblack: \"font-black\",\n\t\t},\n\t\tfont: {\n\t\t\tdefault: \"font-sansTight\",\n\t\t\tserif: \"font-serif\",\n\t\t\tmono: \"font-mono\",\n\t\t},\n\t},\n\tdefaultVariants: {\n\t\tsize: \"default\",\n\t\tweight: \"bold\",\n\t\tfont: \"default\",\n\t},\n});\n\ninterface GifTextProps extends VariantProps<typeof textBaseVariants> {\n\tgifUrl: string;\n\ttext: string;\n\tclassName?: string;\n\tfallbackColor?: string;\n\ttransitionDuration?: number;\n}\n\nconst GifText = React.memo(function GifTextComponent({\n\tgifUrl,\n\ttext,\n\tsize,\n\tweight,\n\tfont,\n\tclassName,\n\tfallbackColor = \"black\",\n\ttransitionDuration = 300,\n}: GifTextProps) {\n\tconst [loaded, setLoaded] = useState(false);\n\tconst [error, setError] = useState(false);\n\n\t// Reset states when gifUrl changes\n\tuseEffect(() => {\n\t\tsetLoaded(false);\n\t\tsetError(false);\n\t}, [gifUrl]);\n\n\t// Memoize className for performance\n\tconst textClassName = useMemo(\n\t\t() =>\n\t\t\tcn(\n\t\t\t\ttextBaseVariants({ size, weight, font }),\n\t\t\t\tloaded && !error ? \"text-transparent bg-clip-text\" : \"\",\n\t\t\t\tclassName,\n\t\t\t\t\"pb-1.5 md:pb-4\"\n\t\t\t),\n\t\t[size, weight, font, className, loaded, error]\n\t);\n\n\t// Memoize style for performance\n\tconst textStyle = useMemo(() => {\n\t\tconst style: CSSProperties = {\n\t\t\tbackgroundSize: \"cover\",\n\t\t\tbackgroundPosition: \"center\",\n\t\t\tbackgroundRepeat: \"no-repeat\",\n\t\t\tWebkitBackgroundClip: \"text\",\n\t\t\tlineHeight: 1,\n\t\t\ttextAlign: \"center\",\n\t\t\tcolor: fallbackColor, // Always set the fallback color initially\n\t\t\tWebkitTextFillColor: fallbackColor, // Safari fix\n\t\t\ttransition: `background-image ${transitionDuration}ms ease-in-out, color ${transitionDuration}ms ease-in-out`,\n\t\t};\n\n\t\tif (loaded && !error) {\n\t\t\tstyle.backgroundImage = `url(${gifUrl})`;\n\t\t\tstyle.color = \"transparent\";\n\t\t\tstyle.WebkitTextFillColor = \"transparent\"; // Safari fix\n\t\t}\n\n\t\treturn style;\n\t}, [loaded, error, gifUrl, transitionDuration, fallbackColor]);\n\n\treturn (\n\t\t<div className=\"relative inline-block\">\n\t\t\t{/* Hidden image for preloading */}\n\t\t\t{gifUrl && (\n\t\t\t\t<Image\n\t\t\t\t\tsrc={gifUrl || \"/itjustworks.jpg\"}\n\t\t\t\t\talt=\"\"\n\t\t\t\t\twidth={1}\n\t\t\t\t\theight={1}\n\t\t\t\t\tclassName=\"absolute opacity-0 pointer-events-none\"\n\t\t\t\t\tonLoad={() => {\n\t\t\t\t\t\tsetLoaded(true);\n\t\t\t\t\t\tsetError(false);\n\t\t\t\t\t}}\n\t\t\t\t\tonError={() => {\n\t\t\t\t\t\tsetError(true);\n\t\t\t\t\t\tsetLoaded(false);\n\t\t\t\t\t}}\n\t\t\t\t\tpriority\n\t\t\t\t\tunoptimized\n\t\t\t\t/>\n\t\t\t)}\n\t\t\t<span className={textClassName} style={textStyle}>\n\t\t\t\t{text}\n\t\t\t</span>\n\t\t</div>\n\t);\n});\n\n// Export common GIF URLs\nconst gifUrls = [\n\t\"https://media.giphy.com/media/3zvbrvbRe7wxBofOBI/giphy.gif\",\n\t\"https://media.giphy.com/media/fnglNFjBGiyAFtm6ke/giphy.gif\",\n\t\"https://media.giphy.com/media/9Pmfazv34l7aNIKK05/giphy.gif\",\n\t\"https://media.giphy.com/media/4bhs1boql4XVJgmm4H/giphy.gif\",\n];\n\n// Optional: Preloader component\nfunction PreloadGifs() {\n\treturn (\n\t\t<div className=\"hidden\">\n\t\t\t{gifUrls.map((url) => (\n\t\t\t\t<Image\n\t\t\t\t\tkey={url}\n\t\t\t\t\tsrc={url}\n\t\t\t\t\talt=\"\"\n\t\t\t\t\twidth={1}\n\t\t\t\t\theight={1}\n\t\t\t\t\tpriority\n\t\t\t\t\tunoptimized\n\t\t\t\t/>\n\t\t\t))}\n\t\t</div>\n\t);\n}\n\nexport { GifText };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [],
+    "interaction": "Runs on its own — the GIF loops inside the letters. The text starts in a solid fallback colour and fades over to the moving fill once the image has loaded.",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/text-gif",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/gif-text"
+  }
+}

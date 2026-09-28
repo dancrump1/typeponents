@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button-text-slide",
+  "type": "registry:ui",
+  "title": "Button Text Slide",
+  "description": "Solid or outlined link button whose label swaps for a second line of text on hover.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/button-text-slide.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/button-text-slide.tsx",
+      "content": "\"use client\";\r\n\r\n/**\r\n * @author: @kokonut-labs\r\n * @description: Slide Text Button with animated vertical text transition\r\n * @version: 1.0.0\r\n * @date: 2025-11-02\r\n * @license: MIT\r\n * @website: https://kokonutui.com\r\n * @github: https://github.com/kokonut-labs/kokonutui\r\n * https://kokonutui.com/docs/components/slide-text-button\r\n */\r\n\r\n\r\nimport { motion } from \"motion/react\";\r\nimport Link from \"next/link\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\ninterface SlideTextButtonProps\r\n    extends React.AnchorHTMLAttributes<HTMLAnchorElement> {\r\n    text?: string;\r\n    hoverText?: string;\r\n    href?: string;\r\n    className?: string;\r\n    variant?: \"default\" | \"ghost\";\r\n}\r\n\r\nexport default function SlideTextButton({\r\n    text = \"Browse Components\",\r\n    hoverText,\r\n    href = \"/docs/components/liquid-glass-card\",\r\n    className,\r\n    variant = \"default\",\r\n    ...props\r\n}: SlideTextButtonProps) {\r\n    const slideText = hoverText ?? text;\r\n    const variantStyles =\r\n        variant === \"ghost\"\r\n            ? \"border border-black/10 text-black hover:bg-black/5 dark:border-white/10 dark:text-white dark:hover:bg-white/5\"\r\n            : \"bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90\";\r\n\r\n    return (\r\n        <motion.div\r\n            animate={{ x: 0, opacity: 1, transition: { duration: 0.2 } }}\r\n            className=\"relative\"\r\n            initial={{ x: 200, opacity: 0 }}\r\n        >\r\n            <Link\r\n                className={cn(\r\n                    \"group relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-8 font-medium text-md tracking-tighter transition-all duration-300 md:min-w-56\",\r\n                    variantStyles,\r\n                    className\r\n                )}\r\n                href={href}\r\n                {...props}\r\n            >\r\n                <span className=\"group-hover:-translate-y-full relative inline-block transition-transform duration-300 ease-in-out\">\r\n                    <span className=\"flex items-center gap-2 opacity-100 transition-opacity duration-300 group-hover:opacity-0\">\r\n                        <span className=\"font-medium\">{text}</span>\r\n                    </span>\r\n                    <span className=\"absolute top-full left-0 flex items-center gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100\">\r\n                        <span className=\"font-medium\">{slideText}</span>\r\n                    </span>\r\n                </span>\r\n            </Link>\r\n        </motion.div>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "The button slides in from the right and fades up on load; hovering it pushes the current label up out of view while the replacement text rises into its place from below.",
+    "inspiration": {
+      "source": "Kokonut UI",
+      "url": "https://kokonutui.com",
+      "authorUrl": "https://kokonutui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"Browse Components\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hoverText",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "default": "\"/docs/components/liquid-glass-card\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "\"default\" | \"ghost\"",
+        "default": "\"default\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/button-text-slide"
+  }
+}

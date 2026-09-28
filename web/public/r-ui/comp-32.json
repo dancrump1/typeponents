@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-32",
+  "type": "registry:component",
+  "title": "Comp 32",
+  "description": "Comp 32",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-32.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Input } from \"@/components/ui/input\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"group relative\">\r\n\t\t\t<label\r\n\t\t\t\thtmlFor={id}\r\n\t\t\t\tclassName=\"origin-start text-muted-foreground/70 group-focus-within:text-foreground has-[+input:not(:placeholder-shown)]:text-foreground absolute top-1/2 block -translate-y-1/2 cursor-text px-1 text-sm transition-all group-focus-within:pointer-events-none group-focus-within:top-0 group-focus-within:cursor-default group-focus-within:text-xs group-focus-within:font-medium has-[+input:not(:placeholder-shown)]:pointer-events-none has-[+input:not(:placeholder-shown)]:top-0 has-[+input:not(:placeholder-shown)]:cursor-default has-[+input:not(:placeholder-shown)]:text-xs has-[+input:not(:placeholder-shown)]:font-medium\"\r\n\t\t\t>\r\n\t\t\t\t<span className=\"bg-background inline-flex px-2\">\r\n\t\t\t\t\tInput with label animation\r\n\t\t\t\t</span>\r\n\t\t\t</label>\r\n\t\t\t<Input id={id} type=\"email\" placeholder=\" \" />\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/input.tsx",
+      "content": "// SHADCN UI GENERATED CODE\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport interface InputProps\n\textends React.InputHTMLAttributes<HTMLInputElement> {}\n\nconst Input = React.forwardRef<HTMLInputElement, InputProps>(\n\t({ className, type, ...props }, ref) => {\n\t\treturn (\n\t\t\t<input\n\t\t\t\ttype={type}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t/>\n\t\t);\n\t}\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

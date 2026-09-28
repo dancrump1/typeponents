@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "business-footer",
+  "type": "registry:ui",
+  "title": "Business Footer",
+  "description": "Five-column site footer with a brand block, postal address, social icons and grouped product, company, resource and legal links.",
+  "dependencies": [
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/business-footer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/business-footer.tsx",
+      "content": "import React from \"react\";\n\nimport Link from \"next/link\";\n\nimport { FaDiscord, FaGithub, FaHome, FaLinkedin } from \"react-icons/fa\";\nimport { RiTwitterXFill } from \"react-icons/ri\";\n\nconst FooterSecond = () => {\n\tconst brandDetails = {\n\t\tbrandIcon: <FaHome className=\"w-6 h-6 text-foreground\" />,\n\t\tbrandName: \"BrandName\",\n\t\taddress: \"2261 Market Street #5039 San <br /> Francisco, CA 94114\",\n\t};\n\n\tconst socialIcons = [\n\t\t{\n\t\t\tname: \"Twitter\",\n\t\t\ticon: <RiTwitterXFill className=\"w-5 h-5\" />,\n\t\t\tlink: \"https://x.com/ayushmxxn\",\n\t\t},\n\t\t{\n\t\t\tname: \"GitHub\",\n\t\t\ticon: <FaGithub className=\"w-5 h-5\" />,\n\t\t\tlink: \"https://github.com/ayushmxxn\",\n\t\t},\n\t\t{\n\t\t\tname: \"LinkedIn\",\n\t\t\ticon: <FaLinkedin className=\"w-5 h-5\" />,\n\t\t\tlink: \"https://linkedin.com\",\n\t\t},\n\t\t{\n\t\t\tname: \"Discord\",\n\t\t\ticon: <FaDiscord className=\"w-5 h-5\" />,\n\t\t\tlink: \"https://discord.com/invite/kzk6uWey3g\",\n\t\t},\n\t];\n\n\tconst footerSections = [\n\t\t{\n\t\t\ttitle: \"Product\",\n\t\t\tlinks: [\n\t\t\t\t{ text: \"Features\", url: \"/features\" },\n\t\t\t\t{ text: \"Pricing\", url: \"/pricing\" },\n\t\t\t\t{ text: \"Case Studies\", url: \"/case-studies\" },\n\t\t\t\t{ text: \"Reviews\", url: \"/reviews\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\ttitle: \"Company\",\n\t\t\tlinks: [\n\t\t\t\t{ text: \"About\", url: \"/about\" },\n\t\t\t\t{ text: \"Careers\", url: \"/careers\" },\n\t\t\t\t{ text: \"Contact\", url: \"/contact\" },\n\t\t\t\t{ text: \"Blog\", url: \"/blog\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\ttitle: \"Resources\",\n\t\t\tlinks: [\n\t\t\t\t{ text: \"Documentation\", url: \"/documentation\" },\n\t\t\t\t{ text: \"Help Center\", url: \"/help-center\" },\n\t\t\t\t{ text: \"API Reference\", url: \"/api-reference\" },\n\t\t\t\t{ text: \"Status\", url: \"/status\" },\n\t\t\t],\n\t\t},\n\t\t{\n\t\t\ttitle: \"Legal\",\n\t\t\tlinks: [\n\t\t\t\t{ text: \"Privacy Policy\", url: \"/privacy-policy\" },\n\t\t\t\t{ text: \"Terms of Service\", url: \"/terms-of-service\" },\n\t\t\t\t{ text: \"Cookie Policy\", url: \"/cookie-policy\" },\n\t\t\t\t{ text: \"GDPR\", url: \"/gdpr\" },\n\t\t\t],\n\t\t},\n\t];\n\n\treturn (\n\t\t<footer className=\"bg-background text-foreground py-8 px-6 shadow-lg\">\n\t\t\t<div className=\"max-w-7xl mx-auto\">\n\t\t\t\t<div className=\"grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-8\">\n\t\t\t\t\t<div className=\"col-span-1 sm:col-span-2 lg:col-span-1\">\n\t\t\t\t\t\t<div className=\"flex items-center mb-4\">\n\t\t\t\t\t\t\t{brandDetails.brandIcon}\n\t\t\t\t\t\t\t<span className=\"text-xl font-bold ml-2 text-foreground\">\n\t\t\t\t\t\t\t\t{brandDetails.brandName}\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<p\n\t\t\t\t\t\t\tclassName=\"text-sm mb-4 text-foreground\"\n\t\t\t\t\t\t\tdangerouslySetInnerHTML={{ __html: brandDetails.address }}\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<div className=\"flex space-x-4\">\n\t\t\t\t\t\t\t{socialIcons.map((icon, index) => (\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\tkey={index + \"business-footer\"}\n\t\t\t\t\t\t\t\t\thref={icon.link}\n\t\t\t\t\t\t\t\t\tclassName=\"text-foreground hover:text-foreground transition-colors\"\n\t\t\t\t\t\t\t\t\ttarget=\"_blank\"\n\t\t\t\t\t\t\t\t\trel=\"noopener noreferrer\"\n\t\t\t\t\t\t\t\t\taria-label={icon.name}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t{icon.icon}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div className=\"sm:col-span-2 lg:col-span-4 grid grid-cols-2 sm:grid-cols-4 gap-8 \">\n\t\t\t\t\t\t{footerSections.map((section, index) => (\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tkey={index + \"business-footer-section\"}\n\t\t\t\t\t\t\t\tclassName=\"space-y-4\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<h3 className=\"font-semibold mb-2 text-sm uppercase tracking-wider text-foreground\">\n\t\t\t\t\t\t\t\t\t{section.title}\n\t\t\t\t\t\t\t\t</h3>\n\t\t\t\t\t\t\t\t<ul className=\"space-y-2\">\n\t\t\t\t\t\t\t\t\t{section.links.map((link, linkIndex) => (\n\t\t\t\t\t\t\t\t\t\t<li key={linkIndex}>\n\t\t\t\t\t\t\t\t\t\t\t<Link\n\t\t\t\t\t\t\t\t\t\t\t\thref={link.url}\n\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"text-sm text-foreground hover:text-foreground transition-colors\"\n\t\t\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t\t\t{link.text}\n\t\t\t\t\t\t\t\t\t\t\t</Link>\n\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t\t</ul>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t))}\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</footer>\n\t);\n};\n\nexport default FooterSecond;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Static layout — it renders in place on load; links and social icons only shift colour as the pointer passes over them.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/business-footer"
+  }
+}

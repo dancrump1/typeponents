@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "background-boxes",
+  "type": "registry:ui",
+  "title": "Background Boxes",
+  "description": "Backdrop grid of empty cells with faint plus marks at the intersections.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/background-boxes.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/background-boxes.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion } from \"motion/react\";\r\n\r\nexport const BoxesCore = ({\r\n\tclassName,\r\n\trowCount = 15,\r\n\tcolumnCount = 5,\r\n\t...rest\r\n}: {\r\n\tclassName?: string;\r\n\trowCount?: number;\r\n\tcolumnCount?: number;\r\n}) => {\r\n\tconst rows = new Array(rowCount).fill(1);\r\n\tconst cols = new Array(columnCount).fill(1);\r\n\tlet colors = [\r\n\t\t\"--sky-300\",\r\n\t\t\"--pink-300\",\r\n\t\t\"--green-300\",\r\n\t\t\"--yellow-300\",\r\n\t\t\"--red-300\",\r\n\t\t\"--purple-300\",\r\n\t\t\"--blue-300\",\r\n\t\t\"--indigo-300\",\r\n\t\t\"--violet-300\",\r\n\t];\r\n\tconst getRandomColor = () => {\r\n\t\treturn colors[Math.floor(Math.random() * colors.length)];\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tstyle={\r\n\t\t\t\t{\r\n\t\t\t\t\t// transform: `translate(-40%,-60%) skewX(-48deg) skewY(14deg) scale(0.675) rotate(0deg) translateZ(0)`,\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"absolute left-1/4 p-4 -top-1/4 flex  -translate-x-1/2 -translate-y-1/2 w-full h-full z-10 \",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...rest}\r\n\t\t>\r\n\t\t\t{rows.map((_, i) => (\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tkey={`row` + i}\r\n\t\t\t\t\t// Add  'border-l  border-slate-700' to className for borders again\r\n\t\t\t\t\tclassName=\"w-16 h-8 relative\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{cols.map((_, j) => (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\twhileHover={{\r\n\t\t\t\t\t\t\t\tbackgroundColor: `var(${getRandomColor()})`,\r\n\t\t\t\t\t\t\t\ttransition: { duration: 0 },\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\ttransition: { duration: 2 },\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tkey={`col` + j}\r\n\t\t\t\t\t\t\t// Add ' border-r border-t border-slate-700' to className for borders again\r\n\t\t\t\t\t\t\tclassName=\"w-16 h-8 relative\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{j % 2 === 0 && i % 2 === 0 ? (\r\n\t\t\t\t\t\t\t\t<svg\r\n\t\t\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\t\t\t\t\tstrokeWidth=\"1.5\"\r\n\t\t\t\t\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\t\t\t\t\tclassName=\"absolute h-6 w-10 -top-[14px] -left-[22px] text-slate-700 stroke-[1px] pointer-events-none\"\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<path\r\n\t\t\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\t\t\t\t\t\td=\"M12 6v12m6-6H6\"\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t</svg>\r\n\t\t\t\t\t\t\t) : null}\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</motion.div>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport const Boxes = React.memo(BoxesCore);\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering a cell floods it with a random pastel colour instantly, and it clears again as the pointer moves on to the next one.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rowCount",
+        "type": "number",
+        "default": "15",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "columnCount",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/background-boxes"
+  }
+}

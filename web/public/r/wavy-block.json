@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "wavy-block",
+  "type": "registry:ui",
+  "title": "Wavy Block",
+  "description": "Wavy Block",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/wavy-block.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/wavy-block.tsx",
+      "content": "'use client';\r\n\r\nimport {\r\n    HTMLMotionProps,\r\n    motion,\r\n    MotionValue,\r\n    SpringOptions,\r\n    useMotionValue,\r\n    useReducedMotion,\r\n    useScroll,\r\n    UseScrollOptions,\r\n    useSpring,\r\n    useTransform,\r\n} from 'motion/react';\r\nimport React from 'react';\r\n\r\n// Credit:\r\n// https://systaliko-ui.vercel.app/docs/scroll-animations/wavy-block\r\n\r\ninterface WavyTextsConfig {\r\n    baseOffsetFactor: number;\r\n    baseExtra: number;\r\n    baseAmplitude: number;\r\n    lengthEffect: number;\r\n    frequency: number;\r\n    progressScale: number;\r\n    phaseShiftDeg: number;\r\n    spring: SpringOptions;\r\n}\r\ninterface WavyBlockItemProps extends HTMLMotionProps<'div'> {\r\n    index: number;\r\n    config?: Partial<WavyTextsConfig>;\r\n    axis?: 'x' | 'y';\r\n}\r\ninterface WavyBlockContextValue {\r\n    scrollYProgress: MotionValue<number>;\r\n    maxLen: number;\r\n}\r\n\r\nconst WavyBlockContext = React.createContext<WavyBlockContextValue | undefined>(\r\n    undefined,\r\n);\r\n\r\nfunction useWavyBlockContext() {\r\n    const context = React.useContext(WavyBlockContext);\r\n    if (context === undefined) {\r\n        throw new Error('useWavyBlockContext must be used within a WavyBlock');\r\n    }\r\n    return context;\r\n}\r\nconst toRadian = (deg: number) => (deg * Math.PI) / 180;\r\nconst TAU = Math.PI * 2;\r\nconst DEFAULT_X_CONFIG: WavyTextsConfig = {\r\n    baseOffsetFactor: 0.1,\r\n    baseExtra: 0,\r\n    baseAmplitude: 160,\r\n    lengthEffect: 0.6,\r\n    frequency: 35,\r\n    progressScale: 1,\r\n    phaseShiftDeg: -180,\r\n    spring: { damping: 22, stiffness: 300 },\r\n};\r\nconst DEFAULT_Y_CONFIG: WavyTextsConfig = {\r\n    ...DEFAULT_X_CONFIG,\r\n    baseOffsetFactor: 0,\r\n    baseAmplitude: 120,\r\n    progressScale: 2,\r\n    phaseShiftDeg: 0,\r\n};\r\n\r\nexport function WavyBlockItem({\r\n    index,\r\n    axis = 'x',\r\n    config,\r\n    style,\r\n    ...props\r\n}: WavyBlockItemProps) {\r\n    const { scrollYProgress, maxLen } = useWavyBlockContext();\r\n    const reducedMotion = useReducedMotion();\r\n    const lengthFactor = Math.min(1, Math.max(0, maxLen / (maxLen || 1)));\r\n    const resolvedConfig = React.useMemo(() => {\r\n        const defaults = axis === 'y' ? DEFAULT_Y_CONFIG : DEFAULT_X_CONFIG;\r\n        return {\r\n            ...defaults,\r\n            ...config,\r\n            spring: {\r\n                ...defaults.spring,\r\n                ...config?.spring,\r\n            },\r\n        };\r\n    }, [axis, config]);\r\n\r\n    const [isMounted, setIsMounted] = React.useState<boolean>(false);\r\n\r\n    const calculateAxisOffset = React.useCallback(\r\n        (p: number, viewportSize?: number) => {\r\n            const phase = resolvedConfig.progressScale * p * TAU;\r\n\r\n            const size =\r\n                viewportSize ??\r\n                (typeof window !== 'undefined'\r\n                    ? axis === 'y'\r\n                        ? window.innerHeight\r\n                        : window.innerWidth\r\n                    : axis === 'y'\r\n                        ? 900\r\n                        : 1200);\r\n            const hasManualBaseOffset =\r\n                config?.baseOffsetFactor !== undefined ||\r\n                config?.baseExtra !== undefined;\r\n            const baseOffset =\r\n                axis === 'y' && !hasManualBaseOffset\r\n                    ? 0\r\n                    : resolvedConfig.baseOffsetFactor * size + resolvedConfig.baseExtra;\r\n\r\n            const amplitudeScale = 1 - resolvedConfig.lengthEffect * lengthFactor;\r\n            const amplitude = resolvedConfig.baseAmplitude * amplitudeScale;\r\n\r\n            const waveOffset =\r\n                axis === 'y'\r\n                    ? amplitude *\r\n                    Math.sin(\r\n                        phase +\r\n                        toRadian(resolvedConfig.frequency * index) +\r\n                        toRadian(resolvedConfig.phaseShiftDeg),\r\n                    )\r\n                    : amplitude *\r\n                    Math.cos(\r\n                        phase +\r\n                        toRadian(resolvedConfig.frequency * index) +\r\n                        toRadian(resolvedConfig.phaseShiftDeg),\r\n                    );\r\n\r\n            return baseOffset + waveOffset;\r\n        },\r\n        [\r\n            resolvedConfig,\r\n            lengthFactor,\r\n            index,\r\n            axis,\r\n            config?.baseOffsetFactor,\r\n            config?.baseExtra,\r\n        ],\r\n    );\r\n\r\n    const initialOffset = calculateAxisOffset(0);\r\n    const rawOffset = useMotionValue(initialOffset);\r\n    const springOffset = useSpring(rawOffset, resolvedConfig.spring);\r\n    const offset = reducedMotion ? rawOffset : springOffset;\r\n\r\n    React.useLayoutEffect(() => {\r\n        setIsMounted(true);\r\n    }, []);\r\n\r\n    React.useEffect(() => {\r\n        if (!scrollYProgress || !isMounted) return;\r\n\r\n        const unsub = scrollYProgress.onChange((p) => {\r\n            const viewportSize =\r\n                typeof window !== 'undefined'\r\n                    ? axis === 'y'\r\n                        ? window.innerHeight\r\n                        : window.innerWidth\r\n                    : axis === 'y'\r\n                        ? 900\r\n                        : 1200;\r\n            const newOffset = calculateAxisOffset(p, viewportSize);\r\n            rawOffset.set(newOffset);\r\n        });\r\n\r\n        return () => {\r\n            if (unsub) unsub();\r\n        };\r\n    }, [scrollYProgress, rawOffset, calculateAxisOffset, isMounted, axis]);\r\n\r\n    const motionAxisStyle = axis === 'y' ? { y: offset } : { x: offset };\r\n\r\n    return (\r\n        <motion.div\r\n            style={{ ...motionAxisStyle, ...style }}\r\n            suppressHydrationWarning\r\n            {...props}\r\n        />\r\n    );\r\n}\r\n\r\nexport function WavyBlock({\r\n    offset = ['start end', 'end start'],\r\n    ...props\r\n}: React.ComponentPropsWithRef<'div'> & {\r\n    offset?: UseScrollOptions['offset'];\r\n}) {\r\n    const containerRef = React.useRef<HTMLDivElement>(null);\r\n    const { current } = containerRef;\r\n\r\n    const maxLen = React.useMemo(() => {\r\n        if (!current?.children || current.children.length === 0) return 1;\r\n        const childrenArray = Array.from(current.children);\r\n        return Math.max(\r\n            ...childrenArray.map((child) => (child ? String(child).length : 0)),\r\n        );\r\n    }, [current?.children]);\r\n\r\n    const { scrollYProgress } = useScroll({\r\n        target: containerRef,\r\n        offset: offset,\r\n    });\r\n    return (\r\n        <WavyBlockContext.Provider value={{ scrollYProgress, maxLen }}>\r\n            <div ref={containerRef} {...props} />\r\n        </WavyBlockContext.Provider>\r\n    );\r\n}\r\n\r\nexport function WavyBlockSticky({\r\n    yRange = [0, 300],\r\n    yInput = [0, 1],\r\n    style,\r\n    ...props\r\n}: HTMLMotionProps<'div'> & {\r\n    yRange?: [number, number];\r\n    yInput?: [number, number];\r\n}) {\r\n    const { scrollYProgress } = useWavyBlockContext();\r\n\r\n    const y = useTransform(scrollYProgress, yInput, yRange);\r\n    return <motion.div style={{ y, ...style }} {...props} />;\r\n}"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "systaliko-ui.vercel.app",
+      "url": "https://systaliko-ui.vercel.app/docs/scroll-animations/wavy-block",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "index",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "config",
+        "type": "Partial<WavyTextsConfig>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "axis",
+        "type": "\"x\" | \"y\"",
+        "default": "'x'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/wavy-block"
+  }
+}

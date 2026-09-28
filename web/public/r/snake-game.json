@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "snake-game",
+  "type": "registry:ui",
+  "title": "Snake Game",
+  "description": "Snake Game",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/snake-game/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/snake-game/component.tsx",
+      "content": "import type React from \"react\";\r\n\r\nimport { BOARD_SIZE, getSnakeColor, SCALE } from \"./utils\";\r\n\r\ninterface BoardProps {\r\n\tsnakeDots: { x: number; y: number }[];\r\n\tapple: { x: number; y: number };\r\n\tisRainbowMode: boolean;\r\n\trainbowColors: string[];\r\n}\r\n\r\nconst Board: React.FC<BoardProps> = ({\r\n\tsnakeDots,\r\n\tapple,\r\n\tisRainbowMode,\r\n\trainbowColors,\r\n}) => {\r\n\treturn (\r\n\t\t<div\r\n\t\t\tstyle={{\r\n\t\t\t\twidth: `${BOARD_SIZE * SCALE}px`,\r\n\t\t\t\theight: `${BOARD_SIZE * SCALE}px`,\r\n\t\t\t\tborder: \"1px solid #000\",\r\n\t\t\t\tposition: \"relative\",\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t{snakeDots.map((dot, i) => (\r\n\t\t\t\t<div\r\n\t\t\t\t\tkey={i + \"board\"}\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\tposition: \"absolute\",\r\n\t\t\t\t\t\twidth: `${SCALE}px`,\r\n\t\t\t\t\t\theight: `${SCALE}px`,\r\n\t\t\t\t\t\tbackgroundColor: getSnakeColor(\r\n\t\t\t\t\t\t\ti,\r\n\t\t\t\t\t\t\tisRainbowMode,\r\n\t\t\t\t\t\t\trainbowColors\r\n\t\t\t\t\t\t),\r\n\t\t\t\t\t\tleft: `${dot.x * SCALE}px`,\r\n\t\t\t\t\t\ttop: `${dot.y * SCALE}px`,\r\n\t\t\t\t\t\tzIndex: snakeDots.length - i,\r\n\t\t\t\t\t}}\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t\t<div\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tposition: \"absolute\",\r\n\t\t\t\t\twidth: `${SCALE}px`,\r\n\t\t\t\t\theight: `${SCALE}px`,\r\n\t\t\t\t\tbackgroundColor: \"red\",\r\n\t\t\t\t\tleft: `${apple.x * SCALE}px`,\r\n\t\t\t\t\ttop: `${apple.y * SCALE}px`,\r\n\t\t\t\t}}\r\n\t\t\t/>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default Board;\r\n"
+    },
+    {
+      "path": "components/ui/snake-game/utils.ts",
+      "type": "registry:ui",
+      "target": "components/ui/snake-game/utils.ts",
+      "content": "export const BOARD_SIZE = 20\nexport const SNAKE_START = [\n    { x: 10, y: 10 },\n    { x: 10, y: 11 },\n]\nexport const APPLE_START = { x: 5, y: 5 }\nexport const SCALE = 20\nexport const SPEED = 100\nexport const DIRECTIONS = {\n    38: { x: 0, y: -1 }, // up\n    40: { x: 0, y: 1 }, // down\n    37: { x: -1, y: 0 }, // left\n    39: { x: 1, y: 0 }, // right\n}\n\nexport const checkCollision = (piece: { x: number; y: number }, snakeArray: { x: number; y: number }[]) =>\n    snakeArray.some((segment) => segment.x === piece.x && segment.y === piece.y)\n\nexport const appleAte = (newSnake: { x: number; y: number }[], apple: { x: number; y: number }) =>\n    newSnake[0].x === apple.x && newSnake[0].y === apple.y\n\nexport const generateApple = (snake: { x: number; y: number }[]) => {\n    let newApple\n    do {\n        newApple = {\n            x: Math.floor(Math.random() * BOARD_SIZE),\n            y: Math.floor(Math.random() * BOARD_SIZE),\n        }\n    } while (checkCollision(newApple, snake))\n    return newApple\n}\n\nexport const getRandomColor = () => {\n    return `hsl(${Math.random() * 360}, 100%, 50%)`\n}\n\nexport const getSnakeColor = (index: number, isRainbow: boolean, rainbowColors: string[]) => {\n    if (isRainbow) {\n        return rainbowColors[index % rainbowColors.length]\n    }\n    return index === 0 ? \"#00ff00\" : \"#00cc00\"\n}\n\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Games"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "snakeDots",
+        "type": "{ x: number; y: number; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "apple",
+        "type": "{ x: number; y: number; }",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "isRainbowMode",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "rainbowColors",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/snake-game/component"
+  }
+}

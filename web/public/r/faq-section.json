@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "faq-section",
+  "type": "registry:ui",
+  "title": "FAQ Section",
+  "description": "FAQ Section",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/faq-section.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/faq-section.tsx",
+      "content": "import React, { useState } from \"react\";\n\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://eclairui.gopx.dev/components/faq-sections\n\ninterface FAQItem {\n\tquestion: string;\n\tanswer: string;\n}\n\ninterface FAQData {\n\t[key: string]: FAQItem[];\n}\nconst faqData: FAQData = {\n\tComponents: [\n\t\t{\n\t\t\tquestion: \"What are the UI components you offer?\",\n\t\t\tanswer:\n\t\t\t\t\"We offer a wide range of pre-built UI components built with Tailwind CSS and Framer Motion, including buttons, cards, forms, navigation menus, and more.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"How can I use these components in my project?\",\n\t\t\tanswer:\n\t\t\t\t\"Simply copy and paste the code for the components you need into your project, then customize the styles and functionality to match your design.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Are the components responsive and mobile-friendly?\",\n\t\t\tanswer:\n\t\t\t\t\"Yes, our components are designed to be fully responsive and optimized for both desktop and mobile devices.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Can I modify the components to fit my branding?\",\n\t\t\tanswer:\n\t\t\t\t\"Absolutely! The components are highly customizable, allowing you to easily change colors, fonts, and other styles to match your brand identity.\",\n\t\t},\n\t],\n\tFeatures: [\n\t\t{\n\t\t\tquestion: \"What makes your components unique?\",\n\t\t\tanswer:\n\t\t\t\t\"Our components are built with modern technologies like Tailwind CSS and Framer Motion, offering advanced features like animations, hover effects, and smooth scrolling.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Do you provide documentation and support?\",\n\t\t\tanswer:\n\t\t\t\t\"Yes, we offer comprehensive documentation and support to help you get started and troubleshoot any issues you may encounter.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"How often are new components added?\",\n\t\t\tanswer:\n\t\t\t\t\"We regularly add new components and update existing ones to ensure you always have access to the latest design trends and best practices.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Can I use these components in commercial projects?\",\n\t\t\tanswer:\n\t\t\t\t\"Yes, our components are licensed for commercial use, allowing you to incorporate them into your client projects without any additional fees.\",\n\t\t},\n\t],\n\tPricing: [\n\t\t{\n\t\t\tquestion: \"How much do your components cost?\",\n\t\t\tanswer:\n\t\t\t\t\"Our components are available at an affordable, one-time price, with no recurring fees or hidden costs.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Do you offer any discounts or bundle deals?\",\n\t\t\tanswer:\n\t\t\t\t\"Yes, we offer discounts for bulk purchases and bundle deals that include multiple component packs at a reduced price.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"What payment methods do you accept?\",\n\t\t\tanswer:\n\t\t\t\t\"We accept various payment methods, including credit cards, PayPal, and cryptocurrency, to make it easy for you to purchase our components.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Do you offer a money-back guarantee?\",\n\t\t\tanswer:\n\t\t\t\t\"We stand behind the quality of our components and offer a 30-day money-back guarantee if you're not completely satisfied with your purchase.\",\n\t\t},\n\t],\n\tSupport: [\n\t\t{\n\t\t\tquestion: \"What kind of support do you provide?\",\n\t\t\tanswer:\n\t\t\t\t\"Our support team is available to assist you with any questions or issues you may have regarding our components, from installation to customization.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"How can I get in touch with your support team?\",\n\t\t\tanswer:\n\t\t\t\t\"You can reach our support team via email, live chat, or our support forum, where you can also find answers to frequently asked questions.\",\n\t\t},\n\t\t{\n\t\t\tquestion: \"Do you offer any tutorials or guides?\",\n\t\t\tanswer:\n\t\t\t\t\"Yes, we provide a variety of tutorials, guides, and code examples to help you get the most out of our components and learn best practices for web development.\",\n\t\t},\n\t\t{\n\t\t\tquestion:\n\t\t\t\t\"How quickly can I expect a response from your support team?\",\n\t\t\tanswer:\n\t\t\t\t\"We strive to respond to all support inquiries within 24 hours, and we prioritize resolving any critical issues as quickly as possible.\",\n\t\t},\n\t],\n};\n\nconst FAQPage: React.FC = ({ faqs = faqData }: { faqs: FAQData }) => {\n\tconst [activeTab, setActiveTab] = useState<string>(Object.keys(faqs)[0]);\n\tconst [openQuestion, setOpenQuestion] = useState<string>(\n\t\t\"What are the UI components you offer?\"\n\t);\n\n\treturn (\n\t\t<div className=\"mb-16 relative\">\n\t\t\t<div className=\"max-w-4xl mx-auto\">\n\t\t\t\t{/* <PageHeader\n\t\t\t\t\ttitle=\"FAQs\"\n\t\t\t\t\theading=\"Comprehensive Answers to Frequently Asked Questions\"\n\t\t\t\t\tdescription=\"Find detailed answers to common questions about our services and tools.\"\n\t\t\t\t/> */}\n\t\t\t\t<div className=\"flex justify-center space-x-1 sm:space-x-5 mb-8 w-fit mx-auto\">\n\t\t\t\t\t{Object.keys(faqs).map((tab) => (\n\t\t\t\t\t\t<motion.button\n\t\t\t\t\t\t\tkey={tab}\n\t\t\t\t\t\t\tclassName={`px-2 py-1 font-bold rounded-md text-xs sm:text-sm ${\n\t\t\t\t\t\t\t\tactiveTab === tab\n\t\t\t\t\t\t\t\t\t? \"bg-linear-to-r from-red-400 to-orange-400 text-secondary dark:text-primary dark:from-red-600 dark:to-orange-600\"\n\t\t\t\t\t\t\t\t\t: \"text-primary/50 dark:text-secondary/50\"\n\t\t\t\t\t\t\t}`}\n\t\t\t\t\t\t\tonClick={() => setActiveTab(tab)}\n\t\t\t\t\t\t\twhileHover={{ scale: 1.05 }}\n\t\t\t\t\t\t\twhileTap={{ scale: 0.95 }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{tab}\n\t\t\t\t\t\t</motion.button>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t\t<div className=\"space-y-4\">\n\t\t\t\t\t{faqs[activeTab].map((item) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tkey={item.question}\n\t\t\t\t\t\t\tinitial={{ opacity: 0, y: 20 }}\n\t\t\t\t\t\t\tanimate={{ opacity: 1, y: 0 }}\n\t\t\t\t\t\t\ttransition={{ duration: 0.3 }}\n\t\t\t\t\t\t\tclassName=\"border dark:border-white/20 border-black/20 rounded-lg overflow-hidden bg-background\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<motion.button\n\t\t\t\t\t\t\t\tclassName=\"w-full text-left p-4 flex justify-between items-center font-bold text-foreground\"\n\t\t\t\t\t\t\t\tonClick={() =>\n\t\t\t\t\t\t\t\t\tsetOpenQuestion(\n\t\t\t\t\t\t\t\t\t\topenQuestion === item.question\n\t\t\t\t\t\t\t\t\t\t\t? \"\"\n\t\t\t\t\t\t\t\t\t\t\t: item.question\n\t\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<span>{item.question}</span>\n\t\t\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\t\trotate: openQuestion === item.question ? 45 : 0,\n\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t\ttransition={{ duration: 0.3 }}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t+\n\t\t\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t\t</motion.button>\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tinitial={{ height: 0, opacity: 0 }}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\theight: openQuestion === item.question ? \"auto\" : 0,\n\t\t\t\t\t\t\t\t\topacity: openQuestion === item.question ? 1 : 0,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.3 }}\n\t\t\t\t\t\t\t\tclassName=\"overflow-hidden\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<div className=\"p-4 border-t dark:border-white/20 border-black/20 text-foreground dark:text-foreground/70 bg-background\">\n\t\t\t\t\t\t\t\t\t{item.answer}\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\ninterface PageHeaderProps {\n\ttitle: string;\n\theading: string;\n\tdescription: string;\n}\n\nconst PageHeader: React.FC<PageHeaderProps> = ({\n\ttitle,\n\theading,\n\tdescription,\n}) => {\n\treturn (\n\t\t<div className=\"max-w-(--breakpoint-lg) mx-auto py-8\">\n\t\t\t<div className=\"-z-50 absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.1)_1px,transparent_1px),linear-gradient(to_right,rgba(0,0,0,0.1)_1px,transparent_1px)] dark:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[linear-gradient(to_bottom,white,transparent)]\"></div>\n\t\t\t<p className=\"text-center font-space-grotesk mb-8 font-roboto font-bold uppercase text-xl\">\n\t\t\t\t{title}\n\t\t\t</p>\n\t\t\t<h1 className=\"text-center lg:leading-10 mx-4 lg:mx-0\">\n\t\t\t\t<span className=\"font-bold font-serif lg:text-5xl md:text-4xl sm:text-3xl text-2xl\">\n\t\t\t\t\t{heading}\n\t\t\t\t</span>\n\t\t\t</h1>\n\t\t\t<p className=\"text-center font-space-grotesk w-full max-w-3xl mx-auto px-8 mt-8 text-sm md:text-md opacity-70 italic font-serif\">\n\t\t\t\t{description}\n\t\t\t</p>\n\t\t</div>\n\t);\n};\n\nexport default FAQPage;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Accordions"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/faq-sections",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "faqs",
+        "type": "FAQData",
+        "default": "faqData",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/faq-section"
+  }
+}

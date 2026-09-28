@@ -1,0 +1,68 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-image-links",
+  "type": "registry:ui",
+  "title": "Hover Image Links",
+  "description": "Hover Image Links",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-image-links.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-image-links.tsx",
+      "content": "import { useMotionValue, motion, useSpring, useTransform } from \"motion/react\";\r\nimport React, { useRef } from \"react\";\r\nimport { FiArrowRight } from \"react-icons/fi\";\r\n\r\n\r\n\r\ninterface LinkProps {\r\n    heading: string;\r\n    imgSrc: string;\r\n    subheading: string;\r\n    href: string;\r\n}\r\n\r\nconst Link = ({ heading, imgSrc, subheading, href }: LinkProps) => {\r\n    const ref = useRef<HTMLAnchorElement | null>(null);\r\n\r\n    const x = useMotionValue(0);\r\n    const y = useMotionValue(0);\r\n\r\n    const mouseXSpring = useSpring(x);\r\n    const mouseYSpring = useSpring(y);\r\n\r\n    const top = useTransform(mouseYSpring, [0.5, -0.5], [\"40%\", \"60%\"]);\r\n    const left = useTransform(mouseXSpring, [0.5, -0.5], [\"60%\", \"70%\"]);\r\n\r\n    const handleMouseMove = (\r\n        e: React.MouseEvent<HTMLAnchorElement, MouseEvent>\r\n    ) => {\r\n        const rect = ref.current!.getBoundingClientRect();\r\n\r\n        const width = rect.width;\r\n        const height = rect.height;\r\n\r\n        const mouseX = e.clientX - rect.left;\r\n        const mouseY = e.clientY - rect.top;\r\n\r\n        const xPct = mouseX / width - 0.5;\r\n        const yPct = mouseY / height - 0.5;\r\n\r\n        x.set(xPct);\r\n        y.set(yPct);\r\n    };\r\n\r\n    return (\r\n        <motion.a\r\n            href={href}\r\n            ref={ref}\r\n            onMouseMove={handleMouseMove}\r\n            initial=\"initial\"\r\n            whileHover=\"whileHover\"\r\n            className=\"group relative flex items-center justify-between border-b-2 border-neutral-700 py-4 transition-colors duration-500 hover:border-neutral-50 md:py-8\"\r\n        >\r\n            <div>\r\n                <motion.span\r\n                    variants={{\r\n                        initial: { x: 0 },\r\n                        whileHover: { x: -16 },\r\n                    }}\r\n                    transition={{\r\n                        type: \"spring\",\r\n                        staggerChildren: 0.075,\r\n                        delayChildren: 0.25,\r\n                    }}\r\n                    className=\"relative z-10 block text-4xl font-bold text-neutral-500 transition-colors duration-500 group-hover:text-neutral-50 md:text-6xl\"\r\n                >\r\n                    {heading.split(\"\").map((l, i) => (\r\n                        <motion.span\r\n                            variants={{\r\n                                initial: { x: 0 },\r\n                                whileHover: { x: 16 },\r\n                            }}\r\n                            transition={{ type: \"spring\" }}\r\n                            className=\"inline-block\"\r\n                            key={i}\r\n                        >\r\n                            {l}\r\n                        </motion.span>\r\n                    ))}\r\n                </motion.span>\r\n                <span className=\"relative z-10 mt-2 block text-base text-neutral-500 transition-colors duration-500 group-hover:text-neutral-50\">\r\n                    {subheading}\r\n                </span>\r\n            </div>\r\n\r\n            <motion.img\r\n                style={{\r\n                    top,\r\n                    left,\r\n                    translateX: \"-50%\",\r\n                    translateY: \"-50%\",\r\n                }}\r\n                variants={{\r\n                    initial: { scale: 0, rotate: \"-12.5deg\" },\r\n                    whileHover: { scale: 1, rotate: \"12.5deg\" },\r\n                }}\r\n                transition={{ type: \"spring\" }}\r\n                src={imgSrc}\r\n                className=\"absolute z-0 h-24 w-32 rounded-lg object-cover md:h-48 md:w-64\"\r\n                alt={`Image representing a link for ${heading}`}\r\n            />\r\n\r\n            <motion.div\r\n                variants={{\r\n                    initial: {\r\n                        x: \"25%\",\r\n                        opacity: 0,\r\n                    },\r\n                    whileHover: {\r\n                        x: \"0%\",\r\n                        opacity: 1,\r\n                    },\r\n                }}\r\n                transition={{ type: \"spring\" }}\r\n                className=\"relative z-10 p-4\"\r\n            >\r\n                <FiArrowRight className=\"text-5xl text-neutral-50\" />\r\n            </motion.div>\r\n        </motion.a>\r\n    );\r\n};\r\n\r\nexport default Link;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "heading",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "imgSrc",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "subheading",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-image-links"
+  }
+}

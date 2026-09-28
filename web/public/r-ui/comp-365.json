@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-365",
+  "type": "registry:component",
+  "title": "Comp 365",
+  "description": "Comp 365",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-365.tsx",
+      "content": "import {\r\n\tHoverCard,\r\n\tHoverCardContent,\r\n\tHoverCardTrigger,\r\n} from \"@/components/ui/hover-card\";\r\n\r\nexport default function HoverCardDemo() {\r\n\treturn (\r\n\t\t<div className=\"max-w-md text-sm\">\r\n\t\t\t<HoverCard>\r\n\t\t\t\t<HoverCardTrigger asChild>\r\n\t\t\t\t\t<a className=\"flex size-16 overflow-hidden rounded-md\" href=\"#\">\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tclassName=\"size-full object-cover\"\r\n\t\t\t\t\t\t\tsrc=\"/dialog-content.png\"\r\n\t\t\t\t\t\t\twidth={382}\r\n\t\t\t\t\t\t\theight={216}\r\n\t\t\t\t\t\t\talt=\"Content image\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</a>\r\n\t\t\t\t</HoverCardTrigger>\r\n\t\t\t\t<HoverCardContent className=\"w-[320px]\" showArrow>\r\n\t\t\t\t\t<div className=\"space-y-3\">\r\n\t\t\t\t\t\t<div className=\"space-y-1\">\r\n\t\t\t\t\t\t\t<h2 className=\"font-semibold\">\r\n\t\t\t\t\t\t\t\tBuilding a Design System with Next.js and Tailwind CSS\r\n\t\t\t\t\t\t\t</h2>\r\n\t\t\t\t\t\t\t<p className=\"text-muted-foreground text-sm\">\r\n\t\t\t\t\t\t\t\tLearn how to build a comprehensive design system using\r\n\t\t\t\t\t\t\t\tTailwind CSS, including component architecture, and\r\n\t\t\t\t\t\t\t\ttheme customization.\r\n\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div className=\"text-muted-foreground flex items-center gap-2 text-xs\">\r\n\t\t\t\t\t\t\t<span>8 min read</span>\r\n\t\t\t\t\t\t\t<span>·</span>\r\n\t\t\t\t\t\t\t<span>Updated 2 days ago</span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</HoverCardContent>\r\n\t\t\t</HoverCard>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

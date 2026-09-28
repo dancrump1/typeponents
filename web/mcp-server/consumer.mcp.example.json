@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "oss-registry": {
+      "command": "node",
+      "args": ["/absolute/path/to/shadcn-style-lib/mcp-server/dist/index.js"],
+      "env": {
+        "REGISTRY_ROOT": "/absolute/path/to/shadcn-style-lib"
+      }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sparkles",
+  "type": "registry:ui",
+  "title": "Sparkles",
+  "description": "Sparkles",
+  "dependencies": [
+    "@tsparticles/engine",
+    "@tsparticles/react",
+    "@tsparticles/slim",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sparkles.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sparkles.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport type { Container, SingleOrMultiple } from \"@tsparticles/engine\";\r\nimport Particles, { initParticlesEngine } from \"@tsparticles/react\";\r\nimport { loadSlim } from \"@tsparticles/slim\";\r\nimport { motion, useAnimation } from \"motion/react\";\r\n\r\n// ui.aceternity.com / components / sparkles;\r\n\r\ntype ParticlesProps = {\r\n\tid?: string;\r\n\tclassName?: string;\r\n\tbackground?: string;\r\n\tparticleSize?: number;\r\n\tminSize?: number;\r\n\tmaxSize?: number;\r\n\tspeed?: number;\r\n\tparticleColor?: string;\r\n\tparticleDensity?: number;\r\n};\r\nexport const SparklesCore = (props: ParticlesProps) => {\r\n\tconst {\r\n\t\tid,\r\n\t\tclassName,\r\n\t\tbackground,\r\n\t\tminSize,\r\n\t\tmaxSize,\r\n\t\tspeed,\r\n\t\tparticleColor,\r\n\t\tparticleDensity,\r\n\t} = props;\r\n\tconst [init, setInit] = useState(false);\r\n\tuseEffect(() => {\r\n\t\tinitParticlesEngine(async (engine) => {\r\n\t\t\tawait loadSlim(engine);\r\n\t\t}).then(() => {\r\n\t\t\tsetInit(true);\r\n\t\t});\r\n\t}, []);\r\n\tconst controls = useAnimation();\r\n\r\n\tconst particlesLoaded = async (container?: Container) => {\r\n\t\tif (container) {\r\n\t\t\tcontrols.start({\r\n\t\t\t\topacity: 1,\r\n\t\t\t\ttransition: {\r\n\t\t\t\t\tduration: 1,\r\n\t\t\t\t\tdelay: 0,\r\n\t\t\t\t},\r\n\t\t\t});\r\n\t\t}\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.div animate={controls} className={cn(\"opacity-0\", className)}>\r\n\t\t\t{init && (\r\n\t\t\t\t<Particles\r\n\t\t\t\t\tid={id || \"tsparticles\"}\r\n\t\t\t\t\t// className={cn(\"h-full w-full\")}\r\n\t\t\t\t\tparticlesLoaded={particlesLoaded}\r\n\t\t\t\t\toptions={{\r\n\t\t\t\t\t\tbackground: {\r\n\t\t\t\t\t\t\tcolor: {\r\n\t\t\t\t\t\t\t\tvalue: background || \"transparent\",\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tfullScreen: {\r\n\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\tzIndex: 1,\r\n\t\t\t\t\t\t},\r\n\r\n\t\t\t\t\t\tfpsLimit: 120,\r\n\t\t\t\t\t\tinteractivity: {\r\n\t\t\t\t\t\t\tevents: {\r\n\t\t\t\t\t\t\t\tonClick: {\r\n\t\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\t\tmode: \"push\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tonHover: {\r\n\t\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\t\tmode: \"repulse\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tresize: true as any,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tmodes: {\r\n\t\t\t\t\t\t\t\tpush: {\r\n\t\t\t\t\t\t\t\t\tquantity: 4,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\trepulse: {\r\n\t\t\t\t\t\t\t\t\tdistance: 50,\r\n\t\t\t\t\t\t\t\t\tduration: 0.4,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tparticles: {\r\n\t\t\t\t\t\t\tbounce: {\r\n\t\t\t\t\t\t\t\thorizontal: {\r\n\t\t\t\t\t\t\t\t\tvalue: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tvertical: {\r\n\t\t\t\t\t\t\t\t\tvalue: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tcollisions: {\r\n\t\t\t\t\t\t\t\tabsorb: {\r\n\t\t\t\t\t\t\t\t\tspeed: 2,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tbounce: {\r\n\t\t\t\t\t\t\t\t\thorizontal: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: 1,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\tvertical: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: 1,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\tmaxSpeed: 50,\r\n\t\t\t\t\t\t\t\tmode: \"bounce\",\r\n\t\t\t\t\t\t\t\toverlap: {\r\n\t\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\t\tretries: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tcolor: {\r\n\t\t\t\t\t\t\t\tvalue: particleColor || \"#ffffff\",\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\th: {\r\n\t\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\t\tspeed: 1,\r\n\t\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\t\tsync: true,\r\n\t\t\t\t\t\t\t\t\t\toffset: 0,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\ts: {\r\n\t\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\t\tspeed: 1,\r\n\t\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\t\tsync: true,\r\n\t\t\t\t\t\t\t\t\t\toffset: 0,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\tl: {\r\n\t\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\t\tspeed: 1,\r\n\t\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\t\tsync: true,\r\n\t\t\t\t\t\t\t\t\t\toffset: 0,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\teffect: {\r\n\t\t\t\t\t\t\t\tclose: true,\r\n\t\t\t\t\t\t\t\tfill: true,\r\n\t\t\t\t\t\t\t\toptions: {},\r\n\t\t\t\t\t\t\t\ttype: {} as SingleOrMultiple<string> | undefined,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tgroups: {},\r\n\t\t\t\t\t\t\tmove: {\r\n\t\t\t\t\t\t\t\tangle: {\r\n\t\t\t\t\t\t\t\t\toffset: 0,\r\n\t\t\t\t\t\t\t\t\tvalue: 90,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tattract: {\r\n\t\t\t\t\t\t\t\t\tdistance: 200,\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\trotate: {\r\n\t\t\t\t\t\t\t\t\t\tx: 3000,\r\n\t\t\t\t\t\t\t\t\t\ty: 3000,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tcenter: {\r\n\t\t\t\t\t\t\t\t\tx: 50,\r\n\t\t\t\t\t\t\t\t\ty: 50,\r\n\t\t\t\t\t\t\t\t\tmode: \"percent\",\r\n\t\t\t\t\t\t\t\t\tradius: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\tdistance: {},\r\n\t\t\t\t\t\t\t\tdirection: \"none\",\r\n\t\t\t\t\t\t\t\tdrift: 0,\r\n\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\tgravity: {\r\n\t\t\t\t\t\t\t\t\tacceleration: 9.81,\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tinverse: false,\r\n\t\t\t\t\t\t\t\t\tmaxSpeed: 50,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tpath: {\r\n\t\t\t\t\t\t\t\t\tclamp: true,\r\n\t\t\t\t\t\t\t\t\tdelay: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\toptions: {},\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\toutModes: {\r\n\t\t\t\t\t\t\t\t\tdefault: \"out\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\trandom: false,\r\n\t\t\t\t\t\t\t\tsize: false,\r\n\t\t\t\t\t\t\t\tspeed: {\r\n\t\t\t\t\t\t\t\t\tmin: 0.1,\r\n\t\t\t\t\t\t\t\t\tmax: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tspin: {\r\n\t\t\t\t\t\t\t\t\tacceleration: 0,\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tstraight: false,\r\n\t\t\t\t\t\t\t\ttrail: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tlength: 10,\r\n\t\t\t\t\t\t\t\t\tfill: {},\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tvibrate: false,\r\n\t\t\t\t\t\t\t\twarp: false,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tnumber: {\r\n\t\t\t\t\t\t\t\tdensity: {\r\n\t\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\t\twidth: 400,\r\n\t\t\t\t\t\t\t\t\theight: 400,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tlimit: {\r\n\t\t\t\t\t\t\t\t\tmode: \"delete\",\r\n\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tvalue: particleDensity || 120,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\topacity: {\r\n\t\t\t\t\t\t\t\tvalue: {\r\n\t\t\t\t\t\t\t\t\tmin: 0.1,\r\n\t\t\t\t\t\t\t\t\tmax: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\tenable: true,\r\n\t\t\t\t\t\t\t\t\tspeed: speed || 4,\r\n\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t\tmode: \"auto\",\r\n\t\t\t\t\t\t\t\t\tstartValue: \"random\",\r\n\t\t\t\t\t\t\t\t\tdestroy: \"none\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\treduceDuplicates: false,\r\n\t\t\t\t\t\t\tshadow: {\r\n\t\t\t\t\t\t\t\tblur: 0,\r\n\t\t\t\t\t\t\t\tcolor: {\r\n\t\t\t\t\t\t\t\t\tvalue: \"#000\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\toffset: {\r\n\t\t\t\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tshape: {\r\n\t\t\t\t\t\t\t\tclose: true,\r\n\t\t\t\t\t\t\t\tfill: true,\r\n\t\t\t\t\t\t\t\toptions: {},\r\n\t\t\t\t\t\t\t\ttype: \"circle\",\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tsize: {\r\n\t\t\t\t\t\t\t\tvalue: {\r\n\t\t\t\t\t\t\t\t\tmin: minSize || 1,\r\n\t\t\t\t\t\t\t\t\tmax: maxSize || 3,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tspeed: 5,\r\n\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t\tmode: \"auto\",\r\n\t\t\t\t\t\t\t\t\tstartValue: \"random\",\r\n\t\t\t\t\t\t\t\t\tdestroy: \"none\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tstroke: {\r\n\t\t\t\t\t\t\t\twidth: 0,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tzIndex: {\r\n\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\topacityRate: 1,\r\n\t\t\t\t\t\t\t\tsizeRate: 1,\r\n\t\t\t\t\t\t\t\tvelocityRate: 1,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tdestroy: {\r\n\t\t\t\t\t\t\t\tbounds: {},\r\n\t\t\t\t\t\t\t\tmode: \"none\",\r\n\t\t\t\t\t\t\t\tsplit: {\r\n\t\t\t\t\t\t\t\t\tcount: 1,\r\n\t\t\t\t\t\t\t\t\tfactor: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: 3,\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\trate: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: {\r\n\t\t\t\t\t\t\t\t\t\t\tmin: 4,\r\n\t\t\t\t\t\t\t\t\t\t\tmax: 9,\r\n\t\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\tsizeOffset: true,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\troll: {\r\n\t\t\t\t\t\t\t\tdarken: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\tenlighten: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tmode: \"vertical\",\r\n\t\t\t\t\t\t\t\tspeed: 25,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\ttilt: {\r\n\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tspeed: 0,\r\n\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tdirection: \"clockwise\",\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\ttwinkle: {\r\n\t\t\t\t\t\t\t\tlines: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tfrequency: 0.05,\r\n\t\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tparticles: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tfrequency: 0.05,\r\n\t\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\twobble: {\r\n\t\t\t\t\t\t\t\tdistance: 5,\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\tspeed: {\r\n\t\t\t\t\t\t\t\t\tangle: 50,\r\n\t\t\t\t\t\t\t\t\tmove: 10,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tlife: {\r\n\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\tdelay: {\r\n\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tduration: {\r\n\t\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\trotate: {\r\n\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tspeed: 0,\r\n\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tdirection: \"clockwise\",\r\n\t\t\t\t\t\t\t\tpath: false,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\torbit: {\r\n\t\t\t\t\t\t\t\tanimation: {\r\n\t\t\t\t\t\t\t\t\tcount: 0,\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tspeed: 1,\r\n\t\t\t\t\t\t\t\t\tdecay: 0,\r\n\t\t\t\t\t\t\t\t\tdelay: 0,\r\n\t\t\t\t\t\t\t\t\tsync: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\trotation: {\r\n\t\t\t\t\t\t\t\t\tvalue: 45,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\twidth: 1,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\tlinks: {\r\n\t\t\t\t\t\t\t\tblink: false,\r\n\t\t\t\t\t\t\t\tcolor: {\r\n\t\t\t\t\t\t\t\t\tvalue: \"#fff\",\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\tconsent: false,\r\n\t\t\t\t\t\t\t\tdistance: 100,\r\n\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\tfrequency: 1,\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\tshadow: {\r\n\t\t\t\t\t\t\t\t\tblur: 5,\r\n\t\t\t\t\t\t\t\t\tcolor: {\r\n\t\t\t\t\t\t\t\t\t\tvalue: \"#000\",\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\ttriangles: {\r\n\t\t\t\t\t\t\t\t\tenable: false,\r\n\t\t\t\t\t\t\t\t\tfrequency: 1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\twidth: 1,\r\n\t\t\t\t\t\t\t\twarp: false,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\trepulse: {\r\n\t\t\t\t\t\t\t\tvalue: 0,\r\n\t\t\t\t\t\t\t\tenabled: false,\r\n\t\t\t\t\t\t\t\tdistance: 1,\r\n\t\t\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\t\t\tfactor: 1,\r\n\t\t\t\t\t\t\t\tspeed: 1,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tdetectRetina: true,\r\n\t\t\t\t\t}}\r\n\t\t\t\t/>\r\n\t\t\t)}\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "id",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "background",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "particleSize",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "minSize",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxSize",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "particleColor",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "particleDensity",
+        "type": "number",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sparkles"
+  }
+}

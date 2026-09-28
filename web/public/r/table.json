@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "table",
+  "type": "registry:ui",
+  "title": "Table",
+  "description": "Table",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/table.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/table.tsx",
+      "content": "// Tremor Table [v0.0.3]\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nconst TableRoot = React.forwardRef<\r\n\tHTMLDivElement,\r\n\tReact.HTMLAttributes<HTMLDivElement>\r\n>(({ className, children, ...props }, forwardedRef) => (\r\n\t<div\r\n\t\tref={forwardedRef}\r\n\t\t// Activate if table is used in a float environment\r\n\t\t// className=\"flow-root\"\r\n\t>\r\n\t\t<div\r\n\t\t\t// make table scrollable on mobile\r\n\t\t\tclassName={cn(\"w-full overflow-auto whitespace-nowrap\", className)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t{children}\r\n\t\t</div>\r\n\t</div>\r\n));\r\n\r\nTableRoot.displayName = \"TableRoot\";\r\n\r\nconst Table = React.forwardRef<\r\n\tHTMLTableElement,\r\n\tReact.TableHTMLAttributes<HTMLTableElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<table\r\n\t\tref={forwardedRef}\r\n\t\ttremor-id=\"tremor-raw\"\r\n\t\tclassName={cn(\r\n\t\t\t// base\r\n\t\t\t\"w-full caption-bottom border-b\",\r\n\t\t\t// border color\r\n\t\t\t\"border-gray-200 dark:border-gray-800\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTable.displayName = \"Table\";\r\n\r\nconst TableHead = React.forwardRef<\r\n\tHTMLTableSectionElement,\r\n\tReact.HTMLAttributes<HTMLTableSectionElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<thead ref={forwardedRef} className={cn(className)} {...props} />\r\n));\r\n\r\nTableHead.displayName = \"TableHead\";\r\n\r\nconst TableHeaderCell = React.forwardRef<\r\n\tHTMLTableCellElement,\r\n\tReact.ThHTMLAttributes<HTMLTableCellElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<th\r\n\t\tref={forwardedRef}\r\n\t\tclassName={cn(\r\n\t\t\t// base\r\n\t\t\t\"border-b px-4 py-3.5 text-left text-sm font-semibold\",\r\n\t\t\t// text color\r\n\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\t// border color\r\n\t\t\t\"border-gray-200 dark:border-gray-800\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTableHeaderCell.displayName = \"TableHeaderCell\";\r\n\r\nconst TableBody = React.forwardRef<\r\n\tHTMLTableSectionElement,\r\n\tReact.HTMLAttributes<HTMLTableSectionElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<tbody\r\n\t\tref={forwardedRef}\r\n\t\tclassName={cn(\r\n\t\t\t// base\r\n\t\t\t\"divide-y\",\r\n\t\t\t// divide color\r\n\t\t\t\"divide-gray-200 dark:divide-gray-800\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTableBody.displayName = \"TableBody\";\r\n\r\nconst TableRow = React.forwardRef<\r\n\tHTMLTableRowElement,\r\n\tReact.HTMLAttributes<HTMLTableRowElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<tr\r\n\t\tref={forwardedRef}\r\n\t\tclassName={cn(\r\n\t\t\t\"[&_td:last-child]:pr-4 [&_th:last-child]:pr-4\",\r\n\t\t\t\"[&_td:first-child]:pl-4 [&_th:first-child]:pl-4\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTableRow.displayName = \"TableRow\";\r\n\r\nconst TableCell = React.forwardRef<\r\n\tHTMLTableCellElement,\r\n\tReact.TdHTMLAttributes<HTMLTableCellElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<td\r\n\t\tref={forwardedRef}\r\n\t\tclassName={cn(\r\n\t\t\t// base\r\n\t\t\t\"p-4 text-sm\",\r\n\t\t\t// text color\r\n\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTableCell.displayName = \"TableCell\";\r\n\r\nconst TableFoot = React.forwardRef<\r\n\tHTMLTableSectionElement,\r\n\tReact.HTMLAttributes<HTMLTableSectionElement>\r\n>(({ className, ...props }, forwardedRef) => {\r\n\treturn (\r\n\t\t<tfoot\r\n\t\t\tref={forwardedRef}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t// base\r\n\t\t\t\t\"border-t text-left font-medium\",\r\n\t\t\t\t// text color\r\n\t\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\t\t// border color\r\n\t\t\t\t\"border-gray-200 dark:border-gray-800\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t);\r\n});\r\n\r\nTableFoot.displayName = \"TableFoot\";\r\n\r\nconst TableCaption = React.forwardRef<\r\n\tHTMLTableCaptionElement,\r\n\tReact.HTMLAttributes<HTMLTableCaptionElement>\r\n>(({ className, ...props }, forwardedRef) => (\r\n\t<caption\r\n\t\tref={forwardedRef}\r\n\t\tclassName={cn(\r\n\t\t\t// base\r\n\t\t\t\"mt-3 px-3 text-center text-sm\",\r\n\t\t\t// text color\r\n\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\n\r\nTableCaption.displayName = \"TableCaption\";\r\n\r\nexport {\r\n\tTable,\r\n\tTableBody,\r\n\tTableCaption,\r\n\tTableCell,\r\n\tTableFoot,\r\n\tTableHead,\r\n\tTableHeaderCell,\r\n\tTableRoot,\r\n\tTableRow,\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Data & Tables"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/table"
+  }
+}

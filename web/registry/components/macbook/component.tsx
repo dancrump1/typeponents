@@ -1,0 +1,621 @@
+"use client";
+
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from "react";
+
+import { cn } from "@/lib/utils";
+import { motion, MotionValue, useScroll, useTransform } from "motion/react";
+
+import { AnimatedTooltip } from "@/registry/components/tool-tip/component";
+
+// https://ui.aceternity.com/components/macbook-scroll
+
+const MacbookScroll = ({
+	src,
+	showGradient,
+	title,
+	badge,
+	children,
+	response,
+	containerRef,
+}: {
+	src?: string;
+	showGradient?: boolean;
+	title?: string | React.ReactNode;
+	badge?: React.ReactNode;
+	children?: React.ReactNode;
+}) => {
+	const ref = useRef<HTMLDivElement>(null);
+	const { scrollYProgress } = useScroll({
+		target: ref,
+		offset: ["start center", "end end"],
+		// container: containerRef || null,
+	});
+
+	const [isMobile, setIsMobile] = useState(false);
+
+	useEffect(() => {
+		if (window && window.innerWidth < 768) {
+			setIsMobile(true);
+		}
+	}, []);
+
+	const scaleX = useTransform(
+		scrollYProgress,
+		[0, 0.3],
+		[1.2, isMobile ? 1 : 1.5]
+	);
+	const scaleY = useTransform(
+		scrollYProgress,
+		[0, 0.3],
+		[0.6, isMobile ? 1 : 2]
+	);
+	const translate = useTransform(scrollYProgress, [0, 1], [0, 1000]);
+	const rotate = useTransform(
+		scrollYProgress,
+		[0.1, 0.12, 0.3],
+		[-28, -28, 0]
+	);
+	const textTransform = useTransform(scrollYProgress, [0, 0.3], [0, 100]);
+	const textOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+
+	if (!!containerRef && containerRef.current === undefined) return null;
+
+	return (
+		<div
+			ref={ref}
+			className="min-h-[200vh] flex flex-col items-center py-0 md:py-80 justify-start shrink-0 perspective-midrange transform md:scale-100  scale-[0.35] sm:scale-50"
+		>
+			<motion.h2
+				style={{
+					translateY: textTransform,
+					opacity: textOpacity,
+				}}
+				className="dark:text-foreground -mt-[50vh] text-foreground text-3xl font-bold mb-20 text-center"
+			>
+				{title || (
+					<span>
+						This Macbook is built with Tailwindcss. <br /> No kidding.
+					</span>
+				)}
+			</motion.h2>
+			{/* Lid */}
+			<Lid
+				src={src}
+				scaleX={scaleX}
+				scaleY={scaleY}
+				rotate={rotate}
+				translate={translate}
+				response={response}
+			>
+				{children}
+			</Lid>
+			{/* Base area */}
+			<div className="h-88 w-lg bg-background dark:bg-background rounded-2xl overflow-hidden relative -z-10">
+				{/* above keyboard bar */}
+				<div className="h-10 w-full relative">
+					<div className="absolute inset-x-0 mx-auto w-[80%] h-4 bg-background" />
+				</div>
+				<div className="flex relative">
+					<div className="mx-auto w-[10%] overflow-hidden  h-full">
+						<SpeakerGrid />
+					</div>
+					<div className="mx-auto w-[80%] h-full">
+						<Keypad />
+					</div>
+					<div className="mx-auto w-[10%] overflow-hidden  h-full">
+						<SpeakerGrid />
+					</div>
+				</div>
+				<Trackpad />
+				<div className="h-2 w-20 mx-auto inset-x-0 absolute bottom-0 bg-linear-to-t from-[#272729] to-[#050505] rounded-tr-3xl rounded-tl-3xl" />
+				{showGradient && (
+					<div className="h-40 w-full absolute bottom-0 inset-x-0 bg-linear-to-t dark:from-background from-background via-background dark:via-background to-transparent z-40"></div>
+				)}
+				{badge && <div className="absolute bottom-4 left-4">{badge}</div>}
+			</div>
+		</div>
+	);
+};
+
+export const Lid = ({
+	scaleX,
+	scaleY,
+	rotate,
+	translate,
+	src,
+	children,
+	response,
+}: {
+	scaleX: MotionValue<number>;
+	scaleY: MotionValue<number>;
+	rotate: MotionValue<number>;
+	translate: MotionValue<number>;
+	src?: string;
+	children: React.ReactNode;
+}) => {
+	return (
+		<div className="relative perspective-midrange">
+			<div
+				style={{
+					transform: "perspective(800px) rotateX(-25deg) translateZ(0px)",
+					transformOrigin: "bottom",
+					transformStyle: "preserve-3d",
+				}}
+				className="h-48 w-lg bg-background rounded-2xl p-2 relative"
+			>
+				{/* <div
+					style={{
+						boxShadow: "0px 2px 0px 2px var(--neutral-900) inset",
+					}}
+					className="absolute inset-0 bg-background rounded-lg flex items-center justify-center z-20 flex-wrap gap-3"
+				>
+					<AnimatedTooltip items={response.data.peopleEntries} />
+				</div> */}
+			</div>
+			<motion.div
+				style={{
+					scaleX: scaleX,
+					scaleY: scaleY,
+					rotateX: rotate,
+					translateY: translate,
+					transformStyle: "preserve-3d",
+					transformOrigin: "top",
+				}}
+				className="w-lg absolute inset-0 bg-background rounded-2xl p-2"
+			>
+				<div className="inset-0 bg-background rounded-lg" />
+				{/* What moves on scroll */}
+				{/* <img
+          src={src as string}
+          alt="dbs logo"
+          fill="true"
+          className="object-cover object-top-left absolute rounded-lg inset-0 h-full w-full"
+        /> */}
+				{children}
+			</motion.div>
+		</div>
+	);
+};
+
+export const Trackpad = () => {
+	return (
+		<div
+			className="w-[40%] mx-auto h-32  rounded-xl my-1"
+			style={{
+				boxShadow: "0px 0px 1px 1px #00000020 inset",
+			}}
+		></div>
+	);
+};
+
+export const Keypad = () => {
+	return (
+		<div className="h-full rounded-md bg-background mx-1 p-1">
+			{/* First Row */}
+			<Row>
+				<KBtn
+					className="w-10 items-end justify-start pl-[4px] pb-[2px]"
+					childrenClassName="items-start"
+				>
+					esc
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F1</span>
+				</KBtn>
+
+				<KBtn>
+					<span className="inline-block mt-1">F2</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F3</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F4</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F5</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F6</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F7</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F8</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F8</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F10</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F11</span>
+				</KBtn>
+				<KBtn>
+					<span className="inline-block mt-1">F12</span>
+				</KBtn>
+				<KBtn>
+					<div className="h-4 w-4 rounded-full  bg-linear-to-b from-20% from-background via-background via-50% to-background to-95% p-px">
+						<div className="bg-background h-full w-full rounded-full" />
+					</div>
+				</KBtn>
+			</Row>
+
+			{/* Second row */}
+			<Row>
+				<KBtn>
+					<span className="block">~</span>
+					<span className="block mt-1">`</span>
+				</KBtn>
+
+				<KBtn>
+					<span className="block ">!</span>
+					<span className="block">1</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">@</span>
+					<span className="block">2</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">#</span>
+					<span className="block">3</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">$</span>
+					<span className="block">4</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">%</span>
+					<span className="block">5</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">^</span>
+					<span className="block">6</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">&</span>
+					<span className="block">7</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">*</span>
+					<span className="block">8</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">(</span>
+					<span className="block">9</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">)</span>
+					<span className="block">0</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">&mdash;</span>
+					<span className="block">_</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">+</span>
+					<span className="block"> = </span>
+				</KBtn>
+				<KBtn
+					className="w-10 items-end justify-end pr-[4px] pb-[2px]"
+					childrenClassName="items-end"
+				>
+					delete
+				</KBtn>
+			</Row>
+
+			{/* Third row */}
+			<Row>
+				<KBtn
+					className="w-10 items-end justify-start pl-[4px] pb-[2px]"
+					childrenClassName="items-start"
+				>
+					tab
+				</KBtn>
+				<KBtn>
+					<span className="block">Q</span>
+				</KBtn>
+
+				<KBtn>
+					<span className="block">W</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">E</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">R</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">T</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">Y</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">U</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">I</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">O</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">P</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`{`}</span>
+					<span className="block">{`[`}</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`}`}</span>
+					<span className="block">{`]`}</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`|`}</span>
+					<span className="block">{`\\`}</span>
+				</KBtn>
+			</Row>
+
+			{/* Fourth Row */}
+			<Row>
+				<KBtn
+					className="w-[2.8rem] items-end justify-start pl-[4px] pb-[2px]"
+					childrenClassName="items-start"
+				>
+					caps lock
+				</KBtn>
+				<KBtn>
+					<span className="block">A</span>
+				</KBtn>
+
+				<KBtn>
+					<span className="block">S</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">D</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">F</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">G</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">H</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">J</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">K</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">L</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`:`}</span>
+					<span className="block">{`;`}</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`"`}</span>
+					<span className="block">{`'`}</span>
+				</KBtn>
+				<KBtn
+					className="w-[2.85rem] items-end justify-end pr-[4px] pb-[2px]"
+					childrenClassName="items-end"
+				>
+					return
+				</KBtn>
+			</Row>
+
+			{/* Fifth Row */}
+			<Row>
+				<KBtn
+					className="w-[3.65rem] items-end justify-start pl-[4px] pb-[2px]"
+					childrenClassName="items-start"
+				>
+					shift
+				</KBtn>
+				<KBtn>
+					<span className="block">Z</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">X</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">C</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">V</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">B</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">N</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">M</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`<`}</span>
+					<span className="block">{`,`}</span>
+				</KBtn>
+				<KBtn>
+					<span className="block">{`>`}</span>
+					<span className="block">{`.`}</span>
+				</KBtn>{" "}
+				<KBtn>
+					<span className="block">{`?`}</span>
+					<span className="block">{`/`}</span>
+				</KBtn>
+				<KBtn
+					className="w-[3.65rem] items-end justify-end pr-[4px] pb-[2px]"
+					childrenClassName="items-end"
+				>
+					shift
+				</KBtn>
+			</Row>
+
+			{/* sixth Row */}
+			<Row>
+				<KBtn
+					className=""
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-end w-full pr-1">
+						<span className="block">fn</span>
+					</div>
+				</KBtn>
+				<KBtn
+					className=""
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-start w-full pl-1">
+						<span className="block">control</span>
+					</div>
+				</KBtn>
+				<KBtn
+					className=""
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-end w-full pr-1">
+						<OptionKey className="h-[6px] w-[6px]" />
+					</div>
+					<div className="flex justify-start w-full pl-1">
+						<span className="block">option</span>
+					</div>
+				</KBtn>
+				<KBtn
+					className="w-8"
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-start w-full pl-1">
+						<span className="block">command</span>
+					</div>
+				</KBtn>
+				<KBtn className="w-[8.2rem]"></KBtn>
+				<KBtn
+					className="w-8"
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-start w-full pl-1">
+						<span className="block">command</span>
+					</div>
+				</KBtn>
+				<KBtn
+					className=""
+					childrenClassName="h-full justify-between py-[4px]"
+				>
+					<div className="flex justify-start w-full pl-1">
+						<OptionKey className="h-[6px] w-[6px]" />
+					</div>
+					<div className="flex justify-start w-full pl-1">
+						<span className="block">option</span>
+					</div>
+				</KBtn>
+			</Row>
+		</div>
+	);
+};
+export const KBtn = ({
+	className,
+	children,
+	childrenClassName,
+	backlit = true,
+}: {
+	className?: string;
+	children?: React.ReactNode;
+	childrenClassName?: string;
+	backlit?: boolean;
+}) => {
+	return (
+		<div
+			className={cn(
+				"p-[0.5px] rounded-[4px]",
+				backlit && "bg-background/20 shadow-xl shadow-white"
+			)}
+		>
+			<div
+				className={cn(
+					"h-6 w-6 bg-background rounded-[3.5px] flex items-center justify-center",
+					className
+				)}
+				style={{
+					boxShadow:
+						"0px -0.5px 2px 0 #0D0D0F inset, -0.5px 0px 2px 0 #0D0D0F inset",
+				}}
+			>
+				<div
+					className={cn(
+						"text-foreground text-[5px] w-full flex justify-center items-center flex-col",
+						childrenClassName,
+						backlit && "text-foreground"
+					)}
+				>
+					{children}
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const Row = ({ children }: { children: React.ReactNode }) => {
+	return (
+		<div className="flex gap-[2px] mb-[2px] w-full shrink-0">
+			{children}
+		</div>
+	);
+};
+
+export const SpeakerGrid = () => {
+	return (
+		<div
+			className="flex px-[0.5px] gap-[2px] mt-2 h-40"
+			style={{
+				backgroundImage:
+					"radial-gradient(circle, #08080A 0.5px, transparent 0.5px)",
+				backgroundSize: "3px 3px",
+			}}
+		></div>
+	);
+};
+
+export const OptionKey = ({ className }: { className: string }) => {
+	return (
+		<svg
+			fill="none"
+			version="1.1"
+			id="icon"
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 32 32"
+			className={className}
+		>
+			<rect
+				stroke="currentColor"
+				strokeWidth={2}
+				x="18"
+				y="5"
+				width="10"
+				height="2"
+			/>
+			<polygon
+				stroke="currentColor"
+				strokeWidth={2}
+				points="10.6,5 4,5 4,7 9.4,7 18.4,27 28,27 28,25 19.6,25 "
+			/>
+			<rect
+				id="_Transparent_Rectangle_"
+				className="st0"
+				width="32"
+				height="32"
+				stroke="none"
+			/>
+		</svg>
+	);
+};
+
+export default MacbookScroll;

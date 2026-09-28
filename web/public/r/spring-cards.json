@@ -1,0 +1,68 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spring-cards",
+  "type": "registry:ui",
+  "title": "Spring Cards",
+  "description": "Spring Cards",
+  "dependencies": [
+    "motion",
+    "react-icons",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spring-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spring-cards.tsx",
+      "content": "import React from \"react\";\r\nimport { twMerge } from \"tailwind-merge\";\r\nimport { MotionConfig, motion } from \"motion/react\";\r\nimport { FiArrowRight } from \"react-icons/fi\";\r\n\r\n\r\n\r\nconst SpringCard = ({\r\n    title,\r\n    subtitle,\r\n    className,\r\n    containerClassName,\r\n}: {\r\n    title: string;\r\n    subtitle: string;\r\n    className?: string;\r\n    containerClassName?: string;\r\n}) => {\r\n    return (\r\n        <MotionConfig\r\n            transition={{\r\n                type: \"spring\",\r\n                bounce: 0.5,\r\n            }}\r\n        >\r\n            <motion.div\r\n                whileHover=\"hovered\"\r\n                className={twMerge(\r\n                    \"group w-full border-2 border-black bg-emerald-300\",\r\n                    containerClassName,\r\n                    className\r\n                )}\r\n            >\r\n                <motion.div\r\n                    initial={{\r\n                        x: 0,\r\n                        y: 0,\r\n                    }}\r\n                    variants={{\r\n                        hovered: {\r\n                            x: -8,\r\n                            y: -8,\r\n                        },\r\n                    }}\r\n                    className={twMerge(\r\n                        \"-m-0.5 border-2 border-black bg-emerald-300\",\r\n                        className\r\n                    )}\r\n                >\r\n                    <motion.div\r\n                        initial={{\r\n                            x: 0,\r\n                            y: 0,\r\n                        }}\r\n                        variants={{\r\n                            hovered: {\r\n                                x: -8,\r\n                                y: -8,\r\n                            },\r\n                        }}\r\n                        className={twMerge(\r\n                            \"relative -m-0.5 flex h-72 flex-col justify-between overflow-hidden border-2 border-black bg-emerald-300 p-8\",\r\n                            className\r\n                        )}\r\n                    >\r\n                        <p className=\"flex items-center text-2xl font-medium uppercase\">\r\n                            <FiArrowRight className=\"-ml-8 mr-2 opacity-0 transition-all duration-300 ease-in-out group-hover:ml-0 group-hover:opacity-100\" />\r\n                            {title}\r\n                        </p>\r\n                        <div>\r\n                            <p className=\"transition-[margin] duration-300 ease-in-out group-hover:mb-10\">\r\n                                {subtitle}\r\n                            </p>\r\n                            <button className=\"absolute bottom-2 left-2 right-2 translate-y-full border-2 border-black bg-white px-4 py-2 text-black opacity-0 transition-all duration-300 ease-in-out group-hover:translate-y-0 group-hover:opacity-100\">\r\n                                LET'S GO\r\n                            </button>\r\n                        </div>\r\n\r\n                        <motion.svg\r\n                            initial={{ rotate: 0 }}\r\n                            animate={{ rotate: 360 }}\r\n                            transition={{\r\n                                duration: 25,\r\n                                repeat: Infinity,\r\n                                repeatType: \"loop\",\r\n                                ease: \"linear\",\r\n                            }}\r\n                            style={{\r\n                                top: \"0\",\r\n                                right: \"0\",\r\n                                x: \"50%\",\r\n                                y: \"-50%\",\r\n                                scale: 0.75,\r\n                            }}\r\n                            width=\"200\"\r\n                            height=\"200\"\r\n                            className=\"pointer-events-none absolute z-10 rounded-full\"\r\n                        >\r\n                            <path\r\n                                id=\"circlePath\"\r\n                                d=\"M100,100 m-100,0 a100,100 0 1,0 200,0 a100,100 0 1,0 -200,0\"\r\n                                fill=\"none\"\r\n                            />\r\n                            <text>\r\n                                <textPath\r\n                                    href=\"#circlePath\"\r\n                                    fill=\"black\"\r\n                                    className=\"fill-black text-2xl font-black uppercase opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-100\"\r\n                                >\r\n                                    LEARN MORE • LEARN MORE • LEARN MORE • LEARN MORE •\r\n                                </textPath>\r\n                            </text>\r\n                        </motion.svg>\r\n                    </motion.div>\r\n                </motion.div>\r\n            </motion.div>\r\n        </MotionConfig>\r\n    );\r\n};\r\n\r\nexport default SpringCard;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Modals"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "subtitle",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spring-cards"
+  }
+}

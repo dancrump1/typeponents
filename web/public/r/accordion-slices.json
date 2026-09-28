@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "accordion-slices",
+  "type": "registry:ui",
+  "title": "Accordion Slices",
+  "description": "Row of vertical label strips, each with an icon, that open into a full-height image panel.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/accordion-slices.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/accordion-slices.tsx",
+      "content": "import { Dispatch, SetStateAction, useState } from \"react\";\n\nimport { useWindowSize } from \"@/hooks/use-window-size\";\nimport { AnimatePresence, motion } from \"motion/react\";\nimport { IconType } from \"react-icons\";\nimport { FiBarChart, FiBell, FiDollarSign, FiPlay } from \"react-icons/fi\";\n\n// Credit:\n// www.hover.dev/components/accordions#vertical-accordion\n\nconst AccordionSlices = () => {\n\tconst [open, setOpen] = useState(items[0].id);\n\n\treturn (\n\t\t<section className=\"p-4 bg-background\">\n\t\t\t<div className=\"flex flex-col lg:flex-row h-fit lg:h-[450px] w-full max-w-6xl mx-auto shadow-sm overflow-hidden\">\n\t\t\t\t{items.map((item) => {\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<Panel\n\t\t\t\t\t\t\tkey={item.id}\n\t\t\t\t\t\t\topen={open}\n\t\t\t\t\t\t\tsetOpen={setOpen}\n\t\t\t\t\t\t\tid={item.id}\n\t\t\t\t\t\t\tIcon={item.Icon}\n\t\t\t\t\t\t\ttitle={item.title}\n\t\t\t\t\t\t\timgSrc={item.imgSrc}\n\t\t\t\t\t\t\tdescription={item.description}\n\t\t\t\t\t\t/>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</div>\n\t\t</section>\n\t);\n};\n\ninterface PanelProps {\n\topen: number;\n\tsetOpen: Dispatch<SetStateAction<number>>;\n\tid: number;\n\tIcon: IconType;\n\ttitle: string;\n\timgSrc: string;\n\tdescription: string;\n}\n\nconst Panel = ({\n\topen,\n\tsetOpen,\n\tid,\n\tIcon,\n\ttitle,\n\timgSrc,\n\tdescription,\n}: PanelProps) => {\n\tconst { width } = useWindowSize();\n\n\tconst isOpen = open === id;\n\n\treturn (\n\t\t<>\n\t\t\t<button\n\t\t\t\tclassName=\"bg-background hover:bg-foreground transition-colors p-3 border-r border-b border-slate-200 flex flex-row-reverse lg:flex-col justify-end items-center gap-4 relative group\"\n\t\t\t\tonClick={() => setOpen(id)}\n\t\t\t>\n\t\t\t\t<span\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\twritingMode: \"vertical-lr\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"hidden lg:block text-xl font-light rotate-180\"\n\t\t\t\t>\n\t\t\t\t\t{title}\n\t\t\t\t</span>\n\t\t\t\t<span className=\"block lg:hidden text-xl font-light\">{title}</span>\n\t\t\t\t<div className=\"w-6 lg:w-full aspect-square bg-indigo-600 text-foreground grid place-items-center\">\n\t\t\t\t\t<Icon />\n\t\t\t\t</div>\n\t\t\t\t<span className=\"w-4 h-4 bg-background group-hover:bg-slate-50 transition-colors border-r border-b lg:border-b-0 lg:border-t border-slate-200 rotate-45 absolute bottom-0 lg:bottom-[50%] right-[50%] lg:right-0 translate-y-[50%] translate-x-[50%] z-20\" />\n\t\t\t</button>\n\n\t\t\t<AnimatePresence>\n\t\t\t\t{isOpen && (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tkey={`panel-${id}`}\n\t\t\t\t\t\tvariants={\n\t\t\t\t\t\t\twidth && width > 1024 ? panelVariants : panelVariantsSm\n\t\t\t\t\t\t}\n\t\t\t\t\t\tinitial=\"closed\"\n\t\t\t\t\t\tanimate=\"open\"\n\t\t\t\t\t\texit=\"closed\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tbackgroundimgSrc: `url(${imgSrc})`,\n\t\t\t\t\t\t\tbackgroundPosition: \"center\",\n\t\t\t\t\t\t\tbackgroundSize: \"cover\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"w-full h-full overflow-hidden relative bg-background flex items-end\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tvariants={descriptionVariants}\n\t\t\t\t\t\t\tinitial=\"closed\"\n\t\t\t\t\t\t\tanimate=\"open\"\n\t\t\t\t\t\t\texit=\"closed\"\n\t\t\t\t\t\t\tclassName=\"px-4 py-2 bg-background/40 backdrop-blur-xs text-foreground\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<p>{description}</p>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t)}\n\t\t\t</AnimatePresence>\n\t\t</>\n\t);\n};\n\nexport default AccordionSlices;\n\nconst panelVariants = {\n\topen: {\n\t\twidth: \"100%\",\n\t\theight: \"100%\",\n\t},\n\tclosed: {\n\t\twidth: \"0%\",\n\t\theight: \"100%\",\n\t},\n};\n\nconst panelVariantsSm = {\n\topen: {\n\t\twidth: \"100%\",\n\t\theight: \"200px\",\n\t},\n\tclosed: {\n\t\twidth: \"100%\",\n\t\theight: \"0px\",\n\t},\n};\n\nconst descriptionVariants = {\n\topen: {\n\t\topacity: 1,\n\t\ty: \"0%\",\n\t\ttransition: {\n\t\t\tdelay: 0.125,\n\t\t},\n\t},\n\tclosed: { opacity: 0, y: \"100%\" },\n};\n\nconst items = [\n\t{\n\t\tid: 1,\n\t\ttitle: \"Earn more\",\n\t\tIcon: FiDollarSign,\n\t\timgSrc: \"/itjustworks.jpg\",\n\t\tdescription:\n\t\t\t\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum eius deserunt quia consectetur aliquid obcaecati voluptatibus quos distinctio natus! Tenetur.\",\n\t},\n\t{\n\t\tid: 2,\n\t\ttitle: \"Play more\",\n\t\tIcon: FiPlay,\n\t\timgSrc: \"/itjustworks.jpg\",\n\t\tdescription:\n\t\t\t\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum eius deserunt quia consectetur aliquid obcaecati voluptatibus quos distinctio natus! Tenetur.\",\n\t},\n\t{\n\t\tid: 3,\n\t\ttitle: \"Keep track\",\n\t\tIcon: FiBell,\n\t\timgSrc: \"/itjustworks.jpg\",\n\t\tdescription:\n\t\t\t\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum eius deserunt quia consectetur aliquid obcaecati voluptatibus quos distinctio natus! Tenetur.\",\n\t},\n\t{\n\t\tid: 4,\n\t\ttitle: \"Grow faster\",\n\t\tIcon: FiBarChart,\n\t\timgSrc: \"/itjustworks.jpg\",\n\t\tdescription:\n\t\t\t\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum eius deserunt quia consectetur aliquid obcaecati voluptatibus quos distinctio natus! Tenetur.\",\n\t},\n];\n"
+    },
+    {
+      "path": "hooks/use-window-size.tsx",
+      "type": "registry:hook",
+      "target": "hooks/use-window-size.tsx",
+      "content": "import { useEffect, useState } from \"react\";\r\n\r\ninterface Size {\r\n\twidth: number | undefined;\r\n\theight: number | undefined;\r\n}\r\n\r\nexport const useWindowSize = () => {\r\n\tconst [windowSize, setWindowSize] = useState<Size>({\r\n\t\twidth: undefined,\r\n\t\theight: undefined,\r\n\t});\r\n\r\n\tuseEffect(() => {\r\n\t\tfunction handleResize() {\r\n\t\t\tsetWindowSize({\r\n\t\t\t\twidth: window.innerWidth,\r\n\t\t\t\theight: window.innerHeight,\r\n\t\t\t});\r\n\t\t}\r\n\r\n\t\twindow.addEventListener(\"resize\", handleResize);\r\n\r\n\t\thandleResize();\r\n\t\treturn () => window.removeEventListener(\"resize\", handleResize);\r\n\t}, []);\r\n\r\n\treturn windowSize;\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Accordions"
+    ],
+    "tags": [
+      "hover",
+      "responsive"
+    ],
+    "interaction": "Clicking a strip slides its image panel open across the row while the previous one collapses, and the caption rises into the bottom of the panel; on narrow screens the strips stack and open downwards instead.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/accordion-slices"
+  }
+}

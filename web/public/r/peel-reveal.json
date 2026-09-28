@@ -1,0 +1,125 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "peel-reveal",
+  "type": "registry:ui",
+  "title": "Peel Reveal",
+  "description": "Peel Reveal",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/peel-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/peel-reveal.tsx",
+      "content": "import { CSSProperties, useEffect, useMemo, useRef } from \"react\";\n\nimport { gsap } from \"gsap\";\nimport { Draggable } from \"gsap/Draggable\";\n\ngsap.registerPlugin(Draggable);\n\ninterface PeelRevealProps {\n\timageSrc: string;\n\trotate?: number;\n\tpeelBackHoverPct?: number;\n\tpeelBackActivePct?: number;\n\tpeelEasing?: string;\n\tpeelHoverEasing?: string;\n\twidth?: number;\n\tshadowIntensity?: number;\n\tlightingIntensity?: number;\n\tinitialPosition?: \"center\" | \"random\" | { x: number; y: number };\n\tpeelDirection?: number;\n\tclassName?: string;\n}\n\ninterface CSSVars extends CSSProperties {\n\t\"--sticker-rotate\"?: string;\n\t\"--sticker-p\"?: string;\n\t\"--sticker-peelback-hover\"?: string;\n\t\"--sticker-peelback-active\"?: string;\n\t\"--sticker-peel-easing\"?: string;\n\t\"--sticker-peel-hover-easing\"?: string;\n\t\"--sticker-width\"?: string;\n\t\"--sticker-shadow-opacity\"?: number;\n\t\"--sticker-lighting-constant\"?: number;\n\t\"--peel-direction\"?: string;\n\t\"--sticker-start\"?: string;\n\t\"--sticker-end\"?: string;\n}\n\nconst PeelReveal: React.FC<PeelRevealProps> = ({\n\timageSrc,\n\trotate = 30,\n\tpeelBackHoverPct = 30,\n\tpeelBackActivePct = 40,\n\tpeelEasing = \"power3.out\",\n\tpeelHoverEasing = \"power2.out\",\n\twidth = 200,\n\tshadowIntensity = 0.6,\n\tlightingIntensity = 0.1,\n\tinitialPosition = \"center\",\n\tpeelDirection = 0,\n\tclassName = \"\",\n}) => {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst dragTargetRef = useRef<HTMLDivElement>(null);\n\tconst pointLightRef = useRef<SVGFEPointLightElement>(null);\n\tconst pointLightFlippedRef = useRef<SVGFEPointLightElement>(null);\n\tconst draggableInstanceRef = useRef<Draggable | null>(null);\n\n\tconst defaultPadding = 12;\n\n\tuseEffect(() => {\n\t\tconst target = dragTargetRef.current;\n\t\tif (!target) return;\n\n\t\tlet startX = 0,\n\t\t\tstartY = 0;\n\n\t\tif (initialPosition === \"center\") {\n\t\t\treturn;\n\t\t}\n\n\t\tif (\n\t\t\ttypeof initialPosition === \"object\" &&\n\t\t\tinitialPosition.x !== undefined &&\n\t\t\tinitialPosition.y !== undefined\n\t\t) {\n\t\t\tstartX = initialPosition.x;\n\t\t\tstartY = initialPosition.y;\n\t\t}\n\n\t\tgsap.set(target, { x: startX, y: startY });\n\t}, [initialPosition]);\n\n\tuseEffect(() => {\n\t\tconst target = dragTargetRef.current;\n\t\tif (!target) return;\n\n\t\tconst boundsEl = target.parentNode as HTMLElement;\n\n\t\tconst draggable = Draggable.create(target, {\n\t\t\ttype: \"x,y\",\n\t\t\tbounds: boundsEl,\n\t\t\tinertia: true,\n\t\t\tonDrag(this: Draggable) {\n\t\t\t\tconst rot = gsap.utils.clamp(-24, 24, this.deltaX * 0.4);\n\t\t\t\tgsap.to(target, {\n\t\t\t\t\trotation: rot,\n\t\t\t\t\tduration: 0.15,\n\t\t\t\t\tease: \"power1.out\",\n\t\t\t\t});\n\t\t\t},\n\t\t\tonDragEnd() {\n\t\t\t\tconst rotationEase = \"power2.out\";\n\t\t\t\tconst duration = 0.8;\n\t\t\t\tgsap.to(target, { rotation: 0, duration, ease: rotationEase });\n\t\t\t},\n\t\t});\n\n\t\tdraggableInstanceRef.current = draggable[0];\n\n\t\tconst handleResize = () => {\n\t\t\tif (draggableInstanceRef.current) {\n\t\t\t\tdraggableInstanceRef.current.update();\n\n\t\t\t\tconst currentX = gsap.getProperty(target, \"x\") as number;\n\t\t\t\tconst currentY = gsap.getProperty(target, \"y\") as number;\n\n\t\t\t\tconst boundsRect = boundsEl.getBoundingClientRect();\n\t\t\t\tconst targetRect = target.getBoundingClientRect();\n\n\t\t\t\tconst maxX = boundsRect.width - targetRect.width;\n\t\t\t\tconst maxY = boundsRect.height - targetRect.height;\n\n\t\t\t\tconst newX = Math.max(0, Math.min(currentX, maxX));\n\t\t\t\tconst newY = Math.max(0, Math.min(currentY, maxY));\n\n\t\t\t\tif (newX !== currentX || newY !== currentY) {\n\t\t\t\t\tgsap.to(target, {\n\t\t\t\t\t\tx: newX,\n\t\t\t\t\t\ty: newY,\n\t\t\t\t\t\tduration: 0.3,\n\t\t\t\t\t\tease: \"power2.out\",\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\twindow.addEventListener(\"orientationchange\", handleResize);\n\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"resize\", handleResize);\n\t\t\twindow.removeEventListener(\"orientationchange\", handleResize);\n\t\t\tif (draggableInstanceRef.current) {\n\t\t\t\tdraggableInstanceRef.current.kill();\n\t\t\t}\n\t\t};\n\t}, []);\n\n\tuseEffect(() => {\n\t\tconst updateLight = (e: Event) => {\n\t\t\tconst mouseEvent = e as MouseEvent;\n\t\t\tconst rect = containerRef.current?.getBoundingClientRect();\n\t\t\tif (!rect) return;\n\n\t\t\tconst x = mouseEvent.clientX - rect.left;\n\t\t\tconst y = mouseEvent.clientY - rect.top;\n\n\t\t\tif (pointLightRef.current) {\n\t\t\t\tgsap.set(pointLightRef.current, { attr: { x, y } });\n\t\t\t}\n\n\t\t\tconst normalizedAngle = Math.abs(peelDirection % 360);\n\t\t\tif (pointLightFlippedRef.current) {\n\t\t\t\tif (normalizedAngle !== 180) {\n\t\t\t\t\tgsap.set(pointLightFlippedRef.current, {\n\t\t\t\t\t\tattr: { x, y: rect.height - y },\n\t\t\t\t\t});\n\t\t\t\t} else {\n\t\t\t\t\tgsap.set(pointLightFlippedRef.current, {\n\t\t\t\t\t\tattr: { x: -1000, y: -1000 },\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\n\t\tconst container = containerRef.current;\n\t\tconst eventType = \"mousemove\";\n\n\t\tif (container) {\n\t\t\tcontainer.addEventListener(eventType, updateLight);\n\t\t\treturn () => container.removeEventListener(eventType, updateLight);\n\t\t}\n\t}, [peelDirection]);\n\n\tuseEffect(() => {\n\t\tconst container = containerRef.current;\n\t\tif (!container) return;\n\n\t\tconst handleTouchStart = () => {\n\t\t\tcontainer.classList.add(\"touch-active\");\n\t\t};\n\n\t\tconst handleTouchEnd = () => {\n\t\t\tcontainer.classList.remove(\"touch-active\");\n\t\t};\n\n\t\tcontainer.addEventListener(\"touchstart\", handleTouchStart);\n\t\tcontainer.addEventListener(\"touchend\", handleTouchEnd);\n\t\tcontainer.addEventListener(\"touchcancel\", handleTouchEnd);\n\n\t\treturn () => {\n\t\t\tcontainer.removeEventListener(\"touchstart\", handleTouchStart);\n\t\t\tcontainer.removeEventListener(\"touchend\", handleTouchEnd);\n\t\t\tcontainer.removeEventListener(\"touchcancel\", handleTouchEnd);\n\t\t};\n\t}, []);\n\n\tconst cssVars: CSSVars = useMemo(\n\t\t() => ({\n\t\t\t\"--sticker-rotate\": `${rotate}deg`,\n\t\t\t\"--sticker-p\": `${defaultPadding}px`,\n\t\t\t\"--sticker-peelback-hover\": `${peelBackHoverPct}%`,\n\t\t\t\"--sticker-peelback-active\": `${peelBackActivePct}%`,\n\t\t\t\"--sticker-peel-easing\": peelEasing,\n\t\t\t\"--sticker-peel-hover-easing\": peelHoverEasing,\n\t\t\t\"--sticker-width\": `${width}px`,\n\t\t\t\"--sticker-shadow-opacity\": shadowIntensity,\n\t\t\t\"--sticker-lighting-constant\": lightingIntensity,\n\t\t\t\"--peel-direction\": `${peelDirection}deg`,\n\t\t\t\"--sticker-start\": `calc(-1 * ${defaultPadding}px)`,\n\t\t\t\"--sticker-end\": `calc(100% + ${defaultPadding}px)`,\n\t\t}),\n\t\t[\n\t\t\trotate,\n\t\t\tpeelBackHoverPct,\n\t\t\tpeelBackActivePct,\n\t\t\tpeelEasing,\n\t\t\tpeelHoverEasing,\n\t\t\twidth,\n\t\t\tshadowIntensity,\n\t\t\tlightingIntensity,\n\t\t\tpeelDirection,\n\t\t\tdefaultPadding,\n\t\t]\n\t);\n\n\tconst stickerMainStyle: CSSProperties = {\n\t\tclipPath: `polygon(var(--sticker-start) var(--sticker-start), var(--sticker-end) var(--sticker-start), var(--sticker-end) var(--sticker-end), var(--sticker-start) var(--sticker-end))`,\n\t\ttransition: \"clip-path 0.6s ease-out\",\n\t\tfilter: \"url(#dropShadow)\",\n\t\twillChange: \"clip-path, transform\",\n\t};\n\n\tconst flapStyle: CSSProperties = {\n\t\tclipPath: `polygon(var(--sticker-start) var(--sticker-start), var(--sticker-end) var(--sticker-start), var(--sticker-end) var(--sticker-start), var(--sticker-start) var(--sticker-start))`,\n\t\ttop: `calc(-100% - var(--sticker-p) - var(--sticker-p))`,\n\t\ttransform: \"scaleY(-1)\",\n\t\ttransition: \"all 0.6s ease-out\",\n\t\twillChange: \"clip-path, transform\",\n\t};\n\n\tconst imageStyle: CSSProperties = {\n\t\ttransform: `rotate(calc(${rotate}deg - ${peelDirection}deg))`,\n\t\twidth: `${width}px`,\n\t};\n\n\tconst shadowImageStyle: CSSProperties = {\n\t\t...imageStyle,\n\t\tfilter: \"url(#expandAndFill)\",\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName={`absolute cursor-grab active:cursor-grabbing transform-gpu ${className}`}\n\t\t\tref={dragTargetRef}\n\t\t\tstyle={cssVars}\n\t\t>\n\t\t\t<style\n\t\t\t\tdangerouslySetInnerHTML={{\n\t\t\t\t\t__html: `\n          .sticker-container:hover .sticker-main,\n          .sticker-container.touch-active .sticker-main {\n            clip-path: polygon(var(--sticker-start) var(--sticker-peelback-hover), var(--sticker-end) var(--sticker-peelback-hover), var(--sticker-end) var(--sticker-end), var(--sticker-start) var(--sticker-end)) !important;\n          }\n          .sticker-container:hover .sticker-flap,\n          .sticker-container.touch-active .sticker-flap {\n            clip-path: polygon(var(--sticker-start) var(--sticker-start), var(--sticker-end) var(--sticker-start), var(--sticker-end) var(--sticker-peelback-hover), var(--sticker-start) var(--sticker-peelback-hover)) !important;\n            top: calc(-100% + 2 * var(--sticker-peelback-hover) - 1px) !important;\n          }\n          .sticker-container:active .sticker-main {\n            clip-path: polygon(var(--sticker-start) var(--sticker-peelback-active), var(--sticker-end) var(--sticker-peelback-active), var(--sticker-end) var(--sticker-end), var(--sticker-start) var(--sticker-end)) !important;\n          }\n          .sticker-container:active .sticker-flap {\n            clip-path: polygon(var(--sticker-start) var(--sticker-start), var(--sticker-end) var(--sticker-start), var(--sticker-end) var(--sticker-peelback-active), var(--sticker-start) var(--sticker-peelback-active)) !important;\n            top: calc(-100% + 2 * var(--sticker-peelback-active) - 1px) !important;\n          }\n        `,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<svg width=\"0\" height=\"0\">\n\t\t\t\t<defs>\n\t\t\t\t\t<filter id=\"pointLight\">\n\t\t\t\t\t\t<feGaussianBlur stdDeviation=\"1\" result=\"blur\" />\n\t\t\t\t\t\t<feSpecularLighting\n\t\t\t\t\t\t\tresult=\"spec\"\n\t\t\t\t\t\t\tin=\"blur\"\n\t\t\t\t\t\t\tspecularExponent=\"100\"\n\t\t\t\t\t\t\tspecularConstant={lightingIntensity}\n\t\t\t\t\t\t\tlightingColor=\"white\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<fePointLight\n\t\t\t\t\t\t\t\tref={pointLightRef}\n\t\t\t\t\t\t\t\tx=\"100\"\n\t\t\t\t\t\t\t\ty=\"100\"\n\t\t\t\t\t\t\t\tz=\"300\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feSpecularLighting>\n\t\t\t\t\t\t<feComposite in=\"spec\" in2=\"SourceGraphic\" result=\"lit\" />\n\t\t\t\t\t\t<feComposite in=\"lit\" in2=\"SourceAlpha\" operator=\"in\" />\n\t\t\t\t\t</filter>\n\n\t\t\t\t\t<filter id=\"pointLightFlipped\">\n\t\t\t\t\t\t<feGaussianBlur stdDeviation=\"10\" result=\"blur\" />\n\t\t\t\t\t\t<feSpecularLighting\n\t\t\t\t\t\t\tresult=\"spec\"\n\t\t\t\t\t\t\tin=\"blur\"\n\t\t\t\t\t\t\tspecularExponent=\"100\"\n\t\t\t\t\t\t\tspecularConstant={lightingIntensity * 7}\n\t\t\t\t\t\t\tlightingColor=\"white\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<fePointLight\n\t\t\t\t\t\t\t\tref={pointLightFlippedRef}\n\t\t\t\t\t\t\t\tx=\"100\"\n\t\t\t\t\t\t\t\ty=\"100\"\n\t\t\t\t\t\t\t\tz=\"300\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feSpecularLighting>\n\t\t\t\t\t\t<feComposite in=\"spec\" in2=\"SourceGraphic\" result=\"lit\" />\n\t\t\t\t\t\t<feComposite in=\"lit\" in2=\"SourceAlpha\" operator=\"in\" />\n\t\t\t\t\t</filter>\n\n\t\t\t\t\t<filter id=\"dropShadow\">\n\t\t\t\t\t\t<feDropShadow\n\t\t\t\t\t\t\tdx=\"2\"\n\t\t\t\t\t\t\tdy=\"4\"\n\t\t\t\t\t\t\tstdDeviation={3 * shadowIntensity}\n\t\t\t\t\t\t\tfloodColor=\"black\"\n\t\t\t\t\t\t\tfloodOpacity={shadowIntensity}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</filter>\n\n\t\t\t\t\t<filter id=\"expandAndFill\">\n\t\t\t\t\t\t<feOffset dx=\"0\" dy=\"0\" in=\"SourceAlpha\" result=\"shape\" />\n\t\t\t\t\t\t<feFlood floodColor=\"rgb(179,179,179)\" result=\"flood\" />\n\t\t\t\t\t\t<feComposite operator=\"in\" in=\"flood\" in2=\"shape\" />\n\t\t\t\t\t</filter>\n\t\t\t\t</defs>\n\t\t\t</svg>\n\n\t\t\t<div\n\t\t\t\tclassName=\"sticker-container relative select-none touch-none sm:touch-auto\"\n\t\t\t\tref={containerRef}\n\t\t\t\tstyle={{\n\t\t\t\t\tWebkitUserSelect: \"none\",\n\t\t\t\t\tuserSelect: \"none\",\n\t\t\t\t\tWebkitTouchCallout: \"none\",\n\t\t\t\t\tWebkitTapHighlightColor: \"transparent\",\n\t\t\t\t\ttransform: `rotate(${peelDirection}deg)`,\n\t\t\t\t\ttransformOrigin: \"center\",\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<div className=\"sticker-main\" style={stickerMainStyle}>\n\t\t\t\t\t<div style={{ filter: \"url(#pointLight)\" }}>\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc={imageSrc}\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclassName=\"block\"\n\t\t\t\t\t\t\tstyle={imageStyle}\n\t\t\t\t\t\t\tdraggable=\"false\"\n\t\t\t\t\t\t\tonContextMenu={(e) => e.preventDefault()}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div\n\t\t\t\t\tclassName=\"absolute top-4 left-2 w-full h-full opacity-40\"\n\t\t\t\t\tstyle={{ filter: \"brightness(0) blur(8px)\" }}\n\t\t\t\t>\n\t\t\t\t\t<div className=\"sticker-flap\" style={flapStyle}>\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc={imageSrc}\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclassName=\"block\"\n\t\t\t\t\t\t\tstyle={shadowImageStyle}\n\t\t\t\t\t\t\tdraggable=\"false\"\n\t\t\t\t\t\t\tonContextMenu={(e) => e.preventDefault()}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div\n\t\t\t\t\tclassName=\"sticker-flap absolute w-full h-full left-0\"\n\t\t\t\t\tstyle={flapStyle}\n\t\t\t\t>\n\t\t\t\t\t<div style={{ filter: \"url(#pointLightFlipped)\" }}>\n\t\t\t\t\t\t<img\n\t\t\t\t\t\t\tsrc={imageSrc}\n\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\tclassName=\"block\"\n\t\t\t\t\t\t\tstyle={shadowImageStyle}\n\t\t\t\t\t\t\tdraggable=\"false\"\n\t\t\t\t\t\t\tonContextMenu={(e) => e.preventDefault()}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default PeelReveal;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "drag",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "imageSrc",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "rotate",
+        "type": "number",
+        "default": "30",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "peelBackHoverPct",
+        "type": "number",
+        "default": "30",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "peelBackActivePct",
+        "type": "number",
+        "default": "40",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "peelEasing",
+        "type": "string",
+        "default": "\"power3.out\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "peelHoverEasing",
+        "type": "string",
+        "default": "\"power2.out\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "default": "200",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "shadowIntensity",
+        "type": "number",
+        "default": "0.6",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "lightingIntensity",
+        "type": "number",
+        "default": "0.1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "initialPosition",
+        "type": "\"center\" | \"random\" | { x: number; y: number; }",
+        "default": "\"center\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "peelDirection",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/peel-reveal"
+  }
+}

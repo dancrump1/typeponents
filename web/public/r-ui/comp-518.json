@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-518",
+  "type": "registry:component",
+  "title": "Comp 518",
+  "description": "Comp 518",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-518.tsx",
+      "content": "import {\r\n\tStepper,\r\n\tStepperIndicator,\r\n\tStepperItem,\r\n\tStepperSeparator,\r\n\tStepperTrigger,\r\n} from \"@/components/ui/stepper\";\r\nimport { Shuffle } from \"lucide-react\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"mx-auto max-w-xl space-y-8 text-center\">\r\n\t\t\t<Stepper defaultValue={2}>\r\n\t\t\t\t<StepperItem step={1} className=\"not-last:flex-1\">\r\n\t\t\t\t\t<StepperTrigger>\r\n\t\t\t\t\t\t<StepperIndicator asChild>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"rounded-full\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-40-05.jpg\"\r\n\t\t\t\t\t\t\t\twidth={32}\r\n\t\t\t\t\t\t\t\theight={32}\r\n\t\t\t\t\t\t\t\talt=\"Mike Palmer\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</StepperIndicator>\r\n\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t<StepperSeparator />\r\n\t\t\t\t</StepperItem>\r\n\t\t\t\t<StepperItem step={2} className=\"not-last:flex-1\" loading>\r\n\t\t\t\t\t<StepperTrigger>\r\n\t\t\t\t\t\t<StepperIndicator />\r\n\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t<StepperSeparator />\r\n\t\t\t\t</StepperItem>\r\n\t\t\t\t<StepperItem step={3} className=\"not-last:flex-1\">\r\n\t\t\t\t\t<StepperTrigger>\r\n\t\t\t\t\t\t<StepperIndicator asChild>\r\n\t\t\t\t\t\t\t<Shuffle size={14} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t\t<span className=\"sr-only\">Shuffle</span>\r\n\t\t\t\t\t\t</StepperIndicator>\r\n\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t</StepperItem>\r\n\t\t\t</Stepper>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tStepper with mixed elements\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

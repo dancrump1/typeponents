@@ -1,0 +1,109 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-swap",
+  "type": "registry:ui",
+  "title": "Card Swap",
+  "description": "Slanted 3D stack of cards in the corner of a section that deals itself through on a timer.",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/card-swap.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/card-swap.tsx",
+      "content": "import React, {\n\tChildren,\n\tcloneElement,\n\tforwardRef,\n\tisValidElement,\n\tReactElement,\n\tReactNode,\n\tRefObject,\n\tuseEffect,\n\tuseMemo,\n\tuseRef,\n} from \"react\";\n\nimport gsap from \"gsap\";\n\n// Credit:\n// https://www.reactbits.dev/components/card-swap\n\nexport interface CardSwapProps {\n\twidth?: number | string;\n\theight?: number | string;\n\tcardDistance?: number;\n\tverticalDistance?: number;\n\tdelay?: number;\n\tpauseOnHover?: boolean;\n\tonCardClick?: (idx: number) => void;\n\tskewAmount?: number;\n\teasing?: \"linear\" | \"elastic\";\n\tchildren: ReactNode;\n}\n\nexport interface CardProps extends React.HTMLAttributes<HTMLDivElement> {\n\tcustomClass?: string;\n}\n\nexport const SwapCard = forwardRef<HTMLDivElement, CardProps>(\n\t({ customClass, ...rest }, ref) => (\n\t\t<div\n\t\t\tref={ref}\n\t\t\t{...rest}\n\t\t\tclassName={`absolute top-1/2 left-1/2 rounded-xl border border-white bg-background transform-3d will-change-transform backface-hidden ${customClass ?? \"\"} ${rest.className ?? \"\"}`.trim()}\n\t\t/>\n\t)\n);\nSwapCard.displayName = \"SwapCard\";\n\ntype CardRef = RefObject<HTMLDivElement>;\ninterface Slot {\n\tx: number;\n\ty: number;\n\tz: number;\n\tzIndex: number;\n}\n\nconst makeSlot = (\n\ti: number,\n\tdistX: number,\n\tdistY: number,\n\ttotal: number\n): Slot => ({\n\tx: i * distX,\n\ty: -i * distY,\n\tz: -i * distX * 1.5,\n\tzIndex: total - i,\n});\n\nconst placeNow = (el: HTMLElement, slot: Slot, skew: number) =>\n\tgsap.set(el, {\n\t\tx: slot.x,\n\t\ty: slot.y,\n\t\tz: slot.z,\n\t\txPercent: -50,\n\t\tyPercent: -50,\n\t\tskewY: skew,\n\t\ttransformOrigin: \"center center\",\n\t\tzIndex: slot.zIndex,\n\t\tforce3D: true,\n\t});\n\nconst CardSwap: React.FC<CardSwapProps> = ({\n\twidth = 500,\n\theight = 400,\n\tcardDistance = 60,\n\tverticalDistance = 70,\n\tdelay = 5000,\n\tpauseOnHover = false,\n\tonCardClick,\n\tskewAmount = 6,\n\teasing = \"elastic\",\n\tchildren,\n}) => {\n\tconst config =\n\t\teasing === \"elastic\"\n\t\t\t? {\n\t\t\t\t\tease: \"elastic.out(0.6,0.9)\",\n\t\t\t\t\tdurDrop: 2,\n\t\t\t\t\tdurMove: 2,\n\t\t\t\t\tdurReturn: 2,\n\t\t\t\t\tpromoteOverlap: 0.9,\n\t\t\t\t\treturnDelay: 0.05,\n\t\t\t\t}\n\t\t\t: {\n\t\t\t\t\tease: \"power1.inOut\",\n\t\t\t\t\tdurDrop: 0.8,\n\t\t\t\t\tdurMove: 0.8,\n\t\t\t\t\tdurReturn: 0.8,\n\t\t\t\t\tpromoteOverlap: 0.45,\n\t\t\t\t\treturnDelay: 0.2,\n\t\t\t\t};\n\n\tconst childArr = useMemo(\n\t\t() => Children.toArray(children) as ReactElement<CardProps>[],\n\t\t[children]\n\t);\n\tconst refs = useMemo<CardRef[]>(\n\t\t() => childArr.map(() => React.createRef<HTMLDivElement>()),\n\t\t[childArr.length]\n\t);\n\n\tconst order = useRef<number[]>(\n\t\tArray.from({ length: childArr.length }, (_, i) => i)\n\t);\n\n\tconst tlRef = useRef<gsap.core.Timeline | null>(null);\n\tconst intervalRef = useRef<number>();\n\tconst container = useRef<HTMLDivElement>(null);\n\n\tuseEffect(() => {\n\t\tconst total = refs.length;\n\t\trefs.forEach((r, i) =>\n\t\t\tplaceNow(\n\t\t\t\tr.current!,\n\t\t\t\tmakeSlot(i, cardDistance, verticalDistance, total),\n\t\t\t\tskewAmount\n\t\t\t)\n\t\t);\n\n\t\tconst swap = () => {\n\t\t\tif (order.current.length < 2) return;\n\n\t\t\tconst [front, ...rest] = order.current;\n\t\t\tconst elFront = refs[front].current!;\n\t\t\tconst tl = gsap.timeline();\n\t\t\ttlRef.current = tl;\n\n\t\t\ttl.to(elFront, {\n\t\t\t\ty: \"+=500\",\n\t\t\t\tduration: config.durDrop,\n\t\t\t\tease: config.ease,\n\t\t\t});\n\n\t\t\ttl.addLabel(\"promote\", `-=${config.durDrop * config.promoteOverlap}`);\n\t\t\trest.forEach((idx, i) => {\n\t\t\t\tconst el = refs[idx].current!;\n\t\t\t\tconst slot = makeSlot(\n\t\t\t\t\ti,\n\t\t\t\t\tcardDistance,\n\t\t\t\t\tverticalDistance,\n\t\t\t\t\trefs.length\n\t\t\t\t);\n\t\t\t\ttl.set(el, { zIndex: slot.zIndex }, \"promote\");\n\t\t\t\ttl.to(\n\t\t\t\t\tel,\n\t\t\t\t\t{\n\t\t\t\t\t\tx: slot.x,\n\t\t\t\t\t\ty: slot.y,\n\t\t\t\t\t\tz: slot.z,\n\t\t\t\t\t\tduration: config.durMove,\n\t\t\t\t\t\tease: config.ease,\n\t\t\t\t\t},\n\t\t\t\t\t`promote+=${i * 0.15}`\n\t\t\t\t);\n\t\t\t});\n\n\t\t\tconst backSlot = makeSlot(\n\t\t\t\trefs.length - 1,\n\t\t\t\tcardDistance,\n\t\t\t\tverticalDistance,\n\t\t\t\trefs.length\n\t\t\t);\n\t\t\ttl.addLabel(\n\t\t\t\t\"return\",\n\t\t\t\t`promote+=${config.durMove * config.returnDelay}`\n\t\t\t);\n\t\t\ttl.call(\n\t\t\t\t() => {\n\t\t\t\t\tgsap.set(elFront, { zIndex: backSlot.zIndex });\n\t\t\t\t},\n\t\t\t\tundefined,\n\t\t\t\t\"return\"\n\t\t\t);\n\t\t\ttl.set(elFront, { x: backSlot.x, z: backSlot.z }, \"return\");\n\t\t\ttl.to(\n\t\t\t\telFront,\n\t\t\t\t{\n\t\t\t\t\ty: backSlot.y,\n\t\t\t\t\tduration: config.durReturn,\n\t\t\t\t\tease: config.ease,\n\t\t\t\t},\n\t\t\t\t\"return\"\n\t\t\t);\n\n\t\t\ttl.call(() => {\n\t\t\t\torder.current = [...rest, front];\n\t\t\t});\n\t\t};\n\n\t\tswap();\n\t\tintervalRef.current = window.setInterval(swap, delay);\n\n\t\tif (pauseOnHover) {\n\t\t\tconst node = container.current!;\n\t\t\tconst pause = () => {\n\t\t\t\ttlRef.current?.pause();\n\t\t\t\tclearInterval(intervalRef.current);\n\t\t\t};\n\t\t\tconst resume = () => {\n\t\t\t\ttlRef.current?.play();\n\t\t\t\tintervalRef.current = window.setInterval(swap, delay);\n\t\t\t};\n\t\t\tnode.addEventListener(\"mouseenter\", pause);\n\t\t\tnode.addEventListener(\"mouseleave\", resume);\n\t\t\treturn () => {\n\t\t\t\tnode.removeEventListener(\"mouseenter\", pause);\n\t\t\t\tnode.removeEventListener(\"mouseleave\", resume);\n\t\t\t\tclearInterval(intervalRef.current);\n\t\t\t};\n\t\t}\n\t\treturn () => clearInterval(intervalRef.current);\n\t}, [\n\t\tcardDistance,\n\t\tverticalDistance,\n\t\tdelay,\n\t\tpauseOnHover,\n\t\tskewAmount,\n\t\teasing,\n\t]);\n\n\tconst rendered = childArr.map((child, i) =>\n\t\tisValidElement<CardProps>(child)\n\t\t\t? cloneElement(child, {\n\t\t\t\t\tkey: i,\n\t\t\t\t\tref: refs[i],\n\t\t\t\t\tstyle: { width, height, ...(child.props.style ?? {}) },\n\t\t\t\t\tonClick: (e) => {\n\t\t\t\t\t\tchild.props.onClick?.(e as React.MouseEvent<HTMLDivElement>);\n\t\t\t\t\t\tonCardClick?.(i);\n\t\t\t\t\t},\n\t\t\t\t} as CardProps & React.RefAttributes<HTMLDivElement>)\n\t\t\t: child\n\t);\n\n\treturn (\n\t\t<div\n\t\t\tref={container}\n\t\t\tclassName=\"absolute bottom-0 right-0 transform translate-x-[5%] translate-y-[20%] origin-bottom-right perspective-[900px] overflow-visible max-[768px]:translate-x-[25%] max-[768px]:translate-y-[25%] max-[768px]:scale-[0.75] max-[480px]:translate-x-[25%] max-[480px]:translate-y-[25%] max-[480px]:scale-[0.55]\"\n\t\t\tstyle={{ width, height }}\n\t\t>\n\t\t\t{rendered}\n\t\t</div>\n\t);\n};\n\nexport default CardSwap;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "featured",
+      "autoplay"
+    ],
+    "interaction": "Runs on its own — every few seconds the front card drops away, the rest step forward into its place, and the dropped card rises back on at the rear; it can be set to hold still while the pointer rests on the stack, and cards can be clicked.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/components/card-swap",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "width",
+        "type": "string | number",
+        "default": "500",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "default": "400",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cardDistance",
+        "type": "number",
+        "default": "60",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "verticalDistance",
+        "type": "number",
+        "default": "70",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "5000",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pauseOnHover",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onCardClick",
+        "type": "((idx: number) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "skewAmount",
+        "type": "number",
+        "default": "6",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "easing",
+        "type": "\"linear\" | \"elastic\"",
+        "default": "\"elastic\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 9,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/card-swap"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "input-animated",
+  "type": "registry:ui",
+  "title": "Input Animated",
+  "description": "Input Animated",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/input-animated.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/input-animated.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\ninterface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {\n\tlabel: string;\n\tvalue: string;\n\tclassName?: string;\n}\n\nconst containerVariants = {\n\tinitial: {},\n\tanimate: {\n\t\ttransition: {\n\t\t\tstaggerChildren: 0.05,\n\t\t},\n\t},\n};\n\nconst letterVariants = {\n\tinitial: {\n\t\ty: 0,\n\t\tcolor: \"inherit\",\n\t},\n\tanimate: {\n\t\ty: \"-120%\",\n\t\tcolor: \"var(--color-zinc-500)\",\n\t\ttransition: {\n\t\t\ttype: \"spring\",\n\t\t\tstiffness: 300,\n\t\t\tdamping: 20,\n\t\t},\n\t},\n};\n\nexport const InputAnimated = ({\n\tlabel,\n\tclassName = \"\",\n\tvalue,\n\t...props\n}: InputProps) => {\n\tconst [isFocused, setIsFocused] = useState(false);\n\tconst showLabel = isFocused || value.length > 0;\n\n\treturn (\n\t\t<div className={cn(\"relative\", className)}>\n\t\t\t<motion.div\n\t\t\t\tclassName=\"absolute top-1/2 -translate-y-1/2 pointer-events-none text-foreground dark:text-foreground\"\n\t\t\t\tvariants={containerVariants}\n\t\t\t\tinitial=\"initial\"\n\t\t\t\tanimate={showLabel ? \"animate\" : \"initial\"}\n\t\t\t>\n\t\t\t\t{label.split(\"\").map((char, index) => (\n\t\t\t\t\t<motion.span\n\t\t\t\t\t\tkey={index + \"input-animated\"}\n\t\t\t\t\t\tclassName=\"inline-block text-sm\"\n\t\t\t\t\t\tvariants={letterVariants}\n\t\t\t\t\t\tstyle={{ willChange: \"transform\" }}\n\t\t\t\t\t>\n\t\t\t\t\t\t{char === \" \" ? \"\\u00A0\" : char}\n\t\t\t\t\t</motion.span>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\n\t\t\t<input\n\t\t\t\ttype=\"text\"\n\t\t\t\tonFocus={() => setIsFocused(true)}\n\t\t\t\tonBlur={() => setIsFocused(false)}\n\t\t\t\t{...props}\n\t\t\t\tclassName=\"outline-hidden border-b-2 border-zinc-900 dark:border-zinc-50 py-2 w-full text-base font-medium text-foreground dark:text-foreground bg-transparent placeholder-transparent\"\n\t\t\t/>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "value",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/input-animated"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cursor-mask",
+  "type": "registry:ui",
+  "title": "Cursor Mask",
+  "description": "Cursor Mask",
+  "dependencies": [
+    "motion",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/cursor-mask.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/cursor-mask.tsx",
+      "content": "\"use client\";\r\n\r\nimport type React from \"react\";\r\nimport type { ReactNode } from \"react\";\r\nimport { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { useHover } from \"@/lib/hover-context\";\r\nimport { useMousePosition } from \"@/lib/elastic-line-position\";\r\nimport { motion, useMotionValue, useTransform } from \"motion/react\";\r\nimport { twMerge } from \"tailwind-merge\";\r\n\r\n// Credit:\r\n// https://auraui.vercel.app/component/mask-cursor\r\n\r\ninterface MaskCursorProps {\r\n\tchildren: ReactNode;\r\n\thoverColor?: string;\r\n\tmaskColor?: string;\r\n\tclassName?: string;\r\n\thovered?: string;\r\n}\r\nconst MaskCursor: React.FC<MaskCursorProps> = ({\r\n\tchildren,\r\n\tclassName,\r\n\thoverColor,\r\n\tmaskColor = \"#A5FECB\",\r\n\thovered,\r\n}) => {\r\n\tconst { x, y } = useMousePosition();\r\n\r\n\tconst { hovering } = useHover();\r\n\r\n\tconst [svgSize, setSvgSize] = useState(500);\r\n\r\n\t// Reference to the container to calculate offsets\r\n\tconst containerRef = useRef<HTMLDivElement>(null);\r\n\r\n\tconst [recentHover, setRecentHover] = useState(false);\r\n\r\n\tuseEffect(() => {\r\n\t\tsetRecentHover(true);\r\n\t\tsetSvgSize(hovering ? 5000 : 500);\r\n\t\tsetTimeout(() => {\r\n\t\t\tsetRecentHover(false);\r\n\t\t}, 300);\r\n\t}, [hovering]);\r\n\r\n\t// keep track of the cursor center\r\n\tconst [maskCenter, setMaskCenter] = useState({\r\n\t\tx: window.innerWidth / 2,\r\n\t\ty: window.innerHeight / 2,\r\n\t});\r\n\r\n\tuseEffect(() => {\r\n\t\tif (x + y !== 0) {\r\n\t\t\tsetMaskCenter({ x, y }); // always track mouse center, independent of size\r\n\t\t}\r\n\t}, [x, y]);\r\n\r\n\t// useMotionValues for smooth animation\r\n\tconst maskX = useMotionValue(maskCenter.x);\r\n\tconst maskY = useMotionValue(maskCenter.y);\r\n\r\n\t// animate the motion values when maskCenter updates\r\n\tuseEffect(() => {\r\n\t\tmaskX.set(maskCenter.x);\r\n\t\tmaskY.set(maskCenter.y);\r\n\t}, [maskCenter, maskX, maskY]);\r\n\r\n\t// If user scrolls, keep centered on mouse\r\n\tuseEffect(() => {\r\n\t\tif (containerRef.current && x + y !== 0) {\r\n\t\t\tconst rect = containerRef.current.getBoundingClientRect();\r\n\t\t\t// adjust mouse position relative to the container\r\n\t\t\tconst localX = x - rect.left;\r\n\t\t\tconst localY = y - rect.top;\r\n\r\n\t\t\tsetMaskCenter({ x: localX, y: localY });\r\n\t\t}\r\n\t}, [x, y]);\r\n\r\n\t// Keep mask position just the raw mouse coords\r\n\tconst smoothMaskX = useTransform(\r\n\t\tmaskX,\r\n\t\t(value) => `${value - svgSize / 2}px`\r\n\t);\r\n\tconst smoothMaskY = useTransform(\r\n\t\tmaskY,\r\n\t\t(value) => `${value - svgSize / 2}px`\r\n\t);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName={twMerge(\"relative p-10 h-full w-full\", className)}\r\n\t\t\tref={containerRef}\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName={twMerge(\r\n\t\t\t\t\t\"absolute inset-0 text-4xl\",\r\n\t\t\t\t\t`dark:bg-[${maskColor}] bg-gray-200`\r\n\t\t\t\t)}\r\n\t\t\t\tanimate={{\r\n\t\t\t\t\tWebkitMaskSize: `${svgSize}px`,\r\n\t\t\t\t\tWebkitMaskPosition: `${smoothMaskX.get()} ${smoothMaskY.get()}`,\r\n\t\t\t\t}}\r\n\t\t\t\ttransition={{\r\n\t\t\t\t\tWebkitMaskSize: {\r\n\t\t\t\t\t\ttype: \"tween\",\r\n\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\tduration: 0.3,\r\n\t\t\t\t\t},\r\n\r\n\t\t\t\t\tWebkitMaskPosition:\r\n\t\t\t\t\t\t!hovering && !recentHover\r\n\t\t\t\t\t\t\t? {\r\n\t\t\t\t\t\t\t\t\tduration: 0,\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t: {\r\n\t\t\t\t\t\t\t\t\ttype: \"tween\",\r\n\t\t\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t\t\t\tduration: 0.3,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t}}\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tWebkitMaskImage: \"url('/black-circle.svg')\",\r\n\t\t\t\t\tWebkitMaskRepeat: \"no-repeat\",\r\n\t\t\t\t\tcolor: hoverColor ? hoverColor : \"green\",\r\n\t\t\t\t}}\r\n\t\t\t>\r\n\t\t\t\t{(hovered === \"About Us\" || hovered === \"about\") && (\r\n\t\t\t\t\t<video\r\n\t\t\t\t\t\tsrc=\"placeholder.mp4\"\r\n\t\t\t\t\t\theight={1920}\r\n\t\t\t\t\t\twidth={1080}\r\n\t\t\t\t\t\tclassName=\"h-screen w-screen object-cover\"\r\n\t\t\t\t\t\tmuted\r\n\t\t\t\t\t\tautoPlay\r\n\t\t\t\t\t\tpreload=\"auto\"\r\n\t\t\t\t\t\tloop\r\n\t\t\t\t\t/>\r\n\t\t\t\t)}\r\n\t\t\t\t{hovered === \"WATCH REEL\" && (\r\n\t\t\t\t\t<video\r\n\t\t\t\t\t\tsrc=\"IMG_4377 2.MOV\"\r\n\t\t\t\t\t\tautoPlay\r\n\t\t\t\t\t\tmuted\r\n\t\t\t\t\t\theight={1920}\r\n\t\t\t\t\t\twidth={1080}\r\n\t\t\t\t\t\tloop\r\n\t\t\t\t\t\tpreload=\"auto\"\r\n\t\t\t\t\t\tclassName=\"h-screen w-screen object-cover\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t)}\r\n\t\t\t\t{hovered === \"OUR TEAM\" && (\r\n\t\t\t\t\t<video\r\n\t\t\t\t\t\tsrc=\"placeholder.mp4\"\r\n\t\t\t\t\t\theight={1920}\r\n\t\t\t\t\t\twidth={1080}\r\n\t\t\t\t\t\tclassName=\"h-screen w-screen object-cover\"\r\n\t\t\t\t\t\tmuted\r\n\t\t\t\t\t\tautoPlay\r\n\t\t\t\t\t\tloop\r\n\t\t\t\t\t/>\r\n\t\t\t\t)}\r\n\t\t\t\t{hovered === \"CONTACT\" && (\r\n\t\t\t\t\t<video\r\n\t\t\t\t\t\tsrc=\"placeholder.mp4\"\r\n\t\t\t\t\t\theight={1920}\r\n\t\t\t\t\t\twidth={1080}\r\n\t\t\t\t\t\tclassName=\"h-screen w-screen object-cover opacity-25\"\r\n\t\t\t\t\t\tautoPlay\r\n\t\t\t\t\t\tmuted\r\n\t\t\t\t\t\tloop\r\n\t\t\t\t\t/>\r\n\t\t\t\t)}\r\n\t\t\t</motion.div>\r\n\t\t\t{children}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default MaskCursor;\r\n"
+    },
+    {
+      "path": "lib/elastic-line-position.ts",
+      "type": "registry:lib",
+      "target": "lib/elastic-line-position.ts",
+      "content": "import { RefObject, useEffect, useState } from \"react\"\n\nexport const useMousePosition = (\n    containerRef?: RefObject<HTMLElement | SVGElement>\n) => {\n    const [position, setPosition] = useState({ x: 0, y: 0 })\n\n    useEffect(() => {\n        const updatePosition = (x: number, y: number) => {\n            if (containerRef && containerRef.current) {\n                const rect = containerRef.current.getBoundingClientRect()\n                const relativeX = x - rect.left\n                const relativeY = y - rect.top\n\n                // Calculate relative position even when outside the container\n                setPosition({ x: relativeX, y: relativeY })\n            } else {\n                setPosition({ x, y })\n            }\n        }\n\n        const handleMouseMove = (ev: MouseEvent) => {\n            updatePosition(ev.clientX, ev.clientY)\n        }\n\n        const handleTouchMove = (ev: TouchEvent) => {\n            const touch = ev.touches[0]\n            updatePosition(touch.clientX, touch.clientY)\n        }\n\n        // Listen for both mouse and touch events\n        window.addEventListener(\"mousemove\", handleMouseMove)\n        window.addEventListener(\"touchmove\", handleTouchMove)\n\n        return () => {\n            window.removeEventListener(\"mousemove\", handleMouseMove)\n            window.removeEventListener(\"touchmove\", handleTouchMove)\n        }\n    }, [containerRef])\n\n    return position\n}\n"
+    },
+    {
+      "path": "lib/hover-context.tsx",
+      "type": "registry:lib",
+      "target": "lib/hover-context.tsx",
+      "content": "\"use client\";\n\nimport { createContext, useContext, useState } from \"react\";\n\ntype HoverContextType = {\n\thovered: string | null;\n\tsetHovered: (id: string | null) => void;\n\thovering: boolean;\n\tsetHovering: (value: boolean) => void;\n};\n\nconst HoverContext = createContext<HoverContextType | undefined>(undefined);\n\nexport function HoverProvider({ children }: { children: React.ReactNode }) {\n\tconst [hovered, setHovered] = useState<string | null>(\"about\");\n\tconst [hovering, setHovering] = useState<boolean>(false);\n\n\treturn (\n\t\t<HoverContext.Provider\n\t\t\tvalue={{ hovered, setHovered, hovering, setHovering }}\n\t\t>\n\t\t\t{children}\n\t\t</HoverContext.Provider>\n\t);\n}\n\nexport function useHover() {\n\tconst ctx = useContext(HoverContext);\n\tif (!ctx) throw new Error(\"useHover must be used within HoverProvider\");\n\treturn ctx;\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "auraui.vercel.app",
+      "url": "https://auraui.vercel.app/component/mask-cursor",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "hoverColor",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maskColor",
+        "type": "string",
+        "default": "\"#A5FECB\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hovered",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/cursor-mask"
+  }
+}

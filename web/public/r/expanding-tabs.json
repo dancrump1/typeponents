@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "expanding-tabs",
+  "type": "registry:ui",
+  "title": "Expanding Tabs",
+  "description": "Expanding Tabs",
+  "dependencies": [
+    "lucide-react",
+    "motion",
+    "usehooks-ts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/expanding-tabs.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/expanding-tabs.tsx",
+      "content": "\"use client\";\n\nimport React, { useRef, useState } from \"react\";\n\nimport { Bell, HelpCircle, Home, Settings, Shield } from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\nimport { useOnClickOutside } from \"usehooks-ts\";\n\n// Credit:\n// https://geist.vercel.app/docs/framer-motion/navigation/expandable-tabs\n\nexport default function ExpandableTabs() {\n\tconst [selected, setSelected] = useState<number | null>(null);\n\tconst outsideClickRef = useRef(null);\n\n\tuseOnClickOutside(outsideClickRef, () => setSelected(null));\n\n\tconst tabs = [\n\t\t{ title: \"Dashboard\", icon: <Home size={20} /> },\n\t\t{ title: \"Notifications\", icon: <Bell size={20} /> },\n\t\t{ type: \"separator\" },\n\t\t{ title: \"Settings\", icon: <Settings size={20} /> },\n\t\t{ title: \"Support\", icon: <HelpCircle size={20} /> },\n\t\t{ title: \"Security\", icon: <Shield size={20} /> },\n\t];\n\n\tconst buttonVariants = {\n\t\tinitial: {\n\t\t\tgap: 0,\n\t\t\tpaddingLeft: \".5rem\",\n\t\t\tpaddingRight: \".5rem\",\n\t\t},\n\t\tanimate: (isSelected: boolean) => ({\n\t\t\tgap: isSelected ? \".5rem\" : 0,\n\t\t\tpaddingLeft: isSelected ? \"1rem\" : \".5rem\",\n\t\t\tpaddingRight: isSelected ? \"1rem\" : \".5rem\",\n\t\t}),\n\t};\n\n\tconst spanVariants = {\n\t\tinitial: { width: 0, opacity: 0 },\n\t\tanimate: { width: \"auto\", opacity: 1 },\n\t\texit: { width: 0, opacity: 0 },\n\t};\n\n\tconst transition = { delay: 0.1, type: \"spring\", bounce: 0, duration: 0.6 };\n\n\tconst Separator = () => (\n\t\t<div\n\t\t\tclassName=\"mx-1 h-[24px] w-[1.2px] bg-background\"\n\t\t\taria-hidden=\"true\"\n\t\t/>\n\t);\n\n\treturn (\n\t\t<div className=\"mx-auto flex items-center justify-center\">\n\t\t\t<div\n\t\t\t\tref={outsideClickRef}\n\t\t\t\tclassName=\"mb-8 flex flex-wrap items-center gap-2 rounded-2xl border border-neutral-800 bg-background p-1 shadow-[0_6px_24px_rgba(34,42,53,0.12),0_0_0_1px_rgba(34,42,53,0.05),0_4px_8px_rgba(34,42,53,0.08),0_1px_1px_rgba(34,42,53,0.10)]\"\n\t\t\t>\n\t\t\t\t{tabs.map((tab, index) => {\n\t\t\t\t\tif (tab.type === \"separator\") {\n\t\t\t\t\t\treturn <Separator key={`separator-${index}`} />;\n\t\t\t\t\t}\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<motion.button\n\t\t\t\t\t\t\tkey={tab.title}\n\t\t\t\t\t\t\tvariants={buttonVariants}\n\t\t\t\t\t\t\tinitial={false}\n\t\t\t\t\t\t\tanimate=\"animate\"\n\t\t\t\t\t\t\tcustom={selected === index}\n\t\t\t\t\t\t\tonClick={() => setSelected(index)}\n\t\t\t\t\t\t\ttransition={transition}\n\t\t\t\t\t\t\tclassName={`${\n\t\t\t\t\t\t\t\tselected === index\n\t\t\t\t\t\t\t\t\t? \"bg-background text-opacity-100 [&]:text-foreground\"\n\t\t\t\t\t\t\t\t\t: \"hover:bg-background\"\n\t\t\t\t\t\t\t} relative flex items-center rounded-xl px-4 py-2 text-sm font-medium text-foreground transition-colors duration-300`}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{tab.icon}\n\t\t\t\t\t\t\t<AnimatePresence initial={false}>\n\t\t\t\t\t\t\t\t{selected === index && (\n\t\t\t\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\t\t\t\tvariants={spanVariants}\n\t\t\t\t\t\t\t\t\t\tinitial=\"initial\"\n\t\t\t\t\t\t\t\t\t\tanimate=\"animate\"\n\t\t\t\t\t\t\t\t\t\texit=\"exit\"\n\t\t\t\t\t\t\t\t\t\ttransition={transition}\n\t\t\t\t\t\t\t\t\t\tclassName=\"overflow-hidden\"\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t{tab.title}\n\t\t\t\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t</AnimatePresence>\n\t\t\t\t\t\t</motion.button>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "geist.vercel.app",
+      "url": "https://geist.vercel.app/docs/framer-motion/navigation/expandable-tabs",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/expanding-tabs"
+  }
+}

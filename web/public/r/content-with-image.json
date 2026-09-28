@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "content-with-image",
+  "type": "registry:ui",
+  "title": "Content With Image",
+  "description": "Two-column marketing section pairing a heading and paragraph with a full-height photo beside them.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/content-with-image.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/content-with-image.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nconst ContentWithImage = ({ image = {} }) => {\r\n\treturn (\r\n\t\t<div className=\"mx-auto max-w-(--breakpoint-xl) px-4 py-8 sm:px-6 lg:px-8\">\r\n\t\t\t<div className=\"grid grid-cols-1 gap-4 md:grid-cols-2 md:items-center md:gap-8\">\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<div className=\"max-w-lg md:max-w-none\">\r\n\t\t\t\t\t\t<h2 className=\"text-2xl font-semibold text-foreground sm:text-3xl\">\r\n\t\t\t\t\t\t\tLorem ipsum dolor sit amet consectetur adipisicing elit.\r\n\t\t\t\t\t\t</h2>\r\n\r\n\t\t\t\t\t\t<p className=\"mt-4 text-foreground\">\r\n\t\t\t\t\t\t\tLorem ipsum dolor sit amet consectetur adipisicing elit.\r\n\t\t\t\t\t\t\tTenetur doloremque saepe architecto maiores repudiandae\r\n\t\t\t\t\t\t\tamet perferendis repellendus, reprehenderit voluptas sequi.\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<Image\r\n\t\t\t\t\t\tkey={image.uid}\r\n\t\t\t\t\t\tclassName=\"cursor-target h-full w-full object-cover rounded\"\r\n\t\t\t\t\t\tsrc={\r\n\t\t\t\t\t\t\timage?.url ||\r\n\t\t\t\t\t\t\t\"https://images.unsplash.com/photo-1731690415686-e68f78e2b5bd?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\ttitle={image.alt}\r\n\t\t\t\t\t\talt={image.alt || image.title || \"cont-w/-img\"}\r\n\t\t\t\t\t\twidth={image.width || 1920}\r\n\t\t\t\t\t\theight={image.height || 1080}\r\n\t\t\t\t\t\tpriority\r\n\t\t\t\t\t\tloading=\"eager\"\r\n\t\t\t\t\t\tstyle={\r\n\t\t\t\t\t\t\timage.focalPoint\r\n\t\t\t\t\t\t\t\t? {\r\n\t\t\t\t\t\t\t\t\t\tobjectPosition: `${\r\n\t\t\t\t\t\t\t\t\t\t\timage.focalPoint[0] * 100\r\n\t\t\t\t\t\t\t\t\t\t}% ${image.focalPoint[1] * 100}%`,\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t: {}\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ContentWithImage;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [],
+    "interaction": "Static layout — the text and image sit side by side with no motion, and stack into a single column on narrow screens.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/content-with-image"
+  }
+}

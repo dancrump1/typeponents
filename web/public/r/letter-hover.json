@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "letter-hover",
+  "type": "registry:ui",
+  "title": "Letter Hover",
+  "description": "Letter Hover",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "random-letter-swap-hover"
+  ],
+  "files": [
+    {
+      "path": "components/ui/letter-hover.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/letter-hover.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\n\r\nimport {\r\n\tDynamicAnimationOptions,\r\n\tmotion,\r\n\tstagger,\r\n\tuseAnimate,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.fancycomponents.dev/docs/components/text/letter-swap\r\n\r\ninterface TextProps {\r\n\tlabel: string;\r\n\treverse?: boolean;\r\n\ttransition?: DynamicAnimationOptions;\r\n\tstaggerDuration?: number;\r\n\tstaggerFrom?: \"first\" | \"last\" | \"center\" | number;\r\n\tclassName?: string;\r\n\tonClick?: () => void;\r\n}\r\n\r\nconst LetterSwapForward = ({\r\n\tlabel,\r\n\treverse = true,\r\n\ttransition = {\r\n\t\ttype: \"spring\",\r\n\t\tduration: 0.7,\r\n\t},\r\n\tstaggerDuration = 0.03,\r\n\tstaggerFrom = \"first\",\r\n\tclassName,\r\n\tonClick,\r\n\t...props\r\n}: TextProps) => {\r\n\tconst [scope, animate] = useAnimate();\r\n\tconst [blocked, setBlocked] = useState(false);\r\n\r\n\tconst hoverStart = () => {\r\n\t\tif (blocked) return;\r\n\r\n\t\tsetBlocked(true);\r\n\r\n\t\t// Function to merge user transition with stagger and delay\r\n\t\tconst mergeTransition = (baseTransition: DynamicAnimationOptions) => ({\r\n\t\t\t...baseTransition,\r\n\t\t\tdelay: stagger(staggerDuration, {\r\n\t\t\t\tfrom: staggerFrom,\r\n\t\t\t}),\r\n\t\t});\r\n\r\n\t\tanimate(\r\n\t\t\t\".letter\",\r\n\t\t\t{ y: reverse ? \"100%\" : \"-100%\" },\r\n\t\t\tmergeTransition(transition)\r\n\t\t).then(() => {\r\n\t\t\tanimate(\r\n\t\t\t\t\".letter\",\r\n\t\t\t\t{\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\tduration: 0,\r\n\t\t\t\t}\r\n\t\t\t).then(() => {\r\n\t\t\t\tsetBlocked(false);\r\n\t\t\t});\r\n\t\t});\r\n\r\n\t\tanimate(\r\n\t\t\t\".letter-secondary\",\r\n\t\t\t{\r\n\t\t\t\ttop: \"0%\",\r\n\t\t\t},\r\n\t\t\tmergeTransition(transition)\r\n\t\t).then(() => {\r\n\t\t\tanimate(\r\n\t\t\t\t\".letter-secondary\",\r\n\t\t\t\t{\r\n\t\t\t\t\ttop: reverse ? \"-100%\" : \"100%\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\tduration: 0,\r\n\t\t\t\t}\r\n\t\t\t);\r\n\t\t});\r\n\t};\r\n\r\n\treturn (\r\n\t\t<span\r\n\t\t\tclassName={`flex justify-center items-center relative overflow-hidden  ${className} `}\r\n\t\t\tonMouseEnter={hoverStart}\r\n\t\t\tonClick={onClick}\r\n\t\t\tref={scope}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<span className=\"sr-only\">{label}</span>\r\n\r\n\t\t\t{label.split(\"\").map((letter: string, i: number) => {\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<span\r\n\t\t\t\t\t\tclassName=\"whitespace-pre relative flex\"\r\n\t\t\t\t\t\tkey={i + \"letter-hover\"}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.span className={`relative letter`} style={{ top: 0 }}>\r\n\t\t\t\t\t\t\t{letter}\r\n\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\tclassName=\"absolute letter-secondary \"\r\n\t\t\t\t\t\t\taria-hidden={true}\r\n\t\t\t\t\t\t\tstyle={{ top: reverse ? \"-100%\" : \"100%\" }}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{letter}\r\n\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t</span>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t</span>\r\n\t);\r\n};\r\n\r\nexport default LetterSwapForward;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/letter-swap",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "reverse",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "any",
+        "default": "{ type: \"spring\", duration: 0.7, }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "staggerDuration",
+        "type": "number",
+        "default": "0.03",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "staggerFrom",
+        "type": "number | \"first\" | \"last\" | \"center\"",
+        "default": "\"first\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/letter-hover"
+  }
+}

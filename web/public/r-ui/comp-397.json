@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-397",
+  "type": "registry:component",
+  "title": "Comp 397",
+  "description": "Comp 397",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-397.tsx",
+      "content": "import { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"relative\">\r\n\t\t\t<Avatar>\r\n\t\t\t\t<AvatarImage src=\"./avatar-80-07.jpg\" alt=\"Kelly King\" />\r\n\t\t\t\t<AvatarFallback>KK</AvatarFallback>\r\n\t\t\t</Avatar>\r\n\t\t\t<span className=\"absolute -inset-e-1.5 -top-1.5\">\r\n\t\t\t\t<span className=\"sr-only\">Verified</span>\r\n\t\t\t\t<svg\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\twidth=\"20\"\r\n\t\t\t\t\theight=\"20\"\r\n\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\tclassName=\"fill-background\"\r\n\t\t\t\t\t\td=\"M3.046 8.277A4.402 4.402 0 0 1 8.303 3.03a4.4 4.4 0 0 1 7.411 0 4.397 4.397 0 0 1 5.19 3.068c.207.713.23 1.466.067 2.19a4.4 4.4 0 0 1 0 7.415 4.403 4.403 0 0 1-3.06 5.187 4.398 4.398 0 0 1-2.186.072 4.398 4.398 0 0 1-7.422 0 4.398 4.398 0 0 1-5.257-5.248 4.4 4.4 0 0 1 0-7.437Z\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\tclassName=\"fill-primary\"\r\n\t\t\t\t\t\td=\"M4.674 8.954a3.602 3.602 0 0 1 4.301-4.293 3.6 3.6 0 0 1 6.064 0 3.598 3.598 0 0 1 4.3 4.302 3.6 3.6 0 0 1 0 6.067 3.6 3.6 0 0 1-4.29 4.302 3.6 3.6 0 0 1-6.074 0 3.598 3.598 0 0 1-4.3-4.293 3.6 3.6 0 0 1 0-6.085Z\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\tclassName=\"fill-background\"\r\n\t\t\t\t\t\td=\"M15.707 9.293a1 1 0 0 1 0 1.414l-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 1 1 1.414-1.414L11 12.586l3.293-3.293a1 1 0 0 1 1.414 0Z\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</svg>\r\n\t\t\t</span>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/avatar.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as AvatarPrimitive from \"@radix-ui/react-avatar\";\r\n\r\nconst Avatar = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Root\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatar.displayName = AvatarPrimitive.Root.displayName;\r\n\r\nconst AvatarImage = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Image>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Image\r\n\t\tref={ref}\r\n\t\tclassName={cn(\"aspect-square h-full w-full\", className)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatarImage.displayName = AvatarPrimitive.Image.displayName;\r\n\r\nconst AvatarFallback = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Fallback>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Fallback\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"flex h-full w-full items-center justify-center rounded-full bg-muted\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;\r\n\r\nexport { Avatar, AvatarImage, AvatarFallback };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

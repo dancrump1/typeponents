@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "glowing-effect",
+  "type": "registry:ui",
+  "title": "Glowing Effect",
+  "description": "Multicoloured glow that traces the border of whatever card or panel it is dropped into.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/glowing-effect.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/glowing-effect.tsx",
+      "content": "\"use client\";\n\nimport { memo, useCallback, useEffect, useRef } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { animate } from \"motion/react\";\n\n// Credit:\n// https://ui.aceternity.com/components/glowing-effect\n\ninterface GlowingEffectProps {\n\tblur?: number;\n\tinactiveZone?: number;\n\tproximity?: number;\n\tspread?: number;\n\tvariant?: \"default\" | \"white\";\n\tglow?: boolean;\n\tclassName?: string;\n\tdisabled?: boolean;\n\tmovementDuration?: number;\n\tborderWidth?: number;\n}\nconst GlowingEffect = memo(\n\t({\n\t\tblur = 0,\n\t\tinactiveZone = 0.7,\n\t\tproximity = 0,\n\t\tspread = 20,\n\t\tvariant = \"default\",\n\t\tglow = false,\n\t\tclassName,\n\t\tmovementDuration = 2,\n\t\tborderWidth = 1,\n\t\tdisabled = true,\n\t}: GlowingEffectProps) => {\n\t\tconst containerRef = useRef<HTMLDivElement>(null);\n\t\tconst lastPosition = useRef({ x: 0, y: 0 });\n\t\tconst animationFrameRef = useRef<number>(0);\n\n\t\tconst handleMove = useCallback(\n\t\t\t(e?: MouseEvent | { x: number; y: number }) => {\n\t\t\t\tif (!containerRef.current) return;\n\n\t\t\t\tif (animationFrameRef.current) {\n\t\t\t\t\tcancelAnimationFrame(animationFrameRef.current);\n\t\t\t\t}\n\n\t\t\t\tanimationFrameRef.current = requestAnimationFrame(() => {\n\t\t\t\t\tconst element = containerRef.current;\n\t\t\t\t\tif (!element) return;\n\n\t\t\t\t\tconst { left, top, width, height } =\n\t\t\t\t\t\telement.getBoundingClientRect();\n\t\t\t\t\tconst mouseX = e?.x ?? lastPosition.current.x;\n\t\t\t\t\tconst mouseY = e?.y ?? lastPosition.current.y;\n\n\t\t\t\t\tif (e) {\n\t\t\t\t\t\tlastPosition.current = { x: mouseX, y: mouseY };\n\t\t\t\t\t}\n\n\t\t\t\t\tconst center = [left + width * 0.5, top + height * 0.5];\n\t\t\t\t\tconst distanceFromCenter = Math.hypot(\n\t\t\t\t\t\tmouseX - center[0],\n\t\t\t\t\t\tmouseY - center[1]\n\t\t\t\t\t);\n\t\t\t\t\tconst inactiveRadius =\n\t\t\t\t\t\t0.5 * Math.min(width, height) * inactiveZone;\n\n\t\t\t\t\tif (distanceFromCenter < inactiveRadius) {\n\t\t\t\t\t\telement.style.setProperty(\"--active\", \"0\");\n\t\t\t\t\t\treturn;\n\t\t\t\t\t}\n\n\t\t\t\t\tconst isActive =\n\t\t\t\t\t\tmouseX > left - proximity &&\n\t\t\t\t\t\tmouseX < left + width + proximity &&\n\t\t\t\t\t\tmouseY > top - proximity &&\n\t\t\t\t\t\tmouseY < top + height + proximity;\n\n\t\t\t\t\telement.style.setProperty(\"--active\", isActive ? \"1\" : \"0\");\n\n\t\t\t\t\tif (!isActive) return;\n\n\t\t\t\t\tconst currentAngle =\n\t\t\t\t\t\tparseFloat(element.style.getPropertyValue(\"--start\")) || 0;\n\t\t\t\t\tlet targetAngle =\n\t\t\t\t\t\t(180 * Math.atan2(mouseY - center[1], mouseX - center[0])) /\n\t\t\t\t\t\t\tMath.PI +\n\t\t\t\t\t\t90;\n\n\t\t\t\t\tconst angleDiff =\n\t\t\t\t\t\t((targetAngle - currentAngle + 180) % 360) - 180;\n\t\t\t\t\tconst newAngle = currentAngle + angleDiff;\n\n\t\t\t\t\tanimate(currentAngle, newAngle, {\n\t\t\t\t\t\tduration: movementDuration,\n\t\t\t\t\t\tease: [0.16, 1, 0.3, 1],\n\t\t\t\t\t\tonUpdate: (value) => {\n\t\t\t\t\t\t\telement.style.setProperty(\"--start\", String(value));\n\t\t\t\t\t\t},\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t\t},\n\t\t\t[inactiveZone, proximity, movementDuration]\n\t\t);\n\n\t\tuseEffect(() => {\n\t\t\tif (disabled) return;\n\n\t\t\tconst handleScroll = () => handleMove();\n\t\t\tconst handlePointerMove = (e: PointerEvent) => handleMove(e);\n\n\t\t\twindow.addEventListener(\"scroll\", handleScroll, { passive: true });\n\t\t\tdocument.body.addEventListener(\"pointermove\", handlePointerMove, {\n\t\t\t\tpassive: true,\n\t\t\t});\n\n\t\t\treturn () => {\n\t\t\t\tif (animationFrameRef.current) {\n\t\t\t\t\tcancelAnimationFrame(animationFrameRef.current);\n\t\t\t\t}\n\t\t\t\twindow.removeEventListener(\"scroll\", handleScroll);\n\t\t\t\tdocument.body.removeEventListener(\"pointermove\", handlePointerMove);\n\t\t\t};\n\t\t}, [handleMove, disabled]);\n\n\t\treturn (\n\t\t\t<>\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"pointer-events-none absolute -inset-px hidden rounded-[inherit] border opacity-0 transition-opacity\",\n\t\t\t\t\t\tglow && \"opacity-100\",\n\t\t\t\t\t\tvariant === \"white\" && \"border-white\",\n\t\t\t\t\t\tdisabled && \"block!\"\n\t\t\t\t\t)}\n\t\t\t\t/>\n\t\t\t\t<div\n\t\t\t\t\tref={containerRef}\n\t\t\t\t\tstyle={\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\"--blur\": `${blur}px`,\n\t\t\t\t\t\t\t\"--spread\": spread,\n\t\t\t\t\t\t\t\"--start\": \"0\",\n\t\t\t\t\t\t\t\"--active\": \"0\",\n\t\t\t\t\t\t\t\"--glowingeffect-border-width\": `${borderWidth}px`,\n\t\t\t\t\t\t\t\"--repeating-conic-gradient-times\": \"5\",\n\t\t\t\t\t\t\t\"--gradient\":\n\t\t\t\t\t\t\t\tvariant === \"white\"\n\t\t\t\t\t\t\t\t\t? `repeating-conic-gradient(\n                  from 236.84deg at 50% 50%,\n                  var(--black),\n                  var(--black) calc(25% / var(--repeating-conic-gradient-times))\n                )`\n\t\t\t\t\t\t\t\t\t: `radial-gradient(circle, #dd7bbb 10%, #dd7bbb00 20%),\n                radial-gradient(circle at 40% 40%, #d79f1e 5%, #d79f1e00 15%),\n                radial-gradient(circle at 60% 60%, #5a922c 10%, #5a922c00 20%), \n                radial-gradient(circle at 40% 60%, #4c7894 10%, #4c789400 20%),\n                repeating-conic-gradient(\n                  from 236.84deg at 50% 50%,\n                  #dd7bbb 0%,\n                  #d79f1e calc(25% / var(--repeating-conic-gradient-times)),\n                  #5a922c calc(50% / var(--repeating-conic-gradient-times)), \n                  #4c7894 calc(75% / var(--repeating-conic-gradient-times)),\n                  #dd7bbb calc(100% / var(--repeating-conic-gradient-times))\n                )`,\n\t\t\t\t\t\t} as React.CSSProperties\n\t\t\t\t\t}\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity\",\n\t\t\t\t\t\tglow && \"opacity-100\",\n\t\t\t\t\t\tblur > 0 && \"blur-(--blur) \",\n\t\t\t\t\t\tclassName,\n\t\t\t\t\t\tdisabled && \"hidden!\"\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\"glow\",\n\t\t\t\t\t\t\t\"rounded-[inherit]\",\n\t\t\t\t\t\t\t'after:content-[\"\"] after:rounded-[inherit] after:absolute after:inset-[calc(-1*var(--glowingeffect-border-width))]',\n\t\t\t\t\t\t\t\"after:[border:var(--glowingeffect-border-width)_solid_transparent]\",\n\t\t\t\t\t\t\t\"after:[background:var(--gradient)] after:bg-fixed\",\n\t\t\t\t\t\t\t\"after:opacity-(--active) after:transition-opacity after:duration-300\",\n\t\t\t\t\t\t\t\"after:[mask-clip:padding-box,border-box]\",\n\t\t\t\t\t\t\t\"after:mask-intersect\",\n\t\t\t\t\t\t\t\"after:mask-[linear-gradient(#0000,#0000),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#00000000_0deg,#fff,#00000000_calc(var(--spread)*2deg))]\"\n\t\t\t\t\t\t)}\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t</>\n\t\t);\n\t}\n);\n\nGlowingEffect.displayName = \"GlowingEffect\";\n\nexport { GlowingEffect };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "As the pointer approaches the element, a bright arc fades in along the border and swings around to face the cursor, trailing it as it moves. It fades out when the pointer drifts away or settles in the middle.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/glowing-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/glowing-effect"
+  }
+}

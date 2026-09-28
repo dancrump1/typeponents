@@ -1,0 +1,140 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "light-rays",
+  "type": "registry:ui",
+  "title": "Light Rays",
+  "description": "Light Rays",
+  "dependencies": [
+    "ogl"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/light-rays.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/light-rays.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\n\nimport { Mesh, Program, Renderer, Triangle } from \"ogl\";\n\n// Credit:\n// https://www.reactbits.dev/backgrounds/light-rays\n\nexport type RaysOrigin =\n\t| \"top-center\"\n\t| \"top-left\"\n\t| \"top-right\"\n\t| \"right\"\n\t| \"left\"\n\t| \"bottom-center\"\n\t| \"bottom-right\"\n\t| \"bottom-left\";\n\ninterface LightRaysProps {\n\traysOrigin?: RaysOrigin;\n\traysColor?: string;\n\traysSpeed?: number;\n\tlightSpread?: number;\n\trayLength?: number;\n\tpulsating?: boolean;\n\tfadeDistance?: number;\n\tsaturation?: number;\n\tfollowMouse?: boolean;\n\tmouseInfluence?: number;\n\tnoiseAmount?: number;\n\tdistortion?: number;\n\tclassName?: string;\n}\n\nconst DEFAULT_COLOR = \"#ffffff\";\n\nconst hexToRgb = (hex: string): [number, number, number] => {\n\tconst m = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);\n\treturn m\n\t\t? [\n\t\t\t\tparseInt(m[1], 16) / 255,\n\t\t\t\tparseInt(m[2], 16) / 255,\n\t\t\t\tparseInt(m[3], 16) / 255,\n\t\t\t]\n\t\t: [1, 1, 1];\n};\n\nconst getAnchorAndDir = (\n\torigin: RaysOrigin,\n\tw: number,\n\th: number\n): { anchor: [number, number]; dir: [number, number] } => {\n\tconst outside = 0.2;\n\tswitch (origin) {\n\t\tcase \"top-left\":\n\t\t\treturn { anchor: [0, -outside * h], dir: [0, 1] };\n\t\tcase \"top-right\":\n\t\t\treturn { anchor: [w, -outside * h], dir: [0, 1] };\n\t\tcase \"left\":\n\t\t\treturn { anchor: [-outside * w, 0.5 * h], dir: [1, 0] };\n\t\tcase \"right\":\n\t\t\treturn { anchor: [(1 + outside) * w, 0.5 * h], dir: [-1, 0] };\n\t\tcase \"bottom-left\":\n\t\t\treturn { anchor: [0, (1 + outside) * h], dir: [0, -1] };\n\t\tcase \"bottom-center\":\n\t\t\treturn { anchor: [0.5 * w, (1 + outside) * h], dir: [0, -1] };\n\t\tcase \"bottom-right\":\n\t\t\treturn { anchor: [w, (1 + outside) * h], dir: [0, -1] };\n\t\tdefault: // \"top-center\"\n\t\t\treturn { anchor: [0.5 * w, -outside * h], dir: [0, 1] };\n\t}\n};\n\nconst LightRays: React.FC<LightRaysProps> = ({\n\traysOrigin = \"top-center\",\n\traysColor = DEFAULT_COLOR,\n\traysSpeed = 1,\n\tlightSpread = 1,\n\trayLength = 2,\n\tpulsating = false,\n\tfadeDistance = 1.0,\n\tsaturation = 1.0,\n\tfollowMouse = true,\n\tmouseInfluence = 0.1,\n\tnoiseAmount = 0.0,\n\tdistortion = 0.0,\n\tclassName = \"\",\n}) => {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst uniformsRef = useRef<any>(null);\n\tconst rendererRef = useRef<Renderer | null>(null);\n\tconst mouseRef = useRef({ x: 0.5, y: 0.5 });\n\tconst smoothMouseRef = useRef({ x: 0.5, y: 0.5 });\n\tconst animationIdRef = useRef<number | null>(null);\n\tconst meshRef = useRef<any>(null);\n\tconst cleanupFunctionRef = useRef<(() => void) | null>(null);\n\tconst [isVisible, setIsVisible] = useState(false);\n\tconst observerRef = useRef<IntersectionObserver | null>(null);\n\n\tuseEffect(() => {\n\t\tif (!containerRef.current) return;\n\n\t\tobserverRef.current = new IntersectionObserver(\n\t\t\t(entries) => {\n\t\t\t\tconst entry = entries[0];\n\t\t\t\tsetIsVisible(entry.isIntersecting);\n\t\t\t},\n\t\t\t{ threshold: 0.1 }\n\t\t);\n\n\t\tobserverRef.current.observe(containerRef.current);\n\n\t\treturn () => {\n\t\t\tif (observerRef.current) {\n\t\t\t\tobserverRef.current.disconnect();\n\t\t\t\tobserverRef.current = null;\n\t\t\t}\n\t\t};\n\t}, []);\n\n\tuseEffect(() => {\n\t\tif (!isVisible || !containerRef.current) return;\n\n\t\tif (cleanupFunctionRef.current) {\n\t\t\tcleanupFunctionRef.current();\n\t\t\tcleanupFunctionRef.current = null;\n\t\t}\n\n\t\tconst initializeWebGL = async () => {\n\t\t\tif (!containerRef.current) return;\n\n\t\t\tawait new Promise((resolve) => setTimeout(resolve, 10));\n\n\t\t\tif (!containerRef.current) return;\n\n\t\t\tconst renderer = new Renderer({\n\t\t\t\tdpr: Math.min(window.devicePixelRatio, 2),\n\t\t\t\talpha: true,\n\t\t\t});\n\t\t\trendererRef.current = renderer;\n\n\t\t\tconst gl = renderer.gl;\n\t\t\tgl.canvas.style.width = \"100%\";\n\t\t\tgl.canvas.style.height = \"100%\";\n\n\t\t\twhile (containerRef.current.firstChild) {\n\t\t\t\tcontainerRef.current.removeChild(containerRef.current.firstChild);\n\t\t\t}\n\t\t\tcontainerRef.current.appendChild(gl.canvas);\n\n\t\t\tconst vert = `\nattribute vec2 position;\nvarying vec2 vUv;\nvoid main() {\n  vUv = position * 0.5 + 0.5;\n  gl_Position = vec4(position, 0.0, 1.0);\n}`;\n\n\t\t\tconst frag = `precision highp float;\n\nuniform float iTime;\nuniform vec2  iResolution;\n\nuniform vec2  rayPos;\nuniform vec2  rayDir;\nuniform vec3  raysColor;\nuniform float raysSpeed;\nuniform float lightSpread;\nuniform float rayLength;\nuniform float pulsating;\nuniform float fadeDistance;\nuniform float saturation;\nuniform vec2  mousePos;\nuniform float mouseInfluence;\nuniform float noiseAmount;\nuniform float distortion;\n\nvarying vec2 vUv;\n\nfloat noise(vec2 st) {\n  return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);\n}\n\nfloat rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord,\n                  float seedA, float seedB, float speed) {\n  vec2 sourceToCoord = coord - raySource;\n  vec2 dirNorm = normalize(sourceToCoord);\n  float cosAngle = dot(dirNorm, rayRefDirection);\n\n  float distortedAngle = cosAngle + distortion * sin(iTime * 2.0 + length(sourceToCoord) * 0.01) * 0.2;\n  \n  float spreadFactor = pow(max(distortedAngle, 0.0), 1.0 / max(lightSpread, 0.001));\n\n  float distance = length(sourceToCoord);\n  float maxDistance = iResolution.x * rayLength;\n  float lengthFalloff = clamp((maxDistance - distance) / maxDistance, 0.0, 1.0);\n  \n  float fadeFalloff = clamp((iResolution.x * fadeDistance - distance) / (iResolution.x * fadeDistance), 0.5, 1.0);\n  float pulse = pulsating > 0.5 ? (0.8 + 0.2 * sin(iTime * speed * 3.0)) : 1.0;\n\n  float baseStrength = clamp(\n    (0.45 + 0.15 * sin(distortedAngle * seedA + iTime * speed)) +\n    (0.3 + 0.2 * cos(-distortedAngle * seedB + iTime * speed)),\n    0.0, 1.0\n  );\n\n  return baseStrength * lengthFalloff * fadeFalloff * spreadFactor * pulse;\n}\n\nvoid mainImage(out vec4 fragColor, in vec2 fragCoord) {\n  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);\n  \n  vec2 finalRayDir = rayDir;\n  if (mouseInfluence > 0.0) {\n    vec2 mouseScreenPos = mousePos * iResolution.xy;\n    vec2 mouseDirection = normalize(mouseScreenPos - rayPos);\n    finalRayDir = normalize(mix(rayDir, mouseDirection, mouseInfluence));\n  }\n\n  vec4 rays1 = vec4(1.0) *\n               rayStrength(rayPos, finalRayDir, coord, 36.2214, 21.11349,\n                           1.5 * raysSpeed);\n  vec4 rays2 = vec4(1.0) *\n               rayStrength(rayPos, finalRayDir, coord, 22.3991, 18.0234,\n                           1.1 * raysSpeed);\n\n  fragColor = rays1 * 0.5 + rays2 * 0.4;\n\n  if (noiseAmount > 0.0) {\n    float n = noise(coord * 0.01 + iTime * 0.1);\n    fragColor.rgb *= (1.0 - noiseAmount + noiseAmount * n);\n  }\n\n  float brightness = 1.0 - (coord.y / iResolution.y);\n  fragColor.x *= 0.1 + brightness * 0.8;\n  fragColor.y *= 0.3 + brightness * 0.6;\n  fragColor.z *= 0.5 + brightness * 0.5;\n\n  if (saturation != 1.0) {\n    float gray = dot(fragColor.rgb, vec3(0.299, 0.587, 0.114));\n    fragColor.rgb = mix(vec3(gray), fragColor.rgb, saturation);\n  }\n\n  fragColor.rgb *= raysColor;\n}\n\nvoid main() {\n  vec4 color;\n  mainImage(color, gl_FragCoord.xy);\n  gl_FragColor  = color;\n}`;\n\n\t\t\tconst uniforms = {\n\t\t\t\tiTime: { value: 0 },\n\t\t\t\tiResolution: { value: [1, 1] },\n\n\t\t\t\trayPos: { value: [0, 0] },\n\t\t\t\trayDir: { value: [0, 1] },\n\n\t\t\t\traysColor: { value: hexToRgb(raysColor) },\n\t\t\t\traysSpeed: { value: raysSpeed },\n\t\t\t\tlightSpread: { value: lightSpread },\n\t\t\t\trayLength: { value: rayLength },\n\t\t\t\tpulsating: { value: pulsating ? 1.0 : 0.0 },\n\t\t\t\tfadeDistance: { value: fadeDistance },\n\t\t\t\tsaturation: { value: saturation },\n\t\t\t\tmousePos: { value: [0.5, 0.5] },\n\t\t\t\tmouseInfluence: { value: mouseInfluence },\n\t\t\t\tnoiseAmount: { value: noiseAmount },\n\t\t\t\tdistortion: { value: distortion },\n\t\t\t};\n\t\t\tuniformsRef.current = uniforms;\n\n\t\t\tconst geometry = new Triangle(gl);\n\t\t\tconst program = new Program(gl, {\n\t\t\t\tvertex: vert,\n\t\t\t\tfragment: frag,\n\t\t\t\tuniforms,\n\t\t\t});\n\t\t\tconst mesh = new Mesh(gl, { geometry, program });\n\t\t\tmeshRef.current = mesh;\n\n\t\t\tconst updatePlacement = () => {\n\t\t\t\tif (!containerRef.current || !renderer) return;\n\n\t\t\t\trenderer.dpr = Math.min(window.devicePixelRatio, 2);\n\n\t\t\t\tconst { clientWidth: wCSS, clientHeight: hCSS } =\n\t\t\t\t\tcontainerRef.current;\n\t\t\t\trenderer.setSize(wCSS, hCSS);\n\n\t\t\t\tconst dpr = renderer.dpr;\n\t\t\t\tconst w = wCSS * dpr;\n\t\t\t\tconst h = hCSS * dpr;\n\n\t\t\t\tuniforms.iResolution.value = [w, h];\n\n\t\t\t\tconst { anchor, dir } = getAnchorAndDir(raysOrigin, w, h);\n\t\t\t\tuniforms.rayPos.value = anchor;\n\t\t\t\tuniforms.rayDir.value = dir;\n\t\t\t};\n\n\t\t\tconst loop = (t: number) => {\n\t\t\t\tif (\n\t\t\t\t\t!rendererRef.current ||\n\t\t\t\t\t!uniformsRef.current ||\n\t\t\t\t\t!meshRef.current\n\t\t\t\t) {\n\t\t\t\t\treturn;\n\t\t\t\t}\n\n\t\t\t\tuniforms.iTime.value = t * 0.001;\n\n\t\t\t\tif (followMouse && mouseInfluence > 0.0) {\n\t\t\t\t\tconst smoothing = 0.92;\n\n\t\t\t\t\tsmoothMouseRef.current.x =\n\t\t\t\t\t\tsmoothMouseRef.current.x * smoothing +\n\t\t\t\t\t\tmouseRef.current.x * (1 - smoothing);\n\t\t\t\t\tsmoothMouseRef.current.y =\n\t\t\t\t\t\tsmoothMouseRef.current.y * smoothing +\n\t\t\t\t\t\tmouseRef.current.y * (1 - smoothing);\n\n\t\t\t\t\tuniforms.mousePos.value = [\n\t\t\t\t\t\tsmoothMouseRef.current.x,\n\t\t\t\t\t\tsmoothMouseRef.current.y,\n\t\t\t\t\t];\n\t\t\t\t}\n\n\t\t\t\ttry {\n\t\t\t\t\trenderer.render({ scene: mesh });\n\t\t\t\t\tanimationIdRef.current = requestAnimationFrame(loop);\n\t\t\t\t} catch (error) {\n\t\t\t\t\tconsole.warn(\"WebGL rendering error:\", error);\n\t\t\t\t\treturn;\n\t\t\t\t}\n\t\t\t};\n\n\t\t\twindow.addEventListener(\"resize\", updatePlacement);\n\t\t\tupdatePlacement();\n\t\t\tanimationIdRef.current = requestAnimationFrame(loop);\n\n\t\t\tcleanupFunctionRef.current = () => {\n\t\t\t\tif (animationIdRef.current) {\n\t\t\t\t\tcancelAnimationFrame(animationIdRef.current);\n\t\t\t\t\tanimationIdRef.current = null;\n\t\t\t\t}\n\n\t\t\t\twindow.removeEventListener(\"resize\", updatePlacement);\n\n\t\t\t\tif (renderer) {\n\t\t\t\t\ttry {\n\t\t\t\t\t\tconst canvas = renderer.gl.canvas;\n\t\t\t\t\t\tconst loseContextExt =\n\t\t\t\t\t\t\trenderer.gl.getExtension(\"WEBGL_lose_context\");\n\t\t\t\t\t\tif (loseContextExt) {\n\t\t\t\t\t\t\tloseContextExt.loseContext();\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tif (canvas && canvas.parentNode) {\n\t\t\t\t\t\t\tcanvas.parentNode.removeChild(canvas);\n\t\t\t\t\t\t}\n\t\t\t\t\t} catch (error) {\n\t\t\t\t\t\tconsole.warn(\"Error during WebGL cleanup:\", error);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\trendererRef.current = null;\n\t\t\t\tuniformsRef.current = null;\n\t\t\t\tmeshRef.current = null;\n\t\t\t};\n\t\t};\n\n\t\tinitializeWebGL();\n\n\t\treturn () => {\n\t\t\tif (cleanupFunctionRef.current) {\n\t\t\t\tcleanupFunctionRef.current();\n\t\t\t\tcleanupFunctionRef.current = null;\n\t\t\t}\n\t\t};\n\t}, [\n\t\tisVisible,\n\t\traysOrigin,\n\t\traysColor,\n\t\traysSpeed,\n\t\tlightSpread,\n\t\trayLength,\n\t\tpulsating,\n\t\tfadeDistance,\n\t\tsaturation,\n\t\tfollowMouse,\n\t\tmouseInfluence,\n\t\tnoiseAmount,\n\t\tdistortion,\n\t]);\n\n\tuseEffect(() => {\n\t\tif (!uniformsRef.current || !containerRef.current || !rendererRef.current)\n\t\t\treturn;\n\n\t\tconst u = uniformsRef.current;\n\t\tconst renderer = rendererRef.current;\n\n\t\tu.raysColor.value = hexToRgb(raysColor);\n\t\tu.raysSpeed.value = raysSpeed;\n\t\tu.lightSpread.value = lightSpread;\n\t\tu.rayLength.value = rayLength;\n\t\tu.pulsating.value = pulsating ? 1.0 : 0.0;\n\t\tu.fadeDistance.value = fadeDistance;\n\t\tu.saturation.value = saturation;\n\t\tu.mouseInfluence.value = mouseInfluence;\n\t\tu.noiseAmount.value = noiseAmount;\n\t\tu.distortion.value = distortion;\n\n\t\tconst { clientWidth: wCSS, clientHeight: hCSS } = containerRef.current;\n\t\tconst dpr = renderer.dpr;\n\t\tconst { anchor, dir } = getAnchorAndDir(\n\t\t\traysOrigin,\n\t\t\twCSS * dpr,\n\t\t\thCSS * dpr\n\t\t);\n\t\tu.rayPos.value = anchor;\n\t\tu.rayDir.value = dir;\n\t}, [\n\t\traysColor,\n\t\traysSpeed,\n\t\tlightSpread,\n\t\traysOrigin,\n\t\trayLength,\n\t\tpulsating,\n\t\tfadeDistance,\n\t\tsaturation,\n\t\tmouseInfluence,\n\t\tnoiseAmount,\n\t\tdistortion,\n\t]);\n\n\tuseEffect(() => {\n\t\tconst handleMouseMove = (e: MouseEvent) => {\n\t\t\tif (!containerRef.current || !rendererRef.current) return;\n\t\t\tconst rect = containerRef.current.getBoundingClientRect();\n\t\t\tconst x = (e.clientX - rect.left) / rect.width;\n\t\t\tconst y = (e.clientY - rect.top) / rect.height;\n\t\t\tmouseRef.current = { x, y };\n\t\t};\n\n\t\tif (followMouse) {\n\t\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\n\t\t\treturn () => window.removeEventListener(\"mousemove\", handleMouseMove);\n\t\t}\n\t}, [followMouse]);\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName={`w-full h-full pointer-events-none z-3 overflow-hidden relative ${className}`.trim()}\n\t\t/>\n\t);\n};\n\nexport default LightRays;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "scroll-driven",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/backgrounds/light-rays",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "raysOrigin",
+        "type": "RaysOrigin",
+        "default": "\"top-center\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "raysColor",
+        "type": "string",
+        "default": "DEFAULT_COLOR",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "raysSpeed",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "lightSpread",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rayLength",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pulsating",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fadeDistance",
+        "type": "number",
+        "default": "1.0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "saturation",
+        "type": "number",
+        "default": "1.0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "followMouse",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mouseInfluence",
+        "type": "number",
+        "default": "0.1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "noiseAmount",
+        "type": "number",
+        "default": "0.0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distortion",
+        "type": "number",
+        "default": "0.0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/light-rays"
+  }
+}

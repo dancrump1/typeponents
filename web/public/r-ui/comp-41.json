@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-41",
+  "type": "registry:component",
+  "title": "Comp 41",
+  "description": "Comp 41",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-41.tsx",
+      "content": "\"use client\";\r\n\r\nimport { CalendarIcon } from \"lucide-react\";\r\nimport {\r\n\tButton,\r\n\tCalendar,\r\n\tDateInput,\r\n\tDatePicker,\r\n\tDateSegment,\r\n\tDialog,\r\n\tGroup,\r\n\tLabel,\r\n\tPopover,\r\n} from \"react-aria-components\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<DatePicker className=\"not-first:*:mt-2\">\r\n\t\t\t<Label className=\"text-foreground text-sm font-medium\">\r\n\t\t\t\tDate picker\r\n\t\t\t</Label>\r\n\t\t\t<div className=\"flex\">\r\n\t\t\t\t<Group className=\"w-full\">\r\n\t\t\t\t\t<DateInput>\r\n\t\t\t\t\t\t{(segment) => <DateSegment segment={segment} />}\r\n\t\t\t\t\t</DateInput>{\" \"}\r\n\t\t\t\t</Group>\r\n\t\t\t\t<Button className=\"text-muted-foreground/80 hover:text-foreground data-focus-visible:border-ring data-focus-visible:ring-ring/50 z-10 -ms-9 -me-px flex w-9 items-center justify-center rounded-e-md transition-[color,box-shadow] outline-hidden data-focus-visible:ring-[3px]\">\r\n\t\t\t\t\t<CalendarIcon size={16} />\r\n\t\t\t\t</Button>\r\n\t\t\t</div>\r\n\t\t\t<Popover\r\n\t\t\t\tclassName=\"bg-background text-popover-foreground data-entering:animate-in data-exiting:animate-out data-entering:fade-in-0 data-exiting:fade-out-0 data-entering:zoom-in-95 data-exiting:zoom-out-95 data-[placement=bottom]:slide-in-from-top-2 data-[placement=left]:slide-in-from-right-2 data-[placement=right]:slide-in-from-left-2 data-[placement=top]:slide-in-from-bottom-2 z-50 rounded-lg border shadow-lg outline-hidden\"\r\n\t\t\t\toffset={4}\r\n\t\t\t>\r\n\t\t\t\t<Dialog className=\"max-h-[inherit] overflow-auto p-2\">\r\n\t\t\t\t\t<Calendar />\r\n\t\t\t\t</Dialog>\r\n\t\t\t</Popover>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tBuilt with{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\thref=\"https://react-spectrum.adobe.com/react-aria/DatePicker.html\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener nofollow\"\r\n\t\t\t\t>\r\n\t\t\t\t\tReact Aria\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</DatePicker>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

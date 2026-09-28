@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "btn08",
+  "type": "registry:ui",
+  "title": "Btn08",
+  "description": "Share button that trades itself for a row of social icons in the same footprint.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/btn08.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/btn08.tsx",
+      "content": "// Credit:\n// https://kokonutui.com/docs/components/button#button---share\n\nimport { useState } from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\nimport { Facebook, Link, Linkedin, Twitter } from \"lucide-react\";\n\nexport function Btn08({\n\tclassName,\n\t...props\n}: React.ButtonHTMLAttributes<HTMLButtonElement>) {\n\tconst [isHovered, setIsHovered] = useState(false);\n\tconst shareButtons = [\n\t\t{ icon: Twitter },\n\t\t{ icon: Facebook },\n\t\t{ icon: Linkedin },\n\t\t{ icon: Link },\n\t];\n\n\treturn (\n\t\t<div\n\t\t\tclassName=\"relative\"\n\t\t\tonMouseEnter={() => setIsHovered(true)}\n\t\t\tonMouseLeave={() => setIsHovered(false)}\n\t\t>\n\t\t\t<Button\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"min-w-40 relative\",\n\t\t\t\t\t\"bg-background dark:bg-background\",\n\t\t\t\t\t\"hover:bg-background dark:hover:bg-background\",\n\t\t\t\t\t\"text-foreground dark:text-foreground\",\n\t\t\t\t\t\"border border-black/10 dark:border-white/10\",\n\t\t\t\t\t\"transition-[background-color] duration-300\",\n\t\t\t\t\tisHovered ? \"opacity-0\" : \"opacity-100\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t<span className=\"flex items-center gap-2\">\n\t\t\t\t\t<Link className=\"w-4 h-4\" />\n\t\t\t\t\tShare\n\t\t\t\t</span>\n\t\t\t</Button>\n\n\t\t\t<div className=\"absolute top-0 left-0 flex h-10\">\n\t\t\t\t{shareButtons.map((button, index) => (\n\t\t\t\t\t<button\n\t\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t\tkey={index + \"button8\"}\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\"h-10\",\n\t\t\t\t\t\t\t\"w-10\",\n\t\t\t\t\t\t\t\"flex items-center justify-center\",\n\t\t\t\t\t\t\t\"bg-background dark:bg-background\",\n\t\t\t\t\t\t\t\"text-foreground dark:text-foreground\",\n\t\t\t\t\t\t\t\"transition-[background-color,transform,opacity] duration-300\",\n\t\t\t\t\t\t\tindex === 0 && \"rounded-l-md\",\n\t\t\t\t\t\t\tindex === 3 && \"rounded-r-md\",\n\t\t\t\t\t\t\t\"border-r border-white/10 dark:border-black/10 last:border-r-0\",\n\t\t\t\t\t\t\t\"hover:bg-background dark:hover:bg-background\",\n\t\t\t\t\t\t\t\"transform\",\n\t\t\t\t\t\t\tisHovered\n\t\t\t\t\t\t\t\t? \"translate-x-[0%] opacity-100\"\n\t\t\t\t\t\t\t\t: \"-translate-x-full opacity-0\",\n\t\t\t\t\t\t\tindex === 0 && \"duration-200\",\n\t\t\t\t\t\t\tindex === 1 && \"duration-200 delay-50\",\n\t\t\t\t\t\t\tindex === 2 && \"duration-200 delay-100\",\n\t\t\t\t\t\t\tindex === 3 && \"duration-200 delay-150\"\n\t\t\t\t\t\t)}\n\t\t\t\t\t>\n\t\t\t\t\t\t<button.icon className=\"w-4 h-4\" />\n\t\t\t\t\t</button>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering the button fades it out while Twitter, Facebook, LinkedIn and copy-link icons slide in from the left one after another; moving the pointer away reverses it.",
+    "inspiration": {
+      "source": "Kokonut UI",
+      "url": "https://kokonutui.com/docs/components/button#button---share",
+      "authorUrl": "https://kokonutui.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/btn08"
+  }
+}

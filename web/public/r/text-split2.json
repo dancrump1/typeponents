@@ -1,0 +1,74 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-split2",
+  "type": "registry:ui",
+  "title": "Text Split2",
+  "description": "Splits a string into letters or words so each piece can be animated independently.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-split2.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-split2.tsx",
+      "content": "\"use client\"\n\nimport { Fragment, type ReactNode } from \"react\"\nimport { type RenderProp, useRender } from \"@/hooks/use-render\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/text/text-bounce\n\ntype SplitBy = \"letters\" | \"words\"\n\nconst NON_BREAKING_SPACE = \" \"\n\nexport type TextSplitProps = {\n    children: string\n    splitBy?: SplitBy\n    showMask?: boolean\n    renderItems?: (char: string, index: number) => ReactNode\n    render?: RenderProp\n}\n\nfunction Mask({ children, showMask }: { children: ReactNode; showMask: boolean }) {\n    if (!showMask) return children\n    return <span className=\"overflow-clip\">{children}</span>\n}\n\nexport function TextSplit({\n    children,\n    splitBy = \"letters\",\n    showMask = true,\n    renderItems,\n    render,\n}: TextSplitProps) {\n    const words = children.split(\" \")\n    let cursor = 0\n\n    const content = words.map((word, wordIndex) => {\n        const isLast = wordIndex === words.length - 1\n\n        if (splitBy === \"words\") {\n            return (\n                <Mask showMask={showMask} key={wordIndex}>\n                    {renderItems ? renderItems(word, wordIndex) : word}\n                    {!isLast && \" \"}\n                </Mask>\n            )\n        }\n\n        const letters = Array.from(word).map((char) => {\n            const index = cursor++\n            return (\n                <Mask showMask={showMask} key={index}>\n                    {renderItems ? renderItems(char, index) : char}\n                </Mask>\n            )\n        })\n\n        let spacer: ReactNode = null\n        if (!isLast) {\n            const index = cursor++\n            spacer = (\n                <Mask showMask={showMask} key={index}>\n                    {renderItems ? renderItems(\" \", index) : NON_BREAKING_SPACE}\n                </Mask>\n            )\n        }\n\n        return (\n            <Fragment key={wordIndex}>\n                <span className=\"inline-block\">\n                    {letters}\n                    {spacer}\n                </span>\n                {!isLast && <wbr />}\n            </Fragment>\n        )\n    })\n\n    return useRender({\n        render,\n        defaultElement: <span />,\n        props: { children: content },\n    })\n}\n"
+    },
+    {
+      "path": "hooks/use-render.ts",
+      "type": "registry:hook",
+      "target": "hooks/use-render.ts",
+      "content": "// biome-ignore-all lint/suspicious/noExplicitAny: prop merging is inherently dynamic\n/**\n * Inspired by Base UI's `useRender` + `mergeProps`, intentionally simplified for this\n * library's scope at the moment.\n *\n * Chosen over polymorphic prop: cleaner TypeScript, integrates better with other\n * component (Next/Image, design systems, third-party UI libraries)\n *\n * @see https://base-ui.com/react/utils/use-render\n * @see https://base-ui.com/react/utils/merge-props\n */\nimport { cloneElement, isValidElement, type ReactElement, type Ref } from \"react\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/text/text-bounce\n\ntype AnyProps = Record<string, any>\n\ntype RenderFunction<S> = (props: AnyProps, state: S) => ReactElement\n\nexport type RenderProp<S = void> = ReactElement | RenderFunction<S>\n\ntype UseRenderOptions<S> = {\n    render: RenderProp<S> | undefined\n    props: AnyProps\n    state?: S\n    defaultElement: ReactElement\n}\n\nexport function useRender<S = void>(options: UseRenderOptions<S>): ReactElement<AnyProps> {\n    const { render, props, state, defaultElement } = options\n    const target = render ?? defaultElement\n\n    // Function form: consumer wires props themselves, no merging needed.\n    if (typeof target === \"function\") {\n        return target(props, state as S) as ReactElement<AnyProps>\n    }\n\n    // Element form: clone and merge our internal props with whatever the consumer set on the element.\n    const targetProps = (isValidElement(target) ? target.props : {}) as AnyProps\n    return cloneElement(target, mergeProps(props, targetProps)) as ReactElement<AnyProps>\n}\n\nfunction mergeProps(internal: AnyProps, external: AnyProps): AnyProps {\n    const merged: AnyProps = { ...internal }\n\n    for (const key in external) {\n        const internalValue = internal[key]\n        const externalValue = external[key]\n\n        if (key === \"className\" && typeof externalValue === \"string\") {\n            merged[key] = [internalValue, externalValue].filter(Boolean).join(\" \")\n        } else if (key === \"style\" && externalValue && typeof externalValue === \"object\") {\n            merged[key] = { ...internalValue, ...externalValue }\n        } else if (key === \"ref\") {\n            merged[key] = composeRefs(internalValue, externalValue)\n        } else if (\n            key.startsWith(\"on\") &&\n            typeof internalValue === \"function\" &&\n            typeof externalValue === \"function\"\n        ) {\n            // External handler runs first so consumers can stopPropagation before our logic fires.\n            merged[key] = chainFunctions(externalValue, internalValue)\n        } else {\n            merged[key] = externalValue\n        }\n    }\n\n    return merged\n}\n\nfunction chainFunctions(...fns: Array<(...args: any[]) => void>) {\n    return (...args: any[]) => {\n        for (const fn of fns) fn(...args)\n    }\n}\n\nfunction composeRefs<T>(...refs: Array<Ref<T> | undefined>) {\n    return (node: T) => {\n        for (const ref of refs) {\n            if (typeof ref === \"function\") ref(node)\n            else if (ref != null) (ref as { current: T | null }).current = node\n        }\n    }\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [],
+    "interaction": "Renders each letter or word in its own mask, ready for staggered enter/hover animations.",
+    "inspiration": {
+      "source": "Atelier UI",
+      "url": "https://www.atelier-ui.com/en/docs/components/text/text-bounce",
+      "authorUrl": "https://www.atelier-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "splitBy",
+        "type": "SplitBy",
+        "default": "\"letters\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showMask",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "renderItems",
+        "type": "((char: string, index: number) => ReactNode)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "render",
+        "type": "RenderProp",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-split2"
+  }
+}

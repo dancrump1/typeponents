@@ -1,0 +1,50 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fuzzy-overlay",
+  "type": "registry:ui",
+  "title": "Fuzzy Overlay",
+  "description": "Fuzzy Overlay",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fuzzy-overlay.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fuzzy-overlay.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion } from \"motion/react\";\r\n\r\nconst FuzzyOverlay = ({ className }: { className?: string }) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tinitial={{ transform: \"translateX(-10%) translateY(-10%)\" }}\r\n\t\t\tanimate={{\r\n\t\t\t\ttransform: \"translateX(10%) translateY(10%)\",\r\n\t\t\t}}\r\n\t\t\ttransition={{\r\n\t\t\t\trepeat: Infinity,\r\n\t\t\t\tduration: 0.2,\r\n\t\t\t\tease: \"linear\",\r\n\t\t\t\trepeatType: \"mirror\",\r\n\t\t\t}}\r\n\t\t\t// You can download these PNGs here:\r\n\t\t\t// https://www.hover.dev/black-noise.png\r\n\t\t\t// https://www.hover.dev/noise.png\r\n\t\t\tstyle={{\r\n\t\t\t\tbackgroundImage: 'url(\"/dist/local/black-noise.png\")',\r\n\t\t\t\t// backgroundImage: 'url(\"local/noise.png\")',\r\n\t\t\t}}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"pointer-events-none absolute -inset-full opacity-0\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t/>\r\n\t);\r\n};\r\n\r\nexport default FuzzyOverlay;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Hover.dev",
+      "url": "https://www.hover.dev/black-noise.png",
+      "authorUrl": "https://www.hover.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fuzzy-overlay"
+  }
+}

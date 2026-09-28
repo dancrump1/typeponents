@@ -1,0 +1,48 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "project-showcase",
+	title: "Project Showcase",
+	description:
+		"Two-column project showcase pairing a stack of tilted screenshots with the project name, role and write-up.",
+	interaction:
+		"Prev and next swap the top screenshot, which hops upward and settles flat while the rest sit behind it at random angles; the write-up re-enters word by word, sharpening from blurred as it goes. Hovering a screenshot brightens its thin outline.",
+	categories: ["Carousels"],
+	tags: ["drag", "autoplay", "responsive"],
+	inspiration: {
+		source: "Namer UI",
+		url: "https://namer-ui.netlify.app/components",
+		authorUrl: "https://namer-ui.netlify.app",
+		relationship: "adaptation",
+	},
+	dependencies: ["framer-motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "testimonials", type: "Testimonial[]", required: true },
+		{ name: "autoplay", type: "boolean", default: "false" },
+		{ name: "colors", type: "{ name?: string; position?: string; testimony?: string; }", default: "{ name: \"#fff\", position: \"gray-500\",…" },
+		{ name: "fontSizes", type: "{ name?: string; position?: string; testimony?: string; }", default: "{ name: \"2xl\", position: \"sm\", testim…" },
+		{ name: "spacing", type: "{ top?: string; bottom?: string; lineHeight?: string; nam…", default: "{ top: \"20\", bottom: \"20\", lineHeight…" },
+		{ name: "desktopVersionBottomThreshold", type: "number", default: "1024" },
+		{ name: "maxImageWidth", type: "number" },
+		{ name: "imageWidthPercentage", type: "number" },
+		{ name: "mobile", type: "{ fontSizes?: { name?: string; position?: string; testimo…", default: "{}" },
+		{ name: "imageAspectRatio", type: "number", default: "1.37" },
+		{ name: "isRTL", type: "boolean", default: "false" },
+		{ name: "onItemClick", type: "((link: string) => void)" },
+		{ name: "outerRounding", type: "string", default: "\"18.2px\"" },
+		{ name: "innerRounding", type: "string", default: "\"18px\"" },
+		{ name: "outlineColor", type: "string", default: "\"#33313d\"" },
+		{ name: "hoverOutlineColor", type: "string", default: "\"#403d4d\"" },
+		{ name: "buttonInscriptions", type: "{ previousButton: string; nextButton: string; openWebAppB…", default: "{ previousButton: \"Previous\", nextBut…" },
+		{ name: "halomotButtonGradient", type: "string", default: "\"linear-gradient(to right, #a123f4, #…" },
+		{ name: "halomotButtonBackground", type: "string", default: "\"#111014\"" },
+		{ name: "halomotButtonTextColor", type: "string", default: "\"#fff\"" },
+		{ name: "halomotButtonOuterBorderRadius", type: "string", default: "\"6.34px\"" },
+		{ name: "halomotButtonInnerBorderRadius", type: "string", default: "\"6px\"" },
+		{ name: "halomotButtonHoverTextColor", type: "string" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fire-shader",
+  "type": "registry:ui",
+  "title": "Fire Shader",
+  "description": "Fire Shader",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fire-shader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fire-shader.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useRef, useState } from \"react\";\n\n// Credit:\n// https://pro.lightswind.com/components/fire-shader\n\nconst vertexShaderSource = `\n  attribute vec2 a_position;\n  varying vec2 vUv;\n  void main() {\n    vUv = a_position * 0.5 + 0.5;\n    gl_Position = vec4(a_position, 0.0, 1.0);\n  }\n`;\n\nconst fragmentShaderSource = `\n  precision highp float;\n  uniform vec2 iResolution;\n  uniform float iTime;\n  uniform vec2 iMouse;\n  uniform float u_timescale;\n  uniform float u_scaleX;\n  uniform float u_scaleY;\n  \n  // Simplex 2D noise\n  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }\n  vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }\n  vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }\n  float snoise(vec2 v) {\n    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);\n    vec2 i  = floor(v + dot(v, C.yy) );\n    vec2 x0 = v -   i + dot(i, C.xx);\n    vec2 i1;\n    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);\n    vec4 x12 = x0.xyxy + C.xxzz;\n    x12.xy -= i1;\n    i = mod289(i);\n    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));\n    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);\n    m = m*m;\n    m = m*m;\n    vec3 x = 2.0 * fract(p * C.www) - 1.0;\n    vec3 h = abs(x) - 0.5;\n    vec3 ox = floor(x + 0.5);\n    vec3 a0 = x - ox;\n    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );\n    vec3 g;\n    g.x  = a0.x  * x0.x  + h.x  * x0.y;\n    g.yz = a0.yz * x12.xz + h.yz * x12.yw;\n    return 130.0 * dot(m, g);\n  }\n\n  // Fractal Brownian Motion\n  float fbm(vec2 uv) {\n      float f = 0.0;\n      float w = 0.5;\n      vec2 p = uv;\n      for (int i = 0; i < 5; i++) {\n          f += w * snoise(p);\n          p *= 2.0;\n          w *= 0.5;\n      }\n      return f * 0.5 + 0.5;\n  }\n\n  void main() {\n      vec3 col = vec3(0.0, 0.0, 0.0);\n      vec2 uv = gl_FragCoord.xy / iResolution.xy;\n      \n      // Interactive mouse offset for fluid effect\n      vec2 mouse = iMouse.xy / iResolution.xy;\n      \n      // Add slight offset so normalize does not fail on distance point 0\n      vec2 safeMouse = mouse + vec2(0.0001, 0.0001);\n      \n      // Calculate distance to mouse for an interactive push/pull effect\n      float distToMouse = distance(uv, safeMouse);\n      \n      // Expand influence radius for much more interactivity\n      float mouseInfluence = smoothstep(0.4, 0.0, distToMouse); \n      \n      // Create a wave pushing/pulling to the mouse\n      vec2 dir = normalize(uv - safeMouse);\n      // Instead of pushing, pull it to follow the mouse like a vortex\n      vec2 mouseOffset = dir * mouseInfluence * -0.25; \n      \n      vec2 st = uv - mouseOffset;\n\n      // Original texture logic replaced with fbm for better seamless look without loading assets\n      float dist = fbm(vec2(st.x * u_scaleX - iTime * 1.1 * u_timescale, st.y * u_scaleY - iTime * 1.8 * u_timescale) * 3.0);\n      float tex = fbm(vec2(st.x * u_scaleX + dist * 0.2, st.y * u_scaleY - iTime * 1.5 * u_timescale) * 3.0);\n      \n      tex += st.y * 0.5;\n      float fire = pow(1.0 - tex, 2.3);\n      fire -= (1.0 - (abs(st.x - 0.5) * 2.0)) * 0.5;\n      \n      fire = max(0.0, fire); // Prevent negative fire colors\n      \n      float fireIntensity = fire * 5.0;\n      col += fireIntensity * mix(vec3(0.0, 0.2, 1.0), vec3(1.0, 0.21, 0.0), st.x);\n      \n      // Use max color component as alpha for a clean transparent background\n      float alpha = max(col.r, max(col.g, col.b));\n      alpha = smoothstep(0.01, 0.5, alpha); // Sharpen transparency cutoff\n      \n      // Default WebGL requires pre-multiplied alpha\n      gl_FragColor = vec4(col * alpha, alpha);\n  }\n`;\n\ninterface FireShaderProps {\n    className?: string;\n    timescale?: number;\n    scaleX?: number;\n    scaleY?: number;\n}\n\nexport default function FireShader({\n    className,\n    timescale = 0.5,\n    scaleX = 1.5,\n    scaleY = 0.3\n}: FireShaderProps) {\n    const canvasRef = useRef<HTMLCanvasElement>(null);\n    const mouseRef = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });\n\n    useEffect(() => {\n        const canvas = canvasRef.current;\n        if (!canvas) return;\n\n        const gl = canvas.getContext(\"webgl\", { alpha: true, antialias: false });\n        if (!gl) {\n            console.error(\"WebGL not supported\");\n            return;\n        }\n\n        const compileShader = (type: number, source: string) => {\n            const shader = gl.createShader(type);\n            if (!shader) return null;\n            gl.shaderSource(shader, source);\n            gl.compileShader(shader);\n            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {\n                console.error(\"Shader compile err:\", gl.getShaderInfoLog(shader));\n                gl.deleteShader(shader);\n                return null;\n            }\n            return shader;\n        };\n\n        const vertexShader = compileShader(gl.VERTEX_SHADER, vertexShaderSource);\n        const fragmentShader = compileShader(gl.FRAGMENT_SHADER, fragmentShaderSource);\n\n        if (!vertexShader || !fragmentShader) return;\n\n        const program = gl.createProgram();\n        if (!program) return;\n        gl.attachShader(program, vertexShader);\n        gl.attachShader(program, fragmentShader);\n        gl.linkProgram(program);\n\n        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {\n            console.error(\"Program link err:\", gl.getProgramInfoLog(program));\n            return;\n        }\n\n        gl.useProgram(program);\n\n        const positionBuffer = gl.createBuffer();\n        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);\n        const positions = new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]);\n        gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);\n\n        const positionLocation = gl.getAttribLocation(program, \"a_position\");\n        gl.enableVertexAttribArray(positionLocation);\n        gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);\n\n        const iResolutionLocation = gl.getUniformLocation(program, \"iResolution\");\n        const iTimeLocation = gl.getUniformLocation(program, \"iTime\");\n        const iMouseLocation = gl.getUniformLocation(program, \"iMouse\");\n\n        // Scale settings\n        const timescaleLocation = gl.getUniformLocation(program, \"u_timescale\");\n        const scaleXLocation = gl.getUniformLocation(program, \"u_scaleX\");\n        const scaleYLocation = gl.getUniformLocation(program, \"u_scaleY\");\n\n        const startTime = performance.now();\n        let animationFrameId: number;\n\n        const render = () => {\n            // Handle resizing\n            const displayWidth = canvas.clientWidth;\n            const displayHeight = canvas.clientHeight;\n            if (canvas.width !== displayWidth || canvas.height !== displayHeight) {\n                canvas.width = displayWidth;\n                canvas.height = displayHeight;\n                gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);\n            }\n\n            gl.clearColor(0.0, 0.0, 0.0, 0.0);\n            gl.clear(gl.COLOR_BUFFER_BIT);\n\n            // Smooth mouse interpolation overlaying direct mouse movements\n            mouseRef.current.x += (mouseRef.current.targetX - mouseRef.current.x) * 0.1;\n            mouseRef.current.y += (mouseRef.current.targetY - mouseRef.current.y) * 0.1;\n\n            const currentTime = (performance.now() - startTime) / 1000;\n\n            gl.uniform2f(iResolutionLocation, gl.canvas.width, gl.canvas.height);\n            gl.uniform1f(iTimeLocation, currentTime);\n            gl.uniform2f(iMouseLocation, mouseRef.current.x, mouseRef.current.y);\n            gl.uniform1f(timescaleLocation, timescale);\n            gl.uniform1f(scaleXLocation, scaleX);\n            gl.uniform1f(scaleYLocation, scaleY);\n\n            gl.drawArrays(gl.TRIANGLES, 0, 6);\n            animationFrameId = requestAnimationFrame(render);\n        };\n\n        render();\n\n        const handleMouseMove = (e: MouseEvent) => {\n            const rect = canvas.getBoundingClientRect();\n            mouseRef.current.targetX = e.clientX - rect.left;\n            // WebGL y comes from bottom so we invert\n            mouseRef.current.targetY = canvas.height - (e.clientY - rect.top);\n        };\n\n        const handleMouseLeave = () => {\n            mouseRef.current.targetX = canvas.width / 2;\n            mouseRef.current.targetY = canvas.height / 2;\n        };\n\n        canvas.addEventListener(\"mousemove\", handleMouseMove);\n        canvas.addEventListener(\"mouseleave\", handleMouseLeave);\n\n        return () => {\n            cancelAnimationFrame(animationFrameId);\n            canvas.removeEventListener(\"mousemove\", handleMouseMove);\n            canvas.removeEventListener(\"mouseleave\", handleMouseLeave);\n            gl.deleteProgram(program);\n            gl.deleteShader(vertexShader);\n            gl.deleteShader(fragmentShader);\n            gl.deleteBuffer(positionBuffer);\n        };\n    }, [timescale, scaleX, scaleY]);\n\n    return (\n        <canvas\n            ref={canvasRef}\n            className={`w-full h-full block ${className || \"\"}`}\n        />\n    );\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "pro.lightswind.com",
+      "url": "https://pro.lightswind.com/components/fire-shader",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "timescale",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scaleX",
+        "type": "number",
+        "default": "1.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scaleY",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fire-shader"
+  }
+}

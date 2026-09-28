@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-275",
+  "type": "registry:component",
+  "title": "Comp 275",
+  "description": "Comp 275",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-275.tsx",
+      "content": "import { ArrowRightIcon, TriangleAlert } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"rounded-md border px-4 py-3\">\r\n      <div className=\"flex gap-3\">\r\n        <TriangleAlert\r\n          className=\"hrink-0 mt-0.5 text-amber-500\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        <div className=\"flex grow justify-between gap-3\">\r\n          <p className=\"text-sm\">Some information is missing!</p>\r\n          <a href=\"#\" className=\"group text-sm font-medium whitespace-nowrap\">\r\n            Link\r\n            <ArrowRightIcon\r\n              className=\"ms-1 -mt-0.5 inline-flex opacity-60 transition-transform group-hover:translate-x-0.5\"\r\n              size={16}\r\n              aria-hidden=\"true\"\r\n            />\r\n          </a>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

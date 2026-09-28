@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fab",
+  "type": "registry:ui",
+  "title": "Fab",
+  "description": "Fab",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/fab.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fab.tsx",
+      "content": "\n\"use client\";\n\nimport React, { useState } from \"react\";\nimport { motion, AnimatePresence } from \"motion/react\";\nimport { Button } from \"@/components/ui/button\";\nimport { Plus } from \"lucide-react\";\nimport { cn } from \"@/lib/utils\";\n\n// Credit:\n// https://ui.chetanverma.com/components/floating-action-menu\n\ntype FloatingActionMenuProps = {\n    options: {\n        label: string;\n        onClick: () => void;\n        Icon?: React.ReactNode;\n    }[];\n    className?: string;\n};\n\nconst FloatingActionMenu = ({\n    options,\n    className,\n}: FloatingActionMenuProps) => {\n    const [isOpen, setIsOpen] = useState(false);\n\n    const toggleMenu = () => {\n        setIsOpen(!isOpen);\n    };\n\n    return (\n        <div className={cn(\"fixed bottom-8 right-8\", className)}>\n            <Button\n                onClick={toggleMenu}\n                className=\"w-10 h-10 rounded-full bg-[#11111198] hover:bg-[#111111d1] shadow-[0_0_20px_rgba(0,0,0,0.2)] \"\n            >\n                <motion.div\n                    animate={{ rotate: isOpen ? 45 : 0 }}\n                    transition={{\n                        duration: 0.3,\n                        ease: \"easeInOut\",\n                        type: \"spring\",\n                        stiffness: 300,\n                        damping: 20,\n                    }}\n                >\n                    <Plus className=\"w-6 h-6\" />\n                </motion.div>\n            </Button>\n\n            <AnimatePresence>\n                {isOpen && (\n                    <motion.div\n                        initial={{ opacity: 0, x: 10, y: 10, filter: \"blur(10px)\" }}\n                        animate={{ opacity: 1, x: 0, y: 0, filter: \"blur(0px)\" }}\n                        exit={{ opacity: 0, x: 10, y: 10, filter: \"blur(10px)\" }}\n                        transition={{\n                            duration: 0.6,\n                            type: \"spring\",\n                            stiffness: 300,\n                            damping: 20,\n                            delay: 0.1,\n                        }}\n                        className=\"absolute bottom-10 right-0 mb-2\"\n                    >\n                        <div className=\"flex flex-col items-end gap-2\">\n                            {options.map((option, index) => (\n                                <motion.div\n                                    key={index}\n                                    initial={{ opacity: 0, x: 20 }}\n                                    animate={{ opacity: 1, x: 0 }}\n                                    exit={{ opacity: 0, x: 20 }}\n                                    transition={{\n                                        duration: 0.3,\n                                        delay: index * 0.05,\n                                    }}\n                                >\n                                    <Button\n                                        onClick={option.onClick}\n                                        size=\"sm\"\n                                        className=\"flex items-center gap-2 bg-[#11111198] hover:bg-[#111111d1] shadow-[0_0_20px_rgba(0,0,0,0.2)] border-none rounded-xl backdrop-blur-sm\"\n                                    >\n                                        {option.Icon}\n                                        <span>{option.label}</span>\n                                    </Button>\n                                </motion.div>\n                            ))}\n                        </div>\n                    </motion.div>\n                )}\n            </AnimatePresence>\n        </div>\n    );\n};\n\nexport default FloatingActionMenu;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "ui.chetanverma.com",
+      "url": "https://ui.chetanverma.com/components/floating-action-menu",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "options",
+        "type": "{ label: string; onClick: () => void; Icon?: React.ReactN…",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fab"
+  }
+}

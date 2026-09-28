@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magnet-lines",
+  "type": "registry:ui",
+  "title": "Magnet Lines",
+  "description": "Magnet Lines",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/magnet-lines.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/magnet-lines.tsx",
+      "content": "import { useEffect, useRef } from \"react\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/animations/magnet-lines\r\n\r\nexport default function MagnetLines({\r\n\trows = 9,\r\n\tcolumns = 9,\r\n\tcontainerSize = \"80vmin\",\r\n\tlineColor = \"#efefef\",\r\n\tlineWidth = \"1vmin\",\r\n\tlineHeight = \"6vmin\",\r\n\tbaseAngle = -10,\r\n\tclassName = \"\",\r\n\tstyle = {},\r\n}) {\r\n\tconst containerRef = useRef(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst container = containerRef.current;\r\n\t\tif (!container) return;\r\n\r\n\t\tconst items = container.querySelectorAll(\"span\");\r\n\r\n\t\tconst onPointerMove = (pointer) => {\r\n\t\t\titems.forEach((item) => {\r\n\t\t\t\tconst rect = item.getBoundingClientRect();\r\n\t\t\t\tconst centerX = rect.x + rect.width / 2;\r\n\t\t\t\tconst centerY = rect.y + rect.height / 2;\r\n\r\n\t\t\t\tconst b = pointer.x - centerX;\r\n\t\t\t\tconst a = pointer.y - centerY;\r\n\t\t\t\tconst c = Math.sqrt(a * a + b * b) || 1;\r\n\t\t\t\tconst r =\r\n\t\t\t\t\t((Math.acos(b / c) * 180) / Math.PI) *\r\n\t\t\t\t\t(pointer.y > centerY ? 1 : -1);\r\n\r\n\t\t\t\titem.style.setProperty(\"--rotate\", `${r}deg`);\r\n\t\t\t});\r\n\t\t};\r\n\r\n\t\twindow.addEventListener(\"pointermove\", onPointerMove);\r\n\r\n\t\tif (items.length) {\r\n\t\t\tconst middleIndex = Math.floor(items.length / 2);\r\n\t\t\tconst rect = items[middleIndex].getBoundingClientRect();\r\n\t\t\tonPointerMove({ x: rect.x, y: rect.y });\r\n\t\t}\r\n\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"pointermove\", onPointerMove);\r\n\t\t};\r\n\t}, []);\r\n\r\n\t// Create a grid’s worth of spans\r\n\tconst total = rows * columns;\r\n\tconst spans = Array.from({ length: total }, (_, i) => (\r\n\t\t<span\r\n\t\t\tkey={i + \"line-magnet\"}\r\n\t\t\tclassName=\"block origin-center\"\r\n\t\t\tstyle={{\r\n\t\t\t\tbackgroundColor: lineColor,\r\n\t\t\t\twidth: lineWidth,\r\n\t\t\t\theight: lineHeight,\r\n\t\t\t\t\"--rotate\": `${baseAngle}deg`,\r\n\t\t\t\ttransform: \"rotate(var(--rotate))\",\r\n\t\t\t\twillChange: \"transform\",\r\n\t\t\t}}\r\n\t\t/>\r\n\t));\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={containerRef}\r\n\t\t\tclassName={`grid place-items-center ${className}`}\r\n\t\t\tstyle={{\r\n\t\t\t\tgridTemplateColumns: `repeat(${columns}, 1fr)`,\r\n\t\t\t\tgridTemplateRows: `repeat(${rows}, 1fr)`,\r\n\t\t\t\twidth: containerSize,\r\n\t\t\t\theight: containerSize,\r\n\t\t\t\t...style,\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t{spans}\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/animations/magnet-lines",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/magnet-lines"
+  }
+}

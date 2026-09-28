@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "interactive-folder",
+  "type": "registry:ui",
+  "title": "Interactive Folder",
+  "description": "An animated folder component that expands to reveal file contents with smooth spring animations and interactive hover effects.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/interactive-folder.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/interactive-folder.tsx",
+      "content": "'use client';\r\n\r\nimport { AnimatePresence, motion } from 'framer-motion';\r\nimport { X } from 'lucide-react';\r\nimport Image from 'next/image';\r\nimport React, { useState } from 'react';\r\n\r\nconst DUMMY_FILES = [\r\n  {\r\n    id: 1,\r\n    name: 'assignment.doc',\r\n    image: \"/stackbits/fileicons/DOC.svg\"\r\n  },\r\n  {\r\n    id: 2,\r\n    name: 'me.jpg',\r\n    image: \"/stackbits/fileicons/JPG.svg\"\r\n  },\r\n  {\r\n    id: 3,\r\n    name: 'johnmayer.mp3',\r\n    image: \"/stackbits/fileicons/MP3.svg\"\r\n  },\r\n  {\r\n    id: 4,\r\n    name: 'bali.mp4',\r\n    image: \"/stackbits/fileicons/MP4.svg\"\r\n  },\r\n  {\r\n    id: 5,\r\n    name: 'ebook.pdf',\r\n    image: \"/stackbits/fileicons/PDF.svg\"\r\n  },\r\n  {\r\n    id: 6,\r\n    name: 'notes.txt',\r\n    image: \"/stackbits/fileicons/TXT.svg\"\r\n  },\r\n  {\r\n    id: 7,\r\n    name: 'statement.xlsx',\r\n    image: \"/stackbits/fileicons/XLSX.svg\"\r\n  },\r\n  {\r\n    id: 8,\r\n    name: 'export.zip',\r\n    image: \"/stackbits/fileicons/ZIP.svg\"\r\n  }\r\n];\r\n\r\nconst FolderIcon = () => (\r\n  <Image src=\"/stackbits/folder.svg\" alt=\"Folder Icon\" width={64} height={64} className=\"w-full h-full\" />\r\n);\r\n\r\ntype FileIconProps = {\r\n  size: number;\r\n  image: string;\r\n};\r\n\r\nconst FileIcon = ({ size, image }: FileIconProps) => (\r\n  <Image src={image} alt=\"File Icon\" width={size} height={size} />\r\n);\r\n\r\nconst InteractiveFolder = ({ folderName = 'New Folder' }: { folderName?: string }) => {\r\n  const [isOpen, setIsOpen] = useState(false);\r\n\r\n  return (\r\n    <div className=\"flex items-center justify-center flex-col\">\r\n      <motion.div\r\n        initial={{\r\n          filter: 'blur(10px)',\r\n          width: '50px',\r\n          height: '50px'\r\n        }}\r\n        animate={{\r\n          height: isOpen ? '210px' : '50px',\r\n          width: isOpen ? '350px' : '64px',\r\n          backgroundColor: isOpen ? '#f1f1f1' : '#1BA3F8',\r\n          borderRadius: isOpen ? '10px' : '10px',\r\n          cursor: isOpen ? 'default' : 'pointer',\r\n          filter: 'blur(0px)',\r\n          boxShadow: isOpen ? '0px 5px 10px 0 rgba(0, 0, 0, 0.1)' : 'none'\r\n        }}\r\n        whileHover={{\r\n          boxShadow: !isOpen\r\n            ? '0px 3px 10px 0 rgba(0, 0, 0, 0.25)'\r\n            : '0px 5px 10px 0 rgba(0, 0, 0, 0.1)',\r\n          rotateZ: !isOpen ? '-4deg' : '0deg',\r\n          translateY: !isOpen ? '-3px' : '0px'\r\n        }}\r\n        whileTap={{\r\n          boxShadow: !isOpen\r\n            ? '0px 0px 0px 0 rgba(0, 0, 0, 0.25)'\r\n            : '0px 5px 10px 0 rgba(0, 0, 0, 0.1)',\r\n          translateY: !isOpen ? '0px' : '0px',\r\n          rotateZ: !isOpen ? '-2deg' : '0deg',\r\n          scale: !isOpen ? 0.95 : 1\r\n        }}\r\n        transition={{\r\n          type: 'spring',\r\n          stiffness: 300,\r\n          damping: 25\r\n        }}\r\n        onClick={() => !isOpen && setIsOpen(!isOpen)}\r\n        className=\"overflow-hidden\"\r\n      >\r\n        <AnimatePresence mode=\"popLayout\">\r\n          {!isOpen && (\r\n            <motion.div\r\n              initial={{\r\n                filter: 'blur(10px)',\r\n                opacity: 0\r\n              }}\r\n              animate={{\r\n                filter: 'blur(0px)',\r\n                opacity: 1\r\n              }}\r\n              exit={{\r\n                filter: 'blur(10px)',\r\n                opacity: 0\r\n              }}\r\n              whileHover={{\r\n                translateY: '3px',\r\n                rotateZ: '4deg'\r\n              }}\r\n              transition={{\r\n                type: 'spring',\r\n                stiffness: 300,\r\n                damping: 30\r\n              }}\r\n            >\r\n              <FolderIcon />\r\n            </motion.div>\r\n          )}\r\n\r\n          {isOpen && (\r\n            <motion.div\r\n              initial={{\r\n                filter: 'blur(10px)',\r\n                opacity: 0\r\n              }}\r\n              animate={{\r\n                filter: 'blur(0px)',\r\n                opacity: 1\r\n              }}\r\n              exit={{\r\n                filter: 'blur(10px)',\r\n                opacity: 0\r\n              }}\r\n              transition={{\r\n                type: 'spring',\r\n                stiffness: 300,\r\n                damping: 30\r\n              }}\r\n              className=\"h-full w-full flex flex-col overflow-hidden relative\"\r\n            >\r\n              {/* folder container header */}\r\n              <div className=\"h-7 w-full bg-white flex items-center justify-between\">\r\n                <div className=\"bg-[#f1f1f1] h-full flex items-center justify-center\">\r\n                  <motion.p\r\n                    layout=\"position\"\r\n                    layoutId=\"folder-name\"\r\n                    className=\"text-black font-medium px-2 text-sm whitespace-nowrap truncate\"\r\n                  >\r\n                    {folderName}\r\n                  </motion.p>\r\n                </div>\r\n                <div className=\"flex-1 flex items-center justify-end px-1 h-full rounded-bl-lg\">\r\n                  <button\r\n                    onClick={() => setIsOpen(false)}\r\n                    className=\"hover:bg-black/10 rounded-full cursor-pointer p-0.5\"\r\n                  >\r\n                    <X className=\"text-black\" size={14} />\r\n                  </button>\r\n                </div>\r\n              </div>\r\n              <div className=\"rounded-b-lg h-full w-full flex items-start justify-start\">\r\n                <div\r\n                  style={{\r\n                    gridTemplateColumns: 'repeat(4, 50px)'\r\n                  }}\r\n                  className=\"grid items-start justify-start gap-x-2 gap-y-4 overflow-y-scroll w-full p-2 py-4\"\r\n                >\r\n                  {DUMMY_FILES.map((file, index) => (\r\n                    <motion.div\r\n                      key={'folder-item' + folderName + index}\r\n                      initial={{\r\n                        opacity: 0\r\n                      }}\r\n                      animate={{\r\n                        opacity: 1\r\n                      }}\r\n                      exit={{\r\n                        opacity: 0\r\n                      }}\r\n                      transition={{\r\n                        type: 'spring',\r\n                        stiffness: 300,\r\n                        damping: 30\r\n                      }}\r\n                      className=\"w-[50px] h-[54px] gap-2 flex flex-col items-center justify-start overflow-hidden\"\r\n                    >\r\n                      <FileIcon size={30} image={file.image} />\r\n                      <p className=\"text-xs text-black truncate text-left w-full\">{file.name}</p>\r\n                    </motion.div>\r\n                  ))}\r\n                </div>\r\n              </div>\r\n            </motion.div>\r\n          )}\r\n        </AnimatePresence>\r\n      </motion.div>\r\n      {!isOpen && (\r\n        <motion.div\r\n          initial={{\r\n            opacity: 0\r\n          }}\r\n          animate={{\r\n            opacity: 1\r\n          }}\r\n          exit={{\r\n            opacity: 0\r\n          }}\r\n          transition={{\r\n            type: 'spring',\r\n            stiffness: 300,\r\n            damping: 30\r\n          }}\r\n          layoutId=\"folder-name\"\r\n          className=\"text-white font-medium text-sm whitespace-nowrap truncate\"\r\n        >\r\n          {folderName}\r\n        </motion.div>\r\n      )}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default InteractiveFolder;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Click the folder and it springs open to reveal a grid of files.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/interactivefolder",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "folderName",
+        "type": "string",
+        "default": "'New Folder'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/interactive-folder"
+  }
+}

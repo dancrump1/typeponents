@@ -1,0 +1,55 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "backlight",
+  "type": "registry:ui",
+  "title": "Backlight",
+  "description": "Wrapper that casts a blurred, oversaturated copy of its contents outward as a glow.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/backlight.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/backlight.tsx",
+      "content": "import { useId, type ReactElement } from \"react\"\r\n\r\n// Credit:\r\n// https://magicui.design/docs/components/backlight\r\n\r\ntype BacklightProps = {\r\n    children?: ReactElement\r\n    className?: string\r\n    blur?: number\r\n}\r\n\r\nexport function Backlight({ blur = 20, children, className }: BacklightProps) {\r\n    const id = useId()\r\n\r\n    return (\r\n        <div className={className}>\r\n            <svg width=\"0\" height=\"0\" aria-hidden=\"true\">\r\n                <filter id={id} y=\"-50%\" x=\"-50%\" width=\"200%\" height=\"200%\">\r\n                    <feGaussianBlur\r\n                        in=\"SourceGraphic\"\r\n                        stdDeviation={blur}\r\n                        result=\"blurred\"\r\n                    ></feGaussianBlur>\r\n                    <feColorMatrix\r\n                        type=\"saturate\"\r\n                        in=\"blurred\"\r\n                        values=\"4\"\r\n                    ></feColorMatrix>\r\n                    <feComposite in=\"SourceGraphic\" operator=\"over\"></feComposite>\r\n                </filter>\r\n            </svg>\r\n\r\n            <div style={{ filter: `url(#${id})` }}>{children}</div>\r\n        </div>\r\n    )\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [],
+    "interaction": "Static — the glow is taken from the content itself when the page loads and does not respond to input.",
+    "inspiration": {
+      "source": "Magic UI",
+      "url": "https://magicui.design/docs/components/backlight",
+      "authorUrl": "https://magicui.design",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blur",
+        "type": "number",
+        "default": "20",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/backlight"
+  }
+}

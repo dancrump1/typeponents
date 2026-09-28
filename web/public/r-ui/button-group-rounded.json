@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "button-group-rounded",
+  "type": "registry:component",
+  "title": "Button Group Rounded",
+  "description": "Button Group Rounded",
+  "files": [
+    {
+      "path": "registry/ui-basic/ButtonGroupRounded.tsx",
+      "content": "import React from \"react\";\r\n\r\nexport default function ButtonGroupRounded() {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/*<!-- Component: Base sized primary basic button group --> */}\r\n\t\t\t<div className=\"inline-flex overflow-hidden rounded-full\">\r\n\t\t\t\t<button className=\"inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none\">\r\n\t\t\t\t\t<span>Base button</span>\r\n\t\t\t\t</button>\r\n\t\t\t\t<button className=\"inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none\">\r\n\t\t\t\t\t<span>Base button</span>\r\n\t\t\t\t</button>\r\n\t\t\t\t<button className=\"inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap bg-emerald-500 px-5 text-sm font-medium tracking-wide text-white transition duration-300 hover:bg-emerald-600 focus:bg-emerald-700 focus-visible:outline-hidden disabled:cursor-not-allowed disabled:border-emerald-300 disabled:bg-emerald-300 disabled:shadow-none\">\r\n\t\t\t\t\t<span>Base button</span>\r\n\t\t\t\t</button>\r\n\t\t\t</div>\r\n\t\t\t{/*<!-- End Base sized primary basic button group --> */}\r\n\t\t</>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,137 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-trail",
+  "type": "registry:ui",
+  "title": "Text Trail",
+  "description": "Text Trail",
+  "dependencies": [
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-trail.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-trail.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\nimport {\r\n\tCanvasTexture,\r\n\tClock,\r\n\tColor,\r\n\tLinearFilter,\r\n\tLinearMipmapLinearFilter,\r\n\tMesh,\r\n\tOrthographicCamera,\r\n\tPlaneGeometry,\r\n\tScene,\r\n\tShaderMaterial,\r\n\tVector2,\r\n\tVector3,\r\n\tWebGLRenderer,\r\n\tWebGLRenderTarget,\r\n} from \"three\";\r\n\r\nconst hexToRgb = (hex: string): [number, number, number] => {\r\n\tlet h = hex.replace(\"#\", \"\");\r\n\tif (h.length === 3)\r\n\t\th = h\r\n\t\t\t.split(\"\")\r\n\t\t\t.map((c) => c + c)\r\n\t\t\t.join(\"\");\r\n\tconst n = parseInt(h, 16);\r\n\treturn [(n >> 16) & 255, (n >> 8) & 255, n & 255];\r\n};\r\nconst loadFont = async (fam: string) => {\r\n\tif (\"fonts\" in document) await (document as any).fonts.load(`64px \"${fam}\"`);\r\n};\r\n\r\nconst BASE_VERT = `\r\nvarying vec2 v_uv;\r\nvoid main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);v_uv=uv;}`;\r\n\r\nconst SIMPLEX = `\r\nvec3 mod289(vec3 x){return x-floor(x*(1./289.))*289.;}\r\nvec4 mod289(vec4 x){return x-floor(x*(1./289.))*289.;}\r\nvec4 permute(vec4 x){return mod289(((x*34.)+1.)*x);}\r\nfloat snoise3(vec3 v){\r\n  const vec2 C=vec2(1./6.,1./3.);\r\n  const vec4 D=vec4(0.,.5,1.,2.);\r\n  vec3 i=floor(v+dot(v,C.yyy));\r\n  vec3 x0=v-i+dot(i,C.xxx);\r\n  vec3 g=step(x0.yzx,x0.xyz);\r\n  vec3 l=1.-g;\r\n  vec3 i1=min(g.xyz,l.zxy);\r\n  vec3 i2=max(g.xyz,l.zxy);\r\n  vec3 x1=x0-i1+C.xxx;\r\n  vec3 x2=x0-i2+C.yyy;\r\n  vec3 x3=x0-D.yyy;\r\n  i=mod289(i);\r\n  vec4 p=permute(permute(permute(i.z+vec4(0.,i1.z,i2.z,1.))+i.y+vec4(0.,i1.y,i2.y,1.))+i.x+vec4(0.,i1.x,i2.x,1.));\r\n  float n_=1./7.; vec3 ns=n_*D.wyz-D.xzx;\r\n  vec4 j=p-49.*floor(p*ns.z*ns.z);\r\n  vec4 x_=floor(j*ns.z);\r\n  vec4 y_=floor(j-7.*x_);\r\n  vec4 x=x_*ns.x+ns.yyyy;\r\n  vec4 y=y_*ns.x+ns.yyyy;\r\n  vec4 h=1.-abs(x)-abs(y);\r\n  vec4 b0=vec4(x.xy,y.xy);\r\n  vec4 b1=vec4(x.zw,y.zw);\r\n  vec4 s0=floor(b0)*2.+1.;\r\n  vec4 s1=floor(b1)*2.+1.;\r\n  vec4 sh=-step(h,vec4(0.));\r\n  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy;\r\n  vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;\r\n  vec3 p0=vec3(a0.xy,h.x);\r\n  vec3 p1=vec3(a0.zw,h.y);\r\n  vec3 p2=vec3(a1.xy,h.z);\r\n  vec3 p3=vec3(a1.zw,h.w);\r\n  vec4 norm=inversesqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));\r\n  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;\r\n  vec4 m=max(.6-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.);\r\n  m*=m;\r\n  return 42.*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));\r\n}`;\r\n\r\nconst PERSIST_FRAG = `\r\nuniform sampler2D sampler;\r\nuniform float time;\r\nuniform vec2 mousePos;\r\nuniform float noiseFactor,noiseScale,rgbPersistFactor,alphaPersistFactor;\r\nvarying vec2 v_uv;\r\n${SIMPLEX}\r\nvoid main(){\r\n  float a=snoise3(vec3(v_uv*noiseFactor,time*.1))*noiseScale;\r\n  float b=snoise3(vec3(v_uv*noiseFactor,time*.1+100.))*noiseScale;\r\n  vec4 t=texture2D(sampler,v_uv+vec2(a,b)+mousePos*.005);\r\n  gl_FragColor=vec4(t.xyz*rgbPersistFactor,alphaPersistFactor);\r\n}`;\r\n\r\nconst TEXT_FRAG = `\r\nuniform sampler2D sampler;uniform vec3 color;varying vec2 v_uv;\r\nvoid main(){\r\n  vec4 t=texture2D(sampler,v_uv);\r\n  float alpha=smoothstep(0.1,0.9,t.a);\r\n  if(alpha<0.01)discard;\r\n  gl_FragColor=vec4(color,alpha);\r\n}`;\r\n\r\nexport interface TextTrailProps {\r\n\ttext?: string;\r\n\tfontFamily?: string;\r\n\tfontWeight?: string | number;\r\n\tnoiseFactor?: number;\r\n\tnoiseScale?: number;\r\n\trgbPersistFactor?: number;\r\n\talphaPersistFactor?: number;\r\n\tanimateColor?: boolean;\r\n\tstartColor?: string;\r\n\ttextColor?: string;\r\n\tbackgroundColor?: number | string;\r\n\tcolorCycleInterval?: number;\r\n\tsupersample?: number;\r\n}\r\n\r\nconst TextTrail: React.FC<TextTrailProps> = ({\r\n\ttext = \"Vibe\",\r\n\tfontFamily = \"Figtree\",\r\n\tfontWeight = \"900\",\r\n\tnoiseFactor = 1,\r\n\tnoiseScale = 0.0005,\r\n\trgbPersistFactor = 0.98,\r\n\talphaPersistFactor = 0.95,\r\n\tanimateColor = false,\r\n\tstartColor = \"#ffffff\",\r\n\ttextColor = \"#ffffff\",\r\n\tbackgroundColor = 0x271e37,\r\n\tcolorCycleInterval = 3000,\r\n\tsupersample = 2,\r\n}) => {\r\n\tconst ref = useRef<HTMLDivElement>(null);\r\n\r\n\tconst persistColor = useRef<[number, number, number]>(\r\n\t\thexToRgb(textColor || startColor).map((c) => c / 255) as [\r\n\t\t\tnumber,\r\n\t\t\tnumber,\r\n\t\t\tnumber,\r\n\t\t]\r\n\t);\r\n\tconst targetColor = useRef<[number, number, number]>([\r\n\t\t...persistColor.current,\r\n\t]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!ref.current) return;\r\n\r\n\t\tconst idConst = \"text-trail\";\r\n\r\n\t\tconst size = () => ({\r\n\t\t\tw: ref.current!.clientWidth,\r\n\t\t\th: ref.current!.clientHeight,\r\n\t\t});\r\n\t\tlet { w, h } = size();\r\n\r\n\t\tconst renderer = new WebGLRenderer({ antialias: true });\r\n\t\trenderer.setClearColor(new Color(backgroundColor as any), 1);\r\n\t\trenderer.setPixelRatio(window.devicePixelRatio || 1);\r\n\t\trenderer.setSize(w, h);\r\n\t\trenderer.domElement.id = idConst;\r\n\t\tif (document.getElementById(idConst)) {\r\n\t\t\tif (ref.current?.contains(renderer.domElement)) {\r\n\t\t\t\tref.current?.removeChild(document.getElementById(idConst));\r\n\t\t\t}\r\n\t\t\tref.current.appendChild(renderer.domElement);\r\n\t\t} else {\r\n\t\t\tref.current.appendChild(renderer.domElement);\r\n\t\t}\r\n\r\n\t\tconst scene = new Scene();\r\n\t\tconst fluidScene = new Scene();\r\n\t\tconst clock = new Clock();\r\n\t\tconst cam = new OrthographicCamera(-w / 2, w / 2, h / 2, -h / 2, 0.1, 10);\r\n\t\tcam.position.z = 1;\r\n\r\n\t\tlet rt0 = new WebGLRenderTarget(w, h);\r\n\t\tlet rt1 = rt0.clone();\r\n\r\n\t\tconst quadMat = new ShaderMaterial({\r\n\t\t\tuniforms: {\r\n\t\t\t\tsampler: { value: null },\r\n\t\t\t\ttime: { value: 0 },\r\n\t\t\t\tmousePos: { value: new Vector2(-1, 1) },\r\n\t\t\t\tnoiseFactor: { value: noiseFactor },\r\n\t\t\t\tnoiseScale: { value: noiseScale },\r\n\t\t\t\trgbPersistFactor: { value: rgbPersistFactor },\r\n\t\t\t\talphaPersistFactor: { value: alphaPersistFactor },\r\n\t\t\t},\r\n\t\t\tvertexShader: BASE_VERT,\r\n\t\t\tfragmentShader: PERSIST_FRAG,\r\n\t\t\ttransparent: true,\r\n\t\t});\r\n\t\tconst quad = new Mesh(new PlaneGeometry(w, h), quadMat);\r\n\t\tfluidScene.add(quad);\r\n\r\n\t\tconst labelMat = new ShaderMaterial({\r\n\t\t\tuniforms: {\r\n\t\t\t\tsampler: { value: null },\r\n\t\t\t\tcolor: { value: new Vector3(...persistColor.current) },\r\n\t\t\t},\r\n\t\t\tvertexShader: BASE_VERT,\r\n\t\t\tfragmentShader: TEXT_FRAG,\r\n\t\t\ttransparent: true,\r\n\t\t});\r\n\t\tconst label = new Mesh(\r\n\t\t\tnew PlaneGeometry(Math.min(w, h), Math.min(w, h)),\r\n\t\t\tlabelMat\r\n\t\t);\r\n\t\tscene.add(label);\r\n\r\n\t\tconst texCanvas = document.createElement(\"canvas\");\r\n\r\n\t\tconst ctx = texCanvas.getContext(\"2d\", {\r\n\t\t\talpha: true,\r\n\t\t\tcolorSpace: \"srgb\",\r\n\t\t})!;\r\n\t\tconst drawText = () => {\r\n\t\t\tconst max = Math.min(renderer.capabilities.maxTextureSize, 4096);\r\n\t\t\tconst pixelRatio = (window.devicePixelRatio || 1) * supersample;\r\n\t\t\tconst canvasSize = max * pixelRatio;\r\n\t\t\ttexCanvas.width = canvasSize;\r\n\t\t\ttexCanvas.height = canvasSize;\r\n\t\t\ttexCanvas.style.width = `${max}px`;\r\n\t\t\ttexCanvas.style.height = `${max}px`;\r\n\r\n\t\t\tctx.setTransform(1, 0, 0, 1, 0, 0);\r\n\t\t\tctx.scale(pixelRatio, pixelRatio);\r\n\t\t\tctx.clearRect(0, 0, max, max);\r\n\t\t\tctx.imageSmoothingEnabled = true;\r\n\t\t\tctx.imageSmoothingQuality = \"high\";\r\n\t\t\tctx.shadowColor = \"rgba(255,255,255,0.3)\";\r\n\t\t\tctx.shadowBlur = 2;\r\n\t\t\tctx.fillStyle = \"#fff\";\r\n\t\t\tctx.textAlign = \"center\";\r\n\t\t\tctx.textBaseline = \"middle\";\r\n\r\n\t\t\tconst refSize = 250;\r\n\t\t\tctx.font = `${fontWeight} ${refSize}px ${fontFamily}`;\r\n\t\t\tconst width = ctx.measureText(text).width;\r\n\t\t\tctx.font = `${fontWeight} ${(refSize * max) / width}px ${fontFamily}`;\r\n\r\n\t\t\tconst cx = max / 2,\r\n\t\t\t\tcy = max / 2;\r\n\t\t\tconst offs = [\r\n\t\t\t\t[0, 0],\r\n\t\t\t\t[0.1, 0],\r\n\t\t\t\t[-0.1, 0],\r\n\t\t\t\t[0, 0.1],\r\n\t\t\t\t[0, -0.1],\r\n\t\t\t\t[0.1, 0.1],\r\n\t\t\t\t[-0.1, -0.1],\r\n\t\t\t\t[0.1, -0.1],\r\n\t\t\t\t[-0.1, 0.1],\r\n\t\t\t];\r\n\t\t\tctx.globalAlpha = 1 / offs.length;\r\n\t\t\toffs.forEach(([dx, dy]) => ctx.fillText(text, cx + dx, cy + dy));\r\n\t\t\tctx.globalAlpha = 1;\r\n\r\n\t\t\tconst tex = new CanvasTexture(texCanvas);\r\n\t\t\ttex.generateMipmaps = true;\r\n\t\t\ttex.minFilter = LinearMipmapLinearFilter;\r\n\t\t\ttex.magFilter = LinearFilter;\r\n\t\t\tlabelMat.uniforms.sampler.value = tex;\r\n\t\t};\r\n\t\tloadFont(fontFamily).finally(drawText);\r\n\r\n\t\tconst mouse = [0, 0],\r\n\t\t\ttarget = [0, 0];\r\n\t\tconst onMove = (e: PointerEvent) => {\r\n\t\t\tconst r = ref.current!.getBoundingClientRect();\r\n\t\t\ttarget[0] = ((e.clientX - r.left) / r.width) * 2 - 1;\r\n\t\t\ttarget[1] = ((r.top + r.height - e.clientY) / r.height) * 2 - 1;\r\n\t\t};\r\n\t\tref.current.addEventListener(\"pointermove\", onMove);\r\n\r\n\t\tconst ro = new ResizeObserver(() => {\r\n\t\t\t({ w, h } = size());\r\n\t\t\trenderer.setSize(w, h);\r\n\t\t\tcam.left = -w / 2;\r\n\t\t\tcam.right = w / 2;\r\n\t\t\tcam.top = h / 2;\r\n\t\t\tcam.bottom = -h / 2;\r\n\t\t\tcam.updateProjectionMatrix();\r\n\t\t\tquad.geometry.dispose();\r\n\t\t\tquad.geometry = new PlaneGeometry(w, h);\r\n\t\t\trt0.setSize(w, h);\r\n\t\t\trt1.setSize(w, h);\r\n\t\t\tlabel.geometry.dispose();\r\n\t\t\tlabel.geometry = new PlaneGeometry(Math.min(w, h), Math.min(w, h));\r\n\t\t});\r\n\t\tro.observe(ref.current);\r\n\r\n\t\tconst timer = setInterval(() => {\r\n\t\t\tif (!textColor) {\r\n\t\t\t\ttargetColor.current = [Math.random(), Math.random(), Math.random()];\r\n\t\t\t}\r\n\t\t}, colorCycleInterval);\r\n\r\n\t\trenderer.setAnimationLoop(() => {\r\n\t\t\tconst dt = clock.getDelta();\r\n\t\t\tif (animateColor && !textColor) {\r\n\t\t\t\tfor (let i = 0; i < 3; i++)\r\n\t\t\t\t\tpersistColor.current[i] +=\r\n\t\t\t\t\t\t(targetColor.current[i] - persistColor.current[i]) * dt;\r\n\t\t\t}\r\n\t\t\tconst speed = dt * 5;\r\n\t\t\tmouse[0] += (target[0] - mouse[0]) * speed;\r\n\t\t\tmouse[1] += (target[1] - mouse[1]) * speed;\r\n\r\n\t\t\tquadMat.uniforms.mousePos.value.set(mouse[0], mouse[1]);\r\n\t\t\tquadMat.uniforms.sampler.value = rt1.texture;\r\n\t\t\tquadMat.uniforms.time.value = clock.getElapsedTime();\r\n\t\t\tlabelMat.uniforms.color.value.set(...persistColor.current);\r\n\r\n\t\t\trenderer.autoClearColor = false;\r\n\t\t\trenderer.setRenderTarget(rt0);\r\n\t\t\trenderer.clearColor();\r\n\t\t\trenderer.render(fluidScene, cam);\r\n\t\t\trenderer.render(scene, cam);\r\n\t\t\trenderer.setRenderTarget(null);\r\n\t\t\trenderer.render(fluidScene, cam);\r\n\t\t\trenderer.render(scene, cam);\r\n\t\t\t[rt0, rt1] = [rt1, rt0];\r\n\t\t});\r\n\r\n\t\treturn () => {\r\n\t\t\trenderer.setAnimationLoop(null);\r\n\t\t\tclearInterval(timer);\r\n\t\t\tref.current?.removeEventListener(\"pointermove\", onMove);\r\n\t\t\tro.disconnect();\r\n\t\t\tif (ref.current?.contains(renderer.domElement)) {\r\n\t\t\t\tref.current?.removeChild(renderer.domElement);\r\n\t\t\t}\r\n\t\t\trenderer.dispose();\r\n\t\t\trt0.dispose();\r\n\t\t\trt1.dispose();\r\n\t\t\tquadMat.dispose();\r\n\t\t\tquad.geometry.dispose();\r\n\t\t\tlabelMat.dispose();\r\n\t\t\tlabel.geometry.dispose();\r\n\t\t};\r\n\t}, [\r\n\t\tfontFamily,\r\n\t\tfontWeight,\r\n\t\tnoiseFactor,\r\n\t\tnoiseScale,\r\n\t\trgbPersistFactor,\r\n\t\talphaPersistFactor,\r\n\t\tanimateColor,\r\n\t\tstartColor,\r\n\t\ttextColor,\r\n\t\tbackgroundColor,\r\n\t\tcolorCycleInterval,\r\n\t\tsupersample,\r\n\t]);\r\n\r\n\treturn <div ref={ref} className=\"w-full h-full\" />;\r\n};\r\n\r\nexport default TextTrail;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "webgl",
+      "canvas",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"Vibe\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontFamily",
+        "type": "string",
+        "default": "\"Figtree\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontWeight",
+        "type": "string | number",
+        "default": "\"900\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "noiseFactor",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "noiseScale",
+        "type": "number",
+        "default": "0.0005",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rgbPersistFactor",
+        "type": "number",
+        "default": "0.98",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "alphaPersistFactor",
+        "type": "number",
+        "default": "0.95",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animateColor",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "startColor",
+        "type": "string",
+        "default": "\"#ffffff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textColor",
+        "type": "string",
+        "default": "\"#ffffff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string | number",
+        "default": "0x271e37",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "colorCycleInterval",
+        "type": "number",
+        "default": "3000",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "supersample",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-trail"
+  }
+}

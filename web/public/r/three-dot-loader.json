@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "three-dot-loader",
+  "type": "registry:ui",
+  "title": "Three Dot Loader",
+  "description": "Three Dot Loader",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/three-dot-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/three-dot-loader.tsx",
+      "content": "export default function ThreeDotLoaderGrowing() {\n\tconst animationDuration = 1;\n\n\treturn (\n\t\t<>\n\t\t\t<style>\n\t\t\t\t{`\n          @keyframes three-dot-loader-growing {\n            0% {\n              transform: scale(1) ;\n            }\n            20% {\n              transform: scale(1.3);\n            }\n            90% {\n              transform: scale(1);\n            }\n          }\n        `}\n\t\t\t</style>\n\t\t\t<div className=\"flex gap-2\">\n\t\t\t\t{[...new Array(3)].map((_, index) => (\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"size-5 origin-center rounded-xl bg-background dark:invert\"\n\t\t\t\t\t\tkey={index.toString() + \"three-dot\"}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tanimationName: \"three-dot-loader-growing\",\n\t\t\t\t\t\t\tanimationDuration: `${animationDuration}s`,\n\t\t\t\t\t\t\tanimationIterationCount: \"infinite\",\n\t\t\t\t\t\t\tanimationDirection: \"normal\",\n\t\t\t\t\t\t\tanimationTimingFunction: \"ease-in-out\",\n\t\t\t\t\t\t\tanimationDelay: `${(animationDuration / 3) * index}s`,\n\t\t\t\t\t\t}}\n\t\t\t\t\t/>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/three-dot-loader"
+  }
+}

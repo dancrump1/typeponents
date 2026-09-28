@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cards",
+  "type": "registry:ui",
+  "title": "Cards",
+  "description": "Set of flip-card building blocks — container, header, divider, front and back faces, and buttons — for cards with two sides.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/cards.tsx",
+      "content": "import React, { forwardRef } from \"react\";\n\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\nconst CardContainer = ({ children, className }) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"group basis-64 xl:basis-[355px] leading-tight lg:grow\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t<div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"relative h-full transition-all duration-500 transform-3d\"\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t<AnimatePresence mode=\"popLayout\" initial={false}>\n\t\t\t\t\t{children}\n\t\t\t\t</AnimatePresence>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nconst CardHeader = ({ children }) => {\n\treturn (\n\t\t<div className=\"bg-backgroundSecondary text-foreground justify-center flex items-center\">\n\t\t\t<span className=\"sm:min-w-[290px] mx-auto py-4 lg:px-6 lg:py-8 text-center text-balance\">\n\t\t\t\t{children}\n\t\t\t</span>\n\t\t</div>\n\t);\n};\n\nconst CardHr = () => (\n\t<hr className=\"w-[140px] my-2 mx-auto border-background border-b-2\" />\n);\n\n/** Custom component note: When using popLayout mode, any immediate child of AnimatePresence that's a custom component must be wrapped in React's forwardRef function, forwarding the provided ref to the DOM node you wish to pop out of the layout. */\nconst CardContent = forwardRef(({ children, key }, ref) => {\n\treturn (\n\t\t<motion.div\n\t\t\tref={ref}\n\t\t\tkey={key}\n\t\t\tinitial={{ rotateY: 180 }}\n\t\t\tanimate={{ rotateY: 0 }}\n\t\t\texit={{ rotateY: -180 }}\n\t\t\ttransition={{ duration: 0.5 }}\n\t\t\tclassName={cn(\n\t\t\t\t\"flex flex-col w-full backface-hidden rounded-xl min-h-[400px] lg:min-h-[500px] overflow-hidden shadow-lg bg-background\"\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</motion.div>\n\t);\n});\n\n/** Custom component note: When using popLayout mode, any immediate child of AnimatePresence that's a custom component must be wrapped in React's forwardRef function, forwarding the provided ref to the DOM node you wish to pop out of the layout. */\nconst FlipCardBackContent = forwardRef(({ children, key }, ref) => {\n\treturn (\n\t\t<motion.div\n\t\t\tref={ref}\n\t\t\tkey={key}\n\t\t\tinitial={{ rotateY: 180 }}\n\t\t\tanimate={{ rotateY: 0 }}\n\t\t\texit={{ rotateY: -180 }}\n\t\t\ttransition={{ duration: 0.5 }}\n\t\t\tclassName={cn(\n\t\t\t\t\"w-full rounded-xl backface-hidden overflow-hidden shadow-lg \"\n\t\t\t)}\n\t\t>\n\t\t\t<div className=\"flex flex-col gap-2 rounded-xl min-h-[400px] lg:min-h-[500px]\">\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</motion.div>\n\t);\n});\n\nconst FlipCardButton = ({ children, onClick }) => {\n\treturn (\n\t\t<button\n\t\t\tclassName=\"button red-to-background my-6 mx-auto\"\n\t\t\tonClick={() => onClick()}\n\t\t>\n\t\t\t{children}\n\t\t</button>\n\t);\n};\n\nconst LinkCardButton = ({ children, url, target }) => {\n\treturn (\n\t\t<Link\n\t\t\tclassName=\"button red-to-background my-6 mx-auto\"\n\t\t\thref={url || \"\"}\n\t\t\ttarget={target}\n\t\t\treferrerPolicy={target && \"no-referrer\"}\n\t\t>\n\t\t\t{children}\n\t\t</Link>\n\t);\n};\n\nexport {\n\tCardContainer,\n\tCardHeader,\n\tCardHr,\n\tCardContent,\n\tFlipCardBackContent,\n\tFlipCardButton,\n\tLinkCardButton,\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [],
+    "interaction": "Clicking the card button turns the card on its vertical axis, swinging the current face away while the other face swings in to replace it.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/cards"
+  }
+}

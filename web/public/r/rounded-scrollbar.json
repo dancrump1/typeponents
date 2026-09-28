@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rounded-scrollbar",
+  "type": "registry:ui",
+  "title": "Rounded Scrollbar",
+  "description": "Rounded Scrollbar",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/rounded-scrollbar.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/rounded-scrollbar.tsx",
+      "content": "import React, { useEffect } from \"react\";\r\n\r\nimport gsap from \"gsap\";\r\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\r\n\r\ngsap.registerPlugin(ScrollTrigger);\r\n\r\n// Credit:\r\n// https://codepen.io/jh3y/pen/gOEgxbd\r\n\r\n// CSS:\r\n// to_share/rounded-scroll.scss\r\n\r\nconst RoundedScroll = () => {\r\n\tuseEffect(() => {\r\n\t\tconst scroller = document.querySelector(\".scroll-container\");\r\n\t\tconst list = scroller.querySelector(\"ul\");\r\n\t\tconst bar = scroller.querySelector(\".scroller__bar\");\r\n\t\tconst track = scroller.querySelector(\".bar__track\");\r\n\t\tconst thumb = bar.querySelector(\".bar__thumb\");\r\n\t\tconst styles = scroller.querySelector(\"style\");\r\n\r\n\t\tconst CONFIG = {\r\n\t\t\tshow: true,\r\n\t\t\tradius: 32,\r\n\t\t\tscrollPadding: 100,\r\n\t\t\tstroke: 7,\r\n\t\t\tinset: 4,\r\n\t\t\ttrail: 0,\r\n\t\t\ttrack: true,\r\n\t\t\tthumb: 80,\r\n\t\t\tfinish: 5,\r\n\t\t\talpha: 0.75,\r\n\t\t\ttrack: 0,\r\n\t\t\tcornerLength: 0,\r\n\t\t};\r\n\r\n\t\t/**\r\n\t\t * Set up a ResizeObserver that syncs the SVG path and viewBox\r\n\t\t * with the size of the scroller. If you have a static sized scroller\r\n\t\t * and radius, etc. You can take a snapshot of it and use it over and over.\r\n\t\t * The ResizeObserver is mainly for demo purposes so you can make what you\r\n\t\t * want.\r\n\t\t * */\r\n\t\tconst syncBar = (scrollerBar) => {\r\n\t\t\tconst mid = CONFIG.radius;\r\n\t\t\tconst innerRad = Math.max(\r\n\t\t\t\t0,\r\n\t\t\t\tCONFIG.radius - (CONFIG.inset + CONFIG.stroke * 0.5)\r\n\t\t\t);\r\n\t\t\tconst padTop = CONFIG.inset + CONFIG.stroke * 0.5;\r\n\t\t\tconst padLeft = CONFIG.radius * 2 - padTop;\r\n\t\t\tbar.setAttribute(\r\n\t\t\t\t\"viewBox\",\r\n\t\t\t\t`0 0 ${CONFIG.radius * 2} ${scrollerBar.target.offsetHeight}`\r\n\t\t\t);\r\n\t\t\tscroller.style.setProperty(\"--stroke-width\", CONFIG.stroke);\r\n\t\t\tlet d = `\r\n  M${mid - CONFIG.trail},${padTop}\r\n    ${innerRad === 0 ? `` : `L${mid},${padTop}`}\r\n    ${\r\n\t\t\tinnerRad === 0\r\n\t\t\t\t? `L${padLeft},${padTop}`\r\n\t\t\t\t: `a${innerRad},${innerRad} 0 0 1 ${innerRad} ${innerRad}`\r\n\t\t}`;\r\n\t\t\tthumb.setAttribute(\"d\", d);\r\n\t\t\tconst cornerLength = Math.ceil(thumb.getTotalLength());\r\n\t\t\tCONFIG.cornerLength = cornerLength;\r\n\t\t\td = `\r\n    M${mid - CONFIG.trail},${padTop}\r\n    ${innerRad === 0 ? `` : `L${mid},${padTop}`}\r\n    ${\r\n\t\t\tinnerRad === 0\r\n\t\t\t\t? `L${padLeft},${padTop}`\r\n\t\t\t\t: `a${innerRad},${innerRad} 0 0 1 ${innerRad} ${innerRad}`\r\n\t\t}\r\n    L${padLeft},${\r\n\t\t\t\tscrollerBar.target.offsetHeight -\r\n\t\t\t\t(CONFIG.inset + CONFIG.stroke * 0.5 + innerRad)\r\n\t\t\t}\r\n    ${\r\n\t\t\tinnerRad === 0\r\n\t\t\t\t? `L${padLeft},${\r\n\t\t\t\t\t\tscrollerBar.target.offsetHeight -\r\n\t\t\t\t\t\t(CONFIG.inset + CONFIG.stroke * 0.5)\r\n\t\t\t\t  }`\r\n\t\t\t\t: `a${innerRad},${innerRad} 0 0 1 ${-innerRad} ${innerRad}`\r\n\t\t}\r\n    L${mid - CONFIG.trail},${\r\n\t\t\t\tscrollerBar.target.offsetHeight -\r\n\t\t\t\t(CONFIG.inset + CONFIG.stroke * 0.5)\r\n\t\t\t}\r\n  `;\r\n\t\t\tthumb.setAttribute(\"d\", d);\r\n\t\t\ttrack.setAttribute(\"d\", d);\r\n\t\t\tscroller.style.setProperty(\r\n\t\t\t\t\"--track-length\",\r\n\t\t\t\tMath.ceil(track.getTotalLength())\r\n\t\t\t);\r\n\t\t\tscroller.style.setProperty(\"--track-start\", cornerLength);\r\n\t\t\tscroller.style.setProperty(\"--start\", CONFIG.thumb * 2 + cornerLength);\r\n\t\t\tscroller.style.setProperty(\r\n\t\t\t\t\"--destination\",\r\n\t\t\t\tMath.ceil(track.getTotalLength()) - cornerLength + CONFIG.thumb\r\n\t\t\t);\r\n\t\t\tstyles.innerHTML = `\r\n    @keyframes scroll {\r\n      0% { stroke-dashoffset: ${CONFIG.thumb - CONFIG.finish}; }\r\n      ${Math.floor(\r\n\t\t\t(CONFIG.scrollPadding / (list.scrollHeight - scroller.offsetHeight)) *\r\n\t\t\t\t100\r\n\t\t)}% { stroke-dashoffset: ${cornerLength * -1};}\r\n      ${\r\n\t\t\t100 -\r\n\t\t\tMath.floor(\r\n\t\t\t\t(CONFIG.scrollPadding /\r\n\t\t\t\t\t(list.scrollHeight - scroller.offsetHeight)) *\r\n\t\t\t\t\t100\r\n\t\t\t)\r\n\t\t}% { stroke-dashoffset: ${\r\n\t\t\t\t(Math.floor(track.getTotalLength()) - cornerLength - CONFIG.thumb) *\r\n\t\t\t\t-1\r\n\t\t\t};}\r\n      100% { stroke-dashoffset: ${\r\n\t\t\t(Math.floor(track.getTotalLength()) - CONFIG.finish) * -1\r\n\t\t}; }\r\n    }\r\n  `;\r\n\t\t};\r\n\t\tconst resizeObserver = new ResizeObserver((entries) => {\r\n\t\t\tfor (const entry of entries) {\r\n\t\t\t\tsyncBar(entry);\r\n\t\t\t\tupdate();\r\n\t\t\t\tconfigureTimeline();\r\n\t\t\t}\r\n\t\t});\r\n\t\tresizeObserver.observe(scroller);\r\n\r\n\t\tlet tl;\r\n\t\tconst configureTimeline = () => {\r\n\t\t\tconst frameOne = `${Math.floor(\r\n\t\t\t\t(CONFIG.scrollPadding /\r\n\t\t\t\t\t(list.scrollHeight - scroller.offsetHeight)) *\r\n\t\t\t\t\t100\r\n\t\t\t)}%`;\r\n\t\t\tconst frameTwo = `${\r\n\t\t\t\t100 -\r\n\t\t\t\tMath.floor(\r\n\t\t\t\t\t(CONFIG.scrollPadding /\r\n\t\t\t\t\t\t(list.scrollHeight - scroller.offsetHeight)) *\r\n\t\t\t\t\t\t100\r\n\t\t\t\t)\r\n\t\t\t}%`;\r\n\t\t\tif (tl) tl.kill();\r\n\t\t\ttl = gsap.to(\".bar__thumb\", {\r\n\t\t\t\tscrollTrigger: {\r\n\t\t\t\t\t// scroller: scroller,\r\n\t\t\t\t\tscrub: true,\r\n\t\t\t\t},\r\n\t\t\t\tease: \"none\",\r\n\t\t\t\tkeyframes: {\r\n\t\t\t\t\t\"0%\": { strokeDashoffset: CONFIG.thumb - CONFIG.finish },\r\n\t\t\t\t\t[frameOne]: { strokeDashoffset: CONFIG.cornerLength * -1 },\r\n\t\t\t\t\t[frameTwo]: {\r\n\t\t\t\t\t\tstrokeDashoffset:\r\n\t\t\t\t\t\t\t(Math.floor(track.getTotalLength()) -\r\n\t\t\t\t\t\t\t\tCONFIG.cornerLength -\r\n\t\t\t\t\t\t\t\tCONFIG.thumb) *\r\n\t\t\t\t\t\t\t-1,\r\n\t\t\t\t\t},\r\n\t\t\t\t\t\"100%\": {\r\n\t\t\t\t\t\tstrokeDashoffset:\r\n\t\t\t\t\t\t\t(Math.floor(track.getTotalLength()) - CONFIG.finish) * -1,\r\n\t\t\t\t\t},\r\n\t\t\t\t},\r\n\t\t\t});\r\n\t\t};\r\n\r\n\t\t/**\r\n\t\t * Use dat.gui to show off the configurability of things\r\n\t\t * */\r\n\t\tif (CONFIG.show)\r\n\t\t\tdocument.documentElement.toggleAttribute(\"data-rounded-scroll\");\r\n\r\n\t\tconst update = () => {\r\n\t\t\tscroller.style.setProperty(\"--radius\", CONFIG.radius);\r\n\t\t\tscroller.style.setProperty(\"--padding\", CONFIG.scrollPadding);\r\n\t\t\tscroller.style.setProperty(\"--thumb-size\", CONFIG.thumb);\r\n\t\t\tscroller.style.setProperty(\"--bar-alpha\", CONFIG.alpha);\r\n\t\t\tscroller.style.setProperty(\"--track-alpha\", CONFIG.track);\r\n\t\t\tscroller.style.setProperty(\r\n\t\t\t\t\"--destination\",\r\n\t\t\t\tMath.ceil(track.getTotalLength()) -\r\n\t\t\t\t\t((Math.ceil(track.getTotalLength()) - scroller.offsetHeight) *\r\n\t\t\t\t\t\t0.5 +\r\n\t\t\t\t\t\tCONFIG.inset)\r\n\t\t\t);\r\n\t\t\tscroller.style.setProperty(\"--start\", CONFIG.thumb * 2);\r\n\t\t\tsyncBar({ target: scroller });\r\n\t\t};\r\n\r\n\t\tsyncBar({ target: scroller });\r\n\t\tupdate();\r\n\r\n\t\tif (!CSS.supports(\"(animation-timeline: scroll())\")) {\r\n\t\t\tconfigureTimeline();\r\n\t\t}\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"scroller\">\r\n\t\t\t<svg\r\n\t\t\t\tclassName=\"scroller__bar bar\"\r\n\t\t\t\tviewBox=\"0 0 56 56\"\r\n\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t>\r\n\t\t\t\t<path className=\"bar__thumb\" fill=\"none\" stroke-linecap=\"round\" />\r\n\t\t\t\t<path className=\"bar__track\" fill=\"none\" stroke-linecap=\"round\" />\r\n\t\t\t</svg>\r\n\t\t\t<ul>\r\n\t\t\t\t<li></li>\r\n\t\t\t\t<li></li>\r\n\t\t\t\t<li></li>\r\n\t\t\t\t<li></li>\r\n\t\t\t\t<li></li>\r\n\t\t\t</ul>\r\n\t\t\t<style id=\"scroller-frames\"></style>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default RoundedScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "scroll-driven",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "CodePen",
+      "url": "https://codepen.io/jh3y/pen/gOEgxbd",
+      "author": "jh3y",
+      "authorUrl": "https://codepen.io/jh3y",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/rounded-scrollbar"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-deck",
+  "type": "registry:ui",
+  "title": "Card Deck",
+  "description": "Stack of image cards that fans out into a tilted 3D spread and pulls one card forward when picked.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/card-deck.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/card-deck.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.serenity-ui.com/components/cards/3dflipcard\r\n\r\n// Types\r\ninterface ImageCardProps {\r\n\tsrc: string;\r\n\talt: string;\r\n\tindex: number;\r\n\tisHovered: boolean;\r\n\tisFirstCard?: boolean;\r\n\tisMobile: boolean;\r\n\tisFront?: boolean;\r\n\tfrontCardIndex: number | null;\r\n\tonClick: (index: number) => void;\r\n}\r\n\r\n// Animations\r\nconst Card: React.FC<ImageCardProps> = ({\r\n\tsrc,\r\n\talt,\r\n\tindex,\r\n\tisHovered,\r\n\tisFirstCard,\r\n\tisMobile,\r\n\tisFront,\r\n\tfrontCardIndex,\r\n\tonClick,\r\n}) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName={`absolute w-80 h-48 rounded-xl overflow-hidden shadow-lg ${\r\n\t\t\t\tisFront ? \"z-20\" : \"\"\r\n\t\t\t}`}\r\n\t\t\tstyle={{\r\n\t\t\t\ttransformStyle: \"preserve-3d\",\r\n\t\t\t\ttransformOrigin: isMobile ? \"top center\" : \"left center\",\r\n\t\t\t\tzIndex: isFront ? 20 : 5 - index,\r\n\t\t\t\tfilter: isFront || frontCardIndex === null ? \"none\" : \"blur(5px)\",\r\n\t\t\t}}\r\n\t\t\tinitial={{\r\n\t\t\t\trotateY: 0,\r\n\t\t\t\tx: 0,\r\n\t\t\t\ty: 0,\r\n\t\t\t\tscale: 1,\r\n\t\t\t\tboxShadow: \"0px 0px 15px rgba(0, 0, 0, 0.1)\",\r\n\t\t\t}}\r\n\t\t\tanimate={\r\n\t\t\t\tisFront\r\n\t\t\t\t\t? {\r\n\t\t\t\t\t\t\tscale: 1.2,\r\n\t\t\t\t\t\t\trotateY: 0,\r\n\t\t\t\t\t\t\tx: isMobile ? 0 : 0,\r\n\t\t\t\t\t\t\ty: isMobile ? 0 : -50,\r\n\t\t\t\t\t\t\tz: 50,\r\n\t\t\t\t\t\t\tboxShadow: \"0px 15px 40px rgba(0, 0, 0, 0.5)\",\r\n\t\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t\t\tdamping: 20,\r\n\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t: isHovered\r\n\t\t\t\t\t\t? {\r\n\t\t\t\t\t\t\t\trotateY: isMobile ? 0 : -45,\r\n\t\t\t\t\t\t\t\tx: isMobile ? 0 : index * 50,\r\n\t\t\t\t\t\t\t\ty: isMobile ? index * 50 : index * -5,\r\n\t\t\t\t\t\t\t\tz: index * 15,\r\n\t\t\t\t\t\t\t\tscale: 1.05,\r\n\t\t\t\t\t\t\t\tboxShadow: `10px 20px 30px rgba(0, 0, 0, ${\r\n\t\t\t\t\t\t\t\t\t0.2 + index * 0.05\r\n\t\t\t\t\t\t\t\t})`,\r\n\t\t\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t\t\t\tdamping: 50,\r\n\t\t\t\t\t\t\t\t\tdelay: index * 0.1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t: {\r\n\t\t\t\t\t\t\t\trotateY: 0,\r\n\t\t\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\tz: 0,\r\n\t\t\t\t\t\t\t\tscale: 1,\r\n\t\t\t\t\t\t\t\tboxShadow: \"0px 0px 15px rgba(0, 0, 0, 0.1)\",\r\n\t\t\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t\t\t\tdamping: 20,\r\n\t\t\t\t\t\t\t\t\tdelay: (4 - index) * 0.1,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t}\r\n\t\t\t}\r\n\t\t\twhileHover={{\r\n\t\t\t\ty: isFirstCard ? 0 : -100,\r\n\t\t\t}}\r\n\t\t\tonClick={() => onClick(index)}\r\n\t\t>\r\n\t\t\t<Image\r\n\t\t\t\tsrc={src}\r\n\t\t\t\talt={alt}\r\n\t\t\t\tfill\r\n\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\tclassName=\"rounded-xl\"\r\n\t\t\t/>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\n// Prop types\r\ninterface CardStack3DProps {\r\n\timages: { src: string; alt: string }[];\r\n}\r\n\r\nconst CardDeck: React.FC<CardStack3DProps> = ({ images }) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\tconst [isMobile, setIsMobile] = useState<boolean>(false);\r\n\tconst [frontCardIndex, setFrontCardIndex] = useState<number | null>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst handleResize = () => {\r\n\t\t\tsetIsMobile(window.innerWidth <= 768);\r\n\t\t};\r\n\r\n\t\thandleResize();\r\n\t\twindow.addEventListener(\"resize\", handleResize);\r\n\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"resize\", handleResize);\r\n\t\t};\r\n\t}, []);\r\n\r\n\tconst handleCardClick = (index: number) => {\r\n\t\tsetFrontCardIndex((prevIndex) => (prevIndex === index ? null : index));\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className={`flex justify-center items-center py-32`}>\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"relative w-80 h-48 perspective-1000\"\r\n\t\t\t\tonMouseEnter={() => setIsHovered(true)}\r\n\t\t\t\tonMouseLeave={() => setIsHovered(false)}\r\n\t\t\t>\r\n\t\t\t\t{images?.map((image, index) => (\r\n\t\t\t\t\t<Card\r\n\t\t\t\t\t\tkey={index + \"card-deck\"}\r\n\t\t\t\t\t\t{...image}\r\n\t\t\t\t\t\tindex={index}\r\n\t\t\t\t\t\tisHovered={isHovered}\r\n\t\t\t\t\t\tisFirstCard={index === 0}\r\n\t\t\t\t\t\tisMobile={isMobile}\r\n\t\t\t\t\t\tisFront={frontCardIndex === index}\r\n\t\t\t\t\t\tfrontCardIndex={frontCardIndex}\r\n\t\t\t\t\t\tonClick={handleCardClick}\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default CardDeck;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Hovering the stack fans the cards out one after another, each turned away and stepped back in depth; clicking a card blurs the rest and floats that one forward at larger size, and clicking it again drops it back into the pile.",
+    "inspiration": {
+      "source": "Serenity UI",
+      "url": "https://www.serenity-ui.com/components/cards/3dflipcard",
+      "authorUrl": "https://www.serenity-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "{ src: string; alt: string; }[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/card-deck"
+  }
+}

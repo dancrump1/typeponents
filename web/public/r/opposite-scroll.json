@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "opposite-scroll",
+  "type": "registry:ui",
+  "title": "Opposite Scroll",
+  "description": "Two-column scroll section pairing stacked text panels on one side with a full-height image column on the other.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/opposite-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/opposite-scroll.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { motion, MotionValue, useScroll, useTransform } from \"motion/react\";\r\nimport { FiArrowDown, FiArrowUp } from \"react-icons/fi\";\r\n\r\n// Credit:\r\n// www.hover.dev/components/other#opposite-scroll-content\r\n\r\nconst OppoScroll = ({ containerRef }) => {\r\n\tconst targetRef = useRef<HTMLDivElement | null>(null);\r\n\tconst [componentContainerRef, setComponentContainerRef] = useState(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tsetComponentContainerRef(containerRef);\r\n\t}, [containerRef]);\r\n\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: targetRef,\r\n\t\t// container: componentContainerRef || null,\r\n\t});\r\n\r\n\tif (!!componentContainerRef && componentContainerRef?.current === undefined)\r\n\t\treturn null;\r\n\r\n\treturn (\r\n\t\t<section ref={targetRef} className=\"flex bg-background text-foreground\">\r\n\t\t\t<Content content={items} />\r\n\t\t\t<Images content={items} scrollYProgress={scrollYProgress} />\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nconst Content = ({ content }: { content: typeof items }) => {\r\n\treturn (\r\n\t\t<div className=\"w-full\">\r\n\t\t\t{content.map(({ id, title, description }, idx) => (\r\n\t\t\t\t<div\r\n\t\t\t\t\tkey={title + id}\r\n\t\t\t\t\tclassName={`p-8 h-screen flex flex-col justify-between ${\r\n\t\t\t\t\t\tidx % 2 ? \"bg-background text-foreground\" : \"bg-background text-foreground\"\r\n\t\t\t\t\t}`}\r\n\t\t\t\t>\r\n\t\t\t\t\t<h3 className=\"text-3xl font-medium\">{title}</h3>\r\n\t\t\t\t\t<p className=\"font-light w-full max-w-md\">{description}</p>\r\n\t\t\t\t</div>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst Images = ({\r\n\tcontent,\r\n\tscrollYProgress,\r\n}: {\r\n\tcontent: typeof items;\r\n\tscrollYProgress: MotionValue<number>;\r\n}) => {\r\n\tconst top = useTransform(\r\n\t\tscrollYProgress,\r\n\t\t[0, 1],\r\n\t\t[`-${(content?.length - 1) * 100}vh`, \"0vh\"]\r\n\t);\r\n\r\n\treturn (\r\n\t\t<div className=\"h-screen overflow-hidden sticky top-0 w-24 md:w-full\">\r\n\t\t\t<motion.div style={{ top }} className=\"absolute left-0 right-0\">\r\n\t\t\t\t{[...content]?.reverse().map(({ img, id, title }) => (\r\n\t\t\t\t\t<img\r\n\t\t\t\t\t\tkey={id + \"opposite-scroll\"}\r\n\t\t\t\t\t\talt={title}\r\n\t\t\t\t\t\tclassName=\"h-screen w-full object-cover\"\r\n\t\t\t\t\t\tsrc={img}\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</motion.div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default OppoScroll;\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\ttitle: \"Black Nike w white check\",\r\n\t\tdescription:\r\n\t\t\t\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.\",\r\n\t\timg: \"https://images.unsplash.com/photo-1543508282-6319a3e2621f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=830&q=80\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\ttitle: \"Bunch of black and white shoes\",\r\n\t\tdescription:\r\n\t\t\t\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.\",\r\n\t\timg: \"https://images.unsplash.com/photo-1600054904350-1d493ae5f922?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=930&q=80\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\ttitle: \"White shoes in the rain\",\r\n\t\tdescription:\r\n\t\t\t\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.\",\r\n\t\timg: \"https://images.unsplash.com/photo-1465479423260-c4afc24172c6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1738&q=80\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\ttitle: \"White shoes with black heel\",\r\n\t\tdescription:\r\n\t\t\t\"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.\",\r\n\t\timg: \"https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1662&q=80\",\r\n\t},\r\n];\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "As you scroll, the text panels move up the page normally while the image column beside them travels the opposite way through a fixed frame, so each paragraph arrives alongside its own photo.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "draft",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/opposite-scroll"
+  }
+}

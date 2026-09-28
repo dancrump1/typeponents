@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-525",
+  "type": "registry:component",
+  "title": "Comp 525",
+  "description": "Comp 525",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-525.tsx",
+      "content": "import {\r\n\tStepper,\r\n\tStepperDescription,\r\n\tStepperIndicator,\r\n\tStepperItem,\r\n\tStepperSeparator,\r\n\tStepperTitle,\r\n\tStepperTrigger,\r\n} from \"@/components/ui/stepper\";\r\n\r\nconst steps = [\r\n\t{\r\n\t\tstep: 1,\r\n\t\ttitle: \"Step One\",\r\n\t\tdescription: \"Desc for step one\",\r\n\t},\r\n\t{\r\n\t\tstep: 2,\r\n\t\ttitle: \"Step Two\",\r\n\t\tdescription: \"Desc for step two\",\r\n\t},\r\n\t{\r\n\t\tstep: 3,\r\n\t\ttitle: \"Step Three\",\r\n\t\tdescription: \"Desc for step three\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"space-y-8 text-center\">\r\n\t\t\t<Stepper defaultValue={2}>\r\n\t\t\t\t{steps.map(({ step, title, description }) => (\r\n\t\t\t\t\t<StepperItem\r\n\t\t\t\t\t\tkey={step}\r\n\t\t\t\t\t\tstep={step}\r\n\t\t\t\t\t\tclassName=\"not-last:flex-1 max-md:items-start\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<StepperTrigger className=\"gap-4 rounded max-md:flex-col\">\r\n\t\t\t\t\t\t\t<StepperIndicator />\r\n\t\t\t\t\t\t\t<div className=\"text-center md:-order-1 md:text-left\">\r\n\t\t\t\t\t\t\t\t<StepperTitle>{title}</StepperTitle>\r\n\t\t\t\t\t\t\t\t<StepperDescription className=\"max-sm:hidden\">\r\n\t\t\t\t\t\t\t\t\t{description}\r\n\t\t\t\t\t\t\t\t</StepperDescription>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t\t{step < steps.length && (\r\n\t\t\t\t\t\t\t<StepperSeparator className=\"max-md:mt-3.5 md:mx-4\" />\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</StepperItem>\r\n\t\t\t\t))}\r\n\t\t\t</Stepper>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tStepper with inline titles and descriptions\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cms-line-sidebar",
+  "type": "registry:block",
+  "title": "Line sidebar (CMS block)",
+  "description": "Craft-ready Line sidebar block with injectable Editable wrapper.",
+  "registryDependencies": [
+    "@dbs/line-sidebar"
+  ],
+  "files": [
+    {
+      "path": "registry/cms/_types.ts",
+      "content": "import type { ComponentPropsWithoutRef, ElementType, ReactNode } from \"react\";\r\n\r\n/** Standard Craft Matrix block fields used by Drive CMS wrappers. */\r\nexport interface CmsBlockData {\r\n\tid: string;\r\n\tuid: string;\r\n\ttitle: string;\r\n\theadline?: string | null;\r\n\tcopy?: string | null;\r\n\thero?: Array<{\r\n\t\turl: string;\r\n\t\talt?: string | null;\r\n\t\twidth?: number;\r\n\t\theight?: number;\r\n\t}>;\r\n\tbutton?: Array<{\r\n\t\ttext?: string | null;\r\n\t\tlinkText?: string | null;\r\n\t\turl?: string | null;\r\n\t\tlinkUrl?: string | null;\r\n\t\tnewWindow?: string | boolean | null;\r\n\t}>;\r\n}\r\n\r\n/**\r\n * CmsBlockData aligns with SharedBlockContent in @/lib/component-content:\r\n *   title, headline, copy → copy fields\r\n *   hero[0]               → image\r\n *   button[0]             → button\r\n */\r\n\r\nexport type EditableMode = \"inline\" | \"panel\" | \"focus\";\r\n\r\nexport interface CmsFieldMapping {\r\n\tcmsField: keyof CmsBlockData | \"componentHandle\";\r\n\tprop: string;\r\n\tlabel: string;\r\n\teditable?: EditableMode;\r\n\t/** e.g. \"comma-list\" to split headline into string[] */\r\n\tformat?: \"comma-list\";\r\n}\r\n\r\nexport interface CmsComponentMeta {\r\n\tenabled: boolean;\r\n\tusesBlockStyles?: boolean;\r\n\tfields: CmsFieldMapping[];\r\n}\r\n\r\nexport interface EditableFieldProps {\r\n\tsubfield: string;\r\n\tlabel: string;\r\n\tinline?: boolean;\r\n\tpanelOnly?: boolean;\r\n\tclassName?: string;\r\n\tas?: ElementType;\r\n\tchildren: ReactNode;\r\n}\r\n\r\nexport type EditableComponent = (\r\n\tprops: EditableFieldProps,\r\n) => ReactNode;\r\n\r\nexport interface CmsBlockContext {\r\n\tfieldHandle: string;\r\n\tblockId: string;\r\n\tblockUid: string;\r\n\tentryId?: string;\r\n\tEditable: EditableComponent;\r\n}\r\n\r\nexport type CmsBlockProps<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\tCmsBlockContext & {\r\n\t\tdata: CmsBlockData;\r\n\t} & TProps;\r\n\r\nexport type CmsBlockComponent<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\t(props: CmsBlockProps<TProps>) => ReactNode;\r\n\r\nexport function mapCommaList(value?: string | null): string[] {\r\n\tif (!value?.trim()) {\r\n\t\treturn [];\r\n\t}\r\n\r\n\treturn value\r\n\t\t.split(/[,;]+/)\r\n\t\t.map((part) => part.trim())\r\n\t\t.filter(Boolean);\r\n}\r\n\r\nexport function getBlockButton(data: CmsBlockData) {\r\n\treturn data.button?.[0];\r\n}\r\n\r\nexport function getBlockImage(data: CmsBlockData) {\r\n\treturn data.hero?.[0];\r\n}\r\n",
+      "type": "registry:lib",
+      "target": "~/registry/cms/_types.ts"
+    },
+    {
+      "path": "registry/cms/line-sidebar.block.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport LineSidebar from \"@/registry/open-source/line-sidebar\";\r\n\r\nimport {\r\n\tCmsBlockComponent,\r\n\tgetBlockButton,\r\n\tgetBlockImage,\r\n} from \"./_types\";\r\n\r\n/** Auto-generated CMS block for line-sidebar. */\r\nexport const lineSidebarCmsMeta = {\r\n\tenabled: true,\r\n\tusesBlockStyles: true,\r\n\tfields: [\r\n\t\t{ cmsField: \"title\", prop: \"title\", label: \"Title\", editable: \"inline\" },\r\n\t\t{ cmsField: \"headline\", prop: \"headline\", label: \"Headline\", editable: \"inline\" },\r\n\t\t{ cmsField: \"copy\", prop: \"copy\", label: \"Body\", editable: \"panel\" },\r\n\t\t{ cmsField: \"hero\", prop: \"image\", label: \"Image\", editable: \"focus\" },\r\n\t\t{ cmsField: \"button\", prop: \"button\", label: \"Call to action\", editable: \"focus\" },\r\n\t],\r\n} as const;\r\n\r\nexport const LineSidebarCmsBlock: CmsBlockComponent = ({ data, Editable }) => {\r\n\tconst image = getBlockImage(data);\r\n\tconst button = getBlockButton(data);\r\n\r\n\treturn (\r\n\t\t<div className=\"relative w-full min-h-[240px] overflow-hidden\">\r\n\t\t\t<Editable subfield=\"title\" label=\"Title\" inline>\r\n\t\t\t\t<h2 className=\"text-2xl font-semibold tracking-tight\">\r\n\t\t\t\t\t{data.title || \"Line Sidebar\"}\r\n\t\t\t\t</h2>\r\n\t\t\t</Editable>\r\n\t\t\t{data.headline ? (\r\n\t\t\t\t<Editable subfield=\"headline\" label=\"Headline\" inline>\r\n\t\t\t\t\t<p className=\"mt-2 text-base text-neutral-600 dark:text-neutral-300\">\r\n\t\t\t\t\t\t{data.headline}\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t{data.copy ? (\r\n\t\t\t\t<Editable subfield=\"copy\" label=\"Body\">\r\n\t\t\t\t\t<p className=\"mt-3 text-sm text-neutral-500 dark:text-neutral-400\">\r\n\t\t\t\t\t\t{data.copy}\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t<Editable subfield=\"hero\" label=\"Image\">\r\n\t\t\t\t{image ? (\r\n\t\t\t\t\t<img\r\n\t\t\t\t\t\tsrc={image.url}\r\n\t\t\t\t\t\talt={image.alt || data.title || \"Line Sidebar\"}\r\n\t\t\t\t\t\twidth={image.width}\r\n\t\t\t\t\t\theight={image.height}\r\n\t\t\t\t\t\tclassName=\"mt-4 max-h-64 w-full rounded-lg object-cover\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t) : null}\r\n\t\t\t</Editable>\r\n\t\t\t{button ? (\r\n\t\t\t\t<Editable subfield=\"button\" label=\"Call to action\">\r\n\t\t\t\t\t<a\r\n\t\t\t\t\t\thref={button.url || button.linkUrl || \"#\"}\r\n\t\t\t\t\t\ttarget={button.newWindow ? \"_blank\" : undefined}\r\n\t\t\t\t\t\trel={button.newWindow ? \"noopener noreferrer\" : undefined}\r\n\t\t\t\t\t\tclassName=\"mt-4 inline-flex rounded-md bg-neutral-900 px-4 py-2 text-sm text-white dark:bg-white dark:text-neutral-900\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{button.text || button.linkText || \"Learn more\"}\r\n\t\t\t\t\t</a>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t<div className=\"mt-6 w-full\">\r\n\t\t\t\t<LineSidebar />\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n",
+      "type": "registry:block",
+      "target": "~/registry/cms/line-sidebar.block.tsx"
+    }
+  ],
+  "meta": {
+    "cms": {
+      "handle": "line-sidebar",
+      "usesBlockStyles": true,
+      "fields": [
+        {
+          "cmsField": "title",
+          "prop": "title",
+          "label": "Title",
+          "editable": "inline"
+        },
+        {
+          "cmsField": "headline",
+          "prop": "headline",
+          "label": "Headline",
+          "editable": "inline"
+        },
+        {
+          "cmsField": "copy",
+          "prop": "copy",
+          "label": "Body",
+          "editable": "panel"
+        },
+        {
+          "cmsField": "hero",
+          "prop": "image",
+          "label": "Image",
+          "editable": "focus"
+        },
+        {
+          "cmsField": "button",
+          "prop": "button",
+          "label": "Call to action",
+          "editable": "focus"
+        }
+      ]
+    }
+  },
+  "categories": [
+    "Navigation"
+  ]
+}

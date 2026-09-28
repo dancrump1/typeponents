@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spring-element",
+  "type": "registry:ui",
+  "title": "Spring Element",
+  "description": "Spring Element",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spring-element.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spring-element.tsx",
+      "content": "\"use client\";\n\nimport React, {\n\tReactElement,\n\tuseEffect,\n\tuseImperativeHandle,\n\tuseLayoutEffect,\n\tuseRef,\n\tuseState,\n\tuseSyncExternalStore,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tmotion,\n\tuseMotionValue,\n\tuseSpring,\n\ttype HTMLMotionProps,\n} from \"motion/react\";\n\n// Credit:\n// https://animate-ui.com/docs/components/spring-element\n\nconst generateSpringPath = (\n\tx1: number,\n\ty1: number,\n\tx2: number,\n\ty2: number,\n\tspringConfig: {\n\t\tcoilCount?: number;\n\t\tamplitudeMin?: number;\n\t\tamplitudeMax?: number;\n\t\tcurveRatioMin?: number;\n\t\tcurveRatioMax?: number;\n\t\tbezierOffset?: number;\n\t} = {}\n) => {\n\tconst {\n\t\tcoilCount = 8,\n\t\tamplitudeMin = 8,\n\t\tamplitudeMax = 20,\n\t\tcurveRatioMin = 0.5,\n\t\tcurveRatioMax = 1,\n\t\tbezierOffset = 8,\n\t} = springConfig;\n\n\tconst dx = x2 - x1;\n\tconst dy = y2 - y1;\n\tconst dist = Math.sqrt(dx * dx + dy * dy);\n\tif (dist < 2) return `M${x1},${y1}`;\n\tconst d = dist / coilCount;\n\tconst h = Math.max(0.8, 1 - (dist - 40) / 200);\n\tconst amplitude = Math.max(\n\t\tamplitudeMin,\n\t\tMath.min(amplitudeMax, amplitudeMax * h)\n\t);\n\tconst curveRatio =\n\t\tdist <= 40\n\t\t\t? curveRatioMax\n\t\t\t: dist <= 120\n\t\t\t\t? curveRatioMax -\n\t\t\t\t\t((dist - 40) / 80) * (curveRatioMax - curveRatioMin)\n\t\t\t\t: curveRatioMin;\n\tconst ux = dx / dist,\n\t\tuy = dy / dist;\n\tconst perpX = -uy,\n\t\tperpY = ux;\n\n\tlet path = [];\n\tfor (let i = 0; i < coilCount; i++) {\n\t\tconst sx = x1 + ux * (i * d);\n\t\tconst sy = y1 + uy * (i * d);\n\t\tconst ex = x1 + ux * ((i + 1) * d);\n\t\tconst ey = y1 + uy * ((i + 1) * d);\n\n\t\tconst mx = x1 + ux * ((i + 0.5) * d) + perpX * amplitude;\n\t\tconst my = y1 + uy * ((i + 0.5) * d) + perpY * amplitude;\n\n\t\tconst c1x = sx + d * curveRatio * ux;\n\t\tconst c1y = sy + d * curveRatio * uy;\n\t\tconst c2x = mx + ux * bezierOffset;\n\t\tconst c2y = my + uy * bezierOffset;\n\t\tconst c3x = mx - ux * bezierOffset;\n\t\tconst c3y = my - uy * bezierOffset;\n\t\tconst c4x = ex - d * curveRatio * ux;\n\t\tconst c4y = ey - d * curveRatio * uy;\n\n\t\tif (i === 0) path.push(`M${sx},${sy}`);\n\t\telse path.push(`L${sx},${sy}`);\n\t\tpath.push(`C${c1x},${c1y} ${c2x},${c2y} ${mx},${my}`);\n\t\tpath.push(`C${c3x},${c3y} ${c4x},${c4y} ${ex},${ey}`);\n\t}\n\treturn path.join(\" \");\n};\n\nfunction useMotionValueValue(mv: any) {\n\treturn useSyncExternalStore(\n\t\t(callback) => {\n\t\t\tconst unsub = mv.on(\"change\", callback);\n\t\t\treturn unsub;\n\t\t},\n\t\t() => mv.get(),\n\t\t() => mv.get()\n\t);\n}\n\ntype SpringAvatarProps = {\n\tchildren: ReactElement;\n\tclassName?: string;\n\tspringClassName?: string;\n\tdragElastic?: number;\n\tspringConfig?: { stiffness?: number; damping?: number };\n\tspringPathConfig?: {\n\t\tcoilCount?: number;\n\t\tamplitudeMin?: number;\n\t\tamplitudeMax?: number;\n\t\tcurveRatioMin?: number;\n\t\tcurveRatioMax?: number;\n\t\tbezierOffset?: number;\n\t};\n} & HTMLMotionProps<\"div\">;\n\nfunction SpringElement({\n\tref,\n\tchildren,\n\tclassName,\n\tspringClassName,\n\tdragElastic = 0.2,\n\tspringConfig = { stiffness: 200, damping: 16 },\n\tspringPathConfig = {},\n\t...props\n}: SpringAvatarProps) {\n\tconst x = useMotionValue(0);\n\tconst y = useMotionValue(0);\n\n\tconst springX = useSpring(x, {\n\t\tstiffness: springConfig.stiffness,\n\t\tdamping: springConfig.damping,\n\t});\n\tconst springY = useSpring(y, {\n\t\tstiffness: springConfig.stiffness,\n\t\tdamping: springConfig.damping,\n\t});\n\n\tconst sx = useMotionValueValue(springX);\n\tconst sy = useMotionValueValue(springY);\n\n\tconst childRef = useRef<HTMLDivElement>(null);\n\tuseImperativeHandle(ref, () => childRef.current as HTMLDivElement);\n\tconst [center, setCenter] = useState({ x: 0, y: 0 });\n\tconst [isDragging, setIsDragging] = useState(false);\n\n\tuseLayoutEffect(() => {\n\t\tfunction update() {\n\t\t\tif (childRef.current) {\n\t\t\t\tconst rect = childRef.current.getBoundingClientRect();\n\t\t\t\tsetCenter({\n\t\t\t\t\tx: rect.left + rect.width / 2,\n\t\t\t\t\ty: rect.top + rect.height / 2,\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\t\tupdate();\n\t\twindow.addEventListener(\"resize\", update);\n\t\twindow.addEventListener(\"scroll\", update, true);\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"resize\", update);\n\t\t\twindow.removeEventListener(\"scroll\", update, true);\n\t\t};\n\t}, []);\n\n\tuseEffect(() => {\n\t\tif (isDragging) {\n\t\t\tdocument.body.style.cursor = \"grabbing\";\n\t\t} else {\n\t\t\tdocument.body.style.cursor = \"default\";\n\t\t}\n\t}, [isDragging]);\n\n\tconst path = generateSpringPath(\n\t\tcenter.x,\n\t\tcenter.y,\n\t\tcenter.x + sx,\n\t\tcenter.y + sy,\n\t\tspringPathConfig\n\t);\n\n\treturn (\n\t\t<>\n\t\t\t<svg\n\t\t\t\twidth=\"100vw\"\n\t\t\t\theight=\"100vh\"\n\t\t\t\tclassName=\"fixed inset-0 w-screen h-screen pointer-events-none z-40\"\n\t\t\t>\n\t\t\t\t<path\n\t\t\t\t\td={path}\n\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"stroke-2 stroke-neutral-900 dark:stroke-neutral-100 fill-none\",\n\t\t\t\t\t\tspringClassName\n\t\t\t\t\t)}\n\t\t\t\t/>\n\t\t\t</svg>\n\t\t\t<motion.div\n\t\t\t\tref={childRef}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"z-50\",\n\t\t\t\t\tisDragging ? \"cursor-grabbing\" : \"cursor-grab\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\tstyle={{\n\t\t\t\t\tx: springX,\n\t\t\t\t\ty: springY,\n\t\t\t\t}}\n\t\t\t\tdrag\n\t\t\t\tdragElastic={dragElastic}\n\t\t\t\tdragMomentum={false}\n\t\t\t\tonDragStart={() => {\n\t\t\t\t\tsetIsDragging(true);\n\t\t\t\t}}\n\t\t\t\tonDrag={(_, info) => {\n\t\t\t\t\tx.set(info.offset.x);\n\t\t\t\t\ty.set(info.offset.y);\n\t\t\t\t}}\n\t\t\t\tonDragEnd={() => {\n\t\t\t\t\tx.set(0);\n\t\t\t\t\ty.set(0);\n\t\t\t\t\tsetIsDragging(false);\n\t\t\t\t}}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</motion.div>\n\t\t</>\n\t);\n}\n\nexport { SpringElement };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring",
+      "drag"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Animate UI",
+      "url": "https://animate-ui.com/docs/components/spring-element",
+      "authorUrl": "https://animate-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "springClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "dragElastic",
+        "type": "(number & DragElastic)",
+        "default": "0.2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "springConfig",
+        "type": "{ stiffness?: number; damping?: number; }",
+        "default": "{ stiffness: 200, damping: 16 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "springPathConfig",
+        "type": "{ coilCount?: number; amplitudeMin?: number; amplitudeMax…",
+        "default": "{}",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spring-element"
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rich-popover",
+  "type": "registry:ui",
+  "title": "Rich Popover",
+  "description": "Rich Popover",
+  "dependencies": [
+    "@radix-ui/react-popover",
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "icons"
+  ],
+  "files": [
+    {
+      "path": "components/ui/rich-popover.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/rich-popover.tsx",
+      "content": "\"use client\";\n\nimport type * as React from \"react\";\n\nimport Link from \"next/link\";\n\nimport * as Popover from \"@radix-ui/react-popover\";\nimport { Clock, ExternalLink, Play } from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://smoothui.dev/doc/components/rich-popover\nexport interface RichTooltipProps {\n\ttrigger: React.ReactNode;\n\ttitle: string;\n\tdescription?: string;\n\ticon?: React.ReactNode;\n\thref?: string;\n\tactionLabel?: string;\n\tactionHref?: string;\n\tonActionClick?: () => void;\n\tmeta?: string;\n\tclassName?: string;\n\tside?: \"top\" | \"bottom\" | \"left\" | \"right\";\n\talign?: \"start\" | \"center\" | \"end\";\n}\n\nexport function YouTubeIcon({\n\tclassName = \"h-4 w-4 fill-red-600\",\n}: {\n\tclassName?: string;\n}) {\n\treturn (\n\t\t<svg\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\tviewBox=\"0 0 16 16\"\n\t\t\twidth=\"16\"\n\t\t\theight=\"16\"\n\t\t\tclassName={className}\n\t\t\trole=\"img\"\n\t\t\taria-label=\"YouTube\"\n\t\t\tfocusable=\"false\"\n\t\t>\n\t\t\t<path d=\"M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z\" />\n\t\t</svg>\n\t);\n}\n\nexport default function RichPopover({\n\ttrigger,\n\ttitle,\n\tdescription,\n\ticon,\n\thref,\n\tactionLabel,\n\tactionHref,\n\tonActionClick,\n\tmeta,\n\tclassName = \"\",\n\tside = \"top\",\n\talign = \"center\",\n}: RichTooltipProps) {\n\tconst Title = (\n\t\t<div className=\"flex items-center gap-2 text-sm font-medium\">\n\t\t\t{icon ?? <YouTubeIcon />}\n\t\t\t{href ? (\n\t\t\t\t<Link\n\t\t\t\t\thref={href}\n\t\t\t\t\ttarget=\"_blank\"\n\t\t\t\t\trel=\"noopener noreferrer\"\n\t\t\t\t\tclassName=\"inline-flex items-center gap-1 hover:underline\"\n\t\t\t\t>\n\t\t\t\t\t<span>{title}</span>\n\t\t\t\t\t<ExternalLink className=\"h-3.5 w-3.5 opacity-70\" />\n\t\t\t\t</Link>\n\t\t\t) : (\n\t\t\t\t<span>{title}</span>\n\t\t\t)}\n\t\t</div>\n\t);\n\n\tconst Action = actionLabel ? (\n\t\tactionHref ? (\n\t\t\t<Link\n\t\t\t\thref={actionHref}\n\t\t\t\ttarget=\"_blank\"\n\t\t\t\trel=\"noopener noreferrer\"\n\t\t\t\tclassName=\"inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-background/90\"\n\t\t\t>\n\t\t\t\t<Play className=\"h-3.5 w-3.5\" /> {actionLabel}\n\t\t\t</Link>\n\t\t) : (\n\t\t\t<button\n\t\t\t\tonClick={onActionClick}\n\t\t\t\tclassName=\"inline-flex items-center gap-2 rounded-full bg-background px-3 py-2 text-xs font-medium text-foreground transition-colors hover:bg-background/90\"\n\t\t\t\ttype=\"button\"\n\t\t\t>\n\t\t\t\t<Play className=\"h-3.5 w-3.5\" /> {actionLabel}\n\t\t\t</button>\n\t\t)\n\t) : null;\n\n\treturn (\n\t\t<Popover.Root>\n\t\t\t<Popover.Trigger asChild>{trigger}</Popover.Trigger>\n\t\t\t<Popover.Portal>\n\t\t\t\t<Popover.Content\n\t\t\t\t\tside={side}\n\t\t\t\t\talign={align}\n\t\t\t\t\tsideOffset={8}\n\t\t\t\t\tclassName={`z-50 ${className}`}\n\t\t\t\t\tasChild\n\t\t\t\t>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\tscale: 0.95,\n\t\t\t\t\t\t\ty: 5,\n\t\t\t\t\t\t\tfilter: \"blur(8px)\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tanimate={{ opacity: 1, scale: 1, y: 0, filter: \"blur(0px)\" }}\n\t\t\t\t\t\texit={{ opacity: 0, scale: 0.95, y: 5, filter: \"blur(8px)\" }}\n\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\t\tstiffness: 500,\n\t\t\t\t\t\t\tdamping: 30,\n\t\t\t\t\t\t\tduration: 0.2,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"relative rounded-2xl border border-white/10 bg-background px-4 py-3 text-foreground shadow-xl\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{Title}\n\t\t\t\t\t\t{description && (\n\t\t\t\t\t\t\t<p className=\"mt-3 max-w-xs text-base leading-relaxed text-balance text-foreground/90\">\n\t\t\t\t\t\t\t\t{description}\n\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t)}\n\t\t\t\t\t\t{(meta || Action) && (\n\t\t\t\t\t\t\t<div className=\"mt-4 flex items-center justify-between gap-3\">\n\t\t\t\t\t\t\t\t{meta ? (\n\t\t\t\t\t\t\t\t\t<span className=\"inline-flex items-center gap-1 rounded-full bg-background/10 px-3 py-1 text-xs text-foreground\">\n\t\t\t\t\t\t\t\t\t\t<Clock className=\"h-3.5 w-3.5\" /> {meta}\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t) : (\n\t\t\t\t\t\t\t\t\t<span />\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t\t{Action}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t)}\n\n\t\t\t\t\t\t{/* Tail */}\n\t\t\t\t\t\t<Popover.Arrow className=\"fill-black\" />\n\t\t\t\t\t</motion.div>\n\t\t\t\t</Popover.Content>\n\t\t\t</Popover.Portal>\n\t\t</Popover.Root>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "SmoothUI",
+      "url": "https://smoothui.dev/doc/components/rich-popover",
+      "authorUrl": "https://smoothui.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "trigger",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "icon",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "actionLabel",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "actionHref",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onActionClick",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "meta",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "side",
+        "type": "\"top\" | \"bottom\" | \"left\" | \"right\"",
+        "default": "\"top\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "align",
+        "type": "\"start\" | \"center\" | \"end\"",
+        "default": "\"center\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/rich-popover"
+  }
+}

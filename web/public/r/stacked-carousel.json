@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stacked-carousel",
+  "type": "registry:ui",
+  "title": "Stacked Carousel",
+  "description": "Stacked Carousel",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/stacked-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/stacked-carousel.tsx",
+      "content": "\"use client\";\n\nimport React, { useCallback, useRef, useState } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://eclairui.gopx.dev/components/carousels/stacked-carousel\n\ninterface StackedCarouselProps {\n\timages: string[];\n\twidth?: number;\n\theight?: number;\n\tborderColor?: string;\n\tborderWidth?: number;\n\tbackgroundColor?: string;\n}\n\nconst StackedCarousel: React.FC<StackedCarouselProps> = ({\n\timages,\n\twidth = 300,\n\theight = 400,\n\tborderColor = \"white\",\n\tborderWidth = 12,\n\tbackgroundColor = \"#e0f1fa\",\n}) => {\n\tconst [order, setOrder] = useState(images?.map((_, index) => index));\n\tconst [isMoving, setIsMoving] = useState(false);\n\tconst [direction, setDirection] = useState<\"left\" | \"right\" | null>(null);\n\tconst animationQueue = useRef<(\"left\" | \"right\")[]>([]);\n\n\tconst moveCard = useCallback(\n\t\t(moveDirection: \"left\" | \"right\") => {\n\t\t\tif (isMoving) {\n\t\t\t\tanimationQueue.current.push(moveDirection);\n\t\t\t\treturn;\n\t\t\t}\n\n\t\t\tsetIsMoving(true);\n\t\t\tsetDirection(moveDirection);\n\n\t\t\tsetTimeout(() => {\n\t\t\t\tsetOrder((prevOrder) => {\n\t\t\t\t\tconst newOrder = [...prevOrder];\n\t\t\t\t\tif (moveDirection === \"left\") {\n\t\t\t\t\t\tconst lastItem = newOrder.pop()!;\n\t\t\t\t\t\tnewOrder.unshift(lastItem);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tconst firstItem = newOrder.shift()!;\n\t\t\t\t\t\tnewOrder.push(firstItem);\n\t\t\t\t\t}\n\t\t\t\t\treturn newOrder;\n\t\t\t\t});\n\n\t\t\t\tsetIsMoving(false);\n\t\t\t\tsetDirection(null);\n\n\t\t\t\tif (animationQueue.current.length > 0) {\n\t\t\t\t\tconst nextDirection = animationQueue.current.shift()!;\n\t\t\t\t\tmoveCard(nextDirection);\n\t\t\t\t}\n\t\t\t}, 300);\n\t\t},\n\t\t[isMoving]\n\t);\n\n\tconst getRotation = (index: number) => {\n\t\tconst rotations = [0, -10, 10, 20];\n\t\treturn rotations[index % rotations.length];\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tstyle={{ width: `${width}px`, height: `${height}px` }}\n\t\t\tclassName=\"relative\"\n\t\t>\n\t\t\t<div\n\t\t\t\tstyle={{ width: \"100%\", height: `${height - 100}px` }}\n\t\t\t\tclassName=\"relative\"\n\t\t\t>\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{images?.map((src, index) => {\n\t\t\t\t\t\tconst orderIndex = order.indexOf(index);\n\t\t\t\t\t\tconst isTop = orderIndex === order.length - 1;\n\t\t\t\t\t\tconst isBottom = orderIndex === 0;\n\t\t\t\t\t\tconst isAnimating =\n\t\t\t\t\t\t\t(direction === \"left\" && isTop) ||\n\t\t\t\t\t\t\t(direction === \"right\" && isBottom);\n\n\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tkey={src + index + \"stackedcarousel\"}\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\twidth: \"100%\",\n\t\t\t\t\t\t\t\t\theight: \"100%\",\n\t\t\t\t\t\t\t\t\tposition: \"absolute\",\n\t\t\t\t\t\t\t\t\ttop: 0,\n\t\t\t\t\t\t\t\t\tleft: 0,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\trotate: isMoving ? 0 : getRotation(orderIndex),\n\t\t\t\t\t\t\t\t\tx: isAnimating\n\t\t\t\t\t\t\t\t\t\t? direction === \"left\"\n\t\t\t\t\t\t\t\t\t\t\t? \"-100%\"\n\t\t\t\t\t\t\t\t\t\t\t: \"100%\"\n\t\t\t\t\t\t\t\t\t\t: \"0%\",\n\t\t\t\t\t\t\t\t\tzIndex: orderIndex,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\t\tduration: 0.3,\n\t\t\t\t\t\t\t\t\tease: [0.25, 0.1, 0.25, 1],\n\t\t\t\t\t\t\t\t\trotate: {\n\t\t\t\t\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\t\t\t\t\tstiffness: 200,\n\t\t\t\t\t\t\t\t\t\tdamping: 12,\n\t\t\t\t\t\t\t\t\t\tmass: 1,\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\t\twidth: \"100%\",\n\t\t\t\t\t\t\t\t\t\theight: \"100%\",\n\t\t\t\t\t\t\t\t\t\tposition: \"relative\",\n\t\t\t\t\t\t\t\t\t\tborderRadius: \"1.5rem\",\n\t\t\t\t\t\t\t\t\t\tborder: `${borderWidth}px solid ${borderColor}`,\n\t\t\t\t\t\t\t\t\t\toverflow: \"hidden\",\n\t\t\t\t\t\t\t\t\t\tboxShadow:\n\t\t\t\t\t\t\t\t\t\t\t\"0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)\",\n\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\t\tsrc={src}\n\t\t\t\t\t\t\t\t\t\talt={`Image ${index + 1}`}\n\t\t\t\t\t\t\t\t\t\tfill\n\t\t\t\t\t\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\n\t\t\t\t\t\t\t\t\t\tsizes={`${width}px`}\n\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t);\n\t\t\t\t\t})}\n\t\t\t\t</AnimatePresence>\n\t\t\t</div>\n\t\t\t<div className=\"absolute bottom-0 left-0 right-0 flex justify-center space-x-4 mt-4\">\n\t\t\t\t<button\n\t\t\t\t\tonClick={() => moveCard(\"left\")}\n\t\t\t\t\tclassName=\"bg-background bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all\"\n\t\t\t\t\taria-label=\"Previous image\"\n\t\t\t\t>\n\t\t\t\t\t<ChevronLeft className=\"w-6 h-6 text-foreground\" />\n\t\t\t\t</button>\n\t\t\t\t<button\n\t\t\t\t\tonClick={() => moveCard(\"right\")}\n\t\t\t\t\tclassName=\"bg-background bg-opacity-50 hover:bg-opacity-75 rounded-full p-2 focus:outline-hidden focus:ring-2 focus:ring-blue-500 transition-all\"\n\t\t\t\t\taria-label=\"Next image\"\n\t\t\t\t>\n\t\t\t\t\t<ChevronRight className=\"w-6 h-6 text-foreground\" />\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default StackedCarousel;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/carousels/stacked-carousel",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "default": "300",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "default": "400",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderColor",
+        "type": "string",
+        "default": "\"white\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderWidth",
+        "type": "number",
+        "default": "12",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "default": "\"#e0f1fa\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/stacked-carousel"
+  }
+}

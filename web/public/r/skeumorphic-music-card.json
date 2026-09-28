@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "skeumorphic-music-card",
+  "type": "registry:ui",
+  "title": "Skeumorphic Music Card",
+  "description": "A music player card with realistic shadows and 3D effects. Includes play, pause, and skip controls for music apps.",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/skeumorphic-music-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/skeumorphic-music-card.tsx",
+      "content": "'use client';\r\n\r\nimport { Play, Pause, SkipForward, SkipBack } from 'lucide-react';\r\nimport { useState } from 'react';\r\nimport Image from 'next/image';\r\ninterface SkeumorphicMusicCardProps {\r\n  title: string;\r\n  artist: string;\r\n  cover: string;\r\n  className?: string;\r\n}\r\n\r\nconst ControlButton = ({\r\n  isPressed,\r\n  onMouseDown,\r\n  onMouseUp,\r\n  onMouseLeave,\r\n  onTouchStart,\r\n  onTouchEnd,\r\n  onClick,\r\n  children,\r\n  size = 'small'\r\n}: {\r\n  isPressed: boolean;\r\n  onMouseDown: () => void;\r\n  onMouseUp: () => void;\r\n  onMouseLeave: () => void;\r\n  onTouchStart: () => void;\r\n  onTouchEnd: () => void;\r\n  onClick?: () => void;\r\n  children: React.ReactNode;\r\n  size?: 'small' | 'large';\r\n}) => (\r\n  <div\r\n    className=\"rounded-full p-[3px] border-[1px] border-black/5\"\r\n    style={{\r\n      background: 'linear-gradient(135deg, #c2d9f0 0%, #e6f0fa 100%)',\r\n      boxShadow: 'inset 1px 1px 2px rgba(255,255,255,0.6), inset -1px -1px 2px rgba(0,0,0,0.1)'\r\n    }}\r\n  >\r\n    <button\r\n      onClick={onClick}\r\n      onMouseDown={onMouseDown}\r\n      onMouseUp={onMouseUp}\r\n      onMouseLeave={onMouseLeave}\r\n      onTouchStart={onTouchStart}\r\n      onTouchEnd={onTouchEnd}\r\n      style={{\r\n        boxShadow: isPressed\r\n          ? 'inset 3px 3px 7px rgba(0,0,0,0.2), inset -1px -1px 3px rgba(255,255,255,0.5)'\r\n          : '-3px -3px 7px rgba(255,255,255,0.7), 3px 3px 7px rgba(0,0,0,0.2)',\r\n        background: isPressed\r\n          ? 'linear-gradient(135deg, #c2d9f0 0%, #d9e6f2 100%)'\r\n          : 'linear-gradient(135deg, #e6f0fa 0%, #c2d9f0 100%)',\r\n        transform: isPressed ? 'scale(0.95)' : 'scale(1)'\r\n      }}\r\n      className={`rounded-full transition-all duration-75 text-gray-700 hover:text-gray-900 ${\r\n        size === 'large' ? 'p-4' : 'p-2'\r\n      }`}\r\n    >\r\n      {children}\r\n    </button>\r\n  </div>\r\n);\r\n\r\nconst ProgressBar = () => (\r\n  <div\r\n    style={{\r\n      boxShadow: 'inset 2px 2px 3px rgba(0,0,0,0.1), inset -1px -1px 3px rgba(255,255,255,0.7)',\r\n      background: 'linear-gradient(135deg, #c2d9f0 0%, #d9e6f2 100%)'\r\n    }}\r\n    className=\"h-2 rounded-full overflow-hidden\"\r\n  >\r\n    <div\r\n      style={{\r\n        width: '35%',\r\n        background: 'linear-gradient(135deg, #6fa8dc 0%, #3d85c6 100%)',\r\n        boxShadow: '1px 1px 2px rgba(255,255,255,0.3)'\r\n      }}\r\n      className=\"h-full rounded-full\"\r\n    />\r\n  </div>\r\n);\r\n\r\nconst SkeumorphicMusicCard = ({ title, artist, cover, className }: SkeumorphicMusicCardProps) => {\r\n  const [isPlaying, setIsPlaying] = useState(false);\r\n  const [isPlayButtonPressed, setIsPlayButtonPressed] = useState(false);\r\n  const [isBackButtonPressed, setIsBackButtonPressed] = useState(false);\r\n  const [isForwardButtonPressed, setIsForwardButtonPressed] = useState(false);\r\n\r\n  const togglePlayPause = () => setIsPlaying(!isPlaying);\r\n\r\n  return (\r\n    <div\r\n      style={{\r\n        boxShadow: 'inset -8px -8px 15px rgba(255,255,255,0.8), inset 8px 8px 15px rgba(0,0,0,0.2)',\r\n        background: 'linear-gradient(135deg, #e6ecf0 0%, #cfd8e2 100%)'\r\n      }}\r\n      className={`p-5 rounded-[30px] border-[1px] border-black/5 ${className}`}\r\n    >\r\n      <div\r\n        style={{\r\n          boxShadow:\r\n            'inset 2px 2px 5px rgba(255,255,255,0.7), inset -2px -2px 5px rgba(0,0,0,0.1), 5px 5px 15px rgba(0,0,0,0.1)',\r\n          background: 'linear-gradient(135deg, #e6f0fa 0%, #c2d9f0 100%)'\r\n        }}\r\n        className=\"relative w-80 p-6 rounded-[20px] flex flex-col items-center border-[1px] border-black/5\"\r\n      >\r\n        {/* Album Cover */}\r\n        <div\r\n          style={{\r\n            boxShadow: '-2px -2px 5px rgba(255,255,255,0.5), 5px 5px 15px rgba(0,0,0,0.3)'\r\n          }}\r\n          className=\"w-40 h-40 rounded-xl overflow-hidden\"\r\n        >\r\n          <Image\r\n            src={cover}\r\n            alt={title}\r\n            height={1080}\r\n            width={1080}\r\n            className=\"w-full h-full object-cover\"\r\n          />\r\n        </div>\r\n\r\n        {/* Song Info */}\r\n        <div className=\"mt-6 text-center\">\r\n          <h3 className=\"text-lg font-semibold text-gray-800\">{title}</h3>\r\n          <p className=\"text-sm text-gray-600\">{artist}</p>\r\n        </div>\r\n\r\n        <div className=\"w-full mt-6 px-2\">\r\n          <ProgressBar />\r\n        </div>\r\n\r\n        {/* Controls */}\r\n        <div className=\"flex items-center justify-center gap-5 w-full px-2 mt-3\">\r\n          <ControlButton\r\n            isPressed={isBackButtonPressed}\r\n            onMouseDown={() => setIsBackButtonPressed(true)}\r\n            onMouseUp={() => setIsBackButtonPressed(false)}\r\n            onMouseLeave={() => setIsBackButtonPressed(false)}\r\n            onTouchStart={() => setIsBackButtonPressed(true)}\r\n            onTouchEnd={() => setIsBackButtonPressed(false)}\r\n          >\r\n            <SkipBack size={22} />\r\n          </ControlButton>\r\n\r\n          <ControlButton\r\n            isPressed={isPlayButtonPressed}\r\n            onMouseDown={() => setIsPlayButtonPressed(true)}\r\n            onMouseUp={() => setIsPlayButtonPressed(false)}\r\n            onMouseLeave={() => setIsPlayButtonPressed(false)}\r\n            onTouchStart={() => setIsPlayButtonPressed(true)}\r\n            onTouchEnd={() => setIsPlayButtonPressed(false)}\r\n            onClick={togglePlayPause}\r\n            size=\"large\"\r\n          >\r\n            {isPlaying ? <Pause size={24} /> : <Play size={24} />}\r\n          </ControlButton>\r\n\r\n          <ControlButton\r\n            isPressed={isForwardButtonPressed}\r\n            onMouseDown={() => setIsForwardButtonPressed(true)}\r\n            onMouseUp={() => setIsForwardButtonPressed(false)}\r\n            onMouseLeave={() => setIsForwardButtonPressed(false)}\r\n            onTouchStart={() => setIsForwardButtonPressed(true)}\r\n            onTouchEnd={() => setIsForwardButtonPressed(false)}\r\n          >\r\n            <SkipForward size={22} />\r\n          </ControlButton>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default SkeumorphicMusicCard;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Play, pause, and skip on a raised music card with inset shadows.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/skeumorphicMusicCard",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "artist",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "cover",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/skeumorphic-music-card"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "staggered-dropdown",
+  "type": "registry:ui",
+  "title": "Staggered Dropdown",
+  "description": "An actions menu that unrolls below a button, with an icon and label on every row.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/staggered-dropdown.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/staggered-dropdown.tsx",
+      "content": "import {\r\n    FiEdit,\r\n    FiChevronDown,\r\n    FiTrash,\r\n    FiShare,\r\n    FiPlusSquare,\r\n} from \"react-icons/fi\";\r\nimport { motion } from \"motion/react\";\r\nimport { Dispatch, SetStateAction, useState } from \"react\";\r\nimport { IconType } from \"react-icons\";\r\n\r\n\r\n\r\nconst Option = ({\r\n    text,\r\n    Icon,\r\n    setOpen,\r\n}: {\r\n    text: string;\r\n    Icon: IconType;\r\n    setOpen: Dispatch<SetStateAction<boolean>>;\r\n}) => {\r\n    return (\r\n        <motion.li\r\n            variants={itemVariants}\r\n            onClick={() => setOpen(false)}\r\n            className=\"flex items-center gap-2 w-full p-2 text-xs font-medium whitespace-nowrap rounded-md hover:bg-indigo-100 text-slate-700 hover:text-indigo-500 transition-colors cursor-pointer\"\r\n        >\r\n            <motion.span variants={actionIconVariants}>\r\n                <Icon />\r\n            </motion.span>\r\n            <span>{text}</span>\r\n        </motion.li>\r\n    );\r\n};\r\n\r\nexport default Option;\r\n\r\n\r\nconst itemVariants = {\r\n    open: {\r\n        opacity: 1,\r\n        y: 0,\r\n        transition: {\r\n            when: \"beforeChildren\",\r\n        },\r\n    },\r\n    closed: {\r\n        opacity: 0,\r\n        y: -15,\r\n        transition: {\r\n            when: \"afterChildren\",\r\n        },\r\n    },\r\n};\r\n\r\nconst actionIconVariants = {\r\n    open: { scale: 1, y: 0 },\r\n    closed: { scale: 0, y: -7 },\r\n};"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Clicking the button flips its chevron and unrolls the panel downward from its top edge; the rows then fade up one after another, each icon popping to full size a beat after its label. Picking a row closes the menu in reverse.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "Icon",
+        "type": "IconType",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "setOpen",
+        "type": "Dispatch<SetStateAction<boolean>>",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/staggered-dropdown"
+  }
+}

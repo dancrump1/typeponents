@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "grid-distortion-background",
+  "type": "registry:ui",
+  "title": "Grid Distortion Background",
+  "description": "Grid Distortion Background",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/grid-distortion-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/grid-distortion-background.tsx",
+      "content": "import { useState, useEffect, useRef } from \"react\"\n\nconst GridDistortion = ({ children }) => {\n    const canvasRef = useRef(null)\n    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })\n    const [dimensions, setDimensions] = useState({ width: 0, height: 0 })\n    const animationRef = useRef(null)\n\n    useEffect(() => {\n        const handleResize = () => {\n            if (canvasRef.current) {\n                const canvas = canvasRef.current\n                const { width, height } = canvas.getBoundingClientRect()\n\n                const dpr = window.devicePixelRatio || 1\n                canvas.width = width * dpr\n                canvas.height = height * dpr\n\n                const ctx = canvas.getContext(\"2d\")\n                ctx.scale(dpr, dpr)\n\n                setDimensions({ width, height })\n            }\n        }\n\n        handleResize()\n        window.addEventListener(\"resize\", handleResize)\n\n        return () => {\n            window.removeEventListener(\"resize\", handleResize)\n            if (animationRef.current) {\n                cancelAnimationFrame(animationRef.current)\n            }\n        }\n    }, [])\n\n    useEffect(() => {\n        const handleMouseMove = (e) => {\n            if (canvasRef.current) {\n                const { left, top } = canvasRef.current.getBoundingClientRect()\n                setMousePosition({\n                    x: e.clientX - left,\n                    y: e.clientY - top,\n                })\n            }\n        }\n\n        window.addEventListener(\"mousemove\", handleMouseMove)\n        return () => window.removeEventListener(\"mousemove\", handleMouseMove)\n    }, [])\n\n    useEffect(() => {\n        if (!canvasRef.current || dimensions.width === 0) return\n\n        const canvas = canvasRef.current\n        const ctx = canvas.getContext(\"2d\")\n\n        const drawGrid = () => {\n            const { width, height } = dimensions\n\n            ctx.clearRect(0, 0, width, height)\n\n            const cellSize = 30\n            const rows = Math.ceil(height / cellSize) + 1\n            const cols = Math.ceil(width / cellSize) + 1\n\n            const maxDistance = 200\n            const maxDisplacement = 20\n\n            ctx.strokeStyle = \"rgba(255, 255, 255, 0.2)\"\n            ctx.lineWidth = 0.5\n\n            const points = []\n\n            for (let y = 0; y < rows; y++) {\n                const row = []\n                for (let x = 0; x < cols; x++) {\n                    const baseX = x * cellSize\n                    const baseY = y * cellSize\n\n                    const dx = baseX - mousePosition.x\n                    const dy = baseY - mousePosition.y\n                    const distance = Math.sqrt(dx * dx + dy * dy)\n\n                    let distortionX = 0\n                    let distortionY = 0\n\n                    if (distance < maxDistance) {\n                        const force = (1 - distance / maxDistance) * maxDisplacement\n                        distortionX = (dx / distance) * force || 0\n                        distortionY = (dy / distance) * force || 0\n                    }\n\n                    row.push({\n                        x: baseX + distortionX,\n                        y: baseY + distortionY,\n                    })\n                }\n                points.push(row)\n            }\n\n            for (let y = 0; y < rows; y++) {\n                ctx.beginPath()\n                for (let x = 0; x < cols; x++) {\n                    const point = points[y][x]\n                    if (x === 0) {\n                        ctx.moveTo(point.x, point.y)\n                    } else {\n                        ctx.lineTo(point.x, point.y)\n                    }\n                }\n                ctx.stroke()\n            }\n\n            for (let x = 0; x < cols; x++) {\n                ctx.beginPath()\n                for (let y = 0; y < rows; y++) {\n                    const point = points[y][x]\n                    if (y === 0) {\n                        ctx.moveTo(point.x, point.y)\n                    } else {\n                        ctx.lineTo(point.x, point.y)\n                    }\n                }\n                ctx.stroke()\n            }\n\n            ctx.fillStyle = \"rgba(255, 255, 255, 0.4)\"\n            for (let y = 0; y < rows; y++) {\n                for (let x = 0; x < cols; x++) {\n                    const point = points[y][x]\n                    ctx.beginPath()\n                    ctx.arc(point.x, point.y, 1, 0, Math.PI * 2)\n                    ctx.fill()\n                }\n            }\n\n            ctx.beginPath()\n            ctx.arc(mousePosition.x, mousePosition.y, 8, 0, Math.PI * 2)\n\n            const gradient = ctx.createRadialGradient(\n                mousePosition.x,\n                mousePosition.y,\n                0,\n                mousePosition.x,\n                mousePosition.y,\n                30,\n            )\n            gradient.addColorStop(0, \"rgba(100, 200, 255, 0.8)\")\n            gradient.addColorStop(1, \"rgba(100, 200, 255, 0)\")\n\n            ctx.fillStyle = gradient\n            ctx.fill()\n\n            animationRef.current = requestAnimationFrame(drawGrid)\n        }\n\n        drawGrid()\n\n        return () => {\n            if (animationRef.current) {\n                cancelAnimationFrame(animationRef.current)\n            }\n        }\n    }, [dimensions, mousePosition])\n\n    return (\n        <div\n            className=\"relative w-full min-h-[500px] flex items-center justify-center flex-col overflow-hidden rounded-high bg-gray-900\">\n\n            <canvas ref={canvasRef} className=\"absolute inset-0 w-full h-full\" />\n\n            {children}\n        </div>\n    )\n}\n\nexport default GridDistortion;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "draft",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/grid-distortion-background"
+  }
+}

@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "interlocking-page-transition",
+	title: "Interlocking Page Transition",
+	description: "A premium full-screen transition where columns (vertical) or rows (horizontal) enter from opposite sides (interlocking) and exit along the same path, built with Framer Motion.",
+	interaction: "Programmatically triggered on route change or view swaps, showing full-screen interlocking columns entering from top/bottom or left/right and sliding away to reveal content.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/interlocking-page-transition",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "trigger", type: "number", required: true },
+		{ name: "onViewSwap", type: "(() => void)" },
+		{ name: "className", type: "string" },
+		{ name: "panelClassName", type: "string" },
+		{ name: "columns", type: "number" },
+		{ name: "duration", type: "number", default: "0.75" },
+		{ name: "staggerDelay", type: "number", default: "0.075" },
+		{ name: "ease", type: "Easing | Easing[]", default: "[0.85, 0, 0.15, 1]" },
+		{ name: "direction", type: "\"bottom\" | \"left\" | \"right\" | \"top\"", default: "\"top\"" },
+		{ name: "exitOpposite", type: "boolean", default: "true" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

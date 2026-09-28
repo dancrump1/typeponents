@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-452",
+  "type": "registry:component",
+  "title": "Comp 452",
+  "description": "Comp 452",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-452.tsx",
+      "content": "import {\r\n\tBreadcrumb,\r\n\tBreadcrumbItem,\r\n\tBreadcrumbLink,\r\n\tBreadcrumbList,\r\n\tBreadcrumbPage,\r\n\tBreadcrumbSeparator,\r\n} from \"@/components/ui/breadcrumb\";\r\nimport { HomeIcon } from \"lucide-react\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Breadcrumb>\r\n\t\t\t<BreadcrumbList className=\"bg-background rounded-md border px-3 py-2 shadow-2xs\">\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">\r\n\t\t\t\t\t\t<HomeIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t<span className=\"sr-only\">Home</span>\r\n\t\t\t\t\t</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbLink href=\"#\">Components</BreadcrumbLink>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t\t<BreadcrumbSeparator />\r\n\t\t\t\t<BreadcrumbItem>\r\n\t\t\t\t\t<BreadcrumbPage>Breadcrumb</BreadcrumbPage>\r\n\t\t\t\t</BreadcrumbItem>\r\n\t\t\t</BreadcrumbList>\r\n\t\t</Breadcrumb>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

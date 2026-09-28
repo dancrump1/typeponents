@@ -1,0 +1,104 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-cursor",
+  "type": "registry:ui",
+  "title": "Text Cursor",
+  "description": "Pointer trail that drops a repeating character or emoji along the path of the cursor.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-cursor.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-cursor.tsx",
+      "content": "import React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/text-animations/text-cursor\r\n\r\ninterface TextCursorProps {\r\n\ttext: string;\r\n\tdelay?: number;\r\n\tspacing?: number;\r\n\tfollowMouseDirection?: boolean;\r\n\trandomFloat?: boolean;\r\n\texitDuration?: number;\r\n\tremovalInterval?: number;\r\n\tmaxPoints?: number;\r\n}\r\n\r\ninterface TrailItem {\r\n\tid: number;\r\n\tx: number;\r\n\ty: number;\r\n\tangle: number;\r\n\trandomX?: number;\r\n\trandomY?: number;\r\n\trandomRotate?: number;\r\n}\r\n\r\nconst TextCursor: React.FC<TextCursorProps> = ({\r\n\ttext = \"⚛️\",\r\n\tdelay = 0.01,\r\n\tspacing = 100,\r\n\tfollowMouseDirection = true,\r\n\trandomFloat = true,\r\n\texitDuration = 0.5,\r\n\tremovalInterval = 30,\r\n\tmaxPoints = 5,\r\n}) => {\r\n\tconst [trail, setTrail] = useState<TrailItem[]>([]);\r\n\tconst containerRef = useRef<HTMLDivElement>(null);\r\n\tconst lastMoveTimeRef = useRef<number>(Date.now());\r\n\tconst idCounter = useRef<number>(0);\r\n\r\n\tconst handleMouseMove = (e: MouseEvent) => {\r\n\t\tif (!containerRef.current) return;\r\n\t\tconst rect = containerRef.current.getBoundingClientRect();\r\n\t\tconst mouseX = e.clientX - rect.left;\r\n\t\tconst mouseY = e.clientY - rect.top;\r\n\r\n\t\tsetTrail((prev) => {\r\n\t\t\tlet newTrail = [...prev];\r\n\t\t\tif (newTrail.length === 0) {\r\n\t\t\t\tnewTrail.push({\r\n\t\t\t\t\tid: idCounter.current++,\r\n\t\t\t\t\tx: mouseX,\r\n\t\t\t\t\ty: mouseY,\r\n\t\t\t\t\tangle: 0,\r\n\t\t\t\t\t...(randomFloat && {\r\n\t\t\t\t\t\trandomX: Math.random() * 10 - 5,\r\n\t\t\t\t\t\trandomY: Math.random() * 10 - 5,\r\n\t\t\t\t\t\trandomRotate: Math.random() * 10 - 5,\r\n\t\t\t\t\t}),\r\n\t\t\t\t});\r\n\t\t\t} else {\r\n\t\t\t\tconst last = newTrail[newTrail.length - 1];\r\n\t\t\t\tconst dx = mouseX - last.x;\r\n\t\t\t\tconst dy = mouseY - last.y;\r\n\t\t\t\tconst distance = Math.sqrt(dx * dx + dy * dy);\r\n\t\t\t\tif (distance >= spacing) {\r\n\t\t\t\t\tlet rawAngle = (Math.atan2(dy, dx) * 180) / Math.PI;\r\n\t\t\t\t\tif (rawAngle > 90) rawAngle -= 180;\r\n\t\t\t\t\telse if (rawAngle < -90) rawAngle += 180;\r\n\t\t\t\t\tconst computedAngle = followMouseDirection ? rawAngle : 0;\r\n\t\t\t\t\tconst steps = Math.floor(distance / spacing);\r\n\t\t\t\t\tfor (let i = 1; i <= steps; i++) {\r\n\t\t\t\t\t\tconst t = (spacing * i) / distance;\r\n\t\t\t\t\t\tconst newX = last.x + dx * t;\r\n\t\t\t\t\t\tconst newY = last.y + dy * t;\r\n\t\t\t\t\t\tnewTrail.push({\r\n\t\t\t\t\t\t\tid: idCounter.current++,\r\n\t\t\t\t\t\t\tx: newX,\r\n\t\t\t\t\t\t\ty: newY,\r\n\t\t\t\t\t\t\tangle: computedAngle,\r\n\t\t\t\t\t\t\t...(randomFloat && {\r\n\t\t\t\t\t\t\t\trandomX: Math.random() * 10 - 5,\r\n\t\t\t\t\t\t\t\trandomY: Math.random() * 10 - 5,\r\n\t\t\t\t\t\t\t\trandomRotate: Math.random() * 10 - 5,\r\n\t\t\t\t\t\t\t}),\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tif (newTrail.length > maxPoints) {\r\n\t\t\t\tnewTrail = newTrail.slice(newTrail.length - maxPoints);\r\n\t\t\t}\r\n\t\t\treturn newTrail;\r\n\t\t});\r\n\t\tlastMoveTimeRef.current = Date.now();\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\tconst container = containerRef.current;\r\n\t\tif (!container) return;\r\n\t\tcontainer.addEventListener(\"mousemove\", handleMouseMove);\r\n\t\treturn () => container.removeEventListener(\"mousemove\", handleMouseMove);\r\n\t}, []);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst interval = setInterval(() => {\r\n\t\t\tif (Date.now() - lastMoveTimeRef.current > 100) {\r\n\t\t\t\tsetTrail((prev) => (prev.length > 0 ? prev.slice(1) : prev));\r\n\t\t\t}\r\n\t\t}, removalInterval);\r\n\t\treturn () => clearInterval(interval);\r\n\t}, [removalInterval]);\r\n\r\n\treturn (\r\n\t\t<div ref={containerRef} className=\"w-full h-full relative\">\r\n\t\t\t<div className=\"absolute inset-0 pointer-events-none\">\r\n\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t{trail.map((item) => (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\tscale: 1,\r\n\t\t\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\trotate: item.angle,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\tscale: 1,\r\n\t\t\t\t\t\t\t\tx: randomFloat ? [0, item.randomX || 0, 0] : 0,\r\n\t\t\t\t\t\t\t\ty: randomFloat ? [0, item.randomY || 0, 0] : 0,\r\n\t\t\t\t\t\t\t\trotate: randomFloat\r\n\t\t\t\t\t\t\t\t\t? [\r\n\t\t\t\t\t\t\t\t\t\t\titem.angle,\r\n\t\t\t\t\t\t\t\t\t\t\titem.angle + (item.randomRotate || 0),\r\n\t\t\t\t\t\t\t\t\t\t\titem.angle,\r\n\t\t\t\t\t\t\t\t\t\t]\r\n\t\t\t\t\t\t\t\t\t: item.angle,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\texit={{ opacity: 0, scale: 0 }}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\topacity: {\r\n\t\t\t\t\t\t\t\t\tduration: exitDuration,\r\n\t\t\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t\t\t\tdelay,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t...(randomFloat && {\r\n\t\t\t\t\t\t\t\t\tx: {\r\n\t\t\t\t\t\t\t\t\t\tduration: 2,\r\n\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\trepeat: Infinity,\r\n\t\t\t\t\t\t\t\t\t\trepeatType: \"mirror\",\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\ty: {\r\n\t\t\t\t\t\t\t\t\t\tduration: 2,\r\n\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\trepeat: Infinity,\r\n\t\t\t\t\t\t\t\t\t\trepeatType: \"mirror\",\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t\trotate: {\r\n\t\t\t\t\t\t\t\t\t\tduration: 2,\r\n\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\trepeat: Infinity,\r\n\t\t\t\t\t\t\t\t\t\trepeatType: \"mirror\",\r\n\t\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t}),\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tclassName=\"absolute select-none whitespace-nowrap text-3xl\"\r\n\t\t\t\t\t\t\tstyle={{ left: item.x, top: item.y }}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{text}\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</AnimatePresence>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default TextCursor;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "Moving the pointer leaves a short line of characters behind it, each one tilted to follow the direction of travel and drifting gently in place; they fade away one by one once you stop moving.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/text-animations/text-cursor",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"⚛️\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "0.01",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "spacing",
+        "type": "number",
+        "default": "100",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "followMouseDirection",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "randomFloat",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "exitDuration",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "removalInterval",
+        "type": "number",
+        "default": "30",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxPoints",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-cursor"
+  }
+}

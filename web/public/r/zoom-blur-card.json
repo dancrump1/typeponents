@@ -1,0 +1,66 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "zoom-blur-card",
+  "type": "registry:ui",
+  "title": "Zoom Blur Card",
+  "description": "Zoom Blur Card",
+  "dependencies": [
+    "clsx",
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/zoom-blur-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/zoom-blur-card.tsx",
+      "content": "import React, { useState } from \"react\";\n\nimport Image from \"next/image\";\n\nimport clsx from \"clsx\";\nimport { motion } from \"motion/react\";\nimport { FaArrowRightLong } from \"react-icons/fa6\";\n\n// Credit:\n// https://eclairui.gopx.dev/components/cards/zoom-blur-card\n\ninterface ZoomBlurCardProps {\n\ttitle: string;\n\tdescription: string;\n\timageUrl: string;\n}\n\nconst ZoomBlurCard: React.FC<ZoomBlurCardProps> = ({\n\ttitle,\n\tdescription,\n\timageUrl,\n}) => {\n\tconst [isHovered, setIsHovered] = useState(false);\n\n\treturn (\n\t\t<div className=\"hover:cursor-pointer\">\n\t\t\t<motion.div\n\t\t\t\tclassName=\"relative w-full h-64 bg-background/90 rounded-lg shadow-md overflow-hidden group transition-all duration-300 ease-in-out hover:bg-background/70\"\n\t\t\t\tonHoverStart={() => setIsHovered(true)}\n\t\t\t\tonHoverEnd={() => setIsHovered(false)}\n\t\t\t>\n\t\t\t\t<div className=\"absolute inset-0 overflow-hidden bg-background dark:bg-background\">\n\t\t\t\t\t<Image\n\t\t\t\t\t\tsrc={imageUrl}\n\t\t\t\t\t\talt={title}\n\t\t\t\t\t\tlayout=\"fill\"\n\t\t\t\t\t\tobjectFit=\"cover\"\n\t\t\t\t\t\tclassName=\"transition-all duration-300 ease-in-out group-hover:scale-110 opacity-60 group-hover:opacity-70 group-hover:blur-xs\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t\t<div className=\"relative z-10 p-4 h-full flex flex-col justify-between text-foreground\">\n\t\t\t\t\t<div className=\"self-end px-4 py-2 group-hover:-rotate-45 transition-all duration-500\">\n\t\t\t\t\t\t<FaArrowRightLong />\n\t\t\t\t\t</div>\n\t\t\t\t\t<div>\n\t\t\t\t\t\t<ZoomBlurCardTitle\n\t\t\t\t\t\t\tisHovered={isHovered}\n\t\t\t\t\t\t\tclassName=\"text-2xl font-extrabold mb-4\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{title}\n\t\t\t\t\t\t</ZoomBlurCardTitle>\n\t\t\t\t\t\t<p className=\"text-sm\">{description}</p>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\ninterface ZoomBlurCardTitleProps {\n\tchildren: string;\n\tisHovered: boolean;\n\tduration?: number;\n\tstagger?: number;\n\tfontSize?: string;\n\tfontWeight?: string | number;\n\ttextTransform?: \"uppercase\" | \"lowercase\" | \"capitalize\" | \"none\";\n\tinitialColor?: string;\n\thoverColor?: string;\n\tlineHeight?: number | string;\n\teasing?: string;\n\tclassName?: string;\n}\n\nconst ZoomBlurCardTitle: React.FC<ZoomBlurCardTitleProps> = ({\n\tchildren,\n\tisHovered,\n\tduration = 0.25,\n\tstagger = 0.025,\n\thoverColor = \"white\",\n\tlineHeight = 0.9,\n\teasing = \"easeInOut\",\n\tclassName,\n}) => {\n\treturn (\n\t\t<motion.div\n\t\t\tclassName={clsx(\n\t\t\t\t\"relative block overflow-hidden whitespace-nowrap\",\n\t\t\t\t\"transition-colors duration-300\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tstyle={{ lineHeight }}\n\t\t>\n\t\t\t<motion.div>\n\t\t\t\t{children.split(\"\").map((letter, index) => (\n\t\t\t\t\t<motion.span\n\t\t\t\t\t\tkey={index + \"zoom-item\"}\n\t\t\t\t\t\tinitial={{ y: 0 }}\n\t\t\t\t\t\tanimate={isHovered ? { y: \"-100%\" } : { y: 0 }}\n\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\tduration,\n\t\t\t\t\t\t\tease: easing,\n\t\t\t\t\t\t\tdelay: stagger * index,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"inline-block\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{letter}\n\t\t\t\t\t</motion.span>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t\t<motion.div className=\"absolute inset-0\">\n\t\t\t\t{children.split(\"\").map((letter, index) => (\n\t\t\t\t\t<motion.span\n\t\t\t\t\t\tkey={index + \"zoom-item-2\"}\n\t\t\t\t\t\tinitial={{ y: \"100%\" }}\n\t\t\t\t\t\tanimate={isHovered ? { y: 0 } : { y: \"100%\" }}\n\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\tduration,\n\t\t\t\t\t\t\tease: easing,\n\t\t\t\t\t\t\tdelay: stagger * index,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName={clsx(\"inline-block\", `text-${hoverColor}`)}\n\t\t\t\t\t>\n\t\t\t\t\t\t{letter}\n\t\t\t\t\t</motion.span>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t</motion.div>\n\t);\n};\n\nexport default ZoomBlurCard;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/cards/zoom-blur-card",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "imageUrl",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/zoom-blur-card"
+  }
+}

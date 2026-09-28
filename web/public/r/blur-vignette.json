@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "blur-vignette",
+  "type": "registry:ui",
+  "title": "Blur Vignette",
+  "description": "Image frame with a blurred border that fades inward, softening the edges instead of cropping them.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/blur-vignette.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/blur-vignette.tsx",
+      "content": "import React, { createContext, useContext } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Credit:\n// https://www.ui-layouts.com/components/blur-vignette\n\n// ADD TO MAIN.SCSS:\n// @layer utilities {\n//  .blur-vignette {\n//     position: absolute;\n//     inset: 0;\n//     border-radius: var(--radius);\n//     -webkit-backdrop-filter: blur(var(--blur));\n//     backdrop-filter: blur(var(--blur));\n//     --r: max(var(--transition-length), calc(var(--radius) - var(--inset)));\n//     --corner-size: calc(var(--r) + var(--inset)) calc(var(--r) + var(--inset));\n//     --corner-gradient: transparent 0px,\n//       transparent calc(var(--r) - var(--transition-length)), black var(--r);\n//     --fill-gradient: black, black var(--inset),\n//       transparent calc(var(--inset) + var(--transition-length)),\n//       transparent calc(100% - var(--transition-length) - var(--inset)),\n//       black calc(100% - var(--inset));\n//     --fill-narrow-size: calc(100% - (var(--inset) + var(--r)) * 2);\n//     --fill-farther-position: calc(var(--inset) + var(--r));\n//     -webkit-mask-image: linear-gradient(to right, var(--fill-gradient)),\n//       linear-gradient(to bottom, var(--fill-gradient)),\n//       radial-gradient(at bottom right, var(--corner-gradient)),\n//       radial-gradient(at bottom left, var(--corner-gradient)),\n//       radial-gradient(at top left, var(--corner-gradient)),\n//       radial-gradient(at top right, var(--corner-gradient));\n//     -webkit-mask-size:\n//       100% var(--fill-narrow-size),\n//       var(--fill-narrow-size) 100%,\n//       var(--corner-size),\n//       var(--corner-size),\n//       var(--corner-size),\n//       var(--corner-size);\n//     -webkit-mask-position:\n//       0 var(--fill-farther-position),\n//       var(--fill-farther-position) 0,\n//       0 0,\n//       100% 0,\n//       100% 100%,\n//       0 100%;\n//     -webkit-mask-repeat: no-repeat;\n//   }\n// }\n\ninterface BlurVignetteContextProps {\n\tradius?: string;\n\tinset?: string;\n\ttransitionLength?: string;\n\tblur?: string;\n}\n\nconst BlurVignetteContext = createContext<BlurVignetteContextProps>({\n\tradius: \"24px\",\n\tinset: \"20px\",\n\ttransitionLength: \"44px\",\n\tblur: \"6px\",\n});\n\nexport const useBlurVignetteContext = () => useContext(BlurVignetteContext);\n\ninterface BlurVignetteProps {\n\tclassname?: string;\n\tchildren: React.ReactNode;\n\tradius?: string;\n\tinset?: string;\n\ttransitionLength?: string;\n\tblur?: string;\n\tblurclassname?: string;\n}\n\nexport const BlurVignette: React.FC<BlurVignetteProps> = ({\n\tclassname,\n\tchildren,\n\tradius = \"24px\",\n\tinset = \"20px\",\n\ttransitionLength = \"44px\",\n\tblur = \"6px\",\n}) => {\n\treturn (\n\t\t<BlurVignetteContext.Provider\n\t\t\tvalue={{ radius, inset, transitionLength, blur }}\n\t\t>\n\t\t\t<div\n\t\t\t\tclassName={cn(\"relative aspect-square overflow-hidden\", classname)}\n\t\t\t\tstyle={{ borderRadius: radius }}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</BlurVignetteContext.Provider>\n\t);\n};\ninterface BlurVignetteArticleProps {\n\tchildren?: React.ReactNode;\n\tclassname?: string;\n}\n\nexport const BlurVignetteArticle: React.FC<BlurVignetteArticleProps> = ({\n\tchildren,\n\tclassname,\n}) => {\n\tconst { radius, inset, transitionLength, blur } = useBlurVignetteContext();\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"blur-vignette bottom-0 left-0 w-full h-full z-1\",\n\t\t\t\tclassname\n\t\t\t)}\n\t\t\tstyle={\n\t\t\t\t{\n\t\t\t\t\t\"--radius\": radius,\n\t\t\t\t\t\"--inset\": inset,\n\t\t\t\t\t\"--transition-length\": transitionLength,\n\t\t\t\t\t\"--blur\": blur,\n\t\t\t\t} as React.CSSProperties\n\t\t\t}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [],
+    "interaction": "Static — the blurred border is applied on load and does not respond to input.",
+    "inspiration": {
+      "source": "UI Layouts",
+      "url": "https://www.ui-layouts.com/components/blur-vignette",
+      "authorUrl": "https://www.ui-layouts.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/blur-vignette"
+  }
+}

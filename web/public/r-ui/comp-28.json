@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-28",
+  "type": "registry:component",
+  "title": "Comp 28",
+  "description": "Comp 28",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-28.tsx",
+      "content": "\"use client\"\r\n\r\nimport { MinusIcon, PlusIcon } from \"lucide-react\"\r\nimport { Button, Group, Input, Label, NumberField } from \"react-aria-components\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <NumberField defaultValue={2048} minValue={0}>\r\n      <div className=\"not-first:*:mt-2\">\r\n        <Label className=\"text-foreground text-sm font-medium\">\r\n          Number input with plus/minus buttons\r\n        </Label>\r\n        <Group className=\"border-input data-focus-within:border-ring data-focus-within:ring-ring/50 data-focus-within:has-aria-invalid:ring-destructive/20 dark:data-focus-within:has-aria-invalid:ring-destructive/40 data-focus-within:has-aria-invalid:border-destructive relative inline-flex h-9 w-full items-center overflow-hidden rounded-md border text-sm whitespace-nowrap shadow-2xs transition-[color,box-shadow] outline-hidden data-disabled:opacity-50 data-focus-within:ring-[3px]\">\r\n          <Button\r\n            slot=\"decrement\"\r\n            className=\"border-input bg-background text-muted-foreground/80 hover:bg-accent hover:text-foreground -ms-px flex aspect-square h-[inherit] items-center justify-center rounded-s-md border text-sm transition-[color,box-shadow] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50\"\r\n          >\r\n            <MinusIcon size={16} aria-hidden=\"true\" />\r\n          </Button>\r\n          <Input className=\"bg-background text-foreground w-full grow px-3 py-2 text-center tabular-nums\" />\r\n          <Button\r\n            slot=\"increment\"\r\n            className=\"border-input bg-background text-muted-foreground/80 hover:bg-accent hover:text-foreground -me-px flex aspect-square h-[inherit] items-center justify-center rounded-e-md border text-sm transition-[color,box-shadow] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50\"\r\n          >\r\n            <PlusIcon size={16} aria-hidden=\"true\" />\r\n          </Button>\r\n        </Group>\r\n      </div>\r\n      <p\r\n        className=\"text-muted-foreground mt-2 text-xs\"\r\n        role=\"region\"\r\n        aria-live=\"polite\"\r\n      >\r\n        Built with{\" \"}\r\n        <a\r\n          className=\"hover:text-foreground underline\"\r\n          href=\"https://react-spectrum.adobe.com/react-aria/DateField.html\"\r\n          target=\"_blank\"\r\n          rel=\"noopener nofollow\"\r\n        >\r\n          React Aria\r\n        </a>\r\n      </p>\r\n    </NumberField>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

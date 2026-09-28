@@ -1,0 +1,126 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fractal-grid",
+  "type": "registry:ui",
+  "title": "Fractal Grid",
+  "description": "Fractal Grid",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fractal-grid.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fractal-grid.tsx",
+      "content": "\"use client\";\n\nimport React, {\n\tuseCallback,\n\tuseEffect,\n\tuseMemo,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://www.cult-ui.com/docs/components/bg-animated-fractal-grid\n\ninterface FractalDotGridProps {\n\t/** Size of each dot in pixels */\n\tdotSize?: number;\n\t/** Spacing between dots in pixels */\n\tdotSpacing?: number;\n\t/** Opacity of dots (0-1) */\n\tdotOpacity?: number;\n\t/** Intensity of the wave effect when hovering */\n\twaveIntensity?: number;\n\t/** Radius of the wave effect in pixels */\n\twaveRadius?: number;\n\t/** Color of the dots (supports any valid CSS color) */\n\tdotColor?: string;\n\t/** Color of the dot glow effect (supports any valid CSS color) */\n\tglowColor?: string;\n\t/** Enable or disable the noise overlay */\n\tenableNoise?: boolean;\n\t/** Opacity of the noise overlay (0-1) */\n\tnoiseOpacity?: number;\n\t/** Enable or disable the mouse glow effect */\n\tenableMouseGlow?: boolean;\n\t/** Set the initial performance level */\n\tinitialPerformance?: \"low\" | \"medium\" | \"high\";\n}\n\nconst NoiseSVG = React.memo(() => (\n\t<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100%\" height=\"100%\">\n\t\t<filter id=\"noise\">\n\t\t\t<feTurbulence\n\t\t\t\ttype=\"fractalNoise\"\n\t\t\t\tbaseFrequency=\"0.65\"\n\t\t\t\tnumOctaves=\"3\"\n\t\t\t\tstitchTiles=\"stitch\"\n\t\t\t/>\n\t\t</filter>\n\t\t<rect width=\"100%\" height=\"100%\" filter=\"url(#noise)\" />\n\t</svg>\n));\n\nNoiseSVG.displayName = \"NoiseSVG\";\n\nconst NoiseOverlay: React.FC<{ opacity: number }> = ({ opacity }) => (\n\t<div\n\t\tclassName=\"absolute inset-0 h-full w-full mix-blend-overlay\"\n\t\tstyle={{ opacity }}\n\t>\n\t\t<NoiseSVG />\n\t</div>\n);\n\nconst useResponsive = () => {\n\tconst [windowSize, setWindowSize] = useState({\n\t\twidth: typeof window !== \"undefined\" ? window.innerWidth : 0,\n\t\theight: typeof window !== \"undefined\" ? window.innerHeight : 0,\n\t});\n\n\tuseEffect(() => {\n\t\tconst handleResize = () => {\n\t\t\tsetWindowSize({\n\t\t\t\twidth: window.innerWidth,\n\t\t\t\theight: window.innerHeight,\n\t\t\t});\n\t\t};\n\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\treturn () => window.removeEventListener(\"resize\", handleResize);\n\t}, []);\n\n\treturn {\n\t\tisMobile: windowSize.width < 768,\n\t\tisTablet: windowSize.width >= 768 && windowSize.width < 1024,\n\t\tisDesktop: windowSize.width >= 1024,\n\t};\n};\n\nconst usePerformance = (\n\tinitialPerformance: \"low\" | \"medium\" | \"high\" = \"medium\"\n) => {\n\tconst [performance, setPerformance] = useState(initialPerformance);\n\tconst [fps, setFps] = useState(60);\n\n\tuseEffect(() => {\n\t\tlet frameCount = 0;\n\t\tlet lastTime = globalThis.performance.now();\n\t\tlet framerId: number;\n\n\t\tconst measureFps = (time: number) => {\n\t\t\tframeCount++;\n\t\t\tif (time - lastTime > 1000) {\n\t\t\t\tsetFps(Math.round((frameCount * 1000) / (time - lastTime)));\n\t\t\t\tframeCount = 0;\n\t\t\t\tlastTime = time;\n\t\t\t}\n\t\t\tframerId = requestAnimationFrame(measureFps);\n\t\t};\n\n\t\tframerId = requestAnimationFrame(measureFps);\n\n\t\treturn () => cancelAnimationFrame(framerId);\n\t}, []);\n\n\tuseEffect(() => {\n\t\tif (fps < 30 && performance !== \"low\") {\n\t\t\tsetPerformance(\"low\");\n\t\t} else if (fps >= 30 && fps < 50 && performance !== \"medium\") {\n\t\t\tsetPerformance(\"medium\");\n\t\t} else if (fps >= 50 && performance !== \"high\") {\n\t\t\tsetPerformance(\"high\");\n\t\t}\n\t}, [fps, performance]);\n\n\treturn { performance, fps };\n};\n\nconst DotCanvas: React.FC<{\n\tdotSize: number;\n\tdotSpacing: number;\n\tdotOpacity: number;\n\twaveIntensity: number;\n\twaveRadius: number;\n\tdotColor: string;\n\tglowColor: string;\n\tperformance: \"low\" | \"medium\" | \"high\";\n\tmousePos: { x: number; y: number };\n}> = React.memo(\n\t({\n\t\tdotSize,\n\t\tdotSpacing,\n\t\tdotOpacity,\n\t\twaveIntensity,\n\t\twaveRadius,\n\t\tdotColor,\n\t\tglowColor,\n\t\tperformance,\n\t\tmousePos,\n\t}) => {\n\t\tconst canvasRef = useRef<HTMLCanvasElement>(null);\n\t\tconst animationRef = useRef<number>();\n\n\t\tconst drawDots = useCallback(\n\t\t\t(ctx: CanvasRenderingContext2D, time: number) => {\n\t\t\t\tconst { width, height } = ctx.canvas;\n\t\t\t\tctx.clearRect(0, 0, width, height);\n\n\t\t\t\tconst performanceSettings = {\n\t\t\t\t\tlow: { skip: 3 },\n\t\t\t\t\tmedium: { skip: 2 },\n\t\t\t\t\thigh: { skip: 1 },\n\t\t\t\t};\n\n\t\t\t\tconst skip = performanceSettings[performance].skip;\n\n\t\t\t\tconst cols = Math.ceil(width / dotSpacing);\n\t\t\t\tconst rows = Math.ceil(height / dotSpacing);\n\n\t\t\t\tconst centerX = mousePos.x * width;\n\t\t\t\tconst centerY = mousePos.y * height;\n\n\t\t\t\tfor (let i = 0; i < cols; i += skip) {\n\t\t\t\t\tfor (let j = 0; j < rows; j += skip) {\n\t\t\t\t\t\tconst x = i * dotSpacing;\n\t\t\t\t\t\tconst y = j * dotSpacing;\n\n\t\t\t\t\t\tconst distanceX = x - centerX;\n\t\t\t\t\t\tconst distanceY = y - centerY;\n\t\t\t\t\t\tconst distance = Math.sqrt(\n\t\t\t\t\t\t\tdistanceX * distanceX + distanceY * distanceY\n\t\t\t\t\t\t);\n\n\t\t\t\t\t\tlet dotX = x;\n\t\t\t\t\t\tlet dotY = y;\n\n\t\t\t\t\t\tif (distance < waveRadius) {\n\t\t\t\t\t\t\tconst waveStrength = Math.pow(\n\t\t\t\t\t\t\t\t1 - distance / waveRadius,\n\t\t\t\t\t\t\t\t2\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\tconst angle = Math.atan2(distanceY, distanceX);\n\t\t\t\t\t\t\tconst waveOffset =\n\t\t\t\t\t\t\t\tMath.sin(distance * 0.05 - time * 0.005) *\n\t\t\t\t\t\t\t\twaveIntensity *\n\t\t\t\t\t\t\t\twaveStrength;\n\t\t\t\t\t\t\tdotX += Math.cos(angle) * waveOffset;\n\t\t\t\t\t\t\tdotY += Math.sin(angle) * waveOffset;\n\n\t\t\t\t\t\t\tconst glowRadius = dotSize * (1 + waveStrength);\n\t\t\t\t\t\t\tconst gradient = ctx.createRadialGradient(\n\t\t\t\t\t\t\t\tdotX,\n\t\t\t\t\t\t\t\tdotY,\n\t\t\t\t\t\t\t\t0,\n\t\t\t\t\t\t\t\tdotX,\n\t\t\t\t\t\t\t\tdotY,\n\t\t\t\t\t\t\t\tglowRadius\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\tgradient.addColorStop(\n\t\t\t\t\t\t\t\t0,\n\t\t\t\t\t\t\t\tglowColor.replace(\n\t\t\t\t\t\t\t\t\t\"1)\",\n\t\t\t\t\t\t\t\t\t`${dotOpacity * (1 + waveStrength)})`\n\t\t\t\t\t\t\t\t)\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\tgradient.addColorStop(1, glowColor.replace(\"1)\", \"0)\"));\n\t\t\t\t\t\t\tctx.fillStyle = gradient;\n\t\t\t\t\t\t} else {\n\t\t\t\t\t\t\tctx.fillStyle = dotColor.replace(\"1)\", `${dotOpacity})`);\n\t\t\t\t\t\t}\n\n\t\t\t\t\t\tctx.beginPath();\n\t\t\t\t\t\tctx.arc(dotX, dotY, dotSize / 2, 0, Math.PI * 2);\n\t\t\t\t\t\tctx.fill();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t[\n\t\t\t\tdotSize,\n\t\t\t\tdotSpacing,\n\t\t\t\tdotOpacity,\n\t\t\t\twaveIntensity,\n\t\t\t\twaveRadius,\n\t\t\t\tdotColor,\n\t\t\t\tglowColor,\n\t\t\t\tperformance,\n\t\t\t\tmousePos,\n\t\t\t]\n\t\t);\n\n\t\tuseEffect(() => {\n\t\t\tconst canvas = canvasRef.current;\n\t\t\tif (!canvas) return;\n\n\t\t\tconst ctx = canvas.getContext(\"2d\");\n\t\t\tif (!ctx) return;\n\n\t\t\tconst resizeCanvas = () => {\n\t\t\t\tcanvas.width = window.innerWidth;\n\t\t\t\tcanvas.height = window.innerHeight;\n\t\t\t};\n\n\t\t\tresizeCanvas();\n\t\t\twindow.addEventListener(\"resize\", resizeCanvas);\n\n\t\t\tlet lastTime = 0;\n\t\t\tconst animate = (time: number) => {\n\t\t\t\tif (time - lastTime > 16) {\n\t\t\t\t\tdrawDots(ctx, time);\n\t\t\t\t\tlastTime = time;\n\t\t\t\t}\n\t\t\t\tanimationRef.current = requestAnimationFrame(animate);\n\t\t\t};\n\n\t\t\tanimationRef.current = requestAnimationFrame(animate);\n\n\t\t\treturn () => {\n\t\t\t\twindow.removeEventListener(\"resize\", resizeCanvas);\n\t\t\t\tif (animationRef.current) {\n\t\t\t\t\tcancelAnimationFrame(animationRef.current);\n\t\t\t\t}\n\t\t\t};\n\t\t}, [drawDots]);\n\n\t\treturn (\n\t\t\t<canvas\n\t\t\t\tref={canvasRef}\n\t\t\t\tclassName=\"absolute inset-0 h-full w-full bg-background\"\n\t\t\t\tstyle={{ mixBlendMode: \"multiply\" }}\n\t\t\t/>\n\t\t);\n\t}\n);\n\nDotCanvas.displayName = \"DotCanvas\";\n\nconst MouseGlow: React.FC<{\n\tglowColor: string;\n\tmousePos: { x: number; y: number };\n}> = React.memo(({ glowColor, mousePos }) => (\n\t<>\n\t\t<div\n\t\t\tclassName=\"absolute w-40 h-40 rounded-full pointer-events-none\"\n\t\t\tstyle={{\n\t\t\t\tbackground: `radial-gradient(circle, ${glowColor.replace(\n\t\t\t\t\t\"1)\",\n\t\t\t\t\t\"0.2)\"\n\t\t\t\t)} 0%, ${glowColor.replace(\"1)\", \"0)\")} 70%)`,\n\t\t\t\tleft: `${mousePos.x * 100}%`,\n\t\t\t\ttop: `${mousePos.y * 100}%`,\n\t\t\t\ttransform: \"translate(-50%, -50%)\",\n\t\t\t\tfilter: \"blur(10px)\",\n\t\t\t}}\n\t\t/>\n\t\t<div\n\t\t\tclassName=\"absolute w-20 h-20 rounded-full pointer-events-none\"\n\t\t\tstyle={{\n\t\t\t\tbackground: `radial-gradient(circle, ${glowColor.replace(\n\t\t\t\t\t\"1)\",\n\t\t\t\t\t\"0.4)\"\n\t\t\t\t)} 0%, ${glowColor.replace(\"1)\", \"0)\")} 70%)`,\n\t\t\t\tleft: `${mousePos.x * 100}%`,\n\t\t\t\ttop: `${mousePos.y * 100}%`,\n\t\t\t\ttransform: \"translate(-50%, -50%)\",\n\t\t\t}}\n\t\t/>\n\t</>\n));\n\nMouseGlow.displayName = \"MouseGlow\";\n\nexport function FractalDotGrid({\n\tdotSize = 4,\n\tdotSpacing = 20,\n\tdotOpacity = 0.3,\n\twaveIntensity = 30,\n\twaveRadius = 200,\n\tdotColor = \"rgba(100, 100, 255, 1)\",\n\tglowColor = \"rgba(100, 100, 255, 1)\",\n\tenableNoise = true,\n\tnoiseOpacity = 0.03,\n\tenableMouseGlow = true,\n\tinitialPerformance = \"medium\",\n}: FractalDotGridProps) {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst { isMobile, isTablet } = useResponsive();\n\tconst { performance } = usePerformance(initialPerformance);\n\tconst [mousePos, setMousePos] = useState({ x: 0, y: 0 });\n\n\tconst handleMouseMove = useCallback((event: MouseEvent) => {\n\t\tconst { clientX, clientY } = event;\n\t\tconst { left, top, width, height } =\n\t\t\tcontainerRef.current?.getBoundingClientRect() ?? {\n\t\t\t\tleft: 0,\n\t\t\t\ttop: 0,\n\t\t\t\twidth: 0,\n\t\t\t\theight: 0,\n\t\t\t};\n\t\tconst x = (clientX - left) / width;\n\t\tconst y = (clientY - top) / height;\n\t\tsetMousePos({ x, y });\n\t}, []);\n\n\tuseEffect(() => {\n\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\n\t\treturn () => window.removeEventListener(\"mousemove\", handleMouseMove);\n\t}, [handleMouseMove]);\n\n\tconst responsiveDotSize = useMemo(() => {\n\t\tif (isMobile) return dotSize * 0.75;\n\t\tif (isTablet) return dotSize * 0.9;\n\t\treturn dotSize;\n\t}, [isMobile, isTablet, dotSize]);\n\n\tconst responsiveDotSpacing = useMemo(() => {\n\t\tif (isMobile) return dotSpacing * 1.5;\n\t\tif (isTablet) return dotSpacing * 1.25;\n\t\treturn dotSpacing;\n\t}, [isMobile, isTablet, dotSpacing]);\n\n\treturn (\n\t\t<AnimatePresence>\n\t\t\t<motion.div\n\t\t\t\tref={containerRef}\n\t\t\t\tkey=\"fractal-dot-grid\"\n\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\texit={{ opacity: 0 }}\n\t\t\t\ttransition={{ duration: 1.5, ease: \"easeOut\" }}\n\t\t\t\tclassName=\"absolute inset-0 overflow-hidden w-full h-full\"\n\t\t\t>\n\t\t\t\t<DotCanvas\n\t\t\t\t\tdotSize={responsiveDotSize}\n\t\t\t\t\tdotSpacing={responsiveDotSpacing}\n\t\t\t\t\tdotOpacity={dotOpacity}\n\t\t\t\t\twaveIntensity={waveIntensity}\n\t\t\t\t\twaveRadius={waveRadius}\n\t\t\t\t\tdotColor={dotColor}\n\t\t\t\t\tglowColor={glowColor}\n\t\t\t\t\tperformance={performance}\n\t\t\t\t\tmousePos={mousePos}\n\t\t\t\t/>\n\t\t\t\t{enableNoise && <NoiseOverlay opacity={noiseOpacity} />}\n\t\t\t\t{enableMouseGlow && (\n\t\t\t\t\t<MouseGlow glowColor={glowColor} mousePos={mousePos} />\n\t\t\t\t)}\n\t\t\t</motion.div>\n\t\t</AnimatePresence>\n\t);\n}\n\nexport default FractalDotGrid;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/bg-animated-fractal-grid",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "dotSize",
+        "type": "number",
+        "default": "4",
+        "description": "Size of each dot in pixels",
+        "required": false
+      },
+      {
+        "name": "dotSpacing",
+        "type": "number",
+        "default": "20",
+        "description": "Spacing between dots in pixels",
+        "required": false
+      },
+      {
+        "name": "dotOpacity",
+        "type": "number",
+        "default": "0.3",
+        "description": "Opacity of dots (0-1)",
+        "required": false
+      },
+      {
+        "name": "waveIntensity",
+        "type": "number",
+        "default": "30",
+        "description": "Intensity of the wave effect when hovering",
+        "required": false
+      },
+      {
+        "name": "waveRadius",
+        "type": "number",
+        "default": "200",
+        "description": "Radius of the wave effect in pixels",
+        "required": false
+      },
+      {
+        "name": "dotColor",
+        "type": "string",
+        "default": "\"rgba(100, 100, 255, 1)\"",
+        "description": "Color of the dots (supports any valid CSS color)",
+        "required": false
+      },
+      {
+        "name": "glowColor",
+        "type": "string",
+        "default": "\"rgba(100, 100, 255, 1)\"",
+        "description": "Color of the dot glow effect (supports any valid CSS color)",
+        "required": false
+      },
+      {
+        "name": "enableNoise",
+        "type": "boolean",
+        "default": "true",
+        "description": "Enable or disable the noise overlay",
+        "required": false
+      },
+      {
+        "name": "noiseOpacity",
+        "type": "number",
+        "default": "0.03",
+        "description": "Opacity of the noise overlay (0-1)",
+        "required": false
+      },
+      {
+        "name": "enableMouseGlow",
+        "type": "boolean",
+        "default": "true",
+        "description": "Enable or disable the mouse glow effect",
+        "required": false
+      },
+      {
+        "name": "initialPerformance",
+        "type": "\"low\" | \"medium\" | \"high\"",
+        "default": "\"medium\"",
+        "description": "Set the initial performance level",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fractal-grid"
+  }
+}

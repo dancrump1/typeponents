@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-proximity",
+  "type": "registry:ui",
+  "title": "Text Proximity",
+  "description": "Text Proximity",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-proximity.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-proximity.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { CSSProperties, forwardRef, useRef } from \"react\";\r\n\r\nimport { useMousePositionRef } from \"@/hooks/use-mouse-position\";\r\nimport {\r\n\tmotion,\r\n\tuseAnimationFrame,\r\n\tuseMotionValue,\r\n\tuseTransform,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.fancycomponents.dev/docs/components/text/text-cursor-proximity\r\n\r\n// Helper type that makes all properties of CSSProperties accept number | string\r\ntype CSSPropertiesWithValues = {\r\n\t[K in keyof CSSProperties]: string | number;\r\n};\r\n\r\ninterface StyleValue<T extends keyof CSSPropertiesWithValues> {\r\n\tfrom: CSSPropertiesWithValues[T];\r\n\tto: CSSPropertiesWithValues[T];\r\n}\r\n\r\ninterface TextProps extends React.HTMLAttributes<HTMLSpanElement> {\r\n\tlabel: string;\r\n\tstyles: Partial<{\r\n\t\t[K in keyof CSSPropertiesWithValues]: StyleValue<K>;\r\n\t}>;\r\n\tcontainerRef: React.RefObject<HTMLDivElement>;\r\n\tradius?: number;\r\n\tfalloff?: \"linear\" | \"exponential\" | \"gaussian\";\r\n}\r\n\r\nconst TextCursorProximity = forwardRef<HTMLSpanElement, TextProps>(\r\n\t(\r\n\t\t{\r\n\t\t\tlabel,\r\n\t\t\tstyles,\r\n\t\t\tcontainerRef,\r\n\t\t\tradius = 50,\r\n\t\t\tfalloff = \"linear\",\r\n\t\t\tclassName,\r\n\t\t\tonClick,\r\n\t\t\t...props\r\n\t\t},\r\n\t\tref\r\n\t) => {\r\n\t\tconst letterRefs = useRef<(HTMLSpanElement | null)[]>([]);\r\n\t\tconst mousePositionRef = useMousePositionRef(containerRef);\r\n\r\n\t\t// Create a motion value for each letter's proximity\r\n\t\tconst letterProximities = useRef(\r\n\t\t\tArray(label.replace(/\\s/g, \"\").length)\r\n\t\t\t\t.fill(0)\r\n\t\t\t\t.map(() => useMotionValue(0))\r\n\t\t);\r\n\r\n\t\tconst calculateDistance = (\r\n\t\t\tx1: number,\r\n\t\t\ty1: number,\r\n\t\t\tx2: number,\r\n\t\t\ty2: number\r\n\t\t): number => {\r\n\t\t\treturn Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));\r\n\t\t};\r\n\r\n\t\tconst calculateFalloff = (distance: number): number => {\r\n\t\t\tconst normalizedDistance = Math.min(\r\n\t\t\t\tMath.max(1 - distance / radius, 0),\r\n\t\t\t\t1\r\n\t\t\t);\r\n\r\n\t\t\tswitch (falloff) {\r\n\t\t\t\tcase \"exponential\":\r\n\t\t\t\t\treturn Math.pow(normalizedDistance, 2);\r\n\t\t\t\tcase \"gaussian\":\r\n\t\t\t\t\treturn Math.exp(-Math.pow(distance / (radius / 2), 2) / 2);\r\n\t\t\t\tcase \"linear\":\r\n\t\t\t\tdefault:\r\n\t\t\t\t\treturn normalizedDistance;\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tuseAnimationFrame(() => {\r\n\t\t\tif (!containerRef?.current) return;\r\n\t\t\tconst containerRect = containerRef.current.getBoundingClientRect();\r\n\r\n\t\t\tletterRefs.current.forEach((letterRef, index) => {\r\n\t\t\t\tif (!letterRef) return;\r\n\r\n\t\t\t\tconst rect = letterRef.getBoundingClientRect();\r\n\t\t\t\tconst letterCenterX =\r\n\t\t\t\t\trect.left + rect.width / 2 - containerRect.left;\r\n\t\t\t\tconst letterCenterY =\r\n\t\t\t\t\trect.top + rect.height / 2 - containerRect.top;\r\n\r\n\t\t\t\tconst distance = calculateDistance(\r\n\t\t\t\t\tmousePositionRef.current.x,\r\n\t\t\t\t\tmousePositionRef.current.y,\r\n\t\t\t\t\tletterCenterX,\r\n\t\t\t\t\tletterCenterY\r\n\t\t\t\t);\r\n\r\n\t\t\t\tconst proximity = calculateFalloff(distance);\r\n\t\t\t\tletterProximities.current[index].set(proximity);\r\n\t\t\t});\r\n\t\t});\r\n\r\n\t\tconst words = label.split(\" \");\r\n\t\tlet letterIndex = 0;\r\n\r\n\t\treturn (\r\n\t\t\t<span\r\n\t\t\t\tref={ref}\r\n\t\t\t\tclassName={`${className} inline`}\r\n\t\t\t\tonClick={onClick}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t{words.map((word, wordIndex) => (\r\n\t\t\t\t\t<span key={wordIndex} className=\"inline-block whitespace-nowrap\">\r\n\t\t\t\t\t\t{word.split(\"\").map((letter) => {\r\n\t\t\t\t\t\t\tconst currentLetterIndex = letterIndex++;\r\n\t\t\t\t\t\t\tconst proximity =\r\n\t\t\t\t\t\t\t\tletterProximities.current[currentLetterIndex];\r\n\r\n\t\t\t\t\t\t\t// Create transformed values for each style property\r\n\t\t\t\t\t\t\tconst transformedStyles = Object.entries(styles).reduce(\r\n\t\t\t\t\t\t\t\t(acc, [key, value]) => {\r\n\t\t\t\t\t\t\t\t\tacc[key] = useTransform(\r\n\t\t\t\t\t\t\t\t\t\tproximity,\r\n\t\t\t\t\t\t\t\t\t\t[0, 1],\r\n\t\t\t\t\t\t\t\t\t\t[value.from, value.to]\r\n\t\t\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t\t\t\treturn acc;\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t\t{} as Record<string, any>\r\n\t\t\t\t\t\t\t);\r\n\r\n\t\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\t\tkey={currentLetterIndex}\r\n\t\t\t\t\t\t\t\t\tref={(el: HTMLSpanElement | null) => {\r\n\t\t\t\t\t\t\t\t\t\tletterRefs.current[currentLetterIndex] = el;\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\tclassName=\"inline-block\"\r\n\t\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\t\tstyle={transformedStyles}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{letter}\r\n\t\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t})}\r\n\t\t\t\t\t\t{wordIndex < words.length - 1 && (\r\n\t\t\t\t\t\t\t<span className=\"inline-block\">&nbsp;</span>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</span>\r\n\t\t\t\t))}\r\n\t\t\t\t<span className=\"sr-only\">{label}</span>\r\n\t\t\t</span>\r\n\t\t);\r\n\t}\r\n);\r\n\r\nTextCursorProximity.displayName = \"TextCursorProximity\";\r\nexport default TextCursorProximity;\r\n"
+    },
+    {
+      "path": "hooks/use-mouse-position.ts",
+      "type": "registry:hook",
+      "target": "hooks/use-mouse-position.ts",
+      "content": "import { RefObject, useEffect, useRef } from \"react\";\r\n\r\nexport const useMousePositionRef = (\r\n\tcontainerRef?: RefObject<HTMLElement | SVGElement>\r\n) => {\r\n\tconst positionRef = useRef({ x: 0, y: 0 });\r\n\r\n\tuseEffect(() => {\r\n\t\tconst updatePosition = (x: number, y: number) => {\r\n\t\t\tif (containerRef && containerRef.current) {\r\n\t\t\t\tconst rect = containerRef.current.getBoundingClientRect();\r\n\t\t\t\tconst relativeX = x - rect.left;\r\n\t\t\t\tconst relativeY = y - rect.top;\r\n\r\n\t\t\t\t// Calculate relative position even when outside the container\r\n\t\t\t\tpositionRef.current = { x: relativeX, y: relativeY };\r\n\t\t\t} else {\r\n\t\t\t\tpositionRef.current = { x, y };\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tconst handleMouseMove = (ev: MouseEvent) => {\r\n\t\t\tupdatePosition(ev.clientX, ev.clientY);\r\n\t\t};\r\n\r\n\t\tconst handleTouchMove = (ev: TouchEvent) => {\r\n\t\t\tconst touch = ev.touches[0];\r\n\t\t\tupdatePosition(touch.clientX, touch.clientY);\r\n\t\t};\r\n\r\n\t\t// Listen for both mouse and touch events\r\n\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\r\n\t\twindow.addEventListener(\"touchmove\", handleTouchMove);\r\n\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\twindow.removeEventListener(\"touchmove\", handleTouchMove);\r\n\t\t};\r\n\t}, [containerRef]);\r\n\r\n\r\n\treturn positionRef;\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/text-cursor-proximity",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-proximity"
+  }
+}

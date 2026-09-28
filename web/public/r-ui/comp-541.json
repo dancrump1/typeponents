@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-541",
+  "type": "registry:component",
+  "title": "Comp 541",
+  "description": "Comp 541",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-541.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineContent,\r\n\tTimelineDate,\r\n\tTimelineHeader,\r\n\tTimelineIndicator,\r\n\tTimelineItem,\r\n\tTimelineSeparator,\r\n\tTimelineTitle,\r\n} from \"@/components/ui/timeline\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: \"Mar 15, 2024\",\r\n\t\ttitle: \"Project Kickoff\",\r\n\t\tdescription: \"Initial team meeting.\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: \"Mar 22, 2024\",\r\n\t\ttitle: \"Design Phase\",\r\n\t\tdescription: \"Completed wireframes.\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: \"Apr 5, 2024\",\r\n\t\ttitle: \"Development Sprint\",\r\n\t\tdescription: \"Backend development.\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tdate: \"Apr 19, 2024\",\r\n\t\ttitle: \"Testing & Deployment\",\r\n\t\tdescription: \"Performance optimization.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline defaultValue={3} orientation=\"horizontal\">\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tstep={item.id}\r\n\t\t\t\t\tclassName=\"group-data-[orientation=horizontal]/timeline:mt-0\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<TimelineHeader>\r\n\t\t\t\t\t\t<TimelineSeparator className=\"group-data-[orientation=horizontal]/timeline:top-8\" />\r\n\t\t\t\t\t\t<TimelineDate className=\"mb-10\">{item.date}</TimelineDate>\r\n\t\t\t\t\t\t<TimelineTitle>{item.title}</TimelineTitle>\r\n\t\t\t\t\t\t<TimelineIndicator className=\"group-data-[orientation=horizontal]/timeline:top-8\" />\r\n\t\t\t\t\t</TimelineHeader>\r\n\t\t\t\t\t<TimelineContent>{item.description}</TimelineContent>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

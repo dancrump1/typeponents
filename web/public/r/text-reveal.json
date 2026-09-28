@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-reveal",
+  "type": "registry:ui",
+  "title": "Text Reveal",
+  "description": "Text Reveal",
+  "dependencies": [
+    "motion",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-reveal.tsx",
+      "content": "\"use client\";\n\nimport React, { memo, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\nimport { twMerge } from \"tailwind-merge\";\n\n// https://ui.aceternity.com/components/text-reveal-card\n\nexport const TextRevealCard = ({\n\ttext,\n\trevealText,\n\tchildren,\n\tclassName,\n}: {\n\ttext: string;\n\trevealText: string;\n\tchildren?: React.ReactNode;\n\tclassName?: string;\n}) => {\n\tconst [widthPercentage, setWidthPercentage] = useState(0);\n\tconst cardRef = useRef<HTMLDivElement | any>(null);\n\tconst [left, setLeft] = useState(0);\n\tconst [localWidth, setLocalWidth] = useState(0);\n\tconst [isMouseOver, setIsMouseOver] = useState(false);\n\n\tuseEffect(() => {\n\t\tif (cardRef.current) {\n\t\t\tconst { left, width: localWidth } =\n\t\t\t\tcardRef.current.getBoundingClientRect();\n\t\t\tsetLeft(left);\n\t\t\tsetLocalWidth(localWidth);\n\t\t}\n\t}, []);\n\n\tfunction mouseMoveHandler(event: any) {\n\t\tevent.preventDefault();\n\n\t\tconst { clientX } = event;\n\t\tif (cardRef.current) {\n\t\t\tconst relativeX = clientX - left;\n\t\t\tsetWidthPercentage((relativeX / localWidth) * 100);\n\t\t}\n\t}\n\n\tfunction mouseLeaveHandler() {\n\t\tsetIsMouseOver(false);\n\t\tsetWidthPercentage(0);\n\t}\n\tfunction mouseEnterHandler() {\n\t\tsetIsMouseOver(true);\n\t}\n\n\tconst rotateDeg = (widthPercentage - 50) * 0.1;\n\treturn (\n\t\t<div\n\t\t\tonMouseEnter={mouseEnterHandler}\n\t\t\tonMouseLeave={mouseLeaveHandler}\n\t\t\tonMouseMove={mouseMoveHandler}\n\t\t\tref={cardRef}\n\t\t\tclassName={cn(\n\t\t\t\t\"bg-background border border-white/8 w-160 rounded-lg p-8 relative overflow-hidden\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\n\t\t\t<div className=\"h-40  relative flex items-center overflow-hidden\">\n\t\t\t\t<motion.div\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\twidth: \"100%\",\n\t\t\t\t\t}}\n\t\t\t\t\tanimate={\n\t\t\t\t\t\tisMouseOver\n\t\t\t\t\t\t\t? {\n\t\t\t\t\t\t\t\t\topacity: widthPercentage > 0 ? 1 : 0,\n\t\t\t\t\t\t\t\t\tclipPath: `inset(0 ${100 - widthPercentage}% 0 0)`,\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t: {\n\t\t\t\t\t\t\t\t\tclipPath: `inset(0 ${100 - widthPercentage}% 0 0)`,\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t}\n\t\t\t\t\ttransition={isMouseOver ? { duration: 0 } : { duration: 0.4 }}\n\t\t\t\t\tclassName=\"absolute bg-background z-20  will-change-transform\"\n\t\t\t\t>\n\t\t\t\t\t<p\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttextShadow: \"4px 4px 15px rgba(0,0,0,0.5)\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"text-base sm:text-[3rem] py-10 font-bold text-foreground bg-clip-text text-transparent bg-linear-to-b from-background to-background\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{revealText}\n\t\t\t\t\t</p>\n\t\t\t\t</motion.div>\n\t\t\t\t<motion.div\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\tleft: `${widthPercentage}%`,\n\t\t\t\t\t\trotate: `${rotateDeg}deg`,\n\t\t\t\t\t\topacity: widthPercentage > 0 ? 1 : 0,\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={isMouseOver ? { duration: 0 } : { duration: 0.4 }}\n\t\t\t\t\tclassName=\"h-40 w-[8px] bg-linear-to-b from-transparent via-background to-transparent absolute z-40 will-change-transform\"\n\t\t\t\t></motion.div>\n\n\t\t\t\t<div className=\" overflow-hidden mask-[linear-gradient(to_bottom,transparent,white,transparent)]\">\n\t\t\t\t\t<p className=\"text-base sm:text-[3rem] py-10 font-bold bg-clip-text text-transparent bg-background\">\n\t\t\t\t\t\t{text}\n\t\t\t\t\t</p>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport const TextRevealCardTitle = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<h2 className={twMerge(\"text-foreground text-lg mb-2\", className)}>\n\t\t\t{children}\n\t\t</h2>\n\t);\n};\n\nexport const TextRevealCardDescription = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<p className={twMerge(\"text-foreground text-sm\", className)}>{children}</p>\n\t);\n};\n\nconst Stars = () => {\n\tconst randomMove = () => Math.random() * 4 - 2;\n\tconst randomOpacity = () => Math.random();\n\tconst random = () => Math.random();\n\treturn (\n\t\t<div className=\"absolute inset-0\">\n\t\t\t{[...Array(140)].map((_, i) => (\n\t\t\t\t<motion.span\n\t\t\t\t\tkey={`star-${i}`}\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\ttop: `calc(${random() * 100}% + ${randomMove()}px)`,\n\t\t\t\t\t\tleft: `calc(${random() * 100}% + ${randomMove()}px)`,\n\t\t\t\t\t\topacity: randomOpacity(),\n\t\t\t\t\t\tscale: [1, 1.2, 0],\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tduration: random() * 10 + 20,\n\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\tease: \"linear\",\n\t\t\t\t\t}}\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tposition: \"absolute\",\n\t\t\t\t\t\ttop: `${random() * 100}%`,\n\t\t\t\t\t\tleft: `${random() * 100}%`,\n\t\t\t\t\t\twidth: `2px`,\n\t\t\t\t\t\theight: `2px`,\n\t\t\t\t\t\tbackgroundColor: \"white\",\n\t\t\t\t\t\tborderRadius: \"50%\",\n\t\t\t\t\t\tzIndex: 1,\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"inline-block\"\n\t\t\t\t></motion.span>\n\t\t\t))}\n\t\t</div>\n\t);\n};\n\nexport const MemoizedStars = memo(Stars);\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/text-reveal-card",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "revealText",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-reveal"
+  }
+}

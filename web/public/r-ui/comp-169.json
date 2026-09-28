@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-169",
+  "type": "registry:component",
+  "title": "Comp 169",
+  "description": "Comp 169",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-169.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { RadioGroup, RadioGroupItem } from \"@/components/ui/radio-group\";\r\nimport { CheckIcon, MinusIcon } from \"lucide-react\";\r\n\r\nconst items = [\r\n\t{ value: \"1\", label: \"Light\", image: \"/ui-light.png\" },\r\n\t{ value: \"2\", label: \"Dark\", image: \"/ui-dark.png\" },\r\n\t{ value: \"3\", label: \"System\", image: \"/ui-system.png\" },\r\n];\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<fieldset className=\"space-y-4\">\r\n\t\t\t<legend className=\"text-foreground text-sm leading-none font-medium\">\r\n\t\t\t\tChoose a theme\r\n\t\t\t</legend>\r\n\t\t\t<RadioGroup className=\"flex gap-3\" defaultValue=\"1\">\r\n\t\t\t\t{items.map((item) => (\r\n\t\t\t\t\t<label key={`${id}-${item.value}`}>\r\n\t\t\t\t\t\t<RadioGroupItem\r\n\t\t\t\t\t\t\tid={`${id}-${item.value}`}\r\n\t\t\t\t\t\t\tvalue={item.value}\r\n\t\t\t\t\t\t\tclassName=\"peer sr-only after:absolute after:inset-0\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tsrc={item.image}\r\n\t\t\t\t\t\t\talt={item.label}\r\n\t\t\t\t\t\t\twidth={88}\r\n\t\t\t\t\t\t\theight={70}\r\n\t\t\t\t\t\t\tclassName=\"border-input peer-focus-visible:ring-ring/50 peer-data-[state=checked]:border-ring peer-data-[state=checked]:bg-accent relative cursor-pointer overflow-hidden rounded-md border shadow-2xs transition-[color,box-shadow] outline-hidden peer-focus-visible:ring-[3px] peer-data-disabled:cursor-not-allowed peer-data-disabled:opacity-50\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<span className=\"group peer-data-[state=unchecked]:text-muted-foreground/70 mt-2 flex items-center gap-1\">\r\n\t\t\t\t\t\t\t<CheckIcon\r\n\t\t\t\t\t\t\t\tsize={16}\r\n\t\t\t\t\t\t\t\tclassName=\"group-peer-data-[state=unchecked]:hidden\"\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<MinusIcon\r\n\t\t\t\t\t\t\t\tsize={16}\r\n\t\t\t\t\t\t\t\tclassName=\"group-peer-data-[state=checked]:hidden\"\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<span className=\"text-xs font-medium\">{item.label}</span>\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</label>\r\n\t\t\t\t))}\r\n\t\t\t</RadioGroup>\r\n\t\t</fieldset>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/radio-group.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as RadioGroupPrimitive from \"@radix-ui/react-radio-group\";\r\nimport { Circle } from \"lucide-react\";\r\n\r\nconst RadioGroup = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Root\r\n\t\t\tclassName={cn(\"grid gap-2\", className)}\r\n\t\t\t{...props}\r\n\t\t\tref={ref}\r\n\t\t/>\r\n\t);\r\n});\r\nRadioGroup.displayName = RadioGroupPrimitive.Root.displayName;\r\n\r\nconst RadioGroupItem = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Item>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Item\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<RadioGroupPrimitive.Indicator className=\"flex items-center justify-center\">\r\n\t\t\t\t<Circle className=\"h-2.5 w-2.5 fill-current text-current\" />\r\n\t\t\t</RadioGroupPrimitive.Indicator>\r\n\t\t</RadioGroupPrimitive.Item>\r\n\t);\r\n});\r\nRadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;\r\n\r\nexport { RadioGroup, RadioGroupItem };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-417",
+  "type": "registry:component",
+  "title": "Comp 417",
+  "description": "Comp 417",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-417.tsx",
+      "content": "import { Badge } from \"@/components/ui/badge\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Badge asChild>\r\n\t\t\t<a href=\"#\">Link</a>\r\n\t\t</Badge>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/badge.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { cva, type VariantProps } from \"class-variance-authority\";\r\n\r\nconst badgeVariants = cva(\r\n\t\"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2\",\r\n\t{\r\n\t\tvariants: {\r\n\t\t\tvariant: {\r\n\t\t\t\tdefault:\r\n\t\t\t\t\t\"border-transparent bg-primary text-primary-foreground hover:bg-primary/80\",\r\n\t\t\t\tsecondary:\r\n\t\t\t\t\t\"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80\",\r\n\t\t\t\tdestructive:\r\n\t\t\t\t\t\"border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80\",\r\n\t\t\t\toutline: \"text-foreground\",\r\n\t\t\t},\r\n\t\t},\r\n\t\tdefaultVariants: {\r\n\t\t\tvariant: \"default\",\r\n\t\t},\r\n\t}\r\n);\r\n\r\nexport interface BadgeProps\r\n\textends React.HTMLAttributes<HTMLDivElement>,\r\n\t\tVariantProps<typeof badgeVariants> {}\r\n\r\nfunction Badge({ className, variant, ...props }: BadgeProps) {\r\n\treturn (\r\n\t\t<div className={cn(badgeVariants({ variant }), className)} {...props} />\r\n\t);\r\n}\r\n\r\nexport { Badge, badgeVariants };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

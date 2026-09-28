@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-76",
+  "type": "registry:component",
+  "title": "Comp 76",
+  "description": "Comp 76",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-76.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport { Textarea } from \"@/components/ui/textarea\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<Label htmlFor={id}>Read-only textarea</Label>\r\n\t\t\t<Textarea\r\n\t\t\t\tid={id}\r\n\t\t\t\tclassName=\"read-only:bg-muted\"\r\n\t\t\t\tdefaultValue=\"This is a read-only textarea\"\r\n\t\t\t\treadOnly\r\n\t\t\t\tplaceholder=\"Leave a comment\"\r\n\t\t\t/>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/textarea.tsx",
+      "content": "// SHADCN UI GENERATED CODE\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport interface TextareaProps\n\textends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}\n\nconst Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(\n\t({ className, ...props }, ref) => {\n\t\treturn (\n\t\t\t<textarea\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t/>\n\t\t);\n\t}\n);\nTextarea.displayName = \"Textarea\";\n\nexport { Textarea };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

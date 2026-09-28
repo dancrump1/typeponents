@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "holographic-card",
+  "type": "registry:ui",
+  "title": "Holographic Card",
+  "description": "Card with a holographic sheen that tracks the pointer.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/holographic-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/holographic-card.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport {\n    motion,\n    useMotionTemplate,\n    useMotionValue,\n    useSpring,\n    useTransform,\n} from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\n// Credit:\n//  https://www.sparkui.site/components/holographic-card\nconst SPRING = { stiffness: 220, damping: 22, mass: 0.6 };\n\nexport function HolographicCard({\n    children,\n    className,\n    intensity = 12,\n    foilOpacity = 0.5,\n}) {\n    const px = useMotionValue(0.5);\n    const py = useMotionValue(0.5);\n    const [hovering, setHovering] = React.useState(false);\n    const [enabled, setEnabled] = React.useState(true);\n\n    React.useEffect(() => {\n        setEnabled(!window.matchMedia(\"(pointer: coarse)\").matches);\n    }, []);\n\n    const rotateX = useSpring(useTransform(py, [0, 1], [intensity, -intensity]), SPRING);\n    const rotateY = useSpring(useTransform(px, [0, 1], [-intensity, intensity]), SPRING);\n\n    const glareX = useSpring(useTransform(px, [0, 1], [0, 100]), SPRING);\n    const glareY = useSpring(useTransform(py, [0, 1], [0, 100]), SPRING);\n    const foilShift = useSpring(\n        useTransform([px, py], (v) => {\n            const [x, y] = v;\n            return (x + y) * 50;\n        }),\n        SPRING\n    );\n\n    const glare = useMotionTemplate`radial-gradient(circle at ${glareX}% ${glareY}%, rgba(255,255,255,0.45), transparent 45%)`;\n    const foilPosition = useMotionTemplate`${foilShift}% 50%`;\n\n    const handlePointerMove = (e) => {\n        if (!enabled) return;\n        const rect = e.currentTarget.getBoundingClientRect();\n        px.set((e.clientX - rect.left) / rect.width);\n        py.set((e.clientY - rect.top) / rect.height);\n    };\n\n    const handlePointerEnter = () => {\n        if (enabled) setHovering(true);\n    };\n\n    const handlePointerLeave = () => {\n        px.set(0.5);\n        py.set(0.5);\n        setHovering(false);\n    };\n\n    return (\n        <div style={{ perspective: 1000 }}>\n            <motion.div\n                onPointerMove={handlePointerMove}\n                onPointerEnter={handlePointerEnter}\n                onPointerLeave={handlePointerLeave}\n                style={{ rotateX, rotateY, transformStyle: \"preserve-3d\" }}\n                className={cn(\n                    \"group relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900\",\n                    className\n                )}\n            >\n                {children}\n\n                <motion.div\n                    aria-hidden\n                    animate={{ opacity: hovering ? foilOpacity : 0 }}\n                    transition={{ duration: 0.4 }}\n                    style={{\n                        backgroundImage:\n                            \"linear-gradient(115deg, transparent 20%, rgba(255,0,132,0.7) 36%, rgba(255,214,0,0.7) 43%, rgba(0,255,163,0.7) 50%, rgba(0,178,255,0.7) 57%, rgba(172,0,255,0.7) 64%, transparent 80%)\",\n                        backgroundSize: \"300% 300%\",\n                        backgroundPosition: foilPosition,\n                        mixBlendMode: \"color-dodge\",\n                    }}\n                    className=\"pointer-events-none absolute inset-0\"\n                />\n\n                <motion.div\n                    aria-hidden\n                    animate={{ opacity: hovering ? 0.25 : 0 }}\n                    transition={{ duration: 0.4 }}\n                    style={{\n                        backgroundImage:\n                            \"repeating-linear-gradient(0deg, rgba(255,255,255,0.12) 0px, rgba(255,255,255,0.12) 1px, transparent 1px, transparent 3px)\",\n                        mixBlendMode: \"overlay\",\n                    }}\n                    className=\"pointer-events-none absolute inset-0\"\n                />\n\n                <motion.div\n                    aria-hidden\n                    animate={{ opacity: hovering ? 1 : 0 }}\n                    transition={{ duration: 0.4 }}\n                    style={{ backgroundImage: glare, mixBlendMode: \"overlay\" }}\n                    className=\"pointer-events-none absolute inset-0\"\n                />\n            </motion.div>\n        </div>\n    );\n}"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking",
+      "responsive"
+    ],
+    "interaction": "Tilting the pointer across the surface shifts the iridescent highlight.",
+    "inspiration": {
+      "source": "Spark UI",
+      "url": "https://www.sparkui.site/components/holographic-card",
+      "authorUrl": "https://www.sparkui.site",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/holographic-card"
+  }
+}

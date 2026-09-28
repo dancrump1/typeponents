@@ -1,0 +1,114 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "prismatic-burst",
+  "type": "registry:ui",
+  "title": "Prismatic Burst",
+  "description": "Full-bleed burst of prismatic light rays radiating from a centre point through a colour ramp you choose.",
+  "dependencies": [
+    "ogl"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/prismatic-burst.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/prismatic-burst.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\nimport { Mesh, Program, Renderer, Texture, Triangle } from \"ogl\";\r\n\r\ntype Offset = { x?: number | string; y?: number | string };\r\ntype AnimationType = \"rotate\" | \"rotate3d\" | \"hover\";\r\n\r\nexport type PrismaticBurstProps = {\r\n\tintensity?: number;\r\n\tspeed?: number;\r\n\tanimationType?: AnimationType;\r\n\tcolors?: string[];\r\n\tdistort?: number;\r\n\tpaused?: boolean;\r\n\toffset?: Offset;\r\n\thoverDampness?: number;\r\n\trayCount?: number;\r\n\tmixBlendMode?: React.CSSProperties[\"mixBlendMode\"] | \"none\";\r\n};\r\n\r\nconst vertexShader = `#version 300 es\r\nin vec2 position;\r\nin vec2 uv;\r\nout vec2 vUv;\r\nvoid main() {\r\n    vUv = uv;\r\n    gl_Position = vec4(position, 0.0, 1.0);\r\n}\r\n`;\r\n\r\nconst fragmentShader = `#version 300 es\r\nprecision highp float;\r\nprecision highp int;\r\n\r\nout vec4 fragColor;\r\n\r\nuniform vec2  uResolution;\r\nuniform float uTime;\r\n\r\nuniform float uIntensity;\r\nuniform float uSpeed;\r\nuniform int   uAnimType;\r\nuniform vec2  uMouse;\r\nuniform int   uColorCount;\r\nuniform float uDistort;\r\nuniform vec2  uOffset;\r\nuniform sampler2D uGradient;\r\nuniform float uNoiseAmount;\r\nuniform int   uRayCount;\r\n\r\nfloat hash21(vec2 p){\r\n    p = floor(p);\r\n    float f = 52.9829189 * fract(dot(p, vec2(0.065, 0.005)));\r\n    return fract(f);\r\n}\r\n\r\nmat2 rot30(){ return mat2(0.8, -0.5, 0.5, 0.8); }\r\n\r\nfloat layeredNoise(vec2 fragPx){\r\n    vec2 p = mod(fragPx + vec2(uTime * 30.0, -uTime * 21.0), 1024.0);\r\n    vec2 q = rot30() * p;\r\n    float n = 0.0;\r\n    n += 0.40 * hash21(q);\r\n    n += 0.25 * hash21(q * 2.0 + 17.0);\r\n    n += 0.20 * hash21(q * 4.0 + 47.0);\r\n    n += 0.10 * hash21(q * 8.0 + 113.0);\r\n    n += 0.05 * hash21(q * 16.0 + 191.0);\r\n    return n;\r\n}\r\n\r\nvec3 rayDir(vec2 frag, vec2 res, vec2 offset, float dist){\r\n    float focal = res.y * max(dist, 1e-3);\r\n    return normalize(vec3(2.0 * (frag - offset) - res, focal));\r\n}\r\n\r\nfloat edgeFade(vec2 frag, vec2 res, vec2 offset){\r\n    vec2 toC = frag - 0.5 * res - offset;\r\n    float r = length(toC) / (0.5 * min(res.x, res.y));\r\n    float x = clamp(r, 0.0, 1.0);\r\n    float q = x * x * x * (x * (x * 6.0 - 15.0) + 10.0);\r\n    float s = q * 0.5;\r\n    s = pow(s, 1.5);\r\n    float tail = 1.0 - pow(1.0 - s, 2.0);\r\n    s = mix(s, tail, 0.2);\r\n    float dn = (layeredNoise(frag * 0.15) - 0.5) * 0.0015 * s;\r\n    return clamp(s + dn, 0.0, 1.0);\r\n}\r\n\r\nmat3 rotX(float a){ float c = cos(a), s = sin(a); return mat3(1.0,0.0,0.0, 0.0,c,-s, 0.0,s,c); }\r\nmat3 rotY(float a){ float c = cos(a), s = sin(a); return mat3(c,0.0,s, 0.0,1.0,0.0, -s,0.0,c); }\r\nmat3 rotZ(float a){ float c = cos(a), s = sin(a); return mat3(c,-s,0.0, s,c,0.0, 0.0,0.0,1.0); }\r\n\r\nvec3 sampleGradient(float t){\r\n    t = clamp(t, 0.0, 1.0);\r\n    return texture(uGradient, vec2(t, 0.5)).rgb;\r\n}\r\n\r\nvec2 rot2(vec2 v, float a){\r\n    float s = sin(a), c = cos(a);\r\n    return mat2(c, -s, s, c) * v;\r\n}\r\n\r\nfloat bendAngle(vec3 q, float t){\r\n    float a = 0.8 * sin(q.x * 0.55 + t * 0.6)\r\n            + 0.7 * sin(q.y * 0.50 - t * 0.5)\r\n            + 0.6 * sin(q.z * 0.60 + t * 0.7);\r\n    return a;\r\n}\r\n\r\nvoid main(){\r\n    vec2 frag = gl_FragCoord.xy;\r\n    float t = uTime * uSpeed;\r\n    float jitterAmp = 0.1 * clamp(uNoiseAmount, 0.0, 1.0);\r\n    vec3 dir = rayDir(frag, uResolution, uOffset, 1.0);\r\n    float marchT = 0.0;\r\n    vec3 col = vec3(0.0);\r\n    float n = layeredNoise(frag);\r\n    vec4 c = cos(t * 0.2 + vec4(0.0, 33.0, 11.0, 0.0));\r\n    mat2 M2 = mat2(c.x, c.y, c.z, c.w);\r\n    float amp = clamp(uDistort, 0.0, 50.0) * 0.15;\r\n\r\n    mat3 rot3dMat = mat3(1.0);\r\n    if(uAnimType == 1){\r\n      vec3 ang = vec3(t * 0.31, t * 0.21, t * 0.17);\r\n      rot3dMat = rotZ(ang.z) * rotY(ang.y) * rotX(ang.x);\r\n    }\r\n    mat3 hoverMat = mat3(1.0);\r\n    if(uAnimType == 2){\r\n      vec2 m = uMouse * 2.0 - 1.0;\r\n      vec3 ang = vec3(m.y * 0.6, m.x * 0.6, 0.0);\r\n      hoverMat = rotY(ang.y) * rotX(ang.x);\r\n    }\r\n\r\n    for (int i = 0; i < 44; ++i) {\r\n        vec3 P = marchT * dir;\r\n        P.z -= 2.0;\r\n        float rad = length(P);\r\n        vec3 Pl = P * (10.0 / max(rad, 1e-6));\r\n\r\n        if(uAnimType == 0){\r\n            Pl.xz *= M2;\r\n        } else if(uAnimType == 1){\r\n      Pl = rot3dMat * Pl;\r\n        } else {\r\n      Pl = hoverMat * Pl;\r\n        }\r\n\r\n        float stepLen = min(rad - 0.3, n * jitterAmp) + 0.1;\r\n\r\n        float grow = smoothstep(0.35, 3.0, marchT);\r\n        float a1 = amp * grow * bendAngle(Pl * 0.6, t);\r\n        float a2 = 0.5 * amp * grow * bendAngle(Pl.zyx * 0.5 + 3.1, t * 0.9);\r\n        vec3 Pb = Pl;\r\n        Pb.xz = rot2(Pb.xz, a1);\r\n        Pb.xy = rot2(Pb.xy, a2);\r\n\r\n        float rayPattern = smoothstep(\r\n            0.5, 0.7,\r\n            sin(Pb.x + cos(Pb.y) * cos(Pb.z)) *\r\n            sin(Pb.z + sin(Pb.y) * cos(Pb.x + t))\r\n        );\r\n\r\n        if (uRayCount > 0) {\r\n            float ang = atan(Pb.y, Pb.x);\r\n            float comb = 0.5 + 0.5 * cos(float(uRayCount) * ang);\r\n            comb = pow(comb, 3.0);\r\n            rayPattern *= smoothstep(0.15, 0.95, comb);\r\n        }\r\n\r\n        vec3 spectralDefault = 1.0 + vec3(\r\n            cos(marchT * 3.0 + 0.0),\r\n            cos(marchT * 3.0 + 1.0),\r\n            cos(marchT * 3.0 + 2.0)\r\n        );\r\n\r\n        float saw = fract(marchT * 0.25);\r\n        float tRay = saw * saw * (3.0 - 2.0 * saw);\r\n        vec3 userGradient = 2.0 * sampleGradient(tRay);\r\n        vec3 spectral = (uColorCount > 0) ? userGradient : spectralDefault;\r\n        vec3 base = (0.05 / (0.4 + stepLen))\r\n                  * smoothstep(5.0, 0.0, rad)\r\n                  * spectral;\r\n\r\n        col += base * rayPattern;\r\n        marchT += stepLen;\r\n    }\r\n\r\n    col *= edgeFade(frag, uResolution, uOffset);\r\n    col *= uIntensity;\r\n\r\n    fragColor = vec4(clamp(col, 0.0, 1.0), 1.0);\r\n}`;\r\n\r\nconst hexToRgb01 = (hex: string): [number, number, number] => {\r\n\tlet h = hex.trim();\r\n\tif (h.startsWith(\"#\")) h = h.slice(1);\r\n\tif (h.length === 3) {\r\n\t\tconst r = h[0],\r\n\t\t\tg = h[1],\r\n\t\t\tb = h[2];\r\n\t\th = r + r + g + g + b + b;\r\n\t}\r\n\tconst intVal = parseInt(h, 16);\r\n\tif (isNaN(intVal) || (h.length !== 6 && h.length !== 8)) return [1, 1, 1];\r\n\tconst r = ((intVal >> 16) & 255) / 255;\r\n\tconst g = ((intVal >> 8) & 255) / 255;\r\n\tconst b = (intVal & 255) / 255;\r\n\treturn [r, g, b];\r\n};\r\n\r\nconst toPx = (v: number | string | undefined): number => {\r\n\tif (v == null) return 0;\r\n\tif (typeof v === \"number\") return v;\r\n\tconst s = String(v).trim();\r\n\tconst num = parseFloat(s.replace(\"px\", \"\"));\r\n\treturn isNaN(num) ? 0 : num;\r\n};\r\n\r\nconst PrismaticBurst = ({\r\n\tintensity = 2,\r\n\tspeed = 0.5,\r\n\tanimationType = \"rotate3d\",\r\n\tcolors,\r\n\tdistort = 0,\r\n\tpaused = false,\r\n\toffset = { x: 0, y: 0 },\r\n\thoverDampness = 0,\r\n\trayCount,\r\n\tmixBlendMode = \"lighten\",\r\n}: PrismaticBurstProps) => {\r\n\tconst containerRef = useRef<HTMLDivElement>(null);\r\n\tconst programRef = useRef<Program | null>(null);\r\n\tconst rendererRef = useRef<Renderer | null>(null);\r\n\tconst mouseTargetRef = useRef<[number, number]>([0.5, 0.5]);\r\n\tconst mouseSmoothRef = useRef<[number, number]>([0.5, 0.5]);\r\n\tconst pausedRef = useRef<boolean>(paused);\r\n\tconst gradTexRef = useRef<Texture | null>(null);\r\n\tconst hoverDampRef = useRef<number>(hoverDampness);\r\n\tconst isVisibleRef = useRef<boolean>(true);\r\n\tconst meshRef = useRef<Mesh | null>(null);\r\n\tconst triRef = useRef<Triangle | null>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tpausedRef.current = paused;\r\n\t}, [paused]);\r\n\tuseEffect(() => {\r\n\t\thoverDampRef.current = hoverDampness;\r\n\t}, [hoverDampness]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst container = containerRef.current;\r\n\t\tif (!container) return;\r\n\r\n\t\tconst dpr = Math.min(window.devicePixelRatio || 1, 2);\r\n\t\tconst renderer = new Renderer({ dpr, alpha: false, antialias: false });\r\n\t\trendererRef.current = renderer;\r\n\r\n\t\tconst gl = renderer.gl;\r\n\t\tgl.canvas.style.position = \"absolute\";\r\n\t\tgl.canvas.style.inset = \"0\";\r\n\t\tgl.canvas.style.width = \"100%\";\r\n\t\tgl.canvas.style.height = \"100%\";\r\n\t\tgl.canvas.style.mixBlendMode =\r\n\t\t\tmixBlendMode && mixBlendMode !== \"none\" ? mixBlendMode : \"\";\r\n\t\tcontainer.appendChild(gl.canvas);\r\n\r\n\t\tconst white = new Uint8Array([255, 255, 255, 255]);\r\n\t\tconst gradientTex = new Texture(gl, {\r\n\t\t\timage: white,\r\n\t\t\twidth: 1,\r\n\t\t\theight: 1,\r\n\t\t\tgenerateMipmaps: false,\r\n\t\t\tflipY: false,\r\n\t\t});\r\n\r\n\t\tgradientTex.minFilter = gl.LINEAR;\r\n\t\tgradientTex.magFilter = gl.LINEAR;\r\n\t\tgradientTex.wrapS = gl.CLAMP_TO_EDGE;\r\n\t\tgradientTex.wrapT = gl.CLAMP_TO_EDGE;\r\n\t\tgradTexRef.current = gradientTex;\r\n\r\n\t\tconst program = new Program(gl, {\r\n\t\t\tvertex: vertexShader,\r\n\t\t\tfragment: fragmentShader,\r\n\t\t\tuniforms: {\r\n\t\t\t\tuResolution: { value: [1, 1] as [number, number] },\r\n\t\t\t\tuTime: { value: 0 },\r\n\r\n\t\t\t\tuIntensity: { value: 1 },\r\n\t\t\t\tuSpeed: { value: 1 },\r\n\t\t\t\tuAnimType: { value: 0 },\r\n\t\t\t\tuMouse: { value: [0.5, 0.5] as [number, number] },\r\n\t\t\t\tuColorCount: { value: 0 },\r\n\t\t\t\tuDistort: { value: 0 },\r\n\t\t\t\tuOffset: { value: [0, 0] as [number, number] },\r\n\t\t\t\tuGradient: { value: gradientTex },\r\n\t\t\t\tuNoiseAmount: { value: 0.8 },\r\n\t\t\t\tuRayCount: { value: 0 },\r\n\t\t\t},\r\n\t\t});\r\n\r\n\t\tprogramRef.current = program;\r\n\r\n\t\tconst triangle = new Triangle(gl);\r\n\t\tconst mesh = new Mesh(gl, { geometry: triangle, program });\r\n\t\ttriRef.current = triangle;\r\n\t\tmeshRef.current = mesh;\r\n\r\n\t\tconst resize = () => {\r\n\t\t\tconst w = container.clientWidth || 1;\r\n\t\t\tconst h = container.clientHeight || 1;\r\n\t\t\trenderer.setSize(w, h);\r\n\t\t\tprogram.uniforms.uResolution.value = [\r\n\t\t\t\tgl.drawingBufferWidth,\r\n\t\t\t\tgl.drawingBufferHeight,\r\n\t\t\t];\r\n\t\t};\r\n\r\n\t\tlet ro: ResizeObserver | null = null;\r\n\t\tif (\"ResizeObserver\" in window) {\r\n\t\t\tro = new ResizeObserver(resize);\r\n\t\t\tro.observe(container);\r\n\t\t} else {\r\n\t\t\t(window as Window).addEventListener(\"resize\", resize);\r\n\t\t}\r\n\t\tresize();\r\n\r\n\t\tconst onPointer = (e: PointerEvent) => {\r\n\t\t\tconst rect = container.getBoundingClientRect();\r\n\t\t\tconst x = (e.clientX - rect.left) / Math.max(rect.width, 1);\r\n\t\t\tconst y = (e.clientY - rect.top) / Math.max(rect.height, 1);\r\n\t\t\tmouseTargetRef.current = [\r\n\t\t\t\tMath.min(Math.max(x, 0), 1),\r\n\t\t\t\tMath.min(Math.max(y, 0), 1),\r\n\t\t\t];\r\n\t\t};\r\n\t\tcontainer.addEventListener(\"pointermove\", onPointer, { passive: true });\r\n\r\n\t\tlet io: IntersectionObserver | null = null;\r\n\t\tif (\"IntersectionObserver\" in window) {\r\n\t\t\tio = new IntersectionObserver(\r\n\t\t\t\t(entries) => {\r\n\t\t\t\t\tif (entries[0]) isVisibleRef.current = entries[0].isIntersecting;\r\n\t\t\t\t},\r\n\t\t\t\t{ root: null, threshold: 0.01 }\r\n\t\t\t);\r\n\t\t\tio.observe(container);\r\n\t\t}\r\n\t\tconst onVis = () => {};\r\n\t\tdocument.addEventListener(\"visibilitychange\", onVis);\r\n\r\n\t\tlet raf = 0;\r\n\t\tlet last = performance.now();\r\n\t\tlet accumTime = 0;\r\n\r\n\t\tconst update = (now: number) => {\r\n\t\t\tconst dt = Math.max(0, now - last) * 0.001;\r\n\t\t\tlast = now;\r\n\t\t\tconst visible = isVisibleRef.current && !document.hidden;\r\n\t\t\tif (!pausedRef.current) accumTime += dt;\r\n\t\t\tif (!visible) {\r\n\t\t\t\traf = requestAnimationFrame(update);\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\t\t\tconst tau =\r\n\t\t\t\t0.02 + Math.max(0, Math.min(1, hoverDampRef.current)) * 0.5;\r\n\t\t\tconst alpha = 1 - Math.exp(-dt / tau);\r\n\t\t\tconst tgt = mouseTargetRef.current;\r\n\t\t\tconst sm = mouseSmoothRef.current;\r\n\t\t\tsm[0] += (tgt[0] - sm[0]) * alpha;\r\n\t\t\tsm[1] += (tgt[1] - sm[1]) * alpha;\r\n\t\t\tprogram.uniforms.uMouse.value = sm as any;\r\n\t\t\tprogram.uniforms.uTime.value = accumTime;\r\n\t\t\trenderer.render({ scene: meshRef.current! });\r\n\t\t\traf = requestAnimationFrame(update);\r\n\t\t};\r\n\t\traf = requestAnimationFrame(update);\r\n\r\n\t\treturn () => {\r\n\t\t\tcancelAnimationFrame(raf);\r\n\t\t\tcontainer.removeEventListener(\"pointermove\", onPointer);\r\n\t\t\tro?.disconnect();\r\n\t\t\tif (!ro) window.removeEventListener(\"resize\", resize);\r\n\t\t\tio?.disconnect();\r\n\t\t\tdocument.removeEventListener(\"visibilitychange\", onVis);\r\n\t\t\ttry {\r\n\t\t\t\tcontainer.removeChild(gl.canvas);\r\n\t\t\t} catch (e) {\r\n\t\t\t\tvoid e;\r\n\t\t\t}\r\n\t\t\tmeshRef.current = null;\r\n\t\t\ttriRef.current = null;\r\n\t\t\tprogramRef.current = null;\r\n\t\t\ttry {\r\n\t\t\t\tconst glCtx = rendererRef.current?.gl;\r\n\t\t\t\tif (glCtx && gradTexRef.current?.texture)\r\n\t\t\t\t\tglCtx.deleteTexture(gradTexRef.current.texture);\r\n\t\t\t} catch (e) {\r\n\t\t\t\tvoid e;\r\n\t\t\t}\r\n\t\t\trendererRef.current = null;\r\n\t\t\tgradTexRef.current = null;\r\n\t\t};\r\n\t}, []);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst canvas = rendererRef.current?.gl?.canvas as\r\n\t\t\t| HTMLCanvasElement\r\n\t\t\t| undefined;\r\n\t\tif (canvas) {\r\n\t\t\tcanvas.style.mixBlendMode =\r\n\t\t\t\tmixBlendMode && mixBlendMode !== \"none\" ? mixBlendMode : \"\";\r\n\t\t}\r\n\t}, [mixBlendMode]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst program = programRef.current;\r\n\t\tconst renderer = rendererRef.current;\r\n\t\tconst gradTex = gradTexRef.current;\r\n\t\tif (!program || !renderer || !gradTex) return;\r\n\r\n\t\tprogram.uniforms.uIntensity.value = intensity ?? 1;\r\n\t\tprogram.uniforms.uSpeed.value = speed ?? 1;\r\n\r\n\t\tconst animTypeMap: Record<AnimationType, number> = {\r\n\t\t\trotate: 0,\r\n\t\t\trotate3d: 1,\r\n\t\t\thover: 2,\r\n\t\t};\r\n\t\tprogram.uniforms.uAnimType.value = animTypeMap[animationType ?? \"rotate\"];\r\n\r\n\t\tprogram.uniforms.uDistort.value =\r\n\t\t\ttypeof distort === \"number\" ? distort : 0;\r\n\r\n\t\tconst ox = toPx(offset?.x);\r\n\t\tconst oy = toPx(offset?.y);\r\n\t\tprogram.uniforms.uOffset.value = [ox, oy];\r\n\t\tprogram.uniforms.uRayCount.value = Math.max(0, Math.floor(rayCount ?? 0));\r\n\r\n\t\tlet count = 0;\r\n\t\tif (Array.isArray(colors) && colors.length > 0) {\r\n\t\t\tconst gl = renderer.gl;\r\n\t\t\tconst capped = colors.slice(0, 64);\r\n\t\t\tcount = capped.length;\r\n\t\t\tconst data = new Uint8Array(count * 4);\r\n\t\t\tfor (let i = 0; i < count; i++) {\r\n\t\t\t\tconst [r, g, b] = hexToRgb01(capped[i]);\r\n\t\t\t\tdata[i * 4 + 0] = Math.round(r * 255);\r\n\t\t\t\tdata[i * 4 + 1] = Math.round(g * 255);\r\n\t\t\t\tdata[i * 4 + 2] = Math.round(b * 255);\r\n\t\t\t\tdata[i * 4 + 3] = 255;\r\n\t\t\t}\r\n\t\t\tgradTex.image = data;\r\n\t\t\tgradTex.width = count;\r\n\t\t\tgradTex.height = 1;\r\n\t\t\tgradTex.minFilter = gl.LINEAR;\r\n\t\t\tgradTex.magFilter = gl.LINEAR;\r\n\t\t\tgradTex.wrapS = gl.CLAMP_TO_EDGE;\r\n\t\t\tgradTex.wrapT = gl.CLAMP_TO_EDGE;\r\n\t\t\tgradTex.flipY = false;\r\n\t\t\tgradTex.generateMipmaps = false;\r\n\t\t\tgradTex.format = gl.RGBA;\r\n\t\t\tgradTex.type = gl.UNSIGNED_BYTE;\r\n\t\t\tgradTex.needsUpdate = true;\r\n\t\t} else {\r\n\t\t\tcount = 0;\r\n\t\t}\r\n\t\tprogram.uniforms.uColorCount.value = count;\r\n\t}, [intensity, speed, animationType, colors, distort, offset, rayCount]);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"w-full h-full relative overflow-hidden\"\r\n\t\t\tref={containerRef}\r\n\t\t/>\r\n\t);\r\n};\r\n\r\nexport default PrismaticBurst;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "scroll-driven",
+      "hover",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "Runs on its own — the rays sweep and turn in a continuous loop. Set to hover mode, the origin of the burst follows the pointer, drifting toward it rather than snapping.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "intensity",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationType",
+        "type": "AnimationType",
+        "default": "\"rotate3d\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "string[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distort",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "paused",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "offset",
+        "type": "Offset",
+        "default": "{ x: 0, y: 0 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hoverDampness",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rayCount",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mixBlendMode",
+        "type": "Property.MixBlendMode | \"none\"",
+        "default": "\"lighten\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/prismatic-burst"
+  }
+}

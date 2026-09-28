@@ -1,0 +1,173 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-along-path",
+  "type": "registry:ui",
+  "title": "Text Along Path",
+  "description": "Text Along Path",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-along-path.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-along-path.tsx",
+      "content": "import { RefObject, useEffect, useRef } from \"react\";\n\nimport { useScroll, useTransform } from \"motion/react\";\n\n// Credit:\n// https://www.fancycomponents.dev/docs/components/text/text-along-path\n\ntype PreserveAspectRatioAlign =\n\t| \"none\"\n\t| \"xMinYMin\"\n\t| \"xMidYMin\"\n\t| \"xMaxYMin\"\n\t| \"xMinYMid\"\n\t| \"xMidYMid\"\n\t| \"xMaxYMid\"\n\t| \"xMinYMax\"\n\t| \"xMidYMax\"\n\t| \"xMaxYMax\";\n\ntype PreserveAspectRatioMeetOrSlice = \"meet\" | \"slice\";\n\ntype PreserveAspectRatio =\n\t| PreserveAspectRatioAlign\n\t| `${Exclude<\n\t\t\tPreserveAspectRatioAlign,\n\t\t\t\"none\"\n\t  >} ${PreserveAspectRatioMeetOrSlice}`;\n\ninterface AnimatedPathTextProps {\n\t// Path properties\n\tpath: string;\n\tpathId?: string;\n\tpathClassName?: string;\n\tpreserveAspectRatio?: PreserveAspectRatio;\n\tshowPath?: boolean;\n\n\t// SVG properties\n\twidth?: string | number;\n\theight?: string | number;\n\tviewBox?: string;\n\tsvgClassName?: string;\n\n\t// Text properties\n\ttext: string;\n\ttextClassName?: string;\n\ttextAnchor?: \"start\" | \"middle\" | \"end\";\n\n\t// Animation properties\n\tanimationType?: \"auto\" | \"scroll\";\n\n\t// Animation properties if animationType is auto\n\tduration?: number;\n\trepeatCount?: number | \"indefinite\";\n\teasingFunction?: {\n\t\tcalcMode?: string;\n\t\tkeyTimes?: string;\n\t\tkeySplines?: string;\n\t};\n\n\t// Scroll animation properties if animationType is scroll\n\tscrollContainer?: RefObject<HTMLElement>;\n\tscrollOffset?: any[\"offset\"];\n\tscrollTransformValues?: [number, number];\n}\n\nconst AnimatedPathText = ({\n\t// Path defaults\n\tpath,\n\tpathId,\n\tpathClassName,\n\tpreserveAspectRatio = \"xMidYMid meet\",\n\tshowPath = false,\n\n\t// SVG defaults\n\twidth = \"100%\",\n\theight = \"100%\",\n\tviewBox = \"0 0 100 100\",\n\tsvgClassName,\n\n\t// Text defaults\n\ttext,\n\ttextClassName,\n\ttextAnchor = \"start\",\n\n\t// Animation type\n\tanimationType = \"auto\",\n\n\t// Animation defaults\n\tduration = 4,\n\trepeatCount = \"indefinite\",\n\n\teasingFunction = {},\n\n\t// Scroll animation defaults\n\tscrollContainer,\n\tscrollOffset = [\"start end\", \"end end\"],\n\tscrollTransformValues = [0, 100],\n}: AnimatedPathTextProps) => {\n\tconst container = useRef<HTMLDivElement>(null);\n\tconst textPathRefs = useRef<SVGTextPathElement[]>([]);\n\n\t// naive id for the path. you should rather use yours :)\n\tconst id =\n\t\tpathId || `animated-path-${Math.random().toString(36).substring(7)}`;\n\n\tconst { scrollYProgress } = useScroll({\n\t\tcontainer: scrollContainer || container,\n\t\toffset: scrollOffset,\n\t});\n\n\tconst t = useTransform(scrollYProgress, [0, 1], scrollTransformValues);\n\n\tuseEffect(() => {\n\t\t// Re-initialize scroll handler when container ref changes\n\t\tconst handleChange = (e: number) => {\n\t\t\ttextPathRefs.current.forEach((textPath) => {\n\t\t\t\tif (textPath) {\n\t\t\t\t\ttextPath.setAttribute(\"startOffset\", `${t.get()}%`);\n\t\t\t\t}\n\t\t\t});\n\t\t};\n\n\t\tscrollYProgress.on(\"change\", handleChange);\n\n\t\treturn () => {\n\t\t\tscrollYProgress.clearListeners();\n\t\t};\n\t}, [scrollYProgress, t]);\n\n\tconst animationProps =\n\t\tanimationType === \"auto\"\n\t\t\t? {\n\t\t\t\t\tfrom: \"0%\",\n\t\t\t\t\tto: \"100%\",\n\t\t\t\t\tbegin: \"0s\",\n\t\t\t\t\tdur: `${duration}s`,\n\t\t\t\t\trepeatCount: repeatCount,\n\t\t\t\t\t...(easingFunction && easingFunction),\n\t\t\t\t}\n\t\t\t: null;\n\n\treturn (\n\t\t<svg\n\t\t\tclassName={svgClassName}\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\twidth={width}\n\t\t\theight={height}\n\t\t\tviewBox={viewBox}\n\t\t\tpreserveAspectRatio={preserveAspectRatio}\n\t\t>\n\t\t\t<path\n\t\t\t\tid={id}\n\t\t\t\tclassName={pathClassName}\n\t\t\t\td={path}\n\t\t\t\tstroke={showPath ? \"currentColor\" : \"none\"}\n\t\t\t\tfill=\"none\"\n\t\t\t/>\n\n\t\t\t{/* First text element */}\n\t\t\t<text textAnchor={textAnchor} fill=\"currentColor\">\n\t\t\t\t<textPath\n\t\t\t\t\tclassName={textClassName}\n\t\t\t\t\thref={`#${id}`}\n\t\t\t\t\tstartOffset={\"0%\"}\n\t\t\t\t\tref={(ref) => {\n\t\t\t\t\t\tif (ref) textPathRefs.current[0] = ref;\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{animationType === \"auto\" && (\n\t\t\t\t\t\t<animate attributeName=\"startOffset\" {...animationProps} />\n\t\t\t\t\t)}\n\t\t\t\t\t{text}\n\t\t\t\t</textPath>\n\t\t\t</text>\n\n\t\t\t{/* Second text element (offset to hide the jump) */}\n\t\t\t{animationType === \"auto\" && (\n\t\t\t\t<text textAnchor={textAnchor} fill=\"currentColor\">\n\t\t\t\t\t<textPath\n\t\t\t\t\t\tclassName={textClassName}\n\t\t\t\t\t\thref={`#${id}`}\n\t\t\t\t\t\tstartOffset={\"-100%\"}\n\t\t\t\t\t\tref={(ref) => {\n\t\t\t\t\t\t\tif (ref) textPathRefs.current[1] = ref;\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t{animationType === \"auto\" && (\n\t\t\t\t\t\t\t<animate\n\t\t\t\t\t\t\t\tattributeName=\"startOffset\"\n\t\t\t\t\t\t\t\t{...animationProps}\n\t\t\t\t\t\t\t\tfrom=\"-100%\"\n\t\t\t\t\t\t\t\tto=\"0%\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t)}\n\t\t\t\t\t\t{text}\n\t\t\t\t\t</textPath>\n\t\t\t\t</text>\n\t\t\t)}\n\t\t</svg>\n\t);\n};\n\nexport default AnimatedPathText;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/text-along-path",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "path",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "pathId",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pathClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "preserveAspectRatio",
+        "type": "PreserveAspectRatio",
+        "default": "\"xMidYMid meet\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showPath",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "default": "\"100%\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "default": "\"100%\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "viewBox",
+        "type": "string",
+        "default": "\"0 0 100 100\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "svgClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textAnchor",
+        "type": "\"start\" | \"middle\" | \"end\"",
+        "default": "\"start\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationType",
+        "type": "\"auto\" | \"scroll\"",
+        "default": "\"auto\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "4",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "repeatCount",
+        "type": "number | \"indefinite\"",
+        "default": "\"indefinite\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "easingFunction",
+        "type": "{ calcMode?: string; keyTimes?: string; keySplines?: stri…",
+        "default": "{}",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollContainer",
+        "type": "RefObject<HTMLElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollOffset",
+        "type": "any",
+        "default": "[\"start end\", \"end end\"]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollTransformValues",
+        "type": "[number, number]",
+        "default": "[0, 100]",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-along-path"
+  }
+}

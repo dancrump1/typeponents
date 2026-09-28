@@ -1,0 +1,38 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "blur-scroll-reveal",
+	title: "Blur Scroll Reveal",
+	description: "A scroll-driven text animation component where words or lines fade and transition from blur to sharp as they scroll into view.",
+	interaction: "Text blurs and fades in as the container scrolls through the viewport.",
+	categories: ["Text Animations"],
+	tags: ["scroll-driven"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/blur-scroll-reveal",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "text", type: "string", default: "\"Grinding Hard\"" },
+		{ name: "variant", type: "\"word\" | \"line\"", default: "\"word\"" },
+		{ name: "itemClassName", type: "string" },
+		{ name: "containerClassName", type: "string" },
+		{ name: "scrollContainerRef", type: "React.RefObject<HTMLElement | null>" },
+		{ name: "offset", type: "((number | (`${number}` | (\"start\" | \"end\" | \"center\") | …", default: "[\"start end\", \"end 60%\"]" },
+		{ name: "staggerFactor", type: "number", default: "0.85" },
+		{ name: "animationDuration", type: "number", default: "0.12" },
+		{ name: "opacity", type: "[number, number]", default: "[0, 1]" },
+		{ name: "blur", type: "[string, string]", default: "[\"12px\", \"0px\"]" },
+		{ name: "y", type: "[string | number, string | number]", default: "[\"10px\", \"0px\"]" },
+		{ name: "scale", type: "[number, number]", default: "[1, 1]" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

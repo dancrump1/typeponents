@@ -1,0 +1,37 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "animated-path",
+	title: "Animated Path",
+	description: "An animated logo component that draws the paths smoothly using Framer Motion.",
+	interaction: "On initial render, the logo paths are drawn and filled sequentially.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/animated-path",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "className", type: "string" },
+		{ name: "rawSvg", type: "string" },
+		{ name: "paths", type: "(string | PathData)[]" },
+		{ name: "viewBox", type: "string" },
+		{ name: "strokeColor", type: "string", default: "\"#007F7E\"" },
+		{ name: "strokeWidth", type: "string | number", default: "\"3\"" },
+		{ name: "fillColor", type: "string", default: "\"#007F7E\"" },
+		{ name: "pathLengthDuration", type: "number", default: "1.5" },
+		{ name: "fillDuration", type: "number", default: "0.8" },
+		{ name: "pathDelay", type: "number", default: "0.1" },
+		{ name: "fillDelay", type: "number", default: "1.2" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

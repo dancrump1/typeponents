@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sticky-countdown",
+  "type": "registry:ui",
+  "title": "Sticky Countdown",
+  "description": "A slim announcement bar that sticks to the top of the page counting down the days, hours, minutes and seconds to a date.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sticky-countdown.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sticky-countdown.tsx",
+      "content": "import { useAnimate } from \"motion/react\";\r\nimport { useEffect, useRef, useState } from \"react\";\r\n\r\n// NOTE: Change this date to whatever date you want to countdown to :)\r\nconst COUNTDOWN_FROM = \"2024-10-01\";\r\n\r\nconst SECOND = 1000;\r\nconst MINUTE = SECOND * 60;\r\nconst HOUR = MINUTE * 60;\r\nconst DAY = HOUR * 24;\r\n\r\ntype Units = \"Day\" | \"Hour\" | \"Minute\" | \"Second\";\r\n\r\n\r\nconst CountdownItem = ({ unit, text }: { unit: Units; text: string }) => {\r\n    const { ref, time } = useTimer(unit);\r\n    return (\r\n        <div className=\"flex w-fit items-center justify-center gap-1.5 py-2\">\r\n            <div className=\"relative w-full overflow-hidden text-center\">\r\n                <span\r\n                    ref={ref}\r\n                    className=\"block font-mono text-sm font-semibold md:text-base\"\r\n                >\r\n                    {time}\r\n                </span>\r\n            </div>\r\n            <span>{text}</span>\r\n        </div>\r\n    );\r\n};\r\n\r\nexport default CountdownItem;\r\n\r\n// NOTE: Framer motion exit animations can be a bit buggy when repeating\r\n// keys and tabbing between windows. Instead of using them, we've opted here\r\n// to build our own custom hook for handling the entrance and exit animations\r\nconst useTimer = (unit: Units) => {\r\n    const [ref, animate] = useAnimate();\r\n\r\n    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);\r\n    const timeRef = useRef(0);\r\n\r\n    const [time, setTime] = useState(0);\r\n\r\n    useEffect(() => {\r\n        intervalRef.current = setInterval(handleCountdown, 1000);\r\n\r\n        return () => clearInterval(intervalRef.current || undefined);\r\n    }, []);\r\n\r\n    const handleCountdown = async () => {\r\n        const end = new Date(COUNTDOWN_FROM);\r\n        const now = new Date();\r\n        const distance = +end - +now;\r\n\r\n        let newTime = 0;\r\n\r\n        if (unit === \"Day\") {\r\n            newTime = Math.floor(distance / DAY);\r\n        } else if (unit === \"Hour\") {\r\n            newTime = Math.floor((distance % DAY) / HOUR);\r\n        } else if (unit === \"Minute\") {\r\n            newTime = Math.floor((distance % HOUR) / MINUTE);\r\n        } else {\r\n            newTime = Math.floor((distance % MINUTE) / SECOND);\r\n        }\r\n\r\n        if (newTime !== timeRef.current) {\r\n            // Exit animation\r\n            await animate(\r\n                ref.current,\r\n                { y: [\"0%\", \"-50%\"], opacity: [1, 0] },\r\n                { duration: 0.35 }\r\n            );\r\n\r\n            timeRef.current = newTime;\r\n            setTime(newTime);\r\n\r\n            // Enter animation\r\n            await animate(\r\n                ref.current,\r\n                { y: [\"50%\", \"0%\"], opacity: [0, 1] },\r\n                { duration: 0.35 }\r\n            );\r\n        }\r\n    };\r\n\r\n    return { ref, time };\r\n};"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX",
+      "Utilities"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "Runs on its own — each number slides up and fades out as it expires, and the new one rises into its place from below, so only the units that actually changed move.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "unit",
+        "type": "Units",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sticky-countdown"
+  }
+}

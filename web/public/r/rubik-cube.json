@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rubik-cube",
+  "type": "registry:ui",
+  "title": "Rubik Cube",
+  "description": "An interactive 3D Rubik's cube component with multiple dimensions, visual modes, and smooth drag-to-rotate animations.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/rubik-cube.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/rubik-cube.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useEffect } from 'react';\r\nimport { motion, useMotionValue, useTransform, animate, useAnimationControls } from 'framer-motion';\r\nimport { cn } from '@/lib/utils';\r\n\r\nconst SIZE = 48;\r\n\r\nconst modes = ['skeleton', 'normal', 'glass'];\r\nconst dimensionModes = [\r\n  { mode: '2x2', center: [] },\r\n  { mode: '3x3', center: [4] },\r\n  { mode: '4x4', center: [5, 6, 9, 10] }\r\n];\r\n\r\nconst Piece = ({\r\n  config,\r\n  index,\r\n  mode,\r\n  isCenterPiece\r\n}: {\r\n  config: { color: string; position: string };\r\n  index: number;\r\n  mode: number;\r\n  isCenterPiece: boolean;\r\n}) => {\r\n  // Enhanced glass mode colors with better combinations\r\n  const getGlassColor = (baseColor: string, index: number) => {\r\n    const colors = [\r\n      'rgba(255, 255, 255, 0.15)', // White glass\r\n      'rgba(173, 216, 230, 0.2)', // Light blue glass\r\n      'rgba(240, 248, 255, 0.18)', // Alice blue glass\r\n      'rgba(230, 230, 250, 0.16)', // Lavender glass\r\n      'rgba(255, 250, 240, 0.17)', // Floral white glass\r\n      'rgba(245, 245, 245, 0.19)', // White smoke glass\r\n      'rgba(248, 248, 255, 0.14)', // Ghost white glass\r\n      'rgba(250, 235, 215, 0.15)', // Antique white glass\r\n      'rgba(255, 245, 238, 0.16)' // Seashell glass\r\n    ];\r\n    return colors[index % colors.length];\r\n  };\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        height: SIZE,\r\n        width: SIZE\r\n      }}\r\n      animate={{\r\n        backgroundColor:\r\n          mode === 2\r\n            ? getGlassColor(config.color, index)\r\n            : mode === 0\r\n            ? 'rgba(0, 0, 0, 0)'\r\n            : config.color,\r\n        filter: 'none',\r\n        borderColor:\r\n          mode === 0\r\n            ? index % 2 === 0\r\n              ? 'rgba(220, 220, 220, 1)'\r\n              : 'rgba(200, 200, 200, 1)'\r\n            : mode === 2\r\n            ? 'rgba(255, 255, 235, 1)'\r\n            : '#000000',\r\n        backdropFilter: mode === 2 ? 'blur(4px)' : 'none'\r\n      }}\r\n      transition={{\r\n        duration: 0.3,\r\n        ease: 'linear',\r\n        delay: index * 0.05\r\n      }}\r\n      className={cn('border-[1.5px] relative shrink-0', isCenterPiece && 'z-10')}\r\n    >\r\n      {isCenterPiece && mode !== 0 && (\r\n        <>\r\n          <div className=\"absolute top-0 left-0 -translate-x-[calc(50%+2px)] -translate-y-[calc(50%+2px)] rotate-45 w-3 h-3 bg-black z-[1000]\" />\r\n          <div className=\"absolute top-0 right-0 translate-x-[calc(50%+2px)] -translate-y-[calc(50%+2px)] rotate-45 w-3 h-3 bg-black z-[1000]\" />\r\n          <div className=\"absolute bottom-0 right-0 translate-x-[calc(50%+2px)] translate-y-[calc(50%+2px)] rotate-45 w-3 h-3 bg-black z-[1000]\" />\r\n          <div className=\"absolute bottom-0 left-0 -translate-x-[calc(50%+2px)] translate-y-[calc(50%+2px)] rotate-45 w-3 h-3 bg-black z-[1000]\" />\r\n        </>\r\n      )}\r\n    </motion.div>\r\n  );\r\n};\r\n\r\ninterface FaceProps {\r\n  config: {\r\n    color: string;\r\n    position: string;\r\n  };\r\n  mode: number;\r\n  dimensionMode: number;\r\n}\r\n\r\nconst Face = ({ config, mode, dimensionMode }: FaceProps) => {\r\n  const calculatedPosition = {\r\n    rotateX: 0,\r\n    rotateY: 0,\r\n    translateY: 0,\r\n    translateZ: 0,\r\n    translateX: 0\r\n  };\r\n  const DISPLACEMENT_MULTIPLIER = dimensionMode === 0 ? 1 : dimensionMode === 1 ? 1.5 : 2;\r\n  if (config.position === 'top') {\r\n    calculatedPosition.rotateX = 90;\r\n    calculatedPosition.translateY = -SIZE * DISPLACEMENT_MULTIPLIER;\r\n  } else if (config.position === 'back') {\r\n    calculatedPosition.translateZ = SIZE * DISPLACEMENT_MULTIPLIER;\r\n  } else if (config.position === 'front') {\r\n    calculatedPosition.translateZ = -SIZE * DISPLACEMENT_MULTIPLIER;\r\n  } else if (config.position === 'bottom') {\r\n    calculatedPosition.translateY = SIZE * DISPLACEMENT_MULTIPLIER;\r\n    calculatedPosition.rotateX = -90;\r\n  } else if (config.position === 'right') {\r\n    calculatedPosition.rotateY = 90;\r\n    calculatedPosition.translateX = SIZE * DISPLACEMENT_MULTIPLIER;\r\n  } else if (config.position === 'left') {\r\n    calculatedPosition.rotateY = -90;\r\n    calculatedPosition.translateX = -SIZE * DISPLACEMENT_MULTIPLIER;\r\n  }\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        rotateX: calculatedPosition.rotateX,\r\n        rotateY: calculatedPosition.rotateY,\r\n        translateX: calculatedPosition.translateX,\r\n        translateY: calculatedPosition.translateY,\r\n        translateZ: calculatedPosition.translateZ,\r\n        transformStyle: 'preserve-3d',\r\n        backfaceVisibility: 'visible'\r\n      }}\r\n      className={cn(\r\n        'grid absolute shrink-0',\r\n        dimensionMode === 0 ? 'grid-cols-2' : dimensionMode === 1 ? 'grid-cols-3' : 'grid-cols-4'\r\n      )}\r\n    >\r\n      {Array.from({ length: dimensionMode === 0 ? 4 : dimensionMode === 1 ? 9 : 16 }).map(\r\n        (_, index) => {\r\n          return (\r\n            <Piece\r\n              key={'face' + config.position + index}\r\n              config={config}\r\n              index={index}\r\n              isCenterPiece={dimensionModes[dimensionMode].center.includes(index)}\r\n              mode={mode}\r\n            ></Piece>\r\n          );\r\n        }\r\n      )}\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst RubikCube = ({\r\n  mode = 'normal',\r\n  dimensionMode = '3x3'\r\n}: {\r\n  mode?: 'skeleton' | 'normal' | 'glass';\r\n  dimensionMode?: '2x2' | '3x3' | '4x4';\r\n}) => {\r\n  const controls = useAnimationControls();\r\n\r\n  const faceColors = [\r\n    { color: '#C41E3A', position: 'left' },\r\n    { color: '#FF5800', position: 'right' },\r\n    { color: '#009E60', position: 'top' },\r\n    { color: '#0051BA', position: 'bottom' },\r\n    { color: '#FFD500', position: 'front' },\r\n    { color: '#ffffff', position: 'back' }\r\n  ];\r\n\r\n  // Motion values for interactive rotation\r\n  const rotateX = useMotionValue(45);\r\n  const rotateY = useMotionValue(45);\r\n\r\n  // Transform mouse drag to rotation\r\n  const dragRotateX = useTransform(rotateX, (value) => value);\r\n  const dragRotateY = useTransform(rotateY, (value) => value);\r\n\r\n  const handleDragEnd = async () => {\r\n    // Animate back to starting position\r\n    await Promise.all([\r\n      animate(rotateX, 45, { duration: 0.8, ease: 'easeOut' }),\r\n      animate(rotateY, 45, { duration: 0.8, ease: 'easeOut' })\r\n    ]);\r\n\r\n    controls.start({\r\n      rotateX: [45, 405],\r\n      rotateY: [45, -405],\r\n      transition: {\r\n        duration: 10,\r\n        ease: 'linear',\r\n        repeat: Infinity,\r\n        repeatType: 'loop'\r\n      }\r\n    });\r\n  };\r\n\r\n  useEffect(() => {\r\n    handleDragEnd();\r\n  }, []);\r\n\r\n  const modeIndex = modes.indexOf(mode);\r\n  const dimensionModeIndex = dimensionModes.findIndex((mode) => mode.mode === dimensionMode);\r\n\r\n  return (\r\n    <div className=\"flex items-center justify-center relative\">\r\n      <motion.div\r\n        style={{\r\n          height: SIZE * (dimensionModeIndex === 0 ? 2 : dimensionModeIndex === 1 ? 3 : 4),\r\n          width: SIZE * (dimensionModeIndex === 0 ? 2 : dimensionModeIndex === 1 ? 3 : 4),\r\n          perspective: '10000px',\r\n          transformStyle: 'preserve-3d',\r\n          rotateX: dragRotateX,\r\n          rotateY: dragRotateY,\r\n          cursor: 'grab'\r\n        }}\r\n        animate={controls}\r\n        transition={{\r\n          duration: 0.8,\r\n          ease: 'easeOut'\r\n        }}\r\n        drag\r\n        dragConstraints={{ left: -0, right: 0, top: -0, bottom: 0 }}\r\n        dragElastic={0.1}\r\n        dragSnapToOrigin={true}\r\n        onDrag={(event, info) => {\r\n          // Map drag movement to rotation\r\n          const sensitivity = 0.5;\r\n          rotateY.set(rotateY.get() + info.delta.x * sensitivity);\r\n          rotateX.set(rotateX.get() - info.delta.y * sensitivity);\r\n        }}\r\n        onDragStart={() => {\r\n          controls.stop();\r\n        }}\r\n        onDragEnd={handleDragEnd}\r\n        className=\"relative flex flex-wrap items-center justify-center\"\r\n      >\r\n        {faceColors.map((config, index) => {\r\n          // calculate when the face is in view\r\n          return (\r\n            <Face\r\n              key={'face' + index}\r\n              config={config}\r\n              mode={modeIndex}\r\n              dimensionMode={dimensionModeIndex}\r\n            />\r\n          );\r\n        })}\r\n      </motion.div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default RubikCube;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "drag"
+    ],
+    "interaction": "Drag to rotate a CSS 3D cube in 2×2, 3×3, or 4×4.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/rubikcube",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "mode",
+        "type": "\"skeleton\" | \"normal\" | \"glass\"",
+        "default": "'normal'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "dimensionMode",
+        "type": "\"2x2\" | \"3x3\" | \"4x4\"",
+        "default": "'3x3'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/rubik-cube"
+  }
+}

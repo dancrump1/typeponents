@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "power-off-slide",
+  "type": "registry:ui",
+  "title": "Power Off Slide",
+  "description": "Slide-to-power-off track with a draggable knob carrying a red power icon and a shimmering label.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/power-off-slide.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/power-off-slide.tsx",
+      "content": "\"use client\";\r\n\r\nimport { RefObject, useRef, useState } from \"react\";\r\n\r\nimport { Power } from \"lucide-react\";\r\nimport {\r\n\tmotion,\r\n\tuseAnimation,\r\n\tuseAnimationFrame,\r\n\tuseMotionValue,\r\n\tuseTransform,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.smoothui.dev/doc/power-off-slide\r\n\r\nexport default function PowerOffSlide() {\r\n\tconst [isPoweringOff, setIsPoweringOff] = useState(false);\r\n\tconst x = useMotionValue(0);\r\n\tconst controls = useAnimation();\r\n\tconst constraintsRef = useRef(null);\r\n\tconst textRef: RefObject<HTMLDivElement | null> = useRef(null);\r\n\r\n\tconst xInput = [0, 164];\r\n\tconst opacityOutput = [0, 1];\r\n\tconst opacity = useTransform(x, xInput, opacityOutput);\r\n\r\n\tuseAnimationFrame((t) => {\r\n\t\tconst duration = 2000;\r\n\t\tconst progress = (t % duration) / duration;\r\n\t\tif (textRef.current) {\r\n\t\t\ttextRef.current.style.setProperty(\"--x\", `${(1 - progress) * 100}%`);\r\n\t\t}\r\n\t});\r\n\r\n\tconst handleDragEnd = async () => {\r\n\t\tconst dragDistance = x.get();\r\n\t\tif (dragDistance > 160) {\r\n\t\t\tawait controls.start({ x: 168 });\r\n\t\t\tsetIsPoweringOff(true);\r\n\t\t\t// Add a timeout to reset the component after 2 seconds\r\n\t\t\tsetTimeout(() => {\r\n\t\t\t\tsetIsPoweringOff(false);\r\n\t\t\t\tcontrols.start({ x: 0 });\r\n\t\t\t\tx.set(0);\r\n\t\t\t}, 2000);\r\n\t\t} else {\r\n\t\t\tcontrols.start({ x: 0 });\r\n\t\t}\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"flex h-auto items-center justify-center\">\r\n\t\t\t<div className=\"w-56\">\r\n\t\t\t\t{isPoweringOff ? (\r\n\t\t\t\t\t<div className=\"text-light-950 dark:text-dark-950 text-center\">\r\n\t\t\t\t\t\t<p className=\"mb-2 text-xl font-light\">Shutting down...</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t) : (\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tref={constraintsRef}\r\n\t\t\t\t\t\tclassName=\"bg-light-400 dark:bg-dark-400 relative h-14 overflow-hidden rounded-full\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div className=\"absolute inset-0 left-8 z-0 flex items-center justify-center overflow-hidden\">\r\n\t\t\t\t\t\t\t<div className=\"text-md loading-shimmer text-light-950 relative w-full text-center font-normal select-none\">\r\n\t\t\t\t\t\t\t\tSlide to power off\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tdrag=\"x\"\r\n\t\t\t\t\t\t\tdragConstraints={{ left: 0, right: 168 }}\r\n\t\t\t\t\t\t\tdragElastic={0}\r\n\t\t\t\t\t\t\tdragMomentum={false}\r\n\t\t\t\t\t\t\tonDragEnd={handleDragEnd}\r\n\t\t\t\t\t\t\tanimate={controls}\r\n\t\t\t\t\t\t\tstyle={{ x }}\r\n\t\t\t\t\t\t\tclassName=\"bg-light-50 dark:bg-dark-50 absolute top-1 left-1 z-10 flex h-12 w-12 cursor-grab items-center justify-center rounded-full shadow-md active:cursor-grabbing\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<Power size={32} className=\"text-red-600\" />\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t)}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "drag",
+      "autoplay"
+    ],
+    "interaction": "Drag the knob to the far right and the track is replaced by a shutting-down message before resetting itself; release short of the end and the knob snaps back. The label text shimmers in a continuous loop.",
+    "inspiration": {
+      "source": "SmoothUI",
+      "url": "https://www.smoothui.dev/doc/power-off-slide",
+      "authorUrl": "https://www.smoothui.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/power-off-slide"
+  }
+}

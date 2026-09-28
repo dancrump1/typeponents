@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pointer",
+  "type": "registry:ui",
+  "title": "Pointer",
+  "description": "Pointer",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/pointer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/pointer.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tAnimatePresence,\n\tHTMLMotionProps,\n\tmotion,\n\tuseMotionValue,\n} from \"motion/react\";\n\ninterface PointerProps extends Omit<HTMLMotionProps<\"div\">, \"ref\"> {}\n\n/**\n * A custom pointer component that displays an animated cursor.\n * Add this as a child to any component to enable a custom pointer when hovering.\n * You can pass custom children to render as the pointer.\n *\n * @component\n * @param {PointerProps} props - The component props\n */\nexport function Pointer({\n\tclassName,\n\tstyle,\n\tchildren,\n\t...props\n}: PointerProps): JSX.Element {\n\tconst x = useMotionValue(0);\n\tconst y = useMotionValue(0);\n\tconst [isActive, setIsActive] = useState<boolean>(false);\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\n\tuseEffect(() => {\n\t\tif (typeof window !== \"undefined\" && containerRef.current) {\n\t\t\t// Get the parent element directly from the ref\n\t\t\tconst parentElement = containerRef.current.parentElement;\n\n\t\t\tif (parentElement) {\n\t\t\t\t// Add cursor-none to parent\n\t\t\t\tparentElement.style.cursor = \"none\";\n\n\t\t\t\t// Add event listeners to parent\n\t\t\t\tconst handleMouseMove = (e: MouseEvent) => {\n\t\t\t\t\tx.set(e.clientX);\n\t\t\t\t\ty.set(e.clientY);\n\t\t\t\t};\n\n\t\t\t\tconst handleMouseEnter = () => {\n\t\t\t\t\tsetIsActive(true);\n\t\t\t\t};\n\n\t\t\t\tconst handleMouseLeave = () => {\n\t\t\t\t\tsetIsActive(false);\n\t\t\t\t};\n\n\t\t\t\tparentElement.addEventListener(\"mousemove\", handleMouseMove);\n\t\t\t\tparentElement.addEventListener(\"mouseenter\", handleMouseEnter);\n\t\t\t\tparentElement.addEventListener(\"mouseleave\", handleMouseLeave);\n\n\t\t\t\treturn () => {\n\t\t\t\t\tparentElement.style.cursor = \"\";\n\t\t\t\t\tparentElement.removeEventListener(\"mousemove\", handleMouseMove);\n\t\t\t\t\tparentElement.removeEventListener(\n\t\t\t\t\t\t\"mouseenter\",\n\t\t\t\t\t\thandleMouseEnter\n\t\t\t\t\t);\n\t\t\t\t\tparentElement.removeEventListener(\n\t\t\t\t\t\t\"mouseleave\",\n\t\t\t\t\t\thandleMouseLeave\n\t\t\t\t\t);\n\t\t\t\t};\n\t\t\t}\n\t\t}\n\t}, [x, y]);\n\n\treturn (\n\t\t<>\n\t\t\t<div ref={containerRef} />\n\t\t\t<AnimatePresence>\n\t\t\t\t{isActive && (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tclassName=\"transform-[translate(-50%,-50%)] pointer-events-none fixed z-50\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttop: y,\n\t\t\t\t\t\t\tleft: x,\n\t\t\t\t\t\t\t...style,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\tscale: 0,\n\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\tscale: 1,\n\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\texit={{\n\t\t\t\t\t\t\tscale: 0,\n\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\t{...props}\n\t\t\t\t\t>\n\t\t\t\t\t\t{children || (\n\t\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\t\t\tfill=\"currentColor\"\n\t\t\t\t\t\t\t\tstrokeWidth=\"1\"\n\t\t\t\t\t\t\t\tviewBox=\"0 0 16 16\"\n\t\t\t\t\t\t\t\theight=\"24\"\n\t\t\t\t\t\t\t\twidth=\"24\"\n\t\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"rotate-[-70deg] stroke-white text-foreground\",\n\t\t\t\t\t\t\t\t\tclassName\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<path d=\"M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z\" />\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t)}\n\t\t\t\t\t</motion.div>\n\t\t\t\t)}\n\t\t\t</AnimatePresence>\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/pointer"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dynamic-island",
+  "type": "registry:ui",
+  "title": "Dynamic Island",
+  "description": "Black pill notch that reshapes itself between a compact weather badge, an incoming call banner and a countdown timer.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dynamic-island.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dynamic-island.tsx",
+      "content": "\"use client\";\n\nimport { useMemo, useState } from \"react\";\n\nimport {\n\tCloudLightning,\n\tPhone,\n\tThermometer,\n\tTimer as TimerIcon,\n} from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://www.smoothui.dev/doc/dynamic-island\n\n// Animation variants remain the same\nconst ANIMATION_VARIANTS = {\n\t\"ring-idle\": { scale: 0.9, scaleX: 0.9, bounce: 0.5 },\n\t\"timer-ring\": { scale: 0.7, y: -7.5, bounce: 0.35 },\n\t\"ring-timer\": { scale: 1.4, y: 7.5, bounce: 0.35 },\n\t\"timer-idle\": { scale: 0.7, y: -7.5, bounce: 0.3 },\n\t\"idle-timer\": { scale: 1.2, y: 5, bounce: 0.3 },\n\t\"idle-ring\": { scale: 1.1, y: 3, bounce: 0.5 },\n} as const;\n\nconst BOUNCE_VARIANTS = {\n\tidle: 0.5,\n\t\"ring-idle\": 0.5,\n\t\"timer-ring\": 0.35,\n\t\"ring-timer\": 0.35,\n\t\"timer-idle\": 0.3,\n\t\"idle-timer\": 0.3,\n\t\"idle-ring\": 0.5,\n} as const;\n\nconst variants = {\n\texit: (transition: any) => ({\n\t\t...transition,\n\t\topacity: [1, 0],\n\t\tfilter: \"blur(5px)\",\n\t}),\n};\n\n// Idle Component with Weather\nconst Idle = () => {\n\tconst [showTemp, setShowTemp] = useState(false);\n\n\treturn (\n\t\t<motion.div\n\t\t\tclassName=\"flex items-center gap-2 px-3 py-2\"\n\t\t\tonHoverStart={() => setShowTemp(true)}\n\t\t\tonHoverEnd={() => setShowTemp(false)}\n\t\t\tlayout\n\t\t>\n\t\t\t<AnimatePresence mode=\"wait\">\n\t\t\t\t<motion.div\n\t\t\t\t\tkey=\"storm\"\n\t\t\t\t\tinitial={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\tanimate={{ opacity: 1, scale: 1 }}\n\t\t\t\t\texit={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\tclassName=\"text-foreground\"\n\t\t\t\t>\n\t\t\t\t\t<CloudLightning className=\"h-5 w-5\" />\n\t\t\t\t</motion.div>\n\t\t\t</AnimatePresence>\n\n\t\t\t<AnimatePresence>\n\t\t\t\t{showTemp && (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tinitial={{ opacity: 0, width: 0 }}\n\t\t\t\t\t\tanimate={{ opacity: 1, width: \"auto\" }}\n\t\t\t\t\t\texit={{ opacity: 0, width: 0 }}\n\t\t\t\t\t\tclassName=\"flex items-center gap-1 overflow-hidden text-foreground\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<Thermometer className=\"h-3 w-3\" />\n\t\t\t\t\t\t<span className=\"pointer-events-none text-xs whitespace-nowrap\">\n\t\t\t\t\t\t\t12°C\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</motion.div>\n\t\t\t\t)}\n\t\t\t</AnimatePresence>\n\t\t</motion.div>\n\t);\n};\n\n// Ring Component\nconst Ring = () => {\n\treturn (\n\t\t<div className=\"flex w-64 items-center gap-3 overflow-hidden px-4 py-2 text-foreground\">\n\t\t\t<Phone className=\"h-5 w-5\" />\n\t\t\t<div className=\"flex-1\">\n\t\t\t\t<p className=\"pointer-events-none text-sm font-medium\">\n\t\t\t\t\tIncoming Call\n\t\t\t\t</p>\n\t\t\t\t<p className=\"pointer-events-none text-xs opacity-70\">\n\t\t\t\t\tGuillermo Rauch\n\t\t\t\t</p>\n\t\t\t</div>\n\t\t\t<div className=\"h-2 w-2 animate-pulse rounded-full bg-green-500\" />\n\t\t</div>\n\t);\n};\n\n// Timer Component\nconst Timer = () => {\n\tconst [time, setTime] = useState(60);\n\n\tuseMemo(() => {\n\t\tconst timer = setInterval(() => {\n\t\t\tsetTime((t) => (t > 0 ? t - 1 : 0));\n\t\t}, 1000);\n\t\treturn () => clearInterval(timer);\n\t}, []);\n\n\treturn (\n\t\t<div className=\"flex w-64 items-center gap-3 overflow-hidden px-4 py-2 text-foreground\">\n\t\t\t<TimerIcon className=\"h-5 w-5\" />\n\t\t\t<div className=\"flex-1\">\n\t\t\t\t<p className=\"pointer-events-none text-sm font-medium\">\n\t\t\t\t\t{time}s remaining\n\t\t\t\t</p>\n\t\t\t</div>\n\t\t\t<div className=\"h-1 w-24 overflow-hidden rounded-full bg-background/20\">\n\t\t\t\t<motion.div\n\t\t\t\t\tclassName=\"h-full bg-background\"\n\t\t\t\t\tinitial={{ width: \"100%\" }}\n\t\t\t\t\tanimate={{ width: \"0%\" }}\n\t\t\t\t\ttransition={{ duration: time, ease: \"linear\" }}\n\t\t\t\t/>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\ntype View = \"idle\" | \"ring-3\" | \"timer\";\n\nexport default function DynamicIsland() {\n\tconst [view, setView] = useState<View>(\"idle\");\n\tconst [variantKey, setVariantKey] =\n\t\tuseState<keyof typeof BOUNCE_VARIANTS>(\"idle\");\n\n\tconst content = useMemo(() => {\n\t\tswitch (view) {\n\t\t\tcase \"ring-3\":\n\t\t\t\treturn <Ring />;\n\t\t\tcase \"timer\":\n\t\t\t\treturn <Timer />;\n\t\t\tdefault:\n\t\t\t\treturn <Idle />;\n\t\t}\n\t}, [view]);\n\n\tconst handleViewChange = (newView: View) => {\n\t\tif (view === newView) return;\n\t\tsetVariantKey(`${view}-${newView}` as keyof typeof BOUNCE_VARIANTS);\n\t\tsetView(newView);\n\t};\n\n\treturn (\n\t\t<div className=\"h-[200px]\">\n\t\t\t<div className=\"relative flex h-full w-full flex-col justify-between\">\n\t\t\t\t<motion.div\n\t\t\t\t\tlayout\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\tbounce: BOUNCE_VARIANTS[variantKey],\n\t\t\t\t\t}}\n\t\t\t\t\tstyle={{ borderRadius: 32 }}\n\t\t\t\t\tclassName=\"mx-auto w-fit min-w-[100px] overflow-hidden rounded-full bg-background\"\n\t\t\t\t>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\t\tbounce: BOUNCE_VARIANTS[variantKey],\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\tscale: 0.9,\n\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\tfilter: \"blur(5px)\",\n\t\t\t\t\t\t\toriginX: 0.5,\n\t\t\t\t\t\t\toriginY: 0.5,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\tscale: 1,\n\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t\tfilter: \"blur(0px)\",\n\t\t\t\t\t\t\toriginX: 0.5,\n\t\t\t\t\t\t\toriginY: 0.5,\n\t\t\t\t\t\t\ttransition: { delay: 0.05 },\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tkey={view}\n\t\t\t\t\t>\n\t\t\t\t\t\t{content}\n\t\t\t\t\t</motion.div>\n\t\t\t\t</motion.div>\n\n\t\t\t\t<div className=\"pointer-events-none absolute top-0 left-1/2 flex h-[200px] w-[300px] -translate-x-1/2 items-start justify-center\">\n\t\t\t\t\t<AnimatePresence\n\t\t\t\t\t\tmode=\"popLayout\"\n\t\t\t\t\t\tcustom={\n\t\t\t\t\t\t\tANIMATION_VARIANTS[\n\t\t\t\t\t\t\t\tvariantKey as keyof typeof ANIMATION_VARIANTS\n\t\t\t\t\t\t\t]\n\t\t\t\t\t\t}\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\t\t\texit=\"exit\"\n\t\t\t\t\t\t\tvariants={variants}\n\t\t\t\t\t\t\tkey={view}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{content}\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t</AnimatePresence>\n\t\t\t\t</div>\n\n\t\t\t\t<div className=\"flex w-full justify-center gap-1 md:gap-4\">\n\t\t\t\t\t{[\"idle\", \"ring-3\", \"timer\"].map((v) => (\n\t\t\t\t\t\t<motion.button\n\t\t\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t\t\tkey={v}\n\t\t\t\t\t\t\tonClick={() => handleViewChange(v as View)}\n\t\t\t\t\t\t\tclassName={`h-10 w-fit cursor-pointer rounded-full bg-background px-10 py-1.5 text-sm font-medium text-foreground capitalize ring-1 shadow-2xs ring-gray-300/50 ring-inset hover:bg-background md:w-32 md:px-2.5 ${\n\t\t\t\t\t\t\t\tview === v ? \"ring-2 ring-blue-500\" : \"\"\n\t\t\t\t\t\t\t} `}\n\t\t\t\t\t\t\twhileHover={{ scale: 1.05 }}\n\t\t\t\t\t\t\twhileTap={{ scale: 0.95 }}\n\t\t\t\t\t\t\tdisabled={view === v}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{v}\n\t\t\t\t\t\t</motion.button>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "Clicking one of the three buttons below morphs the pill to that size, with the old contents blurring out as the new ones scale in and the pill overshooting slightly before it settles. Hovering the idle pill widens it to reveal the temperature.",
+    "inspiration": {
+      "source": "SmoothUI",
+      "url": "https://www.smoothui.dev/doc/dynamic-island",
+      "authorUrl": "https://www.smoothui.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dynamic-island"
+  }
+}

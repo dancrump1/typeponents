@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-563",
+  "type": "registry:component",
+  "title": "Comp 563",
+  "description": "Comp 563",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-563.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport {\r\n\tCropper,\r\n\tCropperCropArea,\r\n\tCropperDescription,\r\n\tCropperImage,\r\n} from \"@/components/ui/cropper\";\r\n\r\ntype Area = { x: number; y: number; width: number; height: number };\r\n\r\nexport default function Component() {\r\n\tconst [cropData, setCropData] = React.useState<Area | null>(null);\r\n\r\n\treturn (\r\n\t\t<div className=\"flex flex-col items-center gap-2\">\r\n\t\t\t<div className=\"flex w-full flex-col gap-4\">\r\n\t\t\t\t<Cropper\r\n\t\t\t\t\tclassName=\"h-80\"\r\n\t\t\t\t\tcropPadding={20}\r\n\t\t\t\t\timage=\"https://raw.githubusercontent.com/origin-space/origin-images/refs/heads/main/cropper-09_qskkln.jpg\"\r\n\t\t\t\t\tonCropChange={setCropData}\r\n\t\t\t\t>\r\n\t\t\t\t\t<CropperDescription />\r\n\t\t\t\t\t<CropperImage />\r\n\t\t\t\t\t<CropperCropArea />\r\n\t\t\t\t</Cropper>\r\n\r\n\t\t\t\t{cropData && (\r\n\t\t\t\t\t<pre className=\"bg-muted text-foreground/80 overflow-auto rounded-md border px-4 py-3 font-mono text-xs\">\r\n\t\t\t\t\t\t<code>{JSON.stringify(cropData, null, 2)}</code>\r\n\t\t\t\t\t</pre>\r\n\t\t\t\t)}\r\n\t\t\t</div>\r\n\r\n\t\t\t<p\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t>\r\n\t\t\t\tCropper with crop data output ∙{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\thref=\"https://github.com/origin-space/image-cropper\"\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener noreferrer\"\r\n\t\t\t\t>\r\n\t\t\t\t\tAPI\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

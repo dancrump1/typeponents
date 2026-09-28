@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "glass-nav",
+  "type": "registry:ui",
+  "title": "Glass Nav",
+  "description": "Frosted glass navigation bar with a centred logo, link pills and a collapsible mobile menu.",
+  "dependencies": [
+    "motion",
+    "react-icons",
+    "react-use-measure"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/glass-nav.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/glass-nav.tsx",
+      "content": "import { Dispatch, SetStateAction, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimationScope, motion, useAnimate } from \"motion/react\";\nimport { FiArrowUpRight, FiMenu } from \"react-icons/fi\";\nimport useMeasure from \"react-use-measure\";\n\n// Credit:\n// https://www.hover.dev/components/navigation\n\nconst GlassNavigation = ({ demo = false }) => {\n\tconst [hovered, setHovered] = useState(false);\n\tconst [menuOpen, setMenuOpen] = useState(false);\n\n\tconst [scope, animate] = useAnimate();\n\tconst navRef = useRef<HTMLDivElement | null>(null);\n\n\tconst handleMouseMove = ({ offsetX, offsetY, target }: MouseEvent) => {\n\t\t// @ts-ignore\n\t\tconst isNavElement = [...target.classList].includes(\"glass-nav\");\n\n\t\tif (isNavElement) {\n\t\t\tsetHovered(true);\n\n\t\t\tconst top = offsetY + \"px\";\n\t\t\tconst left = offsetX + \"px\";\n\n\t\t\tanimate(scope.current, { top, left }, { duration: 0 });\n\t\t} else {\n\t\t\tsetHovered(false);\n\t\t}\n\t};\n\n\tuseEffect(() => {\n\t\tnavRef.current?.addEventListener(\"mousemove\", handleMouseMove);\n\n\t\treturn () =>\n\t\t\tnavRef.current?.removeEventListener(\"mousemove\", handleMouseMove);\n\t}, []);\n\n\treturn (\n\t\t<nav\n\t\t\tref={navRef}\n\t\t\tonMouseLeave={() => setHovered(false)}\n\t\t\tstyle={{\n\t\t\t\tcursor: hovered ? \"none\" : \"auto\",\n\t\t\t}}\n\t\t\tclassName={cn(\n\t\t\t\t\"glass-nav fixed left-0 right-0 top-0 z-10 mx-auto max-w-6xl overflow-hidden border border-white/10 bg-linear-to-br from-background/20 to-background/5 backdrop-blur-sm md:left-6 md:right-6 md:top-6 md:rounded-2xl\",\n\t\t\t\t{ absolute: demo }\n\t\t\t)}\n\t\t>\n\t\t\t<div className=\"glass-nav flex items-center justify-between px-5 py-5\">\n\t\t\t\t<Cursor hovered={hovered} scope={scope} />\n\n\t\t\t\t<Links />\n\n\t\t\t\t<Logo />\n\n\t\t\t\t<Buttons setMenuOpen={setMenuOpen} />\n\t\t\t</div>\n\n\t\t\t<MobileMenu menuOpen={menuOpen} />\n\t\t</nav>\n\t);\n};\n\nconst Cursor = ({\n\thovered,\n\tscope,\n}: {\n\thovered: boolean;\n\tscope: AnimationScope<any>;\n}) => {\n\treturn (\n\t\t<motion.span\n\t\t\tinitial={false}\n\t\t\tanimate={{\n\t\t\t\topacity: hovered ? 1 : 0,\n\t\t\t\ttransform: `scale(${\n\t\t\t\t\thovered ? 1 : 0\n\t\t\t\t}) translateX(-50%) translateY(-50%)`,\n\t\t\t}}\n\t\t\ttransition={{ duration: 0.15 }}\n\t\t\tref={scope}\n\t\t\tclassName=\"pointer-events-none absolute z-0 grid h-[50px] w-[50px] origin-top-left place-content-center rounded-full bg-linear-to-br from-indigo-600 from-40% to-indigo-400 text-2xl\"\n\t\t>\n\t\t\t<FiArrowUpRight className=\"text-foreground\" />\n\t\t</motion.span>\n\t);\n};\n\nconst Logo = () => (\n\t<span className=\"pointer-events-none relative left-0 top-[50%] z-10 text-4xl font-black text-foreground mix-blend-overlay md:absolute md:left-[50%] md:-translate-x-[50%] md:-translate-y-[50%]\">\n\t\tlogo.\n\t</span>\n);\n\nconst Links = () => (\n\t<div className=\"hidden items-center gap-2 md:flex\">\n\t\t<GlassLink text=\"Products\" />\n\t\t<GlassLink text=\"History\" />\n\t\t<GlassLink text=\"Contact\" />\n\t</div>\n);\n\nconst GlassLink = ({ text }: { text: string }) => {\n\treturn (\n\t\t<a\n\t\t\thref=\"#\"\n\t\t\tclassName=\"group relative scale-100 overflow-hidden rounded-lg px-4 py-2 transition-transform hover:scale-105 active:scale-95\"\n\t\t>\n\t\t\t<span className=\"relative z-10 text-foreground/90 transition-colors group-hover:text-foreground\">\n\t\t\t\t{text}\n\t\t\t</span>\n\t\t\t<span className=\"absolute inset-0 z-0 bg-linear-to-br from-background/20 to-background/5 opacity-0 transition-opacity group-hover:opacity-100\" />\n\t\t</a>\n\t);\n};\n\nconst TextLink = ({ text }: { text: string }) => {\n\treturn (\n\t\t<a href=\"#\" className=\"text-foreground/90 transition-colors hover:text-foreground\">\n\t\t\t{text}\n\t\t</a>\n\t);\n};\n\nconst Buttons = ({\n\tsetMenuOpen,\n}: {\n\tsetMenuOpen: Dispatch<SetStateAction<boolean>>;\n}) => (\n\t<div className=\"flex items-center gap-4\">\n\t\t<div className=\"hidden md:block\">\n\t\t\t<SignInButton />\n\t\t</div>\n\n\t\t<button className=\"relative scale-100 overflow-hidden rounded-lg bg-linear-to-br from-indigo-600 from-40% to-indigo-400 px-4 py-2 font-medium text-foreground transition-transform hover:scale-105 active:scale-95\">\n\t\t\tTry free\n\t\t</button>\n\n\t\t<button\n\t\t\tonClick={() => setMenuOpen((pv) => !pv)}\n\t\t\tclassName=\"ml-2 block scale-100 text-3xl text-foreground/90 transition-[transform,color] hover:scale-105 hover:text-foreground active:scale-95 md:hidden\"\n\t\t>\n\t\t\t<FiMenu />\n\t\t</button>\n\t</div>\n);\n\nconst SignInButton = () => {\n\treturn (\n\t\t<button className=\"group relative scale-100 overflow-hidden rounded-lg px-4 py-2 transition-transform hover:scale-105 active:scale-95\">\n\t\t\t<span className=\"relative z-10 text-foreground/90 transition-colors group-hover:text-foreground\">\n\t\t\t\tSign in\n\t\t\t</span>\n\t\t\t<span className=\"absolute inset-0 z-0 bg-linear-to-br from-background/20 to-background/5 opacity-0 transition-opacity group-hover:opacity-100\" />\n\t\t</button>\n\t);\n};\n\nconst MobileMenu = ({ menuOpen }: { menuOpen: boolean }) => {\n\tconst [ref, { height }] = useMeasure();\n\treturn (\n\t\t<motion.div\n\t\t\tinitial={false}\n\t\t\tanimate={{\n\t\t\t\theight: menuOpen ? height : \"0px\",\n\t\t\t}}\n\t\t\tclassName=\"block overflow-hidden md:hidden\"\n\t\t>\n\t\t\t<div ref={ref} className=\"flex items-center justify-between px-4 pb-4\">\n\t\t\t\t<div className=\"flex items-center gap-4\">\n\t\t\t\t\t<TextLink text=\"Products\" />\n\t\t\t\t\t<TextLink text=\"History\" />\n\t\t\t\t\t<TextLink text=\"Contact\" />\n\t\t\t\t</div>\n\t\t\t\t<SignInButton />\n\t\t\t</div>\n\t\t</motion.div>\n\t);\n};\n\nexport default GlassNavigation;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Moving the pointer across the bar hides the real cursor and replaces it with a round indigo badge that follows it. Links and buttons frost over and grow a little on hover, and the menu icon slides the mobile links open.",
+    "inspiration": {
+      "source": "Hover.dev",
+      "url": "https://www.hover.dev/components/navigation",
+      "authorUrl": "https://www.hover.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/glass-nav"
+  }
+}

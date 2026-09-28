@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-border",
+  "type": "registry:ui",
+  "title": "Hover Border",
+  "description": "Hover Border",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-border.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-border.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\ntype Direction = \"TOP\" | \"LEFT\" | \"BOTTOM\" | \"RIGHT\";\n\n// https://ui.aceternity.com/components/hover-border-gradient\n\nexport function HoverBorderGradient({\n\tchildren,\n\tcontainerClassName,\n\tclassName,\n\tas: Tag = \"button\",\n\tduration = 1,\n\tclockwise = true,\n\t...props\n}: React.PropsWithChildren<\n\t{\n\t\tas?: React.ElementType;\n\t\tcontainerClassName?: string;\n\t\tclassName?: string;\n\t\tduration?: number;\n\t\tclockwise?: boolean;\n\t} & React.HTMLAttributes<HTMLElement>\n>) {\n\tconst [hovered, setHovered] = useState<boolean>(false);\n\tconst [direction, setDirection] = useState<Direction>(\"TOP\");\n\n\tconst rotateDirection = (currentDirection: Direction): Direction => {\n\t\tconst directions: Direction[] = [\"TOP\", \"LEFT\", \"BOTTOM\", \"RIGHT\"];\n\t\tconst currentIndex = directions.indexOf(currentDirection);\n\t\tconst nextIndex = clockwise\n\t\t\t? (currentIndex - 1 + directions.length) % directions.length\n\t\t\t: (currentIndex + 1) % directions.length;\n\t\treturn directions[nextIndex];\n\t};\n\n\tconst movingMap: Record<Direction, string> = {\n\t\tTOP: \"radial-gradient(20.7% 50% at 50% 0%, hsl(0, 0%, 100%) 0%, rgba(255, 255, 255, 0) 100%)\",\n\t\tLEFT: \"radial-gradient(16.6% 43.1% at 0% 50%, hsl(0, 0%, 100%) 0%, rgba(255, 255, 255, 0) 100%)\",\n\t\tBOTTOM:\n\t\t\t\"radial-gradient(20.7% 50% at 50% 100%, hsl(0, 0%, 100%) 0%, rgba(255, 255, 255, 0) 100%)\",\n\t\tRIGHT: \"radial-gradient(16.2% 41.199999999999996% at 100% 50%, hsl(0, 0%, 100%) 0%, rgba(255, 255, 255, 0) 100%)\",\n\t};\n\n\tconst highlight =\n\t\t\"radial-gradient(75% 181.15942028985506% at 50% 50%, #3275F8 0%, rgba(255, 255, 255, 0) 100%)\";\n\n\tuseEffect(() => {\n\t\tif (!hovered) {\n\t\t\tconst interval = setInterval(() => {\n\t\t\t\tsetDirection((prevState) => rotateDirection(prevState));\n\t\t\t}, duration * 1000);\n\t\t\treturn () => clearInterval(interval);\n\t\t}\n\t}, [hovered]);\n\treturn (\n\t\t<Tag\n\t\t\tonMouseEnter={(event: React.MouseEvent<HTMLDivElement>) => {\n\t\t\t\tsetHovered(true);\n\t\t\t}}\n\t\t\tonMouseLeave={() => setHovered(false)}\n\t\t\tclassName={cn(\n\t\t\t\t\"relative flex rounded-full border  content-center bg-background/20 hover:bg-background/10 transition duration-500 dark:bg-background/20 items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-visible p-px box-decoration-clone w-fit\",\n\t\t\t\tcontainerClassName\n\t\t\t)}\n\t\t\t{...props}\n\t\t>\n\t\t\t<div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"w-auto text-foreground z-10 bg-background px-4 py-2 rounded-[inherit]\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t\t<motion.div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex-none inset-0 overflow-hidden absolute z-0 rounded-[inherit]\"\n\t\t\t\t)}\n\t\t\t\tstyle={{\n\t\t\t\t\tfilter: \"blur(2px)\",\n\t\t\t\t\tposition: \"absolute\",\n\t\t\t\t\twidth: \"100%\",\n\t\t\t\t\theight: \"100%\",\n\t\t\t\t}}\n\t\t\t\tinitial={{ background: movingMap[direction] }}\n\t\t\t\tanimate={{\n\t\t\t\t\tbackground: hovered\n\t\t\t\t\t\t? [movingMap[direction], highlight]\n\t\t\t\t\t\t: movingMap[direction],\n\t\t\t\t}}\n\t\t\t\ttransition={{ ease: \"linear\", duration: duration ?? 1 }}\n\t\t\t/>\n\t\t\t<div className=\"bg-background absolute z-1 flex-none inset-[2px] rounded-[100px]\" />\n\t\t</Tag>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/hover-border-gradient",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "as",
+        "type": "React.ElementType<any, keyof React.JSX.IntrinsicElements>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "clockwise",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-border"
+  }
+}

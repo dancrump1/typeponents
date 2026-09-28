@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flip-scroll",
+  "type": "registry:ui",
+  "title": "Flip Scroll",
+  "description": "A scrollable component that displays images with 3D flip animations as you scroll. Each image flips to reveal a back face, creating an engaging card-flipping effect that responds to scroll position.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/flip-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/flip-scroll.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useRef } from 'react';\r\nimport Image from 'next/image';\r\nimport { motion, MotionValue, useScroll, useTransform } from 'framer-motion';\r\n\r\nconst BackFace = () => {\r\n  return (\r\n    <div\r\n      className=\"border border-white/15 h-[500px] w-full absolute rounded-3xl top-0 left-0 flex items-center justify-center bg-black text-white font-bold text-7xl\"\r\n      style={{\r\n        transform: 'rotateY(180deg) translateZ(-1px)',\r\n        backfaceVisibility: 'hidden'\r\n      }}\r\n    >\r\n      ?\r\n    </div>\r\n  );\r\n};\r\n\r\nconst FlipScrollItem = ({\r\n  image,\r\n  index,\r\n  isLeft,\r\n  scrollYProgress,\r\n  totalItems,\r\n  mode\r\n}: {\r\n  image: string;\r\n  index: number;\r\n  isLeft: boolean;\r\n  scrollYProgress: MotionValue<number>;\r\n  totalItems: number;\r\n  mode: 'alternate' | 'normal';\r\n}) => {\r\n  const direction = isLeft ? -1 : 1;\r\n  const position = index / totalItems;\r\n\r\n  const translateX = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [-index * 400 * direction, 0, (totalItems - index) * 400 * direction]\r\n  );\r\n\r\n  const normalRotateY = useTransform(\r\n    scrollYProgress,\r\n    [0, position - 0.04, position - 0.015, position + 0.015, position + 0.04, 1],\r\n    [180, 180, 0, 0, -180, -180]\r\n  );\r\n  const alternateRotateY = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [index * -180 * direction, 0, (totalItems - index) * 180 * direction]\r\n  );\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        translateX,\r\n        perspective: 1000,\r\n        transformStyle: 'preserve-3d'\r\n      }}\r\n      className=\"h-[500px] max-w-sm w-full absolute rounded-3xl overflow-visible text-black\"\r\n    >\r\n      <motion.div\r\n        style={{\r\n          rotateY: mode === 'normal' ? normalRotateY : alternateRotateY,\r\n          transformStyle: 'preserve-3d'\r\n        }}\r\n        className=\"relative\"\r\n      >\r\n        <Image\r\n          src={image}\r\n          alt={image}\r\n          width={1000}\r\n          height={1000}\r\n          style={{\r\n            backfaceVisibility: 'hidden',\r\n            transform: 'translateZ(1px)'\r\n          }}\r\n          className=\"object-cover h-[500px] w-full rounded-3xl absolute top-0 left-0\"\r\n        />\r\n        <BackFace />\r\n      </motion.div>\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst FlipScroll = ({\r\n  items,\r\n  mode = 'normal'\r\n}: {\r\n  items: { image: string }[];\r\n  mode?: 'alternate' | 'normal';\r\n}) => {\r\n  const ref = useRef<HTMLDivElement>(null);\r\n\r\n  const { scrollYProgress } = useScroll({\r\n    container: ref,\r\n    offset: ['start start', 'end end']\r\n  });\r\n\r\n  return (\r\n    <div\r\n      ref={ref}\r\n      className=\"h-full w-full overflow-y-auto relative\"\r\n      style={{ minHeight: '400px' }}\r\n    >\r\n      <div className=\"h-full w-full absolute top-0 left-0\">\r\n        <div\r\n          className=\"w-full\"\r\n          style={{\r\n            height: (items.length - 3) * 500\r\n          }}\r\n        />\r\n      </div>\r\n      <div className=\"grid grid-cols-1 h-full w-full sticky top-0 left-0\">\r\n        <div className=\"flex flex-col h-full justify-center w-full items-center relative\">\r\n          {items.map((image, index) => (\r\n            <FlipScrollItem\r\n              key={`left-column-image-${index}`}\r\n              image={image.image}\r\n              index={index}\r\n              isLeft={true}\r\n              scrollYProgress={scrollYProgress}\r\n              totalItems={items.length}\r\n              mode={mode}\r\n            />\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default FlipScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Cards flip in 3D as you scroll, revealing a back face on each one.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/flipScroll",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "mode",
+        "type": "\"alternate\" | \"normal\"",
+        "default": "'normal'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/flip-scroll"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-225",
+  "type": "registry:component",
+  "title": "Comp 225",
+  "description": "Comp 225",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-225.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport {\r\n\tSelect,\r\n\tSelectContent,\r\n\tSelectGroup,\r\n\tSelectItem,\r\n\tSelectLabel,\r\n\tSelectTrigger,\r\n\tSelectValue,\r\n} from \"@/components/ui/select\";\r\n\r\nconst countries = [\r\n\t{\r\n\t\tcontinent: \"America\",\r\n\t\titems: [\r\n\t\t\t{ value: \"1\", label: \"United States\", flag: \"🇺🇸\" },\r\n\t\t\t{ value: \"2\", label: \"Canada\", flag: \"🇨🇦\" },\r\n\t\t\t{ value: \"3\", label: \"Mexico\", flag: \"🇲🇽\" },\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\tcontinent: \"Africa\",\r\n\t\titems: [\r\n\t\t\t{ value: \"4\", label: \"South Africa\", flag: \"🇿🇦\" },\r\n\t\t\t{ value: \"5\", label: \"Nigeria\", flag: \"🇳🇬\" },\r\n\t\t\t{ value: \"6\", label: \"Morocco\", flag: \"🇲🇦\" },\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\tcontinent: \"Asia\",\r\n\t\titems: [\r\n\t\t\t{ value: \"7\", label: \"China\", flag: \"🇨🇳\" },\r\n\t\t\t{ value: \"8\", label: \"Japan\", flag: \"🇯🇵\" },\r\n\t\t\t{ value: \"9\", label: \"India\", flag: \"🇮🇳\" },\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\tcontinent: \"Europe\",\r\n\t\titems: [\r\n\t\t\t{ value: \"10\", label: \"United Kingdom\", flag: \"🇬🇧\" },\r\n\t\t\t{ value: \"11\", label: \"France\", flag: \"🇫🇷\" },\r\n\t\t\t{ value: \"12\", label: \"Germany\", flag: \"🇩🇪\" },\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\tcontinent: \"Oceania\",\r\n\t\titems: [\r\n\t\t\t{ value: \"13\", label: \"Australia\", flag: \"🇦🇺\" },\r\n\t\t\t{ value: \"14\", label: \"New Zealand\", flag: \"🇳🇿\" },\r\n\t\t],\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<Label htmlFor={id}>Options with flag</Label>\r\n\t\t\t<Select defaultValue=\"2\">\r\n\t\t\t\t<SelectTrigger\r\n\t\t\t\t\tid={id}\r\n\t\t\t\t\tclassName=\"[&>span_svg]:text-muted-foreground/80 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_svg]:shrink-0\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<SelectValue placeholder=\"Select framework\" />\r\n\t\t\t\t</SelectTrigger>\r\n\t\t\t\t<SelectContent className=\"[&_*[role=option]>span>svg]:text-muted-foreground/80 [&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:inset-e-2 [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2 [&_*[role=option]>span>svg]:shrink-0\">\r\n\t\t\t\t\t{countries.map((continent) => (\r\n\t\t\t\t\t\t<SelectGroup key={continent.continent}>\r\n\t\t\t\t\t\t\t<SelectLabel className=\"ps-2\">\r\n\t\t\t\t\t\t\t\t{continent.continent}\r\n\t\t\t\t\t\t\t</SelectLabel>\r\n\t\t\t\t\t\t\t{continent.items.map((item) => (\r\n\t\t\t\t\t\t\t\t<SelectItem key={item.value} value={item.value}>\r\n\t\t\t\t\t\t\t\t\t<span className=\"text-lg leading-none\">\r\n\t\t\t\t\t\t\t\t\t\t{item.flag}\r\n\t\t\t\t\t\t\t\t\t</span>{\" \"}\r\n\t\t\t\t\t\t\t\t\t<span className=\"truncate\">{item.label}</span>\r\n\t\t\t\t\t\t\t\t</SelectItem>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</SelectGroup>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</SelectContent>\r\n\t\t\t</Select>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

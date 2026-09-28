@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "grid-to-flex",
+  "type": "registry:ui",
+  "title": "Grid To Flex",
+  "description": "Grid To Flex",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/grid-to-flex.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/grid-to-flex.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useCallback, useEffect, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { AnimatePresence, motion } from \"framer-motion\";\r\nimport { LayoutGrid, List, LucideIcon, Trash2 } from \"lucide-react\";\r\n\r\n// Credit:\r\n// https://ground.bossadizenith.me/docs/components/layouts/grid-to-flex\r\n\r\ntype ViewType = \"grid\" | \"list\";\r\n\r\nconst listItems: {\r\n\tname: ViewType;\r\n\ticon: LucideIcon;\r\n}[] = [\r\n\t{\r\n\t\tname: \"grid\",\r\n\t\ticon: LayoutGrid,\r\n\t},\r\n\t{\r\n\t\tname: \"list\",\r\n\t\ticon: List,\r\n\t},\r\n];\r\n\r\nexport default function App() {\r\n\tconst [view, setView] = useState<ViewType>(\"grid\");\r\n\r\n\t// Load view from localStorage on mount\r\n\tuseEffect(() => {\r\n\t\tconst savedView = localStorage.getItem(\"view\");\r\n\t\tif (savedView) {\r\n\t\t\tsetView(savedView as ViewType);\r\n\t\t}\r\n\t}, []);\r\n\r\n\t// Memoize the view change handler\r\n\tconst handleViewChange = useCallback((view: ViewType) => {\r\n\t\tlocalStorage.setItem(\"view\", view);\r\n\t\tsetView(view);\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"size-full overflow-y-auto py-20 rounded-lg\">\r\n\t\t\t<div className=\"flex flex-col gap-10 max-w-5xl w-full mx-auto p-10\">\r\n\t\t\t\t<Header view={view} onViewChange={handleViewChange} />\r\n\t\t\t\t{view === \"grid\" ? <GridView /> : <ListView />}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\ntype HeaderProps = {\r\n\tview: ViewType;\r\n\tonViewChange: (view: ViewType) => void;\r\n};\r\n\r\nconst Header = ({ view, onViewChange }: HeaderProps) => {\r\n\treturn (\r\n\t\t<div className=\"flex items-center w-full justify-between h-16 border-b border-border pb-10\">\r\n\t\t\t<h1 className=\"text-4xl font-bold\">Grid to List</h1>\r\n\t\t\t<motion.div\r\n\t\t\t\tlayout\r\n\t\t\t\tclassName=\"rounded-lg bg-muted p-1 gap-4 flex items-center relative z-0\"\r\n\t\t\t>\r\n\t\t\t\t{listItems.map((item) => (\r\n\t\t\t\t\t<button\r\n\t\t\t\t\t\tkey={item.name}\r\n\t\t\t\t\t\tonClick={() => onViewChange(item.name)}\r\n\t\t\t\t\t\tclassName=\"size-10 flex items-center justify-center rounded z-10\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<item.icon aria-hidden=\"true\" className=\"size-4\" />\r\n\t\t\t\t\t</button>\r\n\t\t\t\t))}\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tlayoutId=\"grid-line\"\r\n\t\t\t\t\tclassName=\"size-10 bg-background absolute rounded-md\"\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\tx: view === \"grid\" ? 0 : 56, // this value is had coded cause I don't really have the time to calculate  and it's not really centered // but it get the work done lol\r\n\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t}}\r\n\t\t\t\t/>\r\n\t\t\t</motion.div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst GridView = () => {\r\n\treturn (\r\n\t\t<motion.div>\r\n\t\t\t<div className=\"grid grid-cols-3 gap-4 \">\r\n\t\t\t\t{Array.from({ length: 10 }).map((_, index) => (\r\n\t\t\t\t\t<Item key={index} index={index} className=\"flex flex-col gap-4\">\r\n\t\t\t\t\t\t<div className=\"flex items-center justify-between\">\r\n\t\t\t\t\t\t\t<Avatar index={index} />\r\n\t\t\t\t\t\t\t<Options index={index} />\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<Other index={index} />\r\n\t\t\t\t\t</Item>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst ListView = () => {\r\n\treturn (\r\n\t\t<motion.div className=\"flex flex-col gap-4\">\r\n\t\t\t{Array.from({ length: 10 }).map((_, index) => (\r\n\t\t\t\t<Item\r\n\t\t\t\t\tkey={index}\r\n\t\t\t\t\tindex={index}\r\n\t\t\t\t\tclassName=\"flex items-center justify-between gap-4\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<Avatar index={index} />\r\n\t\t\t\t\t<Other index={index} />\r\n\t\t\t\t\t<Options index={index} />\r\n\t\t\t\t</Item>\r\n\t\t\t))}\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst Item = ({\r\n\tindex,\r\n\tchildren,\r\n\tclassName,\r\n}: {\r\n\tindex: number;\r\n\tchildren: React.ReactNode;\r\n\tclassName?: string;\r\n}) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName={cn(\"bg-muted w-full rounded-lg p-4\", className)}\r\n\t\t\tlayoutId={`item-${index}`}\r\n\t\t>\r\n\t\t\t{children}\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst Avatar = ({ index }: { index: number }) => {\r\n\treturn (\r\n\t\t<div className=\"flex items-center justify-between\">\r\n\t\t\t<div className=\"flex items-center gap-4\">\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tlayoutId={`avatar-${index}`}\r\n\t\t\t\t\tclassName=\"size-10 rounded-full bg-background\"\r\n\t\t\t\t/>\r\n\t\t\t\t<div className=\"flex flex-col\">\r\n\t\t\t\t\t<motion.h3\r\n\t\t\t\t\t\tlayoutId={`name-${index}`}\r\n\t\t\t\t\t\tclassName=\"text-lg font-bold\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\tJohn Doe\r\n\t\t\t\t\t</motion.h3>\r\n\t\t\t\t\t<motion.p\r\n\t\t\t\t\t\tlayoutId={`email-${index}`}\r\n\t\t\t\t\t\tclassName=\"text-sm text-foreground\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\tjohn@doe.com\r\n\t\t\t\t\t</motion.p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst Options = ({ index }: { index: number }) => {\r\n\treturn (\r\n\t\t<div className=\"flex items-center gap-4\">\r\n\t\t\t<motion.button\r\n\t\t\t\tlayoutId={`delete-${index}`}\r\n\t\t\t\tclassName=\"size-8 rounded-full border-2 border-background flex items-center justify-center\"\r\n\t\t\t>\r\n\t\t\t\t<Trash2 className=\"size-4 text-foreground\" />\r\n\t\t\t</motion.button>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst Other = ({ index }: { index: number }) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tlayoutId={`other-component-${index}`}\r\n\t\t\tclassName=\"flex flex-col gap-2 w-full \"\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tlayoutId={`other-${index}`}\r\n\t\t\t\tclassName=\"w-full h-2 rounded-full bg-background flex items-center justify-center\"\r\n\t\t\t/>\r\n\t\t\t<motion.div\r\n\t\t\t\tlayoutId={`other-another-${index}`}\r\n\t\t\t\tclassName=\"w-1/2 max-w-56 h-2 rounded-full bg-background flex items-center justify-center\"\r\n\t\t\t/>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "ground.bossadizenith.me",
+      "url": "https://ground.bossadizenith.me/docs/components/layouts/grid-to-flex",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/grid-to-flex"
+  }
+}

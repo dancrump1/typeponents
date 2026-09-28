@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-153",
+  "type": "registry:component",
+  "title": "Comp 153",
+  "description": "Comp 153",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-153.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport { RadioGroup, RadioGroupItem } from \"@/components/ui/radio-group\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<RadioGroup\r\n\t\t\tdefaultValue=\"1\"\r\n\t\t\tclassName=\"[--primary:var(--color-indigo-500)] [--ring:var(--color-indigo-300)] in-[.dark]:[--primary:var(--color-indigo-500)] in-[.dark]:[--ring:var(--color-indigo-900)]\"\r\n\t\t>\r\n\t\t\t<div className=\"flex items-center gap-2\">\r\n\t\t\t\t<RadioGroupItem value=\"1\" id={`${id}-1`} />\r\n\t\t\t\t<Label htmlFor={`${id}-1`}>Option 1</Label>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"flex items-center gap-2\">\r\n\t\t\t\t<RadioGroupItem value=\"2\" id={`${id}-2`} />\r\n\t\t\t\t<Label htmlFor={`${id}-2`}>Option 2</Label>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"flex items-center gap-2\">\r\n\t\t\t\t<RadioGroupItem value=\"3\" id={`${id}-3`} />\r\n\t\t\t\t<Label htmlFor={`${id}-3`}>Option 3</Label>\r\n\t\t\t</div>\r\n\t\t</RadioGroup>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/radio-group.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as RadioGroupPrimitive from \"@radix-ui/react-radio-group\";\r\nimport { Circle } from \"lucide-react\";\r\n\r\nconst RadioGroup = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Root\r\n\t\t\tclassName={cn(\"grid gap-2\", className)}\r\n\t\t\t{...props}\r\n\t\t\tref={ref}\r\n\t\t/>\r\n\t);\r\n});\r\nRadioGroup.displayName = RadioGroupPrimitive.Root.displayName;\r\n\r\nconst RadioGroupItem = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Item>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Item\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<RadioGroupPrimitive.Indicator className=\"flex items-center justify-center\">\r\n\t\t\t\t<Circle className=\"h-2.5 w-2.5 fill-current text-current\" />\r\n\t\t\t</RadioGroupPrimitive.Indicator>\r\n\t\t</RadioGroupPrimitive.Item>\r\n\t);\r\n});\r\nRadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;\r\n\r\nexport { RadioGroup, RadioGroupItem };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sandbox",
+  "type": "registry:ui",
+  "title": "Sandbox",
+  "description": "Sandbox",
+  "dependencies": [
+    "@codesandbox/sandpack-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sandbox.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sandbox.tsx",
+      "content": "\"use client\";\r\n\r\nimport type {\r\n\tButtonHTMLAttributes,\r\n\tComponentProps,\r\n\tHTMLAttributes,\r\n\tReactNode,\r\n} from \"react\";\r\nimport {\r\n\tcreateContext,\r\n\tuseCallback,\r\n\tuseContext,\r\n\tuseEffect,\r\n\tuseState,\r\n} from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport type {\r\n\tCodeEditorProps,\r\n\tPreviewProps,\r\n\tSandpackLayoutProps,\r\n\tSandpackProviderProps,\r\n} from \"@codesandbox/sandpack-react\";\r\nimport {\r\n\tSandpackCodeEditor,\r\n\tSandpackConsole,\r\n\tSandpackFileExplorer,\r\n\tSandpackLayout,\r\n\tSandpackPreview,\r\n\tSandpackProvider,\r\n} from \"@codesandbox/sandpack-react\";\r\n\r\n// Credit:\r\n// https://www.kibo-ui.com/components/sandbox\r\n\r\nexport type SandboxProviderProps = SandpackProviderProps;\r\nexport const SandboxProvider = ({\r\n\tclassName,\r\n\t...props\r\n}: SandpackProviderProps): ReactNode => (\r\n\t<div className={cn(\"size-full\", className)}>\r\n\t\t<SandpackProvider className=\"size-full! max-h-none!\" {...props} />\r\n\t</div>\r\n);\r\nexport type SandboxLayoutProps = SandpackLayoutProps;\r\nexport const SandboxLayout = ({\r\n\tclassName,\r\n\t...props\r\n}: SandpackLayoutProps): ReactNode => (\r\n\t<SandpackLayout\r\n\t\tclassName={cn(\r\n\t\t\t\"rounded-none! border-none! bg-transparent! h-full!\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n);\r\nexport type SandboxTabsContextValue = {\r\n\tselectedTab: string | undefined;\r\n\tsetSelectedTab: (value: string) => void;\r\n};\r\nconst SandboxTabsContext = createContext<SandboxTabsContextValue | undefined>(\r\n\tundefined\r\n);\r\nconst useSandboxTabsContext = () => {\r\n\tconst context = useContext(SandboxTabsContext);\r\n\tif (!context) {\r\n\t\tthrow new Error(\r\n\t\t\t\"SandboxTabs components must be used within a SandboxTabsProvider\"\r\n\t\t);\r\n\t}\r\n\treturn context;\r\n};\r\nexport type SandboxTabsProps = HTMLAttributes<HTMLDivElement> & {\r\n\tdefaultValue?: string;\r\n\tvalue?: string;\r\n\tonValueChange?: (value: string) => void;\r\n};\r\nexport const SandboxTabs = ({\r\n\tclassName,\r\n\tdefaultValue,\r\n\tvalue,\r\n\tonValueChange,\r\n\t...props\r\n}: SandboxTabsProps): ReactNode => {\r\n\tconst [selectedTab, setSelectedTabState] = useState(value || defaultValue);\r\n\tuseEffect(() => {\r\n\t\tif (value !== undefined) {\r\n\t\t\tsetSelectedTabState(value);\r\n\t\t}\r\n\t}, [value]);\r\n\tconst setSelectedTab = useCallback(\r\n\t\t(newValue: string) => {\r\n\t\t\tif (value === undefined) {\r\n\t\t\t\tsetSelectedTabState(newValue);\r\n\t\t\t}\r\n\t\t\tonValueChange?.(newValue);\r\n\t\t},\r\n\t\t[value, onValueChange]\r\n\t);\r\n\treturn (\r\n\t\t<SandboxTabsContext.Provider value={{ selectedTab, setSelectedTab }}>\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"group relative flex size-full flex-col overflow-hidden rounded-lg border text-sm\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\t{...props}\r\n\t\t\t\tdata-selected={selectedTab}\r\n\t\t\t>\r\n\t\t\t\t{props.children}\r\n\t\t\t</div>\r\n\t\t</SandboxTabsContext.Provider>\r\n\t);\r\n};\r\nexport type SandboxTabsListProps = HTMLAttributes<HTMLDivElement>;\r\nexport const SandboxTabsList = ({\r\n\tclassName,\r\n\t...props\r\n}: SandboxTabsListProps): ReactNode => (\r\n\t<div\r\n\t\tclassName={cn(\r\n\t\t\t\"inline-flex w-full shrink-0 items-center justify-start border-b bg-secondary p-2 text-muted-foreground\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\trole=\"tablist\"\r\n\t\t{...props}\r\n\t/>\r\n);\r\nexport type SandboxTabsTriggerProps = Omit<\r\n\tButtonHTMLAttributes<HTMLButtonElement>,\r\n\t\"onClick\"\r\n> & {\r\n\tvalue: string;\r\n};\r\nexport const SandboxTabsTrigger = ({\r\n\tclassName,\r\n\tvalue,\r\n\t...props\r\n}: SandboxTabsTriggerProps): ReactNode => {\r\n\tconst { selectedTab, setSelectedTab } = useSandboxTabsContext();\r\n\tconst handleClick = useCallback(() => {\r\n\t\tsetSelectedTab(value);\r\n\t}, [setSelectedTab, value]);\r\n\treturn (\r\n\t\t<button\r\n\t\t\taria-selected={selectedTab === value}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1 font-medium text-sm ring-offset-background transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\tdata-state={selectedTab === value ? \"active\" : \"inactive\"}\r\n\t\t\tonClick={handleClick}\r\n\t\t\trole=\"tab\"\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t);\r\n};\r\nexport type SandboxTabsContentProps = HTMLAttributes<HTMLDivElement> & {\r\n\tvalue: string;\r\n};\r\nexport const SandboxTabsContent = ({\r\n\tclassName,\r\n\tvalue,\r\n\t...props\r\n}: SandboxTabsContentProps): ReactNode => {\r\n\tconst { selectedTab } = useSandboxTabsContext();\r\n\treturn (\r\n\t\t<div\r\n\t\t\taria-hidden={selectedTab !== value}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"flex-1 overflow-y-auto ring-offset-background transition-opacity duration-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2\",\r\n\t\t\t\tselectedTab === value\r\n\t\t\t\t\t? \"h-auto w-auto opacity-100\"\r\n\t\t\t\t\t: \"pointer-events-none absolute h-0 w-0 opacity-0\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\tdata-state={selectedTab === value ? \"active\" : \"inactive\"}\r\n\t\t\trole=\"tabpanel\"\r\n\t\t\t{...props}\r\n\t\t/>\r\n\t);\r\n};\r\nexport type SandboxCodeEditorProps = CodeEditorProps;\r\nexport const SandboxCodeEditor = ({\r\n\tshowTabs = false,\r\n\t...props\r\n}: SandboxCodeEditorProps): ReactNode => (\r\n\t<SandpackCodeEditor showTabs={showTabs} {...props} />\r\n);\r\nexport type SandboxConsoleProps = Parameters<typeof SandpackConsole>[0];\r\nexport const SandboxConsole = ({\r\n\tclassName,\r\n\t...props\r\n}: SandboxConsoleProps): ReactNode => (\r\n\t<SandpackConsole className={cn(\"h-full\", className)} {...props} />\r\n);\r\nexport type SandboxPreviewProps = PreviewProps & {\r\n\tclassName?: string;\r\n};\r\nexport const SandboxPreview = ({\r\n\tclassName,\r\n\tshowOpenInCodeSandbox = false,\r\n\t...props\r\n}: SandboxPreviewProps): ReactNode => (\r\n\t<SandpackPreview\r\n\t\tclassName={cn(\"h-full\", className)}\r\n\t\tshowOpenInCodeSandbox={showOpenInCodeSandbox}\r\n\t\t{...props}\r\n\t/>\r\n);\r\nexport type SandboxFileExplorerProps = ComponentProps<\r\n\ttypeof SandpackFileExplorer\r\n>;\r\nexport const SandboxFileExplorer = ({\r\n\tautoHiddenFiles = true,\r\n\tclassName,\r\n\t...props\r\n}: SandboxFileExplorerProps): ReactNode => (\r\n\t<SandpackFileExplorer\r\n\t\tautoHiddenFiles={autoHiddenFiles}\r\n\t\tclassName={cn(\"h-full\", className)}\r\n\t\t{...props}\r\n\t/>\r\n);\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Kibo UI",
+      "url": "https://www.kibo-ui.com/components/sandbox",
+      "authorUrl": "https://www.kibo-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sandbox"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rolling-ball-scroll-indicator",
+  "type": "registry:ui",
+  "title": "Rolling Ball Scroll Indicator",
+  "description": "A scroll indicator that displays animated bars with a rolling ball that moves across them as you scroll. The bars grow and shrink based on your scroll position while a colorful ball rolls smoothly from left to right.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/rolling-ball-scroll-indicator.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/rolling-ball-scroll-indicator.tsx",
+      "content": "'use client';\r\n\r\nimport { motion, MotionValue, useScroll, useSpring, useTransform } from 'framer-motion';\r\nimport { usePathname } from 'next/navigation';\r\nimport React, { useEffect } from 'react';\r\n\r\nconst BARS = 40;\r\n\r\nconst ScrollBar = ({\r\n  index,\r\n  scrollProgress\r\n}: {\r\n  index: number;\r\n  scrollProgress: MotionValue<number>;\r\n}) => {\r\n  const thisBarPosition = index / BARS;\r\n\r\n  // Transform scroll progress directly into distance\r\n  const distance = useTransform(scrollProgress, (value) => {\r\n    return Math.abs(value - thisBarPosition);\r\n  });\r\n\r\n  // Apply spring to the distance for smooth animation\r\n  const springDistance = useSpring(distance, {\r\n    stiffness: 700,\r\n    damping: 40\r\n  });\r\n\r\n  // Transform the spring distance into height\r\n  const height = useTransform(springDistance, [0, 1], [0, 35]);\r\n  const opacity = useTransform(springDistance, [0, 0.05, 1], [0, 0.2, 1]);\r\n\r\n  return (\r\n    <motion.div\r\n      className=\"w-0.5 bg-white\"\r\n      style={{\r\n        height: height,\r\n        opacity: useTransform(opacity, (value) => `${value}`)\r\n      }}\r\n    />\r\n  );\r\n};\r\n\r\nconst ScrollIndicatorBars = ({\r\n  container,\r\n  direction\r\n}: {\r\n  container: HTMLElement;\r\n  direction: 'vertical' | 'horizontal';\r\n}) => {\r\n  const ref = React.useRef<HTMLElement>(container);\r\n\r\n  // Update ref if container changes\r\n  React.useEffect(() => {\r\n    ref.current = container;\r\n  }, [container]);\r\n\r\n  const { scrollXProgress, scrollYProgress } = useScroll({\r\n    container: ref\r\n  });\r\n\r\n  const springDistance = useSpring(direction === 'vertical' ? scrollYProgress : scrollXProgress, {\r\n    stiffness: 700,\r\n    damping: 40\r\n  });\r\n\r\n  const left = useTransform(springDistance, [0, 1], [0, 100]);\r\n  const rotateZ = useTransform(springDistance, [0, 1], [0, 3000]);\r\n\r\n  return (\r\n    <div className=\"flex items-end justify-center gap-1 md:gap-2 relative w-fit\">\r\n      {Array.from({ length: BARS }).map((_, index) => {\r\n        return (\r\n          <ScrollBar\r\n            key={`scroll-bar-${index}`}\r\n            index={index}\r\n            scrollProgress={direction === 'vertical' ? scrollYProgress : scrollXProgress}\r\n          />\r\n        );\r\n      })}\r\n      <motion.div\r\n        className=\"h-3.5 w-1 rounded-full absolute bottom-0\"\r\n        style={{ left: useTransform(left, (value) => `${value}%`) }}\r\n      >\r\n        <motion.div\r\n          style={{ rotateZ: useTransform(rotateZ, (value) => `${value}deg`) }}\r\n          className=\"w-3.5 h-3.5 rounded-full bg-gradient-to-b from-yellow-500 to-green-500 from-50% to-50% absolute top-0 left-1/2 -translate-x-1/2\"\r\n        ></motion.div>\r\n      </motion.div>\r\n    </div>\r\n  );\r\n};\r\n\r\nconst ScrollIndicator = ({\r\n  scrollContainerId,\r\n  direction\r\n}: {\r\n  scrollContainerId: string;\r\n  direction: 'vertical' | 'horizontal';\r\n}) => {\r\n  const [container, setContainer] = React.useState<HTMLElement | null>(null);\r\n\r\n  useEffect(() => {\r\n    const scrollContainer = document.getElementById(scrollContainerId);\r\n    if (scrollContainer) {\r\n      setContainer(scrollContainer);\r\n    }\r\n  }, [scrollContainerId]);\r\n\r\n  if (!container) {\r\n    return null;\r\n  }\r\n\r\n  return <ScrollIndicatorBars container={container} direction={direction} />;\r\n};\r\n\r\nconst RollingBallScrollIndicator = ({\r\n  scrollContainerId = 'scroll-target',\r\n  direction = 'vertical'\r\n}: {\r\n  scrollContainerId?: string;\r\n  direction?: 'vertical' | 'horizontal';\r\n}) => {\r\n  const pathname = usePathname();\r\n\r\n  return (\r\n    <ScrollIndicator key={pathname} scrollContainerId={scrollContainerId} direction={direction} />\r\n  );\r\n};\r\n\r\nexport default RollingBallScrollIndicator;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven"
+    ],
+    "interaction": "A ball rolls across growing bars to mark scroll progress.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/rollingballscrollindicator",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "scrollContainerId",
+        "type": "string",
+        "default": "'scroll-target'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "direction",
+        "type": "\"vertical\" | \"horizontal\"",
+        "default": "'vertical'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/rolling-ball-scroll-indicator"
+  }
+}

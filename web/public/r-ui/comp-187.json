@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-187",
+  "type": "registry:component",
+  "title": "Comp 187",
+  "description": "Comp 187",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-187.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport { Switch } from \"@/components/ui/switch\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"border-input has-data-[state=checked]:border-primary/50 relative flex w-full items-start gap-2 rounded-md border p-4 shadow-2xs outline-hidden\">\r\n\t\t\t<Switch\r\n\t\t\t\tid={id}\r\n\t\t\t\tclassName=\"order-1 h-4 w-6 after:absolute after:inset-0 [&_span]:size-3 [&_span]:data-[state=checked]:translate-x-2 rtl:[&_span]:data-[state=checked]:-translate-x-2\"\r\n\t\t\t\taria-describedby={`${id}-description`}\r\n\t\t\t/>\r\n\t\t\t<div className=\"flex grow items-start gap-3\">\r\n\t\t\t\t<svg\r\n\t\t\t\t\tclassName=\"shrink-0\"\r\n\t\t\t\t\twidth={32}\r\n\t\t\t\t\theight={24}\r\n\t\t\t\t\tviewBox=\"0 0 32 24\"\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<rect width=\"32\" height=\"24\" rx=\"4\" fill=\"#252525\" />\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\td=\"M19.0537 6.49742H12.9282V17.5026H19.0537V6.49742Z\"\r\n\t\t\t\t\t\tfill=\"#FF5A00\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\td=\"M13.3359 12C13.3359 9.76408 14.3871 7.77961 16 6.49741C14.8129 5.56408 13.3155 5 11.6822 5C7.81295 5 4.68221 8.13074 4.68221 12C4.68221 15.8693 7.81295 19 11.6822 19C13.3155 19 14.8129 18.4359 16 17.5026C14.3848 16.2385 13.3359 14.2359 13.3359 12Z\"\r\n\t\t\t\t\t\tfill=\"#EB001B\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\td=\"M27.3178 12C27.3178 15.8693 24.1871 19 20.3178 19C18.6845 19 17.1871 18.4359 16 17.5026C17.6333 16.2181 18.6641 14.2359 18.6641 12C18.6641 9.76408 17.6129 7.77961 16 6.49741C17.1848 5.56408 18.6822 5 20.3155 5C24.1871 5 27.3178 8.15113 27.3178 12Z\"\r\n\t\t\t\t\t\tfill=\"#F79E1B\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</svg>\r\n\t\t\t\t<div className=\"grid grow gap-2\">\r\n\t\t\t\t\t<Label htmlFor={id}>\r\n\t\t\t\t\t\tLabel{\" \"}\r\n\t\t\t\t\t\t<span className=\"text-muted-foreground text-xs leading-[inherit] font-normal\">\r\n\t\t\t\t\t\t\t(Sublabel)\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</Label>\r\n\t\t\t\t\t<p\r\n\t\t\t\t\t\tid={`${id}-description`}\r\n\t\t\t\t\t\tclassName=\"text-muted-foreground text-xs\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\tA short description goes here.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/switch.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as SwitchPrimitives from \"@radix-ui/react-switch\";\r\n\r\nconst Switch = React.forwardRef<\r\n\tReact.ElementRef<typeof SwitchPrimitives.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<SwitchPrimitives.Root\r\n\t\tclassName={cn(\r\n\t\t\t\"peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t\tref={ref}\r\n\t>\r\n\t\t<SwitchPrimitives.Thumb\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0\"\r\n\t\t\t)}\r\n\t\t/>\r\n\t</SwitchPrimitives.Root>\r\n));\r\nSwitch.displayName = SwitchPrimitives.Root.displayName;\r\n\r\nexport { Switch };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

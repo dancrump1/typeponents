@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "video-button",
+  "type": "registry:ui",
+  "title": "Video Button",
+  "description": "Video Button",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/video-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/video-button.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// Credit\r\n// https://eclairui.gopx.dev/components/buttons/video-button\r\n\r\ninterface VideoButtonProps {\r\n\tchildren: React.ReactNode;\r\n\tvideoSrc: string;\r\n\tclassName?: string;\r\n}\r\n\r\nconst VideoButton = ({ children, videoSrc, className }: VideoButtonProps) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\tconst [isPressed, setIsPressed] = useState(false);\r\n\r\n\treturn (\r\n\t\t<button\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"relative inline-flex items-center justify-center rounded-2xl text-sm font-medium transition-all focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-background text-foreground hover:bg-background dark:bg-background dark:text-foreground dark:hover:bg-background h-10 px-8 py-8 overflow-hidden shadow-lg hover:shadow-xl dark:shadow-white/20 dark:hover:shadow-white/30\",\r\n\t\t\t\tisPressed && \"scale-95\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\tonMouseEnter={() => {\r\n\t\t\t\tsetIsHovered(true);\r\n\t\t\t}}\r\n\t\t\tonMouseLeave={() => setIsHovered(false)}\r\n\t\t\tonMouseDown={() => setIsPressed(true)}\r\n\t\t\tonMouseUp={() => setIsPressed(false)}\r\n\t\t\tonTouchStart={() => setIsPressed(true)}\r\n\t\t\tonTouchEnd={() => setIsPressed(false)}\r\n\t\t>\r\n\t\t\t<span className=\"relative z-10\">{children}</span>\r\n\t\t\t<div\r\n\t\t\t\tclassName={`absolute inset-0 transition-opacity duration-300 ${\r\n\t\t\t\t\tisHovered ? \"opacity-50\" : \"opacity-0\"\r\n\t\t\t\t}`}\r\n\t\t\t>\r\n\t\t\t\t<video\r\n\t\t\t\t\tclassName=\"object-cover w-full h-full\"\r\n\t\t\t\t\tsrc={videoSrc}\r\n\t\t\t\t\tloop\r\n\t\t\t\t\tmuted\r\n\t\t\t\t\t// playsInline\r\n\t\t\t\t\t// autoPlay\r\n\t\t\t\t\tonMouseEnter={(e) => e.target.play()}\r\n\t\t\t\t\tonMouseLeave={(e) => e.target.pause()}\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t</button>\r\n\t);\r\n};\r\n\r\nexport default VideoButton;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Eclair UI",
+      "url": "https://eclairui.gopx.dev/components/buttons/video-button",
+      "authorUrl": "https://eclairui.gopx.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "videoSrc",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/video-button"
+  }
+}

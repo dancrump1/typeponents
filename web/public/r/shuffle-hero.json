@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "shuffle-hero",
+  "type": "registry:ui",
+  "title": "Shuffle Hero",
+  "description": "Shuffle Hero",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/shuffle-hero.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/shuffle-hero.tsx",
+      "content": "import React, { useEffect, useRef, useState } from \"react\";\n\nimport { motion } from \"motion/react\";\n\n// www.hover.dev/components/heros#shuffle-hero\n\nconst squareData = [\n\t{\n\t\tid: 1,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 2,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 3,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 4,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 5,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 6,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 7,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 8,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 9,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 10,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 11,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 12,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 13,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 14,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 15,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 16,\n\t\tsrc: \"/itjustworks.jpg\",\n\t},\n];\n\nconst ShuffleHero = ({ pageData = squareData }) => {\n\treturn (\n\t\t<section className=\"w-full h-[90vh] px-8 py-12  dark:bg-slate-900\">\n\t\t\t<div className=\"grid grid-cols-1 md:grid-cols-2 items-center gap-8 max-w-6xl mx-auto\">\n\t\t\t\t<div className=\"relative mx-auto max-w-(--breakpoint-xl) px-4 py-32 sm:px-6 lg:flex lg:h-5/6 lg:items-center lg:px-8\">\n\t\t\t\t\t<div className=\"max-w-xl\">\n\t\t\t\t\t\t<h1 className=\"text-3xl font-extrabold sm:text-5xl\">\n\t\t\t\t\t\t\t{pageData?.headerImageCaption}\n\t\t\t\t\t\t\t<strong className=\"block font-extrabold text-rose-700\">\n\t\t\t\t\t\t\t\t{\" \"}\n\t\t\t\t\t\t\t\tForever Home.{\" \"}\n\t\t\t\t\t\t\t</strong>\n\t\t\t\t\t\t</h1>\n\n\t\t\t\t\t\t<p className=\"mt-4 max-w-lg sm:text-xl/relaxed\">\n\t\t\t\t\t\t\tLorem ipsum dolor sit amet consectetur, adipisicing elit.\n\t\t\t\t\t\t\tNesciunt illo tenetur fuga ducimus numquam ea!\n\t\t\t\t\t\t</p>\n\n\t\t\t\t\t\t<div className=\"mt-8 flex flex-wrap gap-4 text-center\">\n\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\tclassName=\"block w-full rounded bg-rose-600 px-12 py-3 text-sm font-medium text-foreground shadow-sm hover:bg-rose-700 focus:outline-hidden focus:ring-3 active:bg-rose-500 sm:w-auto\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\tGet Started\n\t\t\t\t\t\t\t</a>\n\n\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\t\tclassName=\"block w-full rounded bg-background px-12 py-3 text-sm font-medium text-rose-600 shadow-sm hover:text-rose-700 focus:outline-hidden focus:ring-3 active:text-rose-500 sm:w-auto\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\tLearn More\n\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<ShuffleGrid pageData={pageData} />\n\t\t\t</div>\n\t\t</section>\n\t);\n};\n\nconst shuffle = (array) => {\n\tlet currentIndex = array?.length,\n\t\trandomIndex;\n\n\twhile (currentIndex != 0) {\n\t\trandomIndex = Math.floor(Math.random() * currentIndex);\n\t\tcurrentIndex--;\n\n\t\t[array[currentIndex], array[randomIndex]] = [\n\t\t\tarray[randomIndex],\n\t\t\tarray[currentIndex],\n\t\t];\n\t}\n\n\treturn array;\n};\n\nconst generateSquares = (pageData) => {\n\treturn shuffle(pageData?.headerImage || pageData).map((sq, i) => (\n\t\t<motion.div\n\t\t\tkey={sq.url || sq.src}\n\t\t\tlayout\n\t\t\ttransition={{ duration: 1.5, type: \"spring\" }}\n\t\t\tclassName=\"w-full h-full\"\n\t\t\tstyle={{\n\t\t\t\tbackgroundImage: `url(${sq.url || sq.src})`,\n\t\t\t\tbackgroundSize: \"cover\",\n\t\t\t}}\n\t\t></motion.div>\n\t));\n};\n\nconst ShuffleGrid = ({ pageData }) => {\n\tconst timeoutRef = useRef<any>(null);\n\tconst [squares, setSquares] = useState(generateSquares(pageData));\n\n\tuseEffect(() => {\n\t\tshuffleSquares();\n\n\t\treturn () => clearTimeout(timeoutRef.current);\n\t}, [pageData]);\n\n\tconst shuffleSquares = () => {\n\t\tsetSquares(generateSquares(pageData));\n\n\t\ttimeoutRef.current = setTimeout(shuffleSquares, 3000);\n\t};\n\n\treturn (\n\t\t<>\n\t\t\t<div\n\t\t\t\tonMouseEnter={shuffleSquares}\n\t\t\t\tclassName=\"grid grid-cols-4 grid-rows-4 h-[450px] gap-1\"\n\t\t\t>\n\t\t\t\t{squares.map((sq) => sq)}\n\t\t\t</div>\n\t\t</>\n\t);\n};\n\nexport default ShuffleHero;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/shuffle-hero"
+  }
+}

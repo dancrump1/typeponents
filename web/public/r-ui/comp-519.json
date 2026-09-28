@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-519",
+  "type": "registry:component",
+  "title": "Comp 519",
+  "description": "Comp 519",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-519.tsx",
+      "content": "import {\r\n\tStepper,\r\n\tStepperIndicator,\r\n\tStepperItem,\r\n\tStepperTitle,\r\n\tStepperTrigger,\r\n} from \"@/components/ui/stepper\";\r\n\r\nconst steps = [\r\n\t{\r\n\t\tstep: 1,\r\n\t\ttitle: \"Step One\",\r\n\t},\r\n\t{\r\n\t\tstep: 2,\r\n\t\ttitle: \"Step Two\",\r\n\t},\r\n\t{\r\n\t\tstep: 3,\r\n\t\ttitle: \"Step Three\",\r\n\t},\r\n\t{\r\n\t\tstep: 4,\r\n\t\ttitle: \"Step Four\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"mx-auto max-w-xl space-y-8 text-center\">\r\n\t\t\t<Stepper defaultValue={2} className=\"items-start gap-4\">\r\n\t\t\t\t{steps.map(({ step, title }) => (\r\n\t\t\t\t\t<StepperItem key={step} step={step} className=\"flex-1\">\r\n\t\t\t\t\t\t<StepperTrigger className=\"w-full flex-col items-start gap-2 rounded\">\r\n\t\t\t\t\t\t\t<StepperIndicator asChild className=\"bg-border h-1 w-full\">\r\n\t\t\t\t\t\t\t\t<span className=\"sr-only\">{step}</span>\r\n\t\t\t\t\t\t\t</StepperIndicator>\r\n\t\t\t\t\t\t\t<div className=\"space-y-0.5\">\r\n\t\t\t\t\t\t\t\t<StepperTitle>{title}</StepperTitle>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t</StepperItem>\r\n\t\t\t\t))}\r\n\t\t\t</Stepper>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tStepper with labels\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

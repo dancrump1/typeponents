@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-489",
+  "type": "registry:component",
+  "title": "Comp 489",
+  "description": "Comp 489",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-489.tsx",
+      "content": "\"use client\";\r\n\r\nimport { getLocalTimeZone, isWeekend, today } from \"@internationalized/date\";\r\nimport { useLocale } from \"react-aria\";\r\nimport { RangeCalendar, type DateValue } from \"react-aria-components\";\r\n\r\nexport default function Component() {\r\n\tconst now = today(getLocalTimeZone());\r\n\tconst disabledRanges = [\r\n\t\t[now, now], // Disables today\r\n\t\t[now.add({ days: 14 }), now.add({ days: 14 })], // Disables only the 14th day from now\r\n\t\t[now.add({ days: 23 }), now.add({ days: 23 })], // Disables only the 23rd day from now\r\n\t];\r\n\r\n\tconst { locale } = useLocale();\r\n\tconst isDateUnavailable = (date: DateValue) =>\r\n\t\tisWeekend(date, locale) ||\r\n\t\tdisabledRanges.some(\r\n\t\t\t(interval) =>\r\n\t\t\t\tdate.compare(interval[0]) >= 0 && date.compare(interval[1]) <= 0\r\n\t\t);\r\n\r\n\treturn (\r\n\t\t<div>\r\n\t\t\t<RangeCalendar\r\n\t\t\t\tclassName=\"rounded-md border p-2\"\r\n\t\t\t\tisDateUnavailable={isDateUnavailable}\r\n\t\t\t\tminValue={today(getLocalTimeZone())}\r\n\t\t\t/>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-4 text-center text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tDisabled dates -{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\thref=\"https://react-spectrum.adobe.com/react-aria/DateRangePicker.html\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener nofollow\"\r\n\t\t\t\t>\r\n\t\t\t\t\tReact Aria\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

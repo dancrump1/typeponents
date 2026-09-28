@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "radial-gooey-menu",
+	title: "Radial Gooey Menu",
+	description: "A liquid radial gooey menu component with spring-physics magnetic hover effects and smooth SVG blob matrix filtering.",
+	interaction: "Click center trigger to expand radial menu items with fluid gooey filter effects and magnetic cursor tracking.",
+	categories: ["Navigation"],
+	tags: ["spring", "hover", "cursor-tracking"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/radial-gooey-menu",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "items", type: "RadialGooeyMenuItem[]", default: "[]" },
+		{ name: "radius", type: "number", default: "80" },
+		{ name: "blur", type: "number", default: "10" },
+		{ name: "springStiffness", type: "number", default: "150" },
+		{ name: "springDamping", type: "number", default: "15" },
+		{ name: "defaultOpen", type: "boolean", default: "false" },
+		{ name: "onToggle", type: "((isOpen: boolean) => void)" },
+		{ name: "onItemSelect", type: "((item: RadialGooeyMenuItem, index: number) => void)" },
+		{ name: "buttonClassName", type: "string" },
+		{ name: "itemClassName", type: "string" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

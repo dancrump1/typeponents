@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs';
 import path from 'node:path';
 
-export const DEFAULT_LIBRARY_PATH = '/home/dan/Testing/shadcn-style-lib';
+export const DEFAULT_LIBRARY_PATH = path.resolve(process.cwd(), 'web');
 
 export function libraryPath(): string {
   return process.env.LIBRARY_PATH ?? DEFAULT_LIBRARY_PATH;

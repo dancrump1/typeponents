@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover",
+  "type": "registry:ui",
+  "title": "Hover",
+  "description": "Hover",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useRef, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// https://ui.aceternity.com/components/direction-aware-hover\r\n\r\nexport const DirectionAwareHover = ({\r\n\timageUrl,\r\n\tchildren,\r\n\tchildrenClassName,\r\n\timageClassName,\r\n\tclassName,\r\n}: {\r\n\timageUrl: string;\r\n\tchildren: React.ReactNode | string;\r\n\tchildrenClassName?: string;\r\n\timageClassName?: string;\r\n\tclassName?: string;\r\n}) => {\r\n\tconst ref = useRef<HTMLDivElement>(null);\r\n\r\n\tconst [direction, setDirection] = useState<\r\n\t\t\"top\" | \"bottom\" | \"left\" | \"right\" | string\r\n\t>(\"left\");\r\n\r\n\tconst handleMouseEnter = (\r\n\t\tevent: React.MouseEvent<HTMLDivElement, MouseEvent>\r\n\t) => {\r\n\t\tif (!ref.current) return;\r\n\r\n\t\tconst direction = getDirection(event, ref.current);\r\n\r\n\t\tswitch (direction) {\r\n\t\t\tcase 0:\r\n\t\t\t\tsetDirection(\"top\");\r\n\t\t\t\tbreak;\r\n\t\t\tcase 1:\r\n\t\t\t\tsetDirection(\"right\");\r\n\t\t\t\tbreak;\r\n\t\t\tcase 2:\r\n\t\t\t\tsetDirection(\"bottom\");\r\n\t\t\t\tbreak;\r\n\t\t\tcase 3:\r\n\t\t\t\tsetDirection(\"left\");\r\n\t\t\t\tbreak;\r\n\t\t\tdefault:\r\n\t\t\t\tsetDirection(\"left\");\r\n\t\t\t\tbreak;\r\n\t\t}\r\n\t};\r\n\r\n\tconst getDirection = (\r\n\t\tev: React.MouseEvent<HTMLDivElement, MouseEvent>,\r\n\t\tobj: HTMLElement\r\n\t) => {\r\n\t\tconst { width: w, height: h, left, top } = obj.getBoundingClientRect();\r\n\t\tconst x = ev.clientX - left - (w / 2) * (w > h ? h / w : 1);\r\n\t\tconst y = ev.clientY - top - (h / 2) * (h > w ? w / h : 1);\r\n\t\tconst d = Math.round(Math.atan2(y, x) / 1.57079633 + 5) % 4;\r\n\t\treturn d;\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tonMouseEnter={handleMouseEnter}\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"md:h-96 w-60 h-60 md:w-96 bg-transparent rounded-lg overflow-hidden group/card relative\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t<AnimatePresence mode=\"wait\">\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tclassName=\"relative h-full w-full\"\r\n\t\t\t\t\tinitial=\"initial\"\r\n\t\t\t\t\twhileHover={direction}\r\n\t\t\t\t\texit=\"exit\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div className=\"group-hover/card:block hidden absolute inset-0 w-full h-full bg-background/40 z-10 transition duration-500\" />\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tvariants={variants}\r\n\t\t\t\t\t\tclassName=\"h-full w-full relative bg-background dark:bg-background\"\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\talt=\"image\"\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\"h-full w-full object-cover scale-[1.15]\",\r\n\t\t\t\t\t\t\t\timageClassName\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\twidth=\"1000\"\r\n\t\t\t\t\t\t\theight=\"1000\"\r\n\t\t\t\t\t\t\tsrc={imageUrl}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tvariants={textVariants}\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\tduration: 0.5,\r\n\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\"text-foreground absolute bottom-4 left-4 z-40\",\r\n\t\t\t\t\t\t\tchildrenClassName\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{children}\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</AnimatePresence>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst variants = {\r\n\tinitial: {\r\n\t\tx: 0,\r\n\t},\r\n\r\n\texit: {\r\n\t\tx: 0,\r\n\t\ty: 0,\r\n\t},\r\n\ttop: {\r\n\t\ty: 20,\r\n\t},\r\n\tbottom: {\r\n\t\ty: -20,\r\n\t},\r\n\tleft: {\r\n\t\tx: 20,\r\n\t},\r\n\tright: {\r\n\t\tx: -20,\r\n\t},\r\n};\r\n\r\nconst textVariants = {\r\n\tinitial: {\r\n\t\ty: 0,\r\n\t\tx: 0,\r\n\t\topacity: 0,\r\n\t},\r\n\texit: {\r\n\t\ty: 0,\r\n\t\tx: 0,\r\n\t\topacity: 0,\r\n\t},\r\n\ttop: {\r\n\t\ty: -20,\r\n\t\topacity: 1,\r\n\t},\r\n\tbottom: {\r\n\t\ty: 2,\r\n\t\topacity: 1,\r\n\t},\r\n\tleft: {\r\n\t\tx: -2,\r\n\t\topacity: 1,\r\n\t},\r\n\tright: {\r\n\t\tx: 20,\r\n\t\topacity: 1,\r\n\t},\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/direction-aware-hover",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "imageUrl",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "childrenClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "imageClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover"
+  }
+}

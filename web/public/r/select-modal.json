@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "select-modal",
+  "type": "registry:ui",
+  "title": "Select Modal",
+  "description": "Select Modal",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "select"
+  ],
+  "files": [
+    {
+      "path": "components/ui/select-modal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/select-modal.tsx",
+      "content": "\"use client\";\n\nimport type React from \"react\";\n\nimport {\n\tSelect,\n\tSelectContent,\n\tSelectGroup,\n\tSelectItem,\n\tSelectTrigger,\n\tSelectValue,\n} from \"@/components/ui/select\";\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://starui.link/docs/components/select-model\n\nconst exampleData = [\n\t\"ChatGPT 4o\",\n\t\"ChatGPT 4o-mini\",\n\t\"ChatGPT 4-turbo\",\n\t\"ChatGPT o1\",\n\t\"ChatGPT o1-mini\",\n];\n\nfunction generateLetters(value: string) {\n\tconst letterCount = new Map<string, number>();\n\treturn value.split(\"\").map((letter) => {\n\t\tconst count = letterCount.get(letter) || 0;\n\t\tconst key = `${letter}-${count}`;\n\t\tletterCount.set(letter, count + 1);\n\t\treturn { letter, key };\n\t});\n}\n\nfunction SelectModel() {\n\treturn (\n\t\t<Select defaultValue={exampleData[0]} alignItemToTrigger={false}>\n\t\t\t<SelectTrigger className=\"relative flex h-10 items-center justify-between gap-3 text-sm rounded-md pr-3 pl-3.5 select-none hover:bg-background focus-visible:outline-hidden focus-visible:-outline-offset-1 active:bg-background data-popup-open:bg-background\">\n\t\t\t\t<SelectValue placeholder=\"Select Model\">\n\t\t\t\t\t{/* {(value) => {\n\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t<>\n\t\t\t\t\t\t\t\t<span className=\"sr-only\">{value}</span>\n\t\t\t\t\t\t\t\t{generateLetters(value).map(({ letter, key }) => (\n\t\t\t\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\t\t\t\taria-hidden\n\t\t\t\t\t\t\t\t\t\tkey={key}\n\t\t\t\t\t\t\t\t\t\tlayoutId={key}\n\t\t\t\t\t\t\t\t\t\tclassName=\"inline-block\"\n\t\t\t\t\t\t\t\t\t\ttransition={{ type: \"spring\", bounce: 0.35 }}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t{letter.trim() || \"\\u00A0\"}\n\t\t\t\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t</>\n\t\t\t\t\t\t);\n\t\t\t\t\t}} */}\n\t\t\t\t</SelectValue>\n\t\t\t\t=\n\t\t\t</SelectTrigger>\n\t\t\t<SelectContent>\n\t\t\t\t<SelectGroup className=\"group origin-(--transform-origin) rounded-md bg-background py-1 shadow-lg outline-solid outline-neutral-200 transition-[transform,scale,opacity] data-ending-style:scale-100 data-ending-style:opacity-100 data-ending-style:transition-none data-starting-style:scale-95 data-starting-style:opacity-0 data-[side=none]:data-starting-style:scale-100 data-[side=none]:data-starting-style:opacity-100 data-[side=none]:data-starting-style:transition-none\">\n\t\t\t\t\t{exampleData.map((item) => (\n\t\t\t\t\t\t<SelectItemTest value={item} key={item + \"select-modal\"}>\n\t\t\t\t\t\t\t{item}\n\t\t\t\t\t\t</SelectItemTest>\n\t\t\t\t\t))}\n\t\t\t\t</SelectGroup>\n\t\t\t</SelectContent>\n\t\t</Select>\n\t);\n}\n\nfunction SelectItemTest({\n\tclassName,\n\tchildren,\n\t...props\n}: React.ComponentPropsWithRef<any>) {\n\treturn (\n\t\t<SelectItem\n\t\t\tclassName={cn(\n\t\t\t\t\"grid min-w-(--anchor-width) cursor-default grid-cols-[1fr_0.75rem] items-center gap-2 py-2 pr-4 pl-2.5 text-sm leading-4 outline-hidden select-none group-data-[side=none]:min-w-[calc(var(--anchor-width)+1rem)] group-data-[side=none]:pr-12 group-data-[side=none]:text-base group-data-[side=none]:leading-4 data-highlighted:relative data-highlighted:z-0 data-highlighted:text-foreground data-highlighted:before:absolute data-highlighted:before:inset-x-1 data-highlighted:before:inset-y-0 data-highlighted:before:z-[-1] data-highlighted:before:rounded-sm data-highlighted:before:bg-background\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\t{...props}\n\t\t>\n\t\t\t{children}\n\t\t</SelectItem>\n\t);\n}\n\nexport { SelectModel };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/select-model",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": true
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/select-modal"
+  }
+}

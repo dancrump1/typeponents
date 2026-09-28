@@ -1,0 +1,44 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "image-zoom",
+  "type": "registry:ui",
+  "title": "Image Zoom",
+  "description": "Image Zoom",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/image-zoom.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/image-zoom.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef } from \"react\";\n\nimport gsap from \"gsap\";\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\n\n// Credit:\n// https://ui.noxhd.com/components/image-zoom/\n\ngsap.registerPlugin(ScrollTrigger);\n\nconst ImageZoom = ({ outsideImage, insideImage }) => {\n\tconst containerRef = useRef(null);\n\tconst wrapperRef = useRef(null);\n\tconst imageRef = useRef(null);\n\tconst heroRef = useRef(null);\n\n\tuseEffect(() => {\n\t\tconst container = containerRef.current;\n\t\tconst wrapper = wrapperRef.current;\n\t\tconst image = imageRef.current;\n\t\tconst hero = heroRef.current;\n\n\t\tconst tl = gsap.timeline({\n\t\t\tscrollTrigger: {\n\t\t\t\ttrigger: wrapper,\n\t\t\t\tstart: \"top top\",\n\t\t\t\tend: \"+=150%\",\n\t\t\t\tscrub: 1,\n\t\t\t\tpin: true,\n\t\t\t\tanticipatePin: 1,\n\t\t\t\t// scroller: \".scroll-container\",\n\t\t\t},\n\t\t});\n\n\t\ttl.to(\n\t\t\timage,\n\t\t\t{\n\t\t\t\tscale: 2,\n\t\t\t\ty: \"20%\",\n\t\t\t\ttransformOrigin: \"center center\",\n\t\t\t\tease: \"power1.inOut\",\n\t\t\t},\n\t\t\t0\n\t\t).to(\n\t\t\thero,\n\t\t\t{\n\t\t\t\tscale: 1.2,\n\t\t\t\ttransformOrigin: \"center center\",\n\t\t\t\tease: \"power1.inOut\",\n\t\t\t},\n\t\t\t0\n\t\t);\n\n\t\treturn () => {\n\t\t\ttl.kill();\n\t\t};\n\t}, []);\n\n\treturn (\n\t\t<div\n\t\t\tref={containerRef}\n\t\t\tclassName=\"h-[100vw] md:h-screen overflow-y-auto overflow-x-hidden previews aspect-square md:aspect-auto\"\n\t\t>\n\t\t\t<div ref={wrapperRef} className=\"relative w-full h-full z-10\">\n\t\t\t\t<div className=\"relative w-full h-full overflow-hidden\">\n\t\t\t\t\t<section\n\t\t\t\t\t\tref={heroRef}\n\t\t\t\t\t\tclassName=\"w-full h-full bg-center bg-no-repeat bg-cover\"\n\t\t\t\t\t\tstyle={{ backgroundImage: `${insideImage}` }}\n\t\t\t\t\t></section>\n\t\t\t\t</div>\n\t\t\t\t<div className=\"absolute top-0 left-0 right-0 w-full h-full z-20 overflow-hidden\">\n\t\t\t\t\t<img\n\t\t\t\t\t\tref={imageRef}\n\t\t\t\t\t\tsrc={outsideImage}\n\t\t\t\t\t\talt=\"Parallax Image\"\n\t\t\t\t\t\tclassName=\"w-full h-full object-cover object-center\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default ImageZoom;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "ui.noxhd.com",
+      "url": "https://ui.noxhd.com/components/image-zoom/",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/image-zoom"
+  }
+}

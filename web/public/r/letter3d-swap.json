@@ -1,0 +1,120 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "letter3d-swap",
+  "type": "registry:ui",
+  "title": "Letter3d Swap",
+  "description": "Letter3d Swap",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/letter3d-swap.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/letter3d-swap.tsx",
+      "content": "\"use client\";\n\nimport { useCallback, useEffect, useMemo, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, Transition, useAnimationControls } from \"motion/react\";\n\n// handy function to split text into characters with support for unicode and emojis\nconst splitIntoCharacters = (text: string): string[] => {\n\tif (typeof Intl !== \"undefined\" && \"Segmenter\" in Intl) {\n\t\tconst segmenter = new Intl.Segmenter(\"en\", { granularity: \"grapheme\" });\n\t\treturn Array.from(segmenter.segment(text), ({ segment }) => segment);\n\t}\n\t// Fallback for browsers that don't support Intl.Segmenter\n\treturn Array.from(text);\n};\n\ninterface Letter3DSwapProps {\n\t/**\n\t * Text to display and animate\n\t */\n\ttext: string;\n\n\t/**\n\t * Class name for the main container element.\n\t */\n\tmainClassName?: string;\n\n\t/**\n\t * Class name for the front face element.\n\t */\n\tfrontFaceClassName?: string;\n\n\t/**\n\t * Class name for the secondary face element.\n\t */\n\tsecondFaceClassName?: string;\n\n\t/**\n\t * X Padding to add around the text content for the box (in pixels)\n\t * @default 10\n\t */\n\tpaddingX?: number;\n\n\t/**\n\t * Y Padding to add around the text content for the box (in pixels)\n\t * @default 10\n\t */\n\tpaddingY?: number;\n\n\t/**\n\t * Duration of stagger delay between elements in seconds.\n\t * @default 0.05\n\t */\n\tstaggerDuration?: number;\n\n\t/**\n\t * Direction to stagger animations from.\n\t * @default \"first\"\n\t */\n\tstaggerFrom?: \"first\" | \"last\" | \"center\" | number | \"random\";\n\n\t/**\n\t * Animation transition configuration.\n\t * @default { type: \"spring\", damping: 25, stiffness: 300 }\n\t */\n\ttransition?: Transition;\n\n\t/**\n\t * Fixed width for each character box (optional)\n\t */\n\tcharWidth?: number;\n\n\t/**\n\t * Fixed height for each character box (optional)\n\t */\n\tcharHeight?: number;\n\n\t/**\n\t * Direction of rotation\n\t * @default \"right\"\n\t */\n\trotateDirection?: \"top\" | \"right\" | \"bottom\" | \"left\";\n}\n\nconst Letter3DSwap = ({\n\ttext,\n\tmainClassName,\n\tfrontFaceClassName,\n\tsecondFaceClassName,\n\tpaddingX = 0,\n\tpaddingY = 10,\n\tstaggerDuration = 0.05,\n\tstaggerFrom = \"first\",\n\ttransition = { type: \"spring\", damping: 30, stiffness: 300 },\n\tcharWidth,\n\tcharHeight,\n\trotateDirection = \"right\",\n\t...props\n}: Letter3DSwapProps) => {\n\tconst [charDimensions, setCharDimensions] = useState<{\n\t\t[key: string]: { width: number; height: number };\n\t}>({});\n\tconst [isAnimating, setIsAnimating] = useState(false);\n\tconst [isHovering, setIsHovering] = useState(false);\n\tconst [originalTextDisplay, setOriginalTextDisplay] = useState<{\n\t\twidth: number;\n\t\tletterPositions: { left: number; width: number }[];\n\t}>({ width: 0, letterPositions: [] });\n\tconst measureRef = useRef<HTMLDivElement>(null);\n\tconst textDisplayRef = useRef<HTMLDivElement>(null);\n\tconst charRefs = useRef<Map<string, HTMLDivElement>>(new Map());\n\n\t// Store animation controls in a ref so they persist across renders\n\tconst controlsMapRef = useRef<\n\t\tMap<number, ReturnType<typeof useAnimationControls>>\n\t>(new Map());\n\n\t// Pre-create a set of animation controls for maximum expected characters\n\tconst MAX_CHARS = 100; // Maximum number of possible characters\n\tconst controlsArray = Array(MAX_CHARS)\n\t\t.fill(0)\n\t\t.map(() => useAnimationControls());\n\n\t// Initialize the controlsMapRef with the pre-created controls\n\tuseEffect(() => {\n\t\tfor (let i = 0; i < MAX_CHARS; i++) {\n\t\t\tcontrolsMapRef.current.set(i, controlsArray[i]);\n\t\t}\n\t}, [controlsArray]);\n\n\t// Split text into characters\n\tconst characters = useMemo(() => {\n\t\treturn splitIntoCharacters(text);\n\t}, [text]);\n\n\t// Determine rotation transform based on direction\n\tconst rotationTransform = useMemo(() => {\n\t\tswitch (rotateDirection) {\n\t\t\tcase \"top\":\n\t\t\t\treturn \"rotateX(90deg)\";\n\t\t\tcase \"right\":\n\t\t\t\treturn \"rotateY(-90deg)\";\n\t\t\tcase \"bottom\":\n\t\t\t\treturn \"rotateX(-90deg)\";\n\t\t\tcase \"left\":\n\t\t\t\treturn \"rotateY(90deg)\";\n\t\t\tdefault:\n\t\t\t\treturn \"rotateY(-90deg)\";\n\t\t}\n\t}, [rotateDirection]);\n\n\t// Measure original text display to maintain natural letter spacing\n\tuseEffect(() => {\n\t\tif (!textDisplayRef.current) return;\n\n\t\tconst textElement = textDisplayRef.current;\n\t\tconst textRect = textElement.getBoundingClientRect();\n\t\tconst letterElements = textElement.querySelectorAll(\".measure-letter\");\n\n\t\tconst positions: { left: number; width: number }[] = [];\n\n\t\tletterElements.forEach((letter) => {\n\t\t\tconst letterRect = letter.getBoundingClientRect();\n\t\t\tpositions.push({\n\t\t\t\tleft: letterRect.left - textRect.left,\n\t\t\t\twidth: letterRect.width,\n\t\t\t});\n\t\t});\n\n\t\tsetOriginalTextDisplay({\n\t\t\twidth: textRect.width,\n\t\t\tletterPositions: positions,\n\t\t});\n\t}, [text]);\n\n\t// Measure character dimensions\n\tuseEffect(() => {\n\t\tif (!measureRef.current) return;\n\n\t\t// Get all unique characters from text\n\t\tconst allChars = new Set<string>(splitIntoCharacters(text));\n\n\t\t// Measure each character\n\t\tconst measurements: { [key: string]: { width: number; height: number } } =\n\t\t\t{};\n\n\t\tallChars.forEach((char) => {\n\t\t\tconst charRef = charRefs.current.get(char);\n\t\t\tif (charRef) {\n\t\t\t\tconst rect = charRef.getBoundingClientRect();\n\t\t\t\tmeasurements[char] = {\n\t\t\t\t\twidth: charWidth || Math.max(rect.width, 0),\n\t\t\t\t\theight: charHeight || Math.max(rect.height, 80),\n\t\t\t\t};\n\t\t\t} else {\n\t\t\t\t// Default fallback if measurement fails\n\t\t\t\tmeasurements[char] = {\n\t\t\t\t\twidth: charWidth || 0,\n\t\t\t\t\theight: charHeight || 0,\n\t\t\t\t};\n\t\t\t}\n\t\t});\n\n\t\tsetCharDimensions(measurements);\n\t}, [text, paddingX, paddingY, charWidth, charHeight]);\n\n\t// Helper function to calculate stagger delay\n\tconst getStaggerDelay = useCallback(\n\t\t(index: number, totalChars: number) => {\n\t\t\tif (staggerFrom === \"first\") return index * staggerDuration;\n\t\t\tif (staggerFrom === \"last\")\n\t\t\t\treturn (totalChars - 1 - index) * staggerDuration;\n\t\t\tif (staggerFrom === \"center\") {\n\t\t\t\tconst center = Math.floor(totalChars / 2);\n\t\t\t\treturn Math.abs(center - index) * staggerDuration;\n\t\t\t}\n\t\t\tif (staggerFrom === \"random\") {\n\t\t\t\tconst randomIndex = Math.floor(Math.random() * totalChars);\n\t\t\t\treturn Math.abs(randomIndex - index) * staggerDuration;\n\t\t\t}\n\t\t\treturn Math.abs((staggerFrom as number) - index) * staggerDuration;\n\t\t},\n\t\t[staggerFrom, staggerDuration]\n\t);\n\n\t// Handle hover start - trigger the rotation\n\tconst handleHoverStart = useCallback(async () => {\n\t\tif (isAnimating || isHovering) return;\n\n\t\tsetIsHovering(true);\n\t\tsetIsAnimating(true);\n\n\t\tconst totalChars = characters.length;\n\t\tconst promises: Promise<any>[] = [];\n\n\t\t// Animate rotation of each character box with staggered delay\n\t\tfor (let i = 0; i < totalChars; i++) {\n\t\t\tconst control = controlsMapRef.current.get(i);\n\t\t\tif (control) {\n\t\t\t\tconst animationPromise = control.start({\n\t\t\t\t\ttransform: rotationTransform,\n\t\t\t\t\ttransition: {\n\t\t\t\t\t\t...transition,\n\t\t\t\t\t\tdelay: getStaggerDelay(i, totalChars),\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t\tpromises.push(animationPromise);\n\t\t\t}\n\t\t}\n\n\t\t// Wait for all animations to complete\n\t\tawait Promise.all(promises);\n\n\t\t// Reset all boxes\n\t\tfor (let i = 0; i < totalChars; i++) {\n\t\t\tconst control = controlsMapRef.current.get(i);\n\t\t\tif (control) {\n\t\t\t\tcontrol.set({ transform: \"rotateX(0deg) rotateY(0deg)\" });\n\t\t\t}\n\t\t}\n\n\t\tsetIsAnimating(false);\n\t}, [\n\t\tisAnimating,\n\t\tisHovering,\n\t\tcharacters,\n\t\ttransition,\n\t\tgetStaggerDelay,\n\t\trotationTransform,\n\t]);\n\n\t// Handle hover end\n\tconst handleHoverEnd = useCallback(() => {\n\t\tsetIsHovering(false);\n\t}, []);\n\n\t// Get the transform for the second face based on rotation direction\n\tconst getSecondFaceTransform = useCallback(\n\t\t(boxWidth: number, boxHeight: number) => {\n\t\t\tswitch (rotateDirection) {\n\t\t\t\tcase \"top\":\n\t\t\t\t\treturn `rotateX(-90deg) translateZ(${boxHeight / 2}px)`;\n\t\t\t\tcase \"right\":\n\t\t\t\t\treturn `rotateY(90deg) translateZ(${boxWidth / 2}px)`;\n\t\t\t\tcase \"bottom\":\n\t\t\t\t\treturn `rotateX(90deg) translateZ(${boxHeight / 2}px)`;\n\t\t\t\tcase \"left\":\n\t\t\t\t\treturn `rotateY(-90deg) translateZ(${boxWidth / 2}px)`;\n\t\t\t\tdefault:\n\t\t\t\t\treturn `rotateY(90deg) translateZ(${boxWidth / 2}px)`;\n\t\t\t}\n\t\t},\n\t\t[rotateDirection]\n\t);\n\n\t// Render character box\n\tconst renderCharBox = useCallback(\n\t\t(char: string, index: number) => {\n\t\t\tconst control = controlsMapRef.current.get(index);\n\n\t\t\tif (!control) return null;\n\n\t\t\t// Get position information for natural spacing\n\t\t\tconst letterPosition = originalTextDisplay.letterPositions[index];\n\t\t\tif (!letterPosition) return null;\n\n\t\t\t// Use the letter position width directly from our text measurement\n\t\t\t// This ensures each box has the exact natural width\n\t\t\tconst boxWidth = letterPosition.width;\n\n\t\t\t// Get actual character dimensions for the 3D face\n\t\t\tconst charDimension = charDimensions[char] || { width: 0, height: 0 };\n\n\t\t\t// Calculate face dimensions with padding\n\t\t\tconst faceWidth =\n\t\t\t\tMath.max(boxWidth, charDimension.width) + paddingX * 2;\n\t\t\tconst faceHeight = charDimension.height;\n\n\t\t\t// Get the transform for the second face\n\t\t\tconst secondFaceTransform = getSecondFaceTransform(\n\t\t\t\tboxWidth,\n\t\t\t\tfaceHeight\n\t\t\t);\n\n\t\t\treturn (\n\t\t\t\t<motion.span\n\t\t\t\t\tclassName=\"inline-block relative perspective-[1000px]\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tposition: \"absolute\",\n\t\t\t\t\t\tleft: letterPosition.left,\n\t\t\t\t\t\twidth: boxWidth,\n\t\t\t\t\t\t//height: faceHeight,\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tclassName=\"w-full h-full transform-3d\"\n\t\t\t\t\t\tanimate={control}\n\t\t\t\t\t\tinitial={{ transform: \"rotateX(0deg) rotateY(0deg)\" }}\n\t\t\t\t\t>\n\t\t\t\t\t\t{/* Front face */}\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"absolute flex items-center justify-center backface-hidden\",\n\t\t\t\t\t\t\t\tfrontFaceClassName\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\ttransform: `translateZ(${\n\t\t\t\t\t\t\t\t\trotateDirection === \"top\" ||\n\t\t\t\t\t\t\t\t\trotateDirection === \"bottom\"\n\t\t\t\t\t\t\t\t\t\t? faceHeight / 2\n\t\t\t\t\t\t\t\t\t\t: boxWidth / 2\n\t\t\t\t\t\t\t\t}px)`,\n\t\t\t\t\t\t\t\twidth: faceWidth,\n\t\t\t\t\t\t\t\theight: faceHeight,\n\t\t\t\t\t\t\t\t// Center the face on the rotation axis\n\t\t\t\t\t\t\t\tleft: `calc(50% - ${faceWidth / 2}px)`,\n\t\t\t\t\t\t\t\ttop: `calc(50% - ${faceHeight / 2}px)`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{char}\n\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t{/* Second face - positioned based on rotation direction */}\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"absolute flex items-center justify-center backface-hidden\",\n\t\t\t\t\t\t\t\tsecondFaceClassName\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\ttransform: secondFaceTransform,\n\t\t\t\t\t\t\t\twidth: faceWidth,\n\t\t\t\t\t\t\t\theight: faceHeight,\n\t\t\t\t\t\t\t\t// Center the face on the rotation axis\n\t\t\t\t\t\t\t\tleft: `calc(50% - ${faceWidth / 2}px)`,\n\t\t\t\t\t\t\t\ttop: `calc(50% - ${faceHeight / 2}px)`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{char}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t</motion.span>\n\t\t\t);\n\t\t},\n\t\t[\n\t\t\tcharDimensions,\n\t\t\tfrontFaceClassName,\n\t\t\tsecondFaceClassName,\n\t\t\tpaddingX,\n\t\t\tpaddingY,\n\t\t\toriginalTextDisplay,\n\t\t\tgetSecondFaceTransform,\n\t\t\trotateDirection,\n\t\t]\n\t);\n\n\treturn (\n\t\t<>\n\t\t\t{/* Hidden div for measuring natural letter positions */}\n\t\t\t<div\n\t\t\t\tref={textDisplayRef}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"absolute whitespace-pre opacity-0 pointer-events-none\",\n\t\t\t\t\tmainClassName\n\t\t\t\t)}\n\t\t\t\taria-hidden=\"true\"\n\t\t\t>\n\t\t\t\t{characters.map((char, i) => (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={i + \"letter-3d\"}\n\t\t\t\t\t\tclassName=\"measure-letter inline-block\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{char}\n\t\t\t\t\t</span>\n\t\t\t\t))}\n\t\t\t</div>\n\n\t\t\t{/* Hidden div for character measurements */}\n\t\t\t<div\n\t\t\t\tclassName=\"absolute opacity-0 pointer-events-none\"\n\t\t\t\tref={measureRef}\n\t\t\t\taria-hidden=\"true\"\n\t\t\t>\n\t\t\t\t{Array.from(new Set(characters)).map((char) => (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={char}\n\t\t\t\t\t\tref={(el) => {\n\t\t\t\t\t\t\tif (el) charRefs.current.set(char, el as HTMLDivElement);\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t{char}\n\t\t\t\t\t</span>\n\t\t\t\t))}\n\t\t\t</div>\n\n\t\t\t{/* Visible component */}\n\t\t\t<div\n\t\t\t\tclassName={cn(\"inline-flex flex-wrap relative\", mainClassName)}\n\t\t\t\tstyle={{\n\t\t\t\t\twidth: originalTextDisplay.width,\n\t\t\t\t\theight: \"auto\",\n\t\t\t\t\tcursor: \"pointer\",\n\t\t\t\t\tposition: \"relative\",\n\t\t\t\t}}\n\t\t\t\tonMouseEnter={handleHoverStart}\n\t\t\t\tonMouseLeave={handleHoverEnd}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t<span className=\"sr-only\">{text}</span>\n\n\t\t\t\t{characters.map((char, index) => (\n\t\t\t\t\t<span key={index + \"3d-swap\"}>{renderCharBox(char, index)}</span>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t</>\n\t);\n};\n\nLetter3DSwap.displayName = \"Letter3DSwap\";\n\nexport default Letter3DSwap;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "Text to display and animate",
+        "required": true
+      },
+      {
+        "name": "mainClassName",
+        "type": "string",
+        "description": "Class name for the main container element.",
+        "required": false
+      },
+      {
+        "name": "frontFaceClassName",
+        "type": "string",
+        "description": "Class name for the front face element.",
+        "required": false
+      },
+      {
+        "name": "secondFaceClassName",
+        "type": "string",
+        "description": "Class name for the secondary face element.",
+        "required": false
+      },
+      {
+        "name": "paddingX",
+        "type": "number",
+        "default": "0",
+        "description": "X Padding to add around the text content for the box (in pixels)",
+        "required": false
+      },
+      {
+        "name": "paddingY",
+        "type": "number",
+        "default": "10",
+        "description": "Y Padding to add around the text content for the box (in pixels)",
+        "required": false
+      },
+      {
+        "name": "staggerDuration",
+        "type": "number",
+        "default": "0.05",
+        "description": "Duration of stagger delay between elements in seconds.",
+        "required": false
+      },
+      {
+        "name": "staggerFrom",
+        "type": "number | \"first\" | \"last\" | \"center\" | \"random\"",
+        "default": "\"first\"",
+        "description": "Direction to stagger animations from.",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "Transition",
+        "default": "{ type: \"spring\", damping: 30, stiffn…",
+        "description": "Animation transition configuration.",
+        "required": false
+      },
+      {
+        "name": "charWidth",
+        "type": "number",
+        "description": "Fixed width for each character box (optional)",
+        "required": false
+      },
+      {
+        "name": "charHeight",
+        "type": "number",
+        "description": "Fixed height for each character box (optional)",
+        "required": false
+      },
+      {
+        "name": "rotateDirection",
+        "type": "\"bottom\" | \"left\" | \"right\" | \"top\"",
+        "default": "\"right\"",
+        "description": "Direction of rotation",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/letter3d-swap"
+  }
+}

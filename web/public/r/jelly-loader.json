@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "jelly-loader",
+  "type": "registry:ui",
+  "title": "Jelly Loader",
+  "description": "A loading animation with circles that move and scale like jelly. Perfect for showing that something is loading on your website.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/jelly-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/jelly-loader.tsx",
+      "content": "'use client';\r\n\r\nimport React from 'react';\r\nimport { motion, Transition } from 'framer-motion';\r\n\r\ntype JellyLoaderProps = {\r\n  numberOfCubes?: number;\r\n};\r\n\r\nconst JellyLoader = ({ numberOfCubes = 8 }: JellyLoaderProps) => {\r\n  const colors = [\r\n    '#FFE4E1',\r\n    '#FFB6C1',\r\n    '#FF8A95',\r\n    '#FF6B8A',\r\n    '#E91E63',\r\n    '#C2185B',\r\n    '#AD1457',\r\n    '#880E4F'\r\n  ];\r\n\r\n  const transition: Transition = {\r\n    duration: 1.5,\r\n    repeat: Infinity,\r\n    repeatDelay: 0.5,\r\n    ease: 'easeOut'\r\n  };\r\n\r\n  return (\r\n    <div className=\"-translate-x-1/5 flex items-center justify-center\">\r\n      {Array.from({ length: numberOfCubes }).map((_, index) => {\r\n        const x = index * 10;\r\n        const y = -index * 10;\r\n\r\n        return (\r\n          <motion.span\r\n            key={index}\r\n            className=\"h-[70px] w-[100px] absolute rounded-full\"\r\n            style={{\r\n              x,\r\n              y,\r\n              zIndex: numberOfCubes - index,\r\n              backgroundColor: colors[index],\r\n              opacity: 1 - index * 0.05\r\n            }}\r\n            initial={{ scale: 1 }}\r\n            animate={{ scale: [1, 0.75, 1], rotate: [0, 360] }}\r\n            transition={{\r\n              ...transition,\r\n              delay: index * 0.05\r\n            }}\r\n          >\r\n            {/* <motion.span\r\n              initial={{ rotate: 0 }}\r\n              animate={{ rotate: [0, 360] }}\r\n              transition={{\r\n                ...transition,\r\n                delay: index * 0.05\r\n              }}\r\n              style={{ backgroundColor: colors[index] }}\r\n              className=\"h-[70px] w-[100px] shrink-0 absolute rounded-full\"\r\n            /> */}\r\n          </motion.span>\r\n        );\r\n      })}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default JellyLoader;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "Colored blobs scale and overlap in a looping jelly motion.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/jellyloader",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "numberOfCubes",
+        "type": "number",
+        "default": "8",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/jelly-loader"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "price-card",
+  "type": "registry:ui",
+  "title": "Price Card",
+  "description": "Single pricing card showing plan name, monthly price and a feature list with circled check marks.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/scaling-button.json",
+    "scaling-button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/price-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/price-card.tsx",
+      "content": "\"use client\";\r\n\r\nimport { Check } from \"lucide-react\";\r\nimport { motion } from \"motion/react\";\r\n\r\nimport { ScalingButton } from \"@/components/ui/scaling-button\";\r\n\r\nexport default function PricingCard() {\r\n\tconst features = [\r\n\t\t\"2 Senior Developers\",\r\n\t\t\"Landing Page Development\",\r\n\t\t\"15-20 Days Service (One time)\",\r\n\t\t\"Private Discord Channel\",\r\n\t\t\"One Request at a time\",\r\n\t];\r\n\r\n\treturn (\r\n\t\t<div className=\"flex items-center justify-center\">\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"w-full max-w-md rounded-3xl bg-linear-to-b from-background to-background p-6 text-foreground shadow-xl\"\r\n\t\t\t\tinitial={{ opacity: 0, y: 50 }}\r\n\t\t\t\tanimate={{ opacity: 1, y: 0 }}\r\n\t\t\t\ttransition={{ duration: 0.5 }}\r\n\t\t\t>\r\n\t\t\t\t<h2 className=\"mb-2 text-2xl font-bold\">Extend MVP</h2>\r\n\t\t\t\t<div className=\"mb-4 flex items-baseline\">\r\n\t\t\t\t\t<span className=\"text-5xl font-extrabold\">$3000</span>\r\n\t\t\t\t\t<span className=\"ml-2 text-xl\">/month</span>\r\n\t\t\t\t</div>\r\n\t\t\t\t<p className=\"mb-6 text-foreground\">Product Development</p>\r\n\t\t\t\t<ul className=\"mb-6 space-y-3\">\r\n\t\t\t\t\t{features.map((feature, index) => (\r\n\t\t\t\t\t\t<motion.li\r\n\t\t\t\t\t\t\tkey={index + \"price-card\"}\r\n\t\t\t\t\t\t\tclassName=\"flex items-center space-x-3\"\r\n\t\t\t\t\t\t\tinitial={{ opacity: 0, x: -50 }}\r\n\t\t\t\t\t\t\tanimate={{ opacity: 1, x: 0 }}\r\n\t\t\t\t\t\t\ttransition={{ duration: 0.5, delay: index * 0.1 }}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\tclassName=\"flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-priceAccent\"\r\n\t\t\t\t\t\t\t\tinitial={{ scale: 0 }}\r\n\t\t\t\t\t\t\t\tanimate={{ scale: 1 }}\r\n\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 500,\r\n\t\t\t\t\t\t\t\t\tdelay: index * 0.1 + 0.2,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<Check className=\"h-3 w-3 text-foreground\" />\r\n\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t<span>{feature}</span>\r\n\t\t\t\t\t\t</motion.li>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</ul>\r\n\t\t\t\t<ScalingButton className=\"w-full bg-background text-foreground hover:bg-background/90\">\r\n\t\t\t\t\tOrder Now\r\n\t\t\t\t</ScalingButton>\r\n\t\t\t</motion.div>\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "On load the card rises and fades in while the feature rows slide in from the left one after another, each check badge popping to size; the order button dips in scale when pressed.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/price-card"
+  }
+}

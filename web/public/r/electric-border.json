@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "electric-border",
+  "type": "registry:ui",
+  "title": "Electric Border",
+  "description": "Electric Border",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/electric-border.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/electric-border.tsx",
+      "content": "import React, {\n\tCSSProperties,\n\tPropsWithChildren,\n\tuseEffect,\n\tuseId,\n\tuseLayoutEffect,\n\tuseRef,\n} from \"react\";\n\ntype ElectricBorderProps = PropsWithChildren<{\n\tcolor?: string;\n\tspeed?: number;\n\tchaos?: number;\n\tthickness?: number;\n\tclassName?: string;\n\tstyle?: CSSProperties;\n}>;\n\nfunction hexToRgba(hex: string, alpha = 1): string {\n\tif (!hex) return `rgba(0,0,0,${alpha})`;\n\tlet h = hex.replace(\"#\", \"\");\n\tif (h.length === 3) {\n\t\th = h\n\t\t\t.split(\"\")\n\t\t\t.map((c) => c + c)\n\t\t\t.join(\"\");\n\t}\n\tconst int = parseInt(h, 16);\n\tconst r = (int >> 16) & 255;\n\tconst g = (int >> 8) & 255;\n\tconst b = int & 255;\n\treturn `rgba(${r}, ${g}, ${b}, ${alpha})`;\n}\n\nconst ElectricBorder: React.FC<ElectricBorderProps> = ({\n\tchildren,\n\tcolor = \"#5227FF\",\n\tspeed = 1,\n\tchaos = 1,\n\tthickness = 2,\n\tclassName,\n\tstyle,\n}) => {\n\tconst rawId = useId().replace(/[:]/g, \"\");\n\tconst filterId = `turbulent-displace-${rawId}`;\n\tconst svgRef = useRef<SVGSVGElement | null>(null);\n\tconst rootRef = useRef<HTMLDivElement | null>(null);\n\tconst strokeRef = useRef<HTMLDivElement | null>(null);\n\n\tconst updateAnim = () => {\n\t\tconst svg = svgRef.current;\n\t\tconst host = rootRef.current;\n\t\tif (!svg || !host) return;\n\n\t\tif (strokeRef.current) {\n\t\t\tstrokeRef.current.style.filter = `url(#${filterId})`;\n\t\t}\n\n\t\tconst width = Math.max(\n\t\t\t1,\n\t\t\tMath.round(host.clientWidth || host.getBoundingClientRect().width || 0)\n\t\t);\n\t\tconst height = Math.max(\n\t\t\t1,\n\t\t\tMath.round(\n\t\t\t\thost.clientHeight || host.getBoundingClientRect().height || 0\n\t\t\t)\n\t\t);\n\n\t\tconst dyAnims = Array.from(\n\t\t\tsvg.querySelectorAll<SVGAnimateElement>(\n\t\t\t\t'feOffset > animate[attributeName=\"dy\"]'\n\t\t\t)\n\t\t);\n\t\tif (dyAnims.length >= 2) {\n\t\t\tdyAnims[0].setAttribute(\"values\", `${height}; 0`);\n\t\t\tdyAnims[1].setAttribute(\"values\", `0; -${height}`);\n\t\t}\n\n\t\tconst dxAnims = Array.from(\n\t\t\tsvg.querySelectorAll<SVGAnimateElement>(\n\t\t\t\t'feOffset > animate[attributeName=\"dx\"]'\n\t\t\t)\n\t\t);\n\t\tif (dxAnims.length >= 2) {\n\t\t\tdxAnims[0].setAttribute(\"values\", `${width}; 0`);\n\t\t\tdxAnims[1].setAttribute(\"values\", `0; -${width}`);\n\t\t}\n\n\t\tconst baseDur = 6;\n\t\tconst dur = Math.max(0.001, baseDur / (speed || 1));\n\t\t[...dyAnims, ...dxAnims].forEach((a) => a.setAttribute(\"dur\", `${dur}s`));\n\n\t\tconst disp = svg.querySelector(\"feDisplacementMap\");\n\t\tif (disp) disp.setAttribute(\"scale\", String(30 * (chaos || 1)));\n\n\t\tconst filterEl = svg.querySelector<SVGFilterElement>(\n\t\t\t`#${CSS.escape(filterId)}`\n\t\t);\n\t\tif (filterEl) {\n\t\t\tfilterEl.setAttribute(\"x\", \"-200%\");\n\t\t\tfilterEl.setAttribute(\"y\", \"-200%\");\n\t\t\tfilterEl.setAttribute(\"width\", \"500%\");\n\t\t\tfilterEl.setAttribute(\"height\", \"500%\");\n\t\t}\n\n\t\trequestAnimationFrame(() => {\n\t\t\t[...dyAnims, ...dxAnims].forEach((a: any) => {\n\t\t\t\tif (typeof a.beginElement === \"function\") {\n\t\t\t\t\ttry {\n\t\t\t\t\t\ta.beginElement();\n\t\t\t\t\t} catch {}\n\t\t\t\t}\n\t\t\t});\n\t\t});\n\t};\n\n\tuseEffect(() => {\n\t\tupdateAnim();\n\t}, [speed, chaos]);\n\n\tuseLayoutEffect(() => {\n\t\tif (!rootRef.current) return;\n\t\tconst ro = new ResizeObserver(() => updateAnim());\n\t\tro.observe(rootRef.current);\n\t\tupdateAnim();\n\t\treturn () => ro.disconnect();\n\t}, []);\n\n\tconst inheritRadius: CSSProperties = {\n\t\tborderRadius: style?.borderRadius ?? \"inherit\",\n\t};\n\n\tconst strokeStyle: CSSProperties = {\n\t\t...inheritRadius,\n\t\tborderWidth: thickness,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: color,\n\t};\n\n\tconst glow1Style: CSSProperties = {\n\t\t...inheritRadius,\n\t\tborderWidth: thickness,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: hexToRgba(color, 0.6),\n\t\tfilter: `blur(${0.5 + thickness * 0.25}px)`,\n\t\topacity: 0.5,\n\t};\n\n\tconst glow2Style: CSSProperties = {\n\t\t...inheritRadius,\n\t\tborderWidth: thickness,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: color,\n\t\tfilter: `blur(${2 + thickness * 0.5}px)`,\n\t\topacity: 0.5,\n\t};\n\n\tconst bgGlowStyle: CSSProperties = {\n\t\t...inheritRadius,\n\t\ttransform: \"scale(1.08)\",\n\t\tfilter: \"blur(32px)\",\n\t\topacity: 0.3,\n\t\tzIndex: -1,\n\t\tbackground: `linear-gradient(-30deg, ${hexToRgba(color, 0.8)}, transparent, ${color})`,\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tref={rootRef}\n\t\t\tclassName={\"relative isolate \" + (className ?? \"\")}\n\t\t\tstyle={style}\n\t\t>\n\t\t\t<svg\n\t\t\t\tref={svgRef}\n\t\t\t\tclassName=\"fixed -left-[10000px] -top-[10000px] w-[10px] h-[10px] opacity-[0.001] pointer-events-none\"\n\t\t\t\taria-hidden\n\t\t\t\tfocusable=\"false\"\n\t\t\t>\n\t\t\t\t<defs>\n\t\t\t\t\t<filter\n\t\t\t\t\t\tid={filterId}\n\t\t\t\t\t\tcolorInterpolationFilters=\"sRGB\"\n\t\t\t\t\t\tx=\"-20%\"\n\t\t\t\t\t\ty=\"-20%\"\n\t\t\t\t\t\twidth=\"140%\"\n\t\t\t\t\t\theight=\"140%\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<feTurbulence\n\t\t\t\t\t\t\ttype=\"turbulence\"\n\t\t\t\t\t\t\tbaseFrequency=\"0.02\"\n\t\t\t\t\t\t\tnumOctaves=\"10\"\n\t\t\t\t\t\t\tresult=\"noise1\"\n\t\t\t\t\t\t\tseed=\"1\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feOffset in=\"noise1\" dx=\"0\" dy=\"0\" result=\"offsetNoise1\">\n\t\t\t\t\t\t\t<animate\n\t\t\t\t\t\t\t\tattributeName=\"dy\"\n\t\t\t\t\t\t\t\tvalues=\"700; 0\"\n\t\t\t\t\t\t\t\tdur=\"6s\"\n\t\t\t\t\t\t\t\trepeatCount=\"indefinite\"\n\t\t\t\t\t\t\t\tcalcMode=\"linear\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feOffset>\n\n\t\t\t\t\t\t<feTurbulence\n\t\t\t\t\t\t\ttype=\"turbulence\"\n\t\t\t\t\t\t\tbaseFrequency=\"0.02\"\n\t\t\t\t\t\t\tnumOctaves=\"10\"\n\t\t\t\t\t\t\tresult=\"noise2\"\n\t\t\t\t\t\t\tseed=\"1\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feOffset in=\"noise2\" dx=\"0\" dy=\"0\" result=\"offsetNoise2\">\n\t\t\t\t\t\t\t<animate\n\t\t\t\t\t\t\t\tattributeName=\"dy\"\n\t\t\t\t\t\t\t\tvalues=\"0; -700\"\n\t\t\t\t\t\t\t\tdur=\"6s\"\n\t\t\t\t\t\t\t\trepeatCount=\"indefinite\"\n\t\t\t\t\t\t\t\tcalcMode=\"linear\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feOffset>\n\n\t\t\t\t\t\t<feTurbulence\n\t\t\t\t\t\t\ttype=\"turbulence\"\n\t\t\t\t\t\t\tbaseFrequency=\"0.02\"\n\t\t\t\t\t\t\tnumOctaves=\"10\"\n\t\t\t\t\t\t\tresult=\"noise1\"\n\t\t\t\t\t\t\tseed=\"2\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feOffset in=\"noise1\" dx=\"0\" dy=\"0\" result=\"offsetNoise3\">\n\t\t\t\t\t\t\t<animate\n\t\t\t\t\t\t\t\tattributeName=\"dx\"\n\t\t\t\t\t\t\t\tvalues=\"490; 0\"\n\t\t\t\t\t\t\t\tdur=\"6s\"\n\t\t\t\t\t\t\t\trepeatCount=\"indefinite\"\n\t\t\t\t\t\t\t\tcalcMode=\"linear\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feOffset>\n\n\t\t\t\t\t\t<feTurbulence\n\t\t\t\t\t\t\ttype=\"turbulence\"\n\t\t\t\t\t\t\tbaseFrequency=\"0.02\"\n\t\t\t\t\t\t\tnumOctaves=\"10\"\n\t\t\t\t\t\t\tresult=\"noise2\"\n\t\t\t\t\t\t\tseed=\"2\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feOffset in=\"noise2\" dx=\"0\" dy=\"0\" result=\"offsetNoise4\">\n\t\t\t\t\t\t\t<animate\n\t\t\t\t\t\t\t\tattributeName=\"dx\"\n\t\t\t\t\t\t\t\tvalues=\"0; -490\"\n\t\t\t\t\t\t\t\tdur=\"6s\"\n\t\t\t\t\t\t\t\trepeatCount=\"indefinite\"\n\t\t\t\t\t\t\t\tcalcMode=\"linear\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</feOffset>\n\n\t\t\t\t\t\t<feComposite\n\t\t\t\t\t\t\tin=\"offsetNoise1\"\n\t\t\t\t\t\t\tin2=\"offsetNoise2\"\n\t\t\t\t\t\t\tresult=\"part1\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feComposite\n\t\t\t\t\t\t\tin=\"offsetNoise3\"\n\t\t\t\t\t\t\tin2=\"offsetNoise4\"\n\t\t\t\t\t\t\tresult=\"part2\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feBlend\n\t\t\t\t\t\t\tin=\"part1\"\n\t\t\t\t\t\t\tin2=\"part2\"\n\t\t\t\t\t\t\tmode=\"color-dodge\"\n\t\t\t\t\t\t\tresult=\"combinedNoise\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<feDisplacementMap\n\t\t\t\t\t\t\tin=\"SourceGraphic\"\n\t\t\t\t\t\t\tin2=\"combinedNoise\"\n\t\t\t\t\t\t\tscale=\"30\"\n\t\t\t\t\t\t\txChannelSelector=\"R\"\n\t\t\t\t\t\t\tyChannelSelector=\"B\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</filter>\n\t\t\t\t</defs>\n\t\t\t</svg>\n\n\t\t\t<div\n\t\t\t\tclassName=\"absolute inset-0 pointer-events-none\"\n\t\t\t\tstyle={inheritRadius}\n\t\t\t>\n\t\t\t\t<div\n\t\t\t\t\tref={strokeRef}\n\t\t\t\t\tclassName=\"absolute inset-0 box-border\"\n\t\t\t\t\tstyle={strokeStyle}\n\t\t\t\t/>\n\t\t\t\t<div className=\"absolute inset-0 box-border\" style={glow1Style} />\n\t\t\t\t<div className=\"absolute inset-0 box-border\" style={glow2Style} />\n\t\t\t\t<div className=\"absolute inset-0\" style={bgGlowStyle} />\n\t\t\t</div>\n\n\t\t\t<div className=\"relative\" style={inheritRadius}>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default ElectricBorder;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"#5227FF\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "chaos",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "thickness",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "React.CSSProperties",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/electric-border"
+  }
+}

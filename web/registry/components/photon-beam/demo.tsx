@@ -1,0 +1,22 @@
+import { PhotonBeam } from "./component";
+
+export default function PhotonBeamUsage() {
+    return (
+        <div className="relative h-[500px] w-full overflow-hidden rounded-lg border">
+            <PhotonBeam
+                colorBg="#080808"
+                colorLine="#005f6f"
+                colorSignal="#00d9ff"
+                colorSignal2="#00ffff"
+                colorSignal3="#00b8d4"
+                lineCount={80}
+                spreadHeight={30.33}
+                signalCount={94}
+                speedGlobal={0.345}
+                trailLength={3}
+                bloomStrength={3.0}
+                bloomRadius={0.5}
+            />
+        </div>
+    )
+}

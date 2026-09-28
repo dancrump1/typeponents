@@ -1,0 +1,59 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hero-highlight",
+  "type": "registry:ui",
+  "title": "Hero Highlight",
+  "description": "Hero Highlight",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hero-highlight.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hero-highlight.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, useMotionTemplate, useMotionValue } from \"motion/react\";\n\n// https://ui.aceternity.com/components/hero-highlight\n\nexport const HeroHighlight = ({\n\tchildren,\n\tclassName,\n\tcontainerClassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n\tcontainerClassName?: string;\n}) => {\n\tlet mouseX = useMotionValue(0);\n\tlet mouseY = useMotionValue(0);\n\n\tfunction handleMouseMove({\n\t\tcurrentTarget,\n\t\tclientX,\n\t\tclientY,\n\t}: React.MouseEvent<HTMLDivElement>) {\n\t\tif (!currentTarget) return;\n\t\tlet { left, top } = currentTarget.getBoundingClientRect();\n\n\t\tmouseX.set(clientX - left);\n\t\tmouseY.set(clientY - top);\n\t}\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative h-160 flex items-center bg-background dark:bg-background justify-center w-full group\",\n\t\t\t\tcontainerClassName\n\t\t\t)}\n\t\t\tonMouseMove={handleMouseMove}\n\t\t>\n\t\t\t<div className=\"absolute inset-0 bg-dot-thick-neutral-300 dark:bg-dot-thick-neutral-800  pointer-events-none\" />\n\t\t\t<motion.div\n\t\t\t\tclassName=\"pointer-events-none bg-dot-thick-indigo-500 dark:bg-dot-thick-indigo-500   absolute inset-0 opacity-0 transition delay-1500 duration-300 group-hover:opacity-100\"\n\t\t\t\tstyle={{\n\t\t\t\t\tWebkitMaskImage: useMotionTemplate`\n            radial-gradient(\n              200px circle at ${mouseX}px ${mouseY}px,\n              black 0%,\n              transparent 100%\n            )\n          `,\n\t\t\t\t\tmaskImage: useMotionTemplate`\n            radial-gradient(\n              200px circle at ${mouseX}px ${mouseY}px,\n              black 0%,\n              transparent 100%\n            )\n          `,\n\t\t\t\t}}\n\t\t\t/>\n\n\t\t\t<div className={cn(\"relative z-1\", className)}>{children}</div>\n\t\t</div>\n\t);\n};\n\nexport const Highlight = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<motion.span\n\t\t\tinitial={{\n\t\t\t\tbackgroundSize: \"0% 100%\",\n\t\t\t}}\n\t\t\tanimate={{\n\t\t\t\tbackgroundSize: \"100% 100%\",\n\t\t\t}}\n\t\t\ttransition={{\n\t\t\t\tduration: 2,\n\t\t\t\tease: \"linear\",\n\t\t\t\tdelay: 2.5,\n\t\t\t}}\n\t\t\tstyle={{\n\t\t\t\tbackgroundRepeat: \"no-repeat\",\n\t\t\t\tbackgroundPosition: \"left center\",\n\t\t\t\tdisplay: \"inline\",\n\t\t\t}}\n\t\t\tclassName={cn(\n\t\t\t\t`relative inline-block pb-1   px-1 rounded-lg bg-linear-to-r from-indigo-300 to-purple-300 dark:from-indigo-500 dark:to-purple-500`,\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</motion.span>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/hero-highlight",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hero-highlight"
+  }
+}

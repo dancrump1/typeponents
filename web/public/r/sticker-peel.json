@@ -1,0 +1,55 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sticker-peel",
+  "type": "registry:ui",
+  "title": "Sticker Peel",
+  "description": "A round sticker with a message hidden underneath, drawn with a mirrored curl so the peeled part looks like it is folding over.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sticker-peel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sticker-peel.tsx",
+      "content": "import React, { useState } from \"react\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\ninterface PeelableStickerProps {\r\n\tstickerImage: string;\r\n\tmessage: string;\r\n}\r\n\r\nconst PeelableSticker: React.FC<PeelableStickerProps> = ({\r\n\tstickerImage,\r\n\tmessage,\r\n}) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName=\"relative w-[180px] h-[180px] mx-auto cursor-pointer\"\r\n\t\t\tonHoverStart={() => setIsHovered(true)}\r\n\t\t\tonHoverEnd={() => setIsHovered(false)}\r\n\t\t>\r\n\t\t\t<div className=\"absolute top-0 left-0 w-full h-full overflow-hidden\">\r\n\t\t\t\t<div className=\"bg-background w-[140px] h-[140px] m-[20px] rounded-full shadow-lg flex items-center justify-center font-thin\">\r\n\t\t\t\t\t{message}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"absolute top-0 left-0 w-full h-full\"\r\n\t\t\t\tinitial={false}\r\n\t\t\t\tanimate={{ rotate: isHovered ? 10 : 45 }}\r\n\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t>\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tclassName=\"absolute bottom-0 w-full overflow-hidden\"\r\n\t\t\t\t\tinitial={false}\r\n\t\t\t\t\tanimate={{ height: isHovered ? 70 : 150 }}\r\n\t\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tclassName=\"w-[140px] h-[140px] mx-[20px] rounded-full bg-cover bg-center\"\r\n\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\tanimate={{ marginTop: isHovered ? -90 : -10 }}\r\n\t\t\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackgroundImage: `url(${stickerImage})`,\r\n\t\t\t\t\t\t\tboxShadow:\r\n\t\t\t\t\t\t\t\t\"inset 0 8px 20px -5px rgba(0, 0, 0, 0.5), 0 8px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(0, 0, 0, 0.1)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</motion.div>\r\n\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"absolute top-0 left-0 w-full h-full\"\r\n\t\t\t\tinitial={false}\r\n\t\t\t\tanimate={{ rotate: isHovered ? 10 : 45 }}\r\n\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t>\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tclassName=\"absolute top-[30px] w-full overflow-hidden\"\r\n\t\t\t\t\tinitial={false}\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\theight: isHovered ? 90 : 10,\r\n\t\t\t\t\t\ttop: isHovered ? 110 : 30,\r\n\t\t\t\t\t}}\r\n\t\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tclassName=\"w-[140px] h-[140px] mx-[20px] rounded-full bg-cover bg-center relative overflow-hidden\"\r\n\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\tanimate={{ marginTop: isHovered ? -60 : -130 }}\r\n\t\t\t\t\t\ttransition={{ duration: 0.75, ease: \"easeInOut\" }}\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackgroundImage: `url(${stickerImage})`,\r\n\t\t\t\t\t\t\ttransform: \"scaleY(-1)\",\r\n\t\t\t\t\t\t\tfilter: \"brightness(1.1) contrast(0.7)\",\r\n\t\t\t\t\t\t\tboxShadow:\r\n\t\t\t\t\t\t\t\t\"inset 0 -8px 10px -5px rgba(0, 0, 0, 0.2), 0 -8px 15px -3px rgba(0, 0, 0, 0.3), 0 0 0 10px rgba(0, 0, 0, 0.1)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</motion.div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport default PeelableSticker;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images",
+      "Cursor & Pointer Effects",
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering rotates the sticker upright and peels the lower half back over itself, uncovering the message underneath; moving away rolls the sticker back down flat.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "stickerImage",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "message",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sticker-peel"
+  }
+}

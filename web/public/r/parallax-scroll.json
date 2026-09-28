@@ -1,0 +1,58 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "parallax-scroll",
+  "type": "registry:ui",
+  "title": "Parallax Scroll",
+  "description": "Parallax Scroll",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/parallax-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/parallax-scroll.tsx",
+      "content": "\"use client\";\n\nimport React, { useRef } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, useScroll, useTransform } from \"motion/react\";\n\n// https://ui.aceternity.com/components/parallax-scroll\nexport const ParallaxScroll = ({\n\timages,\n\tclassName,\n}: {\n\timages: string[];\n\tclassName?: string;\n}) => {\n\tconst gridRef = useRef<any>(null);\n\tconst { scrollYProgress } = useScroll({\n\t\tcontainer: gridRef, // remove this if your container is not fixed height\n\t\toffset: [\"start start\", \"end start\"], // remove this if your container is not fixed height\n\t});\n\n\tconst translateFirst = useTransform(scrollYProgress, [0, 1], [0, -200]);\n\tconst translateSecond = useTransform(scrollYProgress, [0, 1], [0, 200]);\n\tconst translateThird = useTransform(scrollYProgress, [0, 1], [0, -200]);\n\n\tconst third = Math.ceil(images?.length / 3);\n\n\tconst firstPart = images?.slice(0, third);\n\tconst secondPart = images?.slice(third, 2 * third);\n\tconst thirdPart = images?.slice(2 * third);\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"h-160 items-start overflow-y-auto w-full\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tref={gridRef}\n\t\t>\n\t\t\t<div\n\t\t\t\tclassName=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 items-start  max-w-5xl mx-auto gap-10 py-40 px-10\"\n\t\t\t\tref={gridRef}\n\t\t\t>\n\t\t\t\t<div className=\"grid gap-10\">\n\t\t\t\t\t{firstPart.map((el, idx) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tstyle={{ y: translateFirst }} // Apply the translateY motion value here\n\t\t\t\t\t\t\tkey={\"grid-1\" + idx}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc={el}\n\t\t\t\t\t\t\t\tclassName=\"h-80 w-full object-cover object-top-left rounded-lg gap-10 m-0! p-0!\"\n\t\t\t\t\t\t\t\theight=\"400\"\n\t\t\t\t\t\t\t\twidth=\"400\"\n\t\t\t\t\t\t\t\talt=\"thumbnail\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t\t<div className=\"grid gap-10\">\n\t\t\t\t\t{secondPart.map((el, idx) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tstyle={{ y: translateSecond }}\n\t\t\t\t\t\t\tkey={\"grid-2\" + idx}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc={el}\n\t\t\t\t\t\t\t\tclassName=\"h-80 w-full object-cover object-top-left rounded-lg gap-10 m-0! p-0!\"\n\t\t\t\t\t\t\t\theight=\"400\"\n\t\t\t\t\t\t\t\twidth=\"400\"\n\t\t\t\t\t\t\t\talt=\"thumbnail\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t\t<div className=\"grid gap-10\">\n\t\t\t\t\t{thirdPart.map((el, idx) => (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tstyle={{ y: translateThird }}\n\t\t\t\t\t\t\tkey={\"grid-3\" + idx}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc={el}\n\t\t\t\t\t\t\t\tclassName=\"h-80 w-full object-cover object-top-left rounded-lg gap-10 m-0! p-0!\"\n\t\t\t\t\t\t\t\theight=\"400\"\n\t\t\t\t\t\t\t\twidth=\"400\"\n\t\t\t\t\t\t\t\talt=\"thumbnail\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/parallax-scroll",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/parallax-scroll"
+  }
+}

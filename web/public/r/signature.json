@@ -1,0 +1,106 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "signature",
+  "type": "registry:ui",
+  "title": "Signature",
+  "description": "Signature",
+  "dependencies": [
+    "motion",
+    "opentype.js"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/signature.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/signature.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useId, useState } from \"react\";\r\nimport { motion } from \"motion/react\";\r\nimport { load as loadFont } from \"opentype.js\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// Credit:\r\n// https://www.componentry.fun/docs/components/signature\r\n\r\ninterface SignatureProps {\r\n    /** Text to generate signature for */\r\n    text?: string;\r\n    /** Color of the signature path */\r\n    color?: string;\r\n    /** Font size of the signature */\r\n    fontSize?: number;\r\n    /** Animation duration in seconds */\r\n    duration?: number;\r\n    /** Delay before animation starts in seconds */\r\n    delay?: number;\r\n    /** Additional CSS classes */\r\n    className?: string;\r\n    /** Only animate when in view */\r\n    inView?: boolean;\r\n    /** Only animate once */\r\n    once?: boolean;\r\n    /** Custom font URL to load */\r\n    fontUrl?: string;\r\n}\r\n\r\nexport function Signature({\r\n    text = \"Signature\",\r\n    color = \"currentColor\",\r\n    fontSize = 32,\r\n    duration = 1.5,\r\n    delay = 0,\r\n    className,\r\n    inView = false,\r\n    once = true,\r\n    fontUrl,\r\n}: SignatureProps) {\r\n    const [paths, setPaths] = useState<string[]>([]);\r\n    const [width, setWidth] = useState<number>(300);\r\n    const height = fontSize * 3; // Give plenty of vertical space\r\n    const horizontalPadding = fontSize * 0.1;\r\n    const topMargin = fontSize * 1.5; // Shift down\r\n    const baseline = topMargin;\r\n    const maskId = `signature-reveal-${useId().replace(/:/g, \"\")}`;\r\n\r\n    useEffect(() => {\r\n        async function load() {\r\n            try {\r\n                let font;\r\n                const fontPaths = fontUrl\r\n                    ? [fontUrl]\r\n                    : [\r\n                        \"/LastoriaBoldRegular.otf\",\r\n                        \"./LastoriaBoldRegular.otf\",\r\n                        \"https://www.componentry.fun/LastoriaBoldRegular.otf\",\r\n                    ];\r\n\r\n                for (const path of fontPaths) {\r\n                    try {\r\n                        font = await loadFont(path as string);\r\n                        break;\r\n                    } catch {\r\n                        // Try next path\r\n                    }\r\n                }\r\n\r\n                if (!font) {\r\n                    throw new Error(\"Font could not be loaded from any path\");\r\n                }\r\n\r\n                let x = horizontalPadding;\r\n                const newPaths: string[] = [];\r\n\r\n                for (const char of text) {\r\n                    const glyph = font.charToGlyph(char);\r\n                    const path = glyph.getPath(x, baseline, fontSize);\r\n                    newPaths.push(path.toPathData(3));\r\n\r\n                    const advanceWidth = glyph.advanceWidth ?? font.unitsPerEm;\r\n                    x += advanceWidth * (fontSize / font.unitsPerEm);\r\n                }\r\n\r\n                setPaths(newPaths);\r\n                setWidth(x + horizontalPadding);\r\n            } catch (error) {\r\n                console.error(\"Signature component font load error:\", error);\r\n                setPaths([]);\r\n                setWidth(text.length * fontSize * 0.6);\r\n            }\r\n        }\r\n\r\n        load();\r\n    }, [text, fontSize, baseline, horizontalPadding, fontUrl]);\r\n\r\n    const variants = {\r\n        hidden: { pathLength: 0, opacity: 0 },\r\n        visible: { pathLength: 1, opacity: 1 },\r\n    };\r\n\r\n    return (\r\n        <motion.svg\r\n            key={paths.length}\r\n            width={width}\r\n            height={height}\r\n            viewBox={`0 0 ${width} ${height}`}\r\n            fill=\"none\"\r\n            className={cn(\"text-foreground overflow-visible\", className)}\r\n            initial=\"hidden\"\r\n            whileInView={inView ? \"visible\" : undefined}\r\n            animate={inView ? undefined : \"visible\"}\r\n            viewport={{ once }}\r\n        >\r\n            <defs>\r\n                <mask id={maskId} maskUnits=\"userSpaceOnUse\">\r\n                    {paths.map((d, i) => (\r\n                        <motion.path\r\n                            key={i}\r\n                            d={d}\r\n                            stroke=\"white\"\r\n                            strokeWidth={fontSize * 0.22}\r\n                            fill=\"none\"\r\n                            variants={variants}\r\n                            transition={{\r\n                                pathLength: {\r\n                                    delay: delay + i * 0.2,\r\n                                    duration,\r\n                                    ease: \"easeInOut\",\r\n                                },\r\n                                opacity: {\r\n                                    delay: delay + i * 0.2 + 0.01,\r\n                                    duration: 0.01,\r\n                                },\r\n                            }}\r\n                            vectorEffect=\"non-scaling-stroke\"\r\n                            strokeLinecap=\"round\"\r\n                            strokeLinejoin=\"round\"\r\n                        />\r\n                    ))}\r\n                </mask>\r\n            </defs>\r\n\r\n            {paths.map((d, i) => (\r\n                <motion.path\r\n                    key={i}\r\n                    d={d}\r\n                    stroke={color}\r\n                    strokeWidth={2}\r\n                    fill=\"none\"\r\n                    variants={variants}\r\n                    transition={{\r\n                        pathLength: {\r\n                            delay: delay + i * 0.2,\r\n                            duration,\r\n                            ease: \"easeInOut\",\r\n                        },\r\n                        opacity: {\r\n                            delay: delay + i * 0.2 + 0.01,\r\n                            duration: 0.01,\r\n                        },\r\n                    }}\r\n                    vectorEffect=\"non-scaling-stroke\"\r\n                    strokeLinecap=\"butt\"\r\n                    strokeLinejoin=\"round\"\r\n                />\r\n            ))}\r\n\r\n            <g mask={`url(#${maskId})`}>\r\n                {paths.map((d, i) => <path key={i} d={d} fill={color} />)}\r\n            </g>\r\n        </motion.svg>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Componentry",
+      "url": "https://www.componentry.fun/docs/components/signature",
+      "authorUrl": "https://www.componentry.fun",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"Signature\"",
+        "description": "Text to generate signature for",
+        "required": false
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"currentColor\"",
+        "description": "Color of the signature path",
+        "required": false
+      },
+      {
+        "name": "fontSize",
+        "type": "number",
+        "default": "32",
+        "description": "Font size of the signature",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "1.5",
+        "description": "Animation duration in seconds",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "0",
+        "description": "Delay before animation starts in seconds",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "Additional CSS classes",
+        "required": false
+      },
+      {
+        "name": "inView",
+        "type": "boolean",
+        "default": "false",
+        "description": "Only animate when in view",
+        "required": false
+      },
+      {
+        "name": "once",
+        "type": "boolean",
+        "default": "true",
+        "description": "Only animate once",
+        "required": false
+      },
+      {
+        "name": "fontUrl",
+        "type": "string",
+        "description": "Custom font URL to load",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/signature"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "typewriter-testimonials",
+  "type": "registry:ui",
+  "title": "Typewriter Testimonials",
+  "description": "Typewriter Testimonials",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/typewriter-testimonials.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/typewriter-testimonials.tsx",
+      "content": "import React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.serenity-ui.com/components/testimonials/typewritertestimonial\r\n\r\ntype Testimonial = {\r\n\timage: string;\r\n\ttext: string;\r\n\tname: string;\r\n\tjobtitle: string;\r\n};\r\n\r\ntype TestimonialsProps = {\r\n\ttestimonials: Testimonial[];\r\n};\r\n\r\nconst TypewriterTestimonial: React.FC<TestimonialsProps> = ({\r\n\ttestimonials,\r\n}) => {\r\n\tconst [hoveredIndex, setHoveredIndex] = useState<number | null>(null);\r\n\r\n\tconst [hasBeenHovered, setHasBeenHovered] = useState<boolean[]>(\r\n\t\tnew Array(testimonials.length).fill(false)\r\n\t);\r\n\tconst [typedText, setTypedText] = useState(\"\");\r\n\tconst typewriterRef = useRef<NodeJS.Timeout | null>(null);\r\n\tconst currentTextRef = useRef(\"\");\r\n\r\n\tconst handleMouseEnter = (index: number) => {\r\n\t\tsetHoveredIndex(index);\r\n\r\n\t\tsetHasBeenHovered((prev) => {\r\n\t\t\tconst updated = [...prev];\r\n\t\t\tupdated[index] = true;\r\n\t\t\treturn updated;\r\n\t\t});\r\n\t\tstartTypewriter(testimonials[index].text);\r\n\t};\r\n\r\n\tconst handleMouseLeave = () => {\r\n\t\tsetHoveredIndex(null);\r\n\t\tstopTypewriter();\r\n\t};\r\n\r\n\tconst startTypewriter = (text: string) => {\r\n\t\tlet i = 0;\r\n\t\tsetTypedText(\"\");\r\n\t\tcurrentTextRef.current = text;\r\n\r\n\t\tconst type = () => {\r\n\t\t\tif (i <= text.length) {\r\n\t\t\t\tsetTypedText(text.slice(0, i));\r\n\t\t\t\ti++;\r\n\t\t\t\ttypewriterRef.current = setTimeout(type, 50);\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\ttype();\r\n\t};\r\n\r\n\tconst stopTypewriter = () => {\r\n\t\tif (typewriterRef.current) {\r\n\t\t\tclearTimeout(typewriterRef.current);\r\n\t\t}\r\n\t\tsetTypedText(\"\");\r\n\t\tcurrentTextRef.current = \"\";\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\treturn () => {\r\n\t\t\tif (typewriterRef.current) {\r\n\t\t\t\tclearTimeout(typewriterRef.current);\r\n\t\t\t}\r\n\t\t};\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"flex justify-center items-center gap-4 flex-wrap\">\r\n\t\t\t{testimonials.map((testimonial, index) => (\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tkey={index + \"typewriter-testimonial\"}\r\n\t\t\t\t\tclassName=\"relative flex flex-col items-center\"\r\n\t\t\t\t\tonMouseEnter={() => handleMouseEnter(index)}\r\n\t\t\t\t\tonMouseLeave={handleMouseLeave}\r\n\t\t\t\t\twhileHover={{ scale: 1.05 }}\r\n\t\t\t\t\twhileTap={{ scale: 0.95 }}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.img\r\n\t\t\t\t\t\tsrc={testimonial.image}\r\n\t\t\t\t\t\talt={`Testimonial ${index}`}\r\n\t\t\t\t\t\tclassName=\"w-16 h-16 rounded-full border-4 hover:animate-pulse border-gray-300\"\r\n\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\tborderColor:\r\n\t\t\t\t\t\t\t\thoveredIndex === index || hasBeenHovered[index]\r\n\t\t\t\t\t\t\t\t\t? \"#ACA0FB\"\r\n\t\t\t\t\t\t\t\t\t: \"#E5E7EB\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\ttransition={{ duration: 0.3 }}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t{hoveredIndex === index && (\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0, scale: 0.8, y: -10 }}\r\n\t\t\t\t\t\t\t\tanimate={{ opacity: 1, scale: 1, y: -20 }}\r\n\t\t\t\t\t\t\t\texit={{ opacity: 0, scale: 0.8, y: -10 }}\r\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.4 }}\r\n\t\t\t\t\t\t\t\tclassName=\"absolute bottom-20 bg-background text-foreground text-sm px-4 py-3 rounded-lg shadow-2xl max-w-xs w-56\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<div className=\"h-24 overflow-hidden whitespace-pre-wrap\">\r\n\t\t\t\t\t\t\t\t\t{typedText}\r\n\t\t\t\t\t\t\t\t\t<span className=\"animate-blink\">|</span>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<p className=\"mt-2 text-right font-semibold\">\r\n\t\t\t\t\t\t\t\t\t{testimonial.name}\r\n\t\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t\t\t<p className=\"text-right text-foreground text-sm\">\r\n\t\t\t\t\t\t\t\t\t{testimonial.jobtitle}\r\n\t\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t\t\t<div className=\"absolute left-1/2 transform -translate-x-1/2 -bottom-4\">\r\n\t\t\t\t\t\t\t\t\t<div className=\"w-3 h-3 bg-background rounded-full shadow-lg\"></div>\r\n\t\t\t\t\t\t\t\t\t<div className=\"w-2 h-2 bg-background rounded-full shadow-lg mt-1\"></div>\r\n\t\t\t\t\t\t\t\t\t<div className=\"w-1 h-1 bg-background rounded-full shadow-lg mt-1\"></div>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t</motion.div>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default TypewriterTestimonial;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Testimonials"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Serenity UI",
+      "url": "https://www.serenity-ui.com/components/testimonials/typewritertestimonial",
+      "authorUrl": "https://www.serenity-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "testimonials",
+        "type": "Testimonial[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/typewriter-testimonials"
+  }
+}

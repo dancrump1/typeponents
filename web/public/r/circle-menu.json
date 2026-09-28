@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "circle-menu",
+  "type": "registry:ui",
+  "title": "Circle Menu",
+  "description": "A circular navigation menu that expands items in a circle around a central button with smooth animations and hover effects.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/circle-menu.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/circle-menu.tsx",
+      "content": "'use client';\r\n\r\nimport { AnimatePresence, motion, useAnimationControls } from 'framer-motion';\r\nimport { Menu, X } from 'lucide-react';\r\nimport React, { useState } from 'react';\r\nimport { cn } from '@/lib/utils';\r\nimport { useRouter } from 'next/navigation';\r\n\r\nconst CONSTANTS = {\r\n  itemSize: 48,\r\n  containerSize: 250,\r\n  openStagger: 0.02,\r\n  closeStagger: 0.07\r\n};\r\n\r\nconst STYLES: Record<string, Record<string, string>> = {\r\n  trigger: {\r\n    container:\r\n      'rounded-full flex items-center bg-[#27272A] justify-center border border-white/10 cursor-pointer outline-none ring-0 hover:brightness-125 transition-all duration-100 z-50',\r\n    active: 'bg-[#27272A]'\r\n  },\r\n  item: {\r\n    container:\r\n      'rounded-full flex items-center justify-center absolute bg-zinc-100 text-black hover:bg-white cursor-pointer',\r\n    label: 'text-xs text-black absolute top-full left-1/2 -translate-x-1/2 text-white mt-1'\r\n  }\r\n};\r\n\r\nconst pointOnCircle = (i: number, n: number, r: number, cx = 0, cy = 0) => {\r\n  const theta = (2 * Math.PI * i) / n - Math.PI / 2;\r\n  const x = cx + r * Math.cos(theta);\r\n  const y = cy + r * Math.sin(theta) + 0;\r\n  return { x, y };\r\n};\r\n\r\ninterface MenuItemProps {\r\n  icon: React.ReactNode;\r\n  label: string;\r\n  href: string;\r\n  index: number;\r\n  totalItems: number;\r\n  isOpen: boolean;\r\n}\r\n\r\nconst MenuItem = ({ icon, label, href, index, totalItems, isOpen }: MenuItemProps) => {\r\n  const { x, y } = pointOnCircle(index, totalItems, CONSTANTS.containerSize / 2);\r\n  const [hovering, setHovering] = useState(false);\r\n\r\n  const router = useRouter();\r\n\r\n  return (\r\n    <motion.button\r\n      onClick={() => router.push(href)}\r\n      animate={{\r\n        x: isOpen ? x : 0,\r\n        y: isOpen ? y : 0\r\n      }}\r\n      whileHover={{\r\n        scale: 1.1,\r\n        transition: {\r\n          duration: 0.1,\r\n          delay: 0\r\n        }\r\n      }}\r\n      transition={{\r\n        delay: isOpen ? index * CONSTANTS.openStagger : index * CONSTANTS.closeStagger,\r\n        type: 'spring',\r\n        stiffness: 300,\r\n        damping: 30\r\n      }}\r\n      style={{\r\n        height: CONSTANTS.itemSize - 2,\r\n        width: CONSTANTS.itemSize - 2\r\n      }}\r\n      className={STYLES.item.container}\r\n      onMouseEnter={() => setHovering(true)}\r\n      onMouseLeave={() => setHovering(false)}\r\n    >\r\n      {icon}\r\n      {hovering && <p className={STYLES.item.label}>{label}</p>}\r\n    </motion.button>\r\n  );\r\n};\r\n\r\ninterface MenuTriggerProps {\r\n  setIsOpen: (isOpen: boolean) => void;\r\n  isOpen: boolean;\r\n  itemsLength: number;\r\n  closeAnimationCallback: () => void;\r\n  openIcon?: React.ReactNode;\r\n  closeIcon?: React.ReactNode;\r\n}\r\n\r\nconst MenuTrigger = ({\r\n  setIsOpen,\r\n  isOpen,\r\n  itemsLength,\r\n  closeAnimationCallback,\r\n  openIcon,\r\n  closeIcon\r\n}: MenuTriggerProps) => {\r\n  const animate = useAnimationControls();\r\n  const shakeAnimation = useAnimationControls();\r\n\r\n  const scaleTransition = Array.from({ length: itemsLength - 1 })\r\n    .map((_, index) => index + 1)\r\n    .reduce((acc, _, index) => {\r\n      const increasedValue = index * 0.15;\r\n      acc.push(1 + increasedValue);\r\n      return acc;\r\n    }, [] as number[]);\r\n\r\n  const closeAnimation = async () => {\r\n    shakeAnimation.start({\r\n      translateX: [0, 2, -2, 0, 2, -2, 0],\r\n      transition: {\r\n        duration: CONSTANTS.closeStagger,\r\n        ease: 'linear',\r\n        repeat: Infinity,\r\n        repeatType: 'loop'\r\n      }\r\n    });\r\n    for (let i = 0; i < scaleTransition.length; i++) {\r\n      await animate.start({\r\n        height: Math.min(\r\n          CONSTANTS.itemSize * scaleTransition[i],\r\n          CONSTANTS.itemSize + CONSTANTS.itemSize / 2\r\n        ),\r\n        width: Math.min(\r\n          CONSTANTS.itemSize * scaleTransition[i],\r\n          CONSTANTS.itemSize + CONSTANTS.itemSize / 2\r\n        ),\r\n        backgroundColor: `color-mix(in srgb, #27272A ${Math.max(100 - i * 10, 40)}%, white)`,\r\n        transition: {\r\n          duration: CONSTANTS.closeStagger / 2,\r\n          ease: 'linear'\r\n        }\r\n      });\r\n      if (i !== scaleTransition.length - 1) {\r\n        await new Promise((resolve) => setTimeout(resolve, CONSTANTS.closeStagger * 1000));\r\n      }\r\n    }\r\n\r\n    shakeAnimation.stop();\r\n    shakeAnimation.start({\r\n      translateX: 0,\r\n      transition: {\r\n        duration: 0\r\n      }\r\n    });\r\n\r\n    animate.start({\r\n      height: CONSTANTS.itemSize,\r\n      width: CONSTANTS.itemSize,\r\n      backgroundColor: '#27272A',\r\n      transition: {\r\n        duration: 0.1,\r\n        ease: 'backInOut'\r\n      }\r\n    });\r\n  };\r\n\r\n  return (\r\n    <motion.div animate={shakeAnimation} className=\"z-50\">\r\n      <motion.button\r\n        animate={animate}\r\n        style={{\r\n          height: CONSTANTS.itemSize,\r\n          width: CONSTANTS.itemSize\r\n        }}\r\n        className={cn(STYLES.trigger.container, isOpen && STYLES.trigger.active)}\r\n        onClick={() => {\r\n          if (isOpen) {\r\n            setIsOpen(false);\r\n            closeAnimationCallback();\r\n            closeAnimation();\r\n          } else {\r\n            setIsOpen(true);\r\n          }\r\n        }}\r\n      >\r\n        <AnimatePresence mode=\"popLayout\">\r\n          {isOpen ? (\r\n            <motion.span\r\n              key=\"menu-close\"\r\n              initial={{\r\n                opacity: 0,\r\n                filter: 'blur(10px)'\r\n              }}\r\n              animate={{\r\n                opacity: 1,\r\n                filter: 'blur(0px)'\r\n              }}\r\n              exit={{\r\n                opacity: 0,\r\n                filter: 'blur(10px)'\r\n              }}\r\n              transition={{\r\n                duration: 0.2\r\n              }}\r\n            >\r\n              {closeIcon}\r\n            </motion.span>\r\n          ) : (\r\n            <motion.span\r\n              key=\"menu-open\"\r\n              initial={{\r\n                opacity: 0,\r\n                filter: 'blur(10px)'\r\n              }}\r\n              animate={{\r\n                opacity: 1,\r\n                filter: 'blur(0px)'\r\n              }}\r\n              exit={{\r\n                opacity: 0,\r\n                filter: 'blur(10px)'\r\n              }}\r\n              transition={{\r\n                duration: 0.2\r\n              }}\r\n            >\r\n              {openIcon}\r\n            </motion.span>\r\n          )}\r\n        </AnimatePresence>\r\n      </motion.button>\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst CircleMenu = ({\r\n  items,\r\n  openIcon = <Menu size={18} className=\"text-white\" />,\r\n  closeIcon = <X size={18} className=\"text-white\" />\r\n}: {\r\n  items: Array<{ label: string; icon: React.ReactNode; href: string }>;\r\n  openIcon?: React.ReactNode;\r\n  closeIcon?: React.ReactNode;\r\n}) => {\r\n  const [isOpen, setIsOpen] = useState(false);\r\n  const animate = useAnimationControls();\r\n\r\n  const closeAnimationCallback = async () => {\r\n    await animate.start({\r\n      rotate: -360,\r\n      filter: 'blur(1px)',\r\n      transition: {\r\n        duration: CONSTANTS.closeStagger * (items.length + 2),\r\n        ease: 'linear'\r\n      }\r\n    });\r\n    await animate.start({\r\n      rotate: 0,\r\n      filter: 'blur(0px)',\r\n      transition: {\r\n        duration: 0\r\n      }\r\n    });\r\n  };\r\n\r\n  return (\r\n    <div\r\n      style={{\r\n        width: CONSTANTS.containerSize,\r\n        height: CONSTANTS.containerSize\r\n      }}\r\n      className=\"relative flex items-center justify-center place-self-center\"\r\n    >\r\n      <MenuTrigger\r\n        setIsOpen={setIsOpen}\r\n        isOpen={isOpen}\r\n        itemsLength={items.length}\r\n        closeAnimationCallback={closeAnimationCallback}\r\n        openIcon={openIcon}\r\n        closeIcon={closeIcon}\r\n      />\r\n      <motion.div\r\n        animate={animate}\r\n        className={cn('absolute inset-0 z-0 flex items-center justify-center')}\r\n      >\r\n        {items.map((item, index) => {\r\n          return (\r\n            <MenuItem\r\n              key={`menu-item-${index}`}\r\n              icon={item.icon}\r\n              label={item.label}\r\n              href={item.href}\r\n              index={index}\r\n              totalItems={items.length}\r\n              isOpen={isOpen}\r\n            />\r\n          );\r\n        })}\r\n      </motion.div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default CircleMenu;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Tap the center button and items spring out in a ring; hover shows each label.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/circleMenu",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ label: string; icon: React.ReactNode; href: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "openIcon",
+        "type": "React.ReactNode",
+        "default": "<Menu size={18} className=\"text-white…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "closeIcon",
+        "type": "React.ReactNode",
+        "default": "<X size={18} className=\"text-white\" />",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/circle-menu"
+  }
+}

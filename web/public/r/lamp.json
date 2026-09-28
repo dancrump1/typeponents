@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lamp",
+  "type": "registry:ui",
+  "title": "Lamp",
+  "description": "Lamp",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/sparkles.json",
+    "sparkles"
+  ],
+  "files": [
+    {
+      "path": "components/ui/lamp.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/lamp.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\nimport { SparklesCore } from \"@/components/ui/sparkles\";\n\n// https://ui.aceternity.com/components/lamp-effect\n\nexport const LampContainer = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative flex min-h-screen flex-col items-center md:w-1/2 justify-center overflow-hidden dark:bg-slate-950 z-0\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t<div className=\"relative flex flex-1 scale-y-125 items-center w-full justify-center isolate z-0 \">\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ opacity: 0.5, width: \"15rem\" }}\n\t\t\t\t\twhileInView={{ opacity: 1, width: \"30rem\" }}\n\t\t\t\t\tviewport={{ once: true }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\tduration: 0.8,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t\t// style={{\n\t\t\t\t\t//   backgroundImage: `conic-gradient(var(--conic-position), var(--tw-gradient-from), var(--tw-gradient-to);)`,\n\t\t\t\t\t// }}\n\t\t\t\t\tclassName=\"from-[#D23A2A] via-transparent to-transparent absolute inset-auto right-1/2 h-56 overflow-visible w-120 bg-gradient-conic text-foreground [--conic-position:from_70deg_at_center_top]\"\n\t\t\t\t>\n\t\t\t\t\t<div className=\"absolute  w-full left-0 dark:bg-slate-950 h-40 bottom-0 z-20 mask-[linear-gradient(to_top,white,transparent)]\" />\n\t\t\t\t\t<div className=\"absolute  w-40 h-full left-0 dark:bg-slate-950  bottom-0 z-20 mask-[linear-gradient(to_right,white,transparent)]\" />\n\t\t\t\t</motion.div>\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ opacity: 0.5, width: \"15rem\" }}\n\t\t\t\t\twhileInView={{ opacity: 1, width: \"30rem\" }}\n\t\t\t\t\tviewport={{ once: true }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\tduration: 0.8,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t\t// style={{\n\t\t\t\t\t//   backgroundImage: `conic-gradient(var(--conic-position),  var(--tw-gradient-from), var(--tw-gradient-to);)`,\n\t\t\t\t\t// }}\n\t\t\t\t\tclassName=\"from-transparent via-transparent to-[#D23A2A] absolute inset-auto left-1/2 h-56 w-120 bg-gradient-conic text-foreground [--conic-position:from_290deg_at_center_top]\"\n\t\t\t\t>\n\t\t\t\t\t<div className=\"absolute  w-40 h-full right-0 dark:bg-slate-950  bottom-0 z-20 mask-[linear-gradient(to_left,white,transparent)]\" />\n\t\t\t\t\t<div className=\"absolute  w-full right-0 dark:bg-slate-950 h-40 bottom-0 z-20 mask-[linear-gradient(to_top,white,transparent)]\" />\n\t\t\t\t</motion.div>\n\n\t\t\t\t<div className=\"absolute top-1/2 h-48 w-full translate-y-12 scale-x-150 dark:bg-slate-950 blur-2xl\"></div>\n\t\t\t\t<div className=\"absolute top-1/2 z-40 h-48 w-full bg-transparent opacity-10 backdrop-blur-md\"></div>\n\n\t\t\t\t<div className=\"absolute inset-auto z-40 h-36 w-md -translate-y-1/2 rounded-full bg-background opacity-50 blur-2xl\"></div>\n\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ width: \"8rem\" }}\n\t\t\t\t\twhileInView={{ width: \"16rem\" }}\n\t\t\t\t\tviewport={{ once: true }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\tduration: 0.8,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute inset-auto z-30 h-36 w-64 -translate-y-24 rounded-full bg-background blur-2xl\"\n\t\t\t\t></motion.div>\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ opacity: 0.5, width: \"15rem\" }}\n\t\t\t\t\twhileInView={{ opacity: 1, width: \"40rem\" }}\n\t\t\t\t\tviewport={{ once: true }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\tduration: 0.8,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute inset-auto h-40\"\n\t\t\t\t>\n\t\t\t\t\t<SparklesCore minSize={0.4} maxSize={1} particleDensity={1200} />\n\t\t\t\t</motion.div>\n\t\t\t\t<motion.div\n\t\t\t\t\tinitial={{ width: \"15rem\" }}\n\t\t\t\t\twhileInView={{ width: \"30rem\" }}\n\t\t\t\t\tviewport={{ once: true }}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\tduration: 0.8,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute inset-auto z-40 h-0.5 w-120 -translate-y-28 bg-background\"\n\t\t\t\t></motion.div>\n\n\t\t\t\t<div className=\"absolute inset-auto z-40 h-44 w-full -translate-y-50 dark:bg-slate-950 \"></div>\n\t\t\t</div>\n\n\t\t\t<div className=\"relative z-40 flex -translate-y-[55vh] flex-col items-center px-5\">\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/lamp-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/lamp"
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fluid-morph",
+  "type": "registry:ui",
+  "title": "Fluid Morph",
+  "description": "Fluid Morph",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fluid-morph.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fluid-morph.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef, useState } from \"react\";\n\nimport { animate } from \"motion/react\";\n\n// Credit:\n// https://www.smoothui.dev/doc/fluid-morph\n\nconst numbers = [\n\t\"M128 40L230 215.766H26L128 40Z\",\n\t\"M212 132L132 212M196 44L44 196\",\n\t\"M45.125 134.46C45.125 148.06 54.6705 159.909 68.1345 161.89C77.374 163.25 86.707 164.295 96.125 165.026V204.5L130.771 169.854C133.121 167.519 136.274 166.172 139.585 166.089C155.747 165.641 171.869 164.239 187.865 161.89C201.329 159.909 210.875 148.069 210.875 134.452V83.2985C210.875 69.6815 201.329 57.841 187.865 55.8605C168.043 52.9511 148.035 51.4937 128 51.5C107.668 51.5 87.676 52.9875 68.1345 55.8605C54.6705 57.841 45.125 69.69 45.125 83.2985V134.452V134.46Z\",\n];\n\ntype CircleRef = SVGCircleElement | null;\ntype PathRef = SVGPathElement | null;\n\nexport default function FluidMorph() {\n\tconst [index, setIndex] = useState(0);\n\tconst circles = useRef<CircleRef[]>([]);\n\tconst paths = useRef<PathRef[]>([]);\n\n\tconst nbOfCircles = 60;\n\tconst radius = 10;\n\n\tuseEffect(() => {\n\t\tconst currentPath = paths.current[index];\n\t\tif (currentPath) {\n\t\t\tconst length = currentPath.getTotalLength();\n\t\t\tconst step = length / nbOfCircles;\n\n\t\t\tcircles.current.forEach((circle, i) => {\n\t\t\t\tif (circle && currentPath) {\n\t\t\t\t\tconst { x, y } = currentPath.getPointAtLength(i * step);\n\t\t\t\t\tanimate(\n\t\t\t\t\t\tcircle,\n\t\t\t\t\t\t{ cx: x, cy: y },\n\t\t\t\t\t\t{ delay: i * 0.015, ease: \"easeOut\", type: \"spring\" }\n\t\t\t\t\t);\n\t\t\t\t}\n\t\t\t});\n\t\t}\n\t}, [index]);\n\n\treturn (\n\t\t<main className=\"flex flex-col items-center justify-center p-4\">\n\t\t\t<svg\n\t\t\t\tviewBox=\"0 0 256 256\"\n\t\t\t\tclassName=\"w-[500px]\"\n\t\t\t\tstyle={{ filter: \"url(#filter)\" }}\n\t\t\t>\n\t\t\t\t<defs>\n\t\t\t\t\t<filter id=\"filter\">\n\t\t\t\t\t\t<feGaussianBlur stdDeviation=\"12\" result=\"blur-xs\" />\n\t\t\t\t\t\t<feColorMatrix\n\t\t\t\t\t\t\tin=\"blur-xs\"\n\t\t\t\t\t\t\tmode=\"matrix\"\n\t\t\t\t\t\t\tvalues=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 25 -15\"\n\t\t\t\t\t\t\tresult=\"filter\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</filter>\n\t\t\t\t</defs>\n\t\t\t\t<g>\n\t\t\t\t\t{numbers.map((path, i) => (\n\t\t\t\t\t\t<path\n\t\t\t\t\t\t\tclassName=\"hidden\"\n\t\t\t\t\t\t\tkey={`p_${i}`}\n\t\t\t\t\t\t\tref={(ref) => {\n\t\t\t\t\t\t\t\tif (ref) paths.current[i] = ref;\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\td={path}\n\t\t\t\t\t\t/>\n\t\t\t\t\t))}\n\t\t\t\t</g>\n\n\t\t\t\t<g>\n\t\t\t\t\t{[...Array(nbOfCircles)].map((_, i) => (\n\t\t\t\t\t\t<circle\n\t\t\t\t\t\t\tclassName=\"fill-light-950 dark:fill-dark-950\"\n\t\t\t\t\t\t\tkey={`c_${i}`}\n\t\t\t\t\t\t\tref={(ref) => {\n\t\t\t\t\t\t\t\tif (ref) circles.current[i] = ref;\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tcx=\"128\"\n\t\t\t\t\t\t\tcy=\"128\"\n\t\t\t\t\t\t\tr={radius}\n\t\t\t\t\t\t/>\n\t\t\t\t\t))}\n\t\t\t\t</g>\n\t\t\t</svg>\n\t\t\t<div className=\"flex cursor-pointer flex-row gap-4 text-3xl\">\n\t\t\t\t{numbers.map((_, i) => (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={i + \"fuid-morph\"}\n\t\t\t\t\t\tclassName={`border-light-200 bg-light-50 dark:border-dark-200 dark:bg-dark-50 flex h-12 w-12 items-center justify-center rounded-full border text-sm transition disabled:opacity-50 ${\n\t\t\t\t\t\t\ti === index\n\t\t\t\t\t\t\t\t? \"cursor-not-allowed text-amber-500\"\n\t\t\t\t\t\t\t\t: \"text-light-950 dark:text-dark-950 cursor-pointer\"\n\t\t\t\t\t\t}`}\n\t\t\t\t\t\tonClick={() => setIndex(i)}\n\t\t\t\t\t>\n\t\t\t\t\t\t{i + 1}\n\t\t\t\t\t</span>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t</main>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "SmoothUI",
+      "url": "https://www.smoothui.dev/doc/fluid-morph",
+      "authorUrl": "https://www.smoothui.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fluid-morph"
+  }
+}

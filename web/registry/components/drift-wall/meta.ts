@@ -1,0 +1,48 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "drift-wall",
+	title: "Drift Wall",
+	description:
+		"Wall of image tiles in columns that scroll past each other endlessly, tilted back in perspective and faded out at the edges.",
+	interaction:
+		"The columns drift up and down on their own in alternating directions. Moving the pointer leans the whole wall toward it, and the tile under the cursor stops its column, brightens to full colour and lifts toward you.",
+	categories: ["Media Galleries"],
+	tags: ["drag", "cursor-tracking", "autoplay", "responsive"],
+	inspiration: {
+		source: "React Bits",
+		url: "https://www.reactbits.dev/components/drift-wall",
+		authorUrl: "https://www.reactbits.dev",
+		relationship: "adaptation",
+	},
+	dependencies: [],
+	registryDependencies: [],
+	props: [
+		{ name: "items", type: "DriftWallItem[]", default: "DEFAULT_ITEMS" },
+		{ name: "columns", type: "number", default: "5" },
+		{ name: "tileWidth", type: "number", default: "200" },
+		{ name: "tileHeight", type: "number", default: "132" },
+		{ name: "gap", type: "number", default: "18" },
+		{ name: "radius", type: "number", default: "14" },
+		{ name: "tilt", type: "number", default: "16" },
+		{ name: "turn", type: "number", default: "-14" },
+		{ name: "roll", type: "number", default: "0" },
+		{ name: "perspective", type: "number", default: "1200" },
+		{ name: "depth", type: "number", default: "120" },
+		{ name: "speed", type: "number", default: "42" },
+		{ name: "direction", type: "\"up\" | \"down\"", default: "'up'" },
+		{ name: "variance", type: "number", default: "0.45" },
+		{ name: "parallax", type: "number", default: "0.6" },
+		{ name: "pauseOnHover", type: "boolean", default: "false" },
+		{ name: "lift", type: "number", default: "64" },
+		{ name: "fade", type: "number", default: "0.6" },
+		{ name: "dim", type: "number", default: "0.55" },
+		{ name: "grayscale", type: "boolean", default: "false" },
+		{ name: "overlayColor", type: "string", default: "'#060010'" },
+		{ name: "className", type: "string", default: "''" },
+		{ name: "style", type: "CSSProperties" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

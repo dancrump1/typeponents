@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "video-viewer",
+  "type": "registry:ui",
+  "title": "Video Viewer",
+  "description": "Video Viewer",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/video-viewer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/video-viewer.tsx",
+      "content": "import React, { useState } from \"react\";\r\n\r\nfunction extractString(str) {\r\n\t// Find the last occurrence of '/'\r\n\tconst lastSlashIndex = str.lastIndexOf(\"/\");\r\n\r\n\t// Find the first occurrence of '?' after the last '/'\r\n\tconst questionMarkIndex = str.indexOf(\"?\", lastSlashIndex);\r\n\r\n\t// Extract the part after the last '/' and before the first '?'\r\n\tif (questionMarkIndex !== -1) {\r\n\t\treturn str.substring(lastSlashIndex + 1, questionMarkIndex);\r\n\t} else {\r\n\t\t// If there's no '?' in the string, return the part after the last '/'\r\n\t\treturn str.substring(lastSlashIndex + 1);\r\n\t}\r\n}\r\n\r\nconst videos = [\r\n\t{\r\n\t\ttitle: \"vid 1\",\r\n\t\tthumbnail: \"./thumbnail.png\",\r\n\t\tvideoTitle: \"welcome to vid 1\",\r\n\t\tdescription: \"vid 1 is about some stuff\",\r\n\t\turl: \"https://www.youtube.com/embed/v4H2fTgHGuc?si=f4L6CB7VHhGr841A\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"vid 2\",\r\n\t\tthumbnail: \"./thumbnail2.png\",\r\n\t\tvideoTitle: \"welcome to vid 2\",\r\n\t\tdescription: \"vid 1 is about some stuff\",\r\n\t\turl: \"https://www.youtube.com/embed/OUM6XmhViN4?si=AuMbxeyCEVTdRidJ\",\r\n\t},\r\n];\r\n\r\nexport function VideoContainer() {\r\n\tconst [selectedVideo, setSelectedVideo] = useState(videos[0]);\r\n\r\n\treturn (\r\n\t\t<div className=\"grid grid-cols-1 gap-6 h-[600px] md:grid-cols-[1fr_300px] mx-6\">\r\n\t\t\t<div className=\"bg-background rounded-lg w-full overflow-hidden relative  min-h-[25vh]\">\r\n\t\t\t\t<span className=\"w-full h-full object-cover aspect-video rounded-md bg-muted\" />\r\n\r\n\t\t\t\t<iframe\r\n\t\t\t\t\tsrc={\r\n\t\t\t\t\t\tselectedVideo.url +\r\n\t\t\t\t\t\t`playlist=${extractString(\r\n\t\t\t\t\t\t\tselectedVideo.url\r\n\t\t\t\t\t\t)}&controls=1&enablejsapi=0&iv_load_policy=3`\r\n\t\t\t\t\t}\r\n\t\t\t\t\twidth={1920}\r\n\t\t\t\t\theight={1080}\r\n\t\t\t\t\ttitle={selectedVideo.title}\r\n\t\t\t\t\tallow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\r\n\t\t\t\t\treferrerPolicy=\"strict-origin-when-cross-origin\"\r\n\t\t\t\t\tallowFullScreen\r\n\t\t\t\t\tclassName=\"h-full w-full\"\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"bg-background dark:bg-background rounded-lg md:block\">\r\n\t\t\t\t<div className=\"p-4 border-b border-gray-200 dark:border-gray-700\">\r\n\t\t\t\t\t<h2 className=\"text-lg font-heading font-semibold\">\r\n\t\t\t\t\t\tRelated Videos\r\n\t\t\t\t\t</h2>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div className=\"overflow-auto max-h-[600px]\">\r\n\t\t\t\t\t<div className=\"grid gap-4 p-4\">\r\n\t\t\t\t\t\t{videos\r\n\t\t\t\t\t\t\t.filter((item) => {\r\n\t\t\t\t\t\t\t\treturn item.videoTitle !== selectedVideo.videoTitle;\r\n\t\t\t\t\t\t\t})\r\n\t\t\t\t\t\t\t.map((embed, i) => {\r\n\t\t\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\t\tclassName=\"grid grid-cols-[80px_1fr] gap-4 items-center cursor-pointer\"\r\n\t\t\t\t\t\t\t\t\t\tonClick={() => setSelectedVideo(embed)}\r\n\t\t\t\t\t\t\t\t\t\tkey={embed.title}\r\n\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\t\t\t\talt=\"Thumbnail\"\r\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"rounded-md object-cover aspect-square\"\r\n\t\t\t\t\t\t\t\t\t\t\theight=\"80\"\r\n\t\t\t\t\t\t\t\t\t\t\tsrc={embed.thumbnail}\r\n\t\t\t\t\t\t\t\t\t\t\twidth=\"80\"\r\n\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t\t<div>\r\n\t\t\t\t\t\t\t\t\t\t\t<h3 className=\"font-medium line-clamp-2 font-copy text-lg\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{embed.videoTitle}\r\n\t\t\t\t\t\t\t\t\t\t\t</h3>\r\n\t\t\t\t\t\t\t\t\t\t\t<p className=\"text-foreground dark:text-foreground line-clamp-2\">\r\n\t\t\t\t\t\t\t\t\t\t\t\t{embed.description}\r\n\t\t\t\t\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t\t})}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Videos"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/video-viewer"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "simple-footer",
+  "type": "registry:ui",
+  "title": "Simple Footer",
+  "description": "Simple Footer",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/simple-footer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/simple-footer.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport Link from \"next/link\";\r\n\r\nimport { Facebook, Github, Linkedin, Twitter } from \"lucide-react\";\r\n\r\n/** Default content, inlined so this component ships standalone. */\r\nconst componentDefaults = {\r\n\tprops: {\r\n\t\tbrandName: \"BrandName\",\r\n\t\tnavigationLinks: [\r\n\t\t\t{\r\n\t\t\t\thref: \"/about\",\r\n\t\t\t\tlabel: \"About Us\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"/services\",\r\n\t\t\t\tlabel: \"Services\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"/blog\",\r\n\t\t\t\tlabel: \"Blog\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"/contact\",\r\n\t\t\t\tlabel: \"Contact\",\r\n\t\t\t},\r\n\t\t],\r\n\t\tsocialLinks: [\r\n\t\t\t{\r\n\t\t\t\thref: \"https://facebook.com\",\r\n\t\t\t\ticon: \"Facebook\",\r\n\t\t\t\thoverColor: \"text-foreground\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"https://x.com/ayushmxxn\",\r\n\t\t\t\ticon: \"Twitter\",\r\n\t\t\t\thoverColor: \"text-foreground\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"https://linkedin.com\",\r\n\t\t\t\ticon: \"Linkedin\",\r\n\t\t\t\thoverColor: \"text-foreground\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\thref: \"https://github.com/ayushmxxn\",\r\n\t\t\t\ticon: \"Github\",\r\n\t\t\t\thoverColor: \"text-foreground\",\r\n\t\t\t},\r\n\t\t],\r\n\t},\r\n};\r\n\r\nconst ICONS = {\r\n\tFacebook,\r\n\tTwitter,\r\n\tLinkedin,\r\n\tGithub,\r\n} as const;\r\n\r\nexport type SimpleFooterLink = {\r\n\thref: string;\r\n\tlabel: string;\r\n};\r\n\r\nexport type SimpleFooterSocialLink = {\r\n\thref: string;\r\n\ticon: keyof typeof ICONS;\r\n\thoverColor?: string;\r\n};\r\n\r\nexport type SimpleFooterProps = {\r\n\tbrandName?: string;\r\n\tnavigationLinks?: SimpleFooterLink[];\r\n\tsocialLinks?: SimpleFooterSocialLink[];\r\n};\r\n\r\nconst FooterThird = (props: Partial<SimpleFooterProps> = {}) => {\r\n\tconst resolved = { ...componentDefaults.props, ...props } as SimpleFooterProps;\r\n\tconst {\r\n\t\tbrandName = \"BrandName\",\r\n\t\tnavigationLinks = [],\r\n\t\tsocialLinks = [],\r\n\t} = resolved;\r\n\r\n\treturn (\r\n\t\t<footer className=\"bg-background text-foreground\">\r\n\t\t\t<div className=\"max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8\">\r\n\t\t\t\t<div className=\"flex flex-col sm:flex-row justify-between items-center space-y-6 sm:space-y-0\">\r\n\t\t\t\t\t<div className=\"text-xl font-bold\">\r\n\t\t\t\t\t\t<Link href=\"/\" className=\"text-foreground hover:text-foreground\">\r\n\t\t\t\t\t\t\t{brandName}\r\n\t\t\t\t\t\t</Link>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div className=\"flex flex-wrap justify-center space-x-6 text-sm\">\r\n\t\t\t\t\t\t{navigationLinks.map((link) => (\r\n\t\t\t\t\t\t\t<Link\r\n\t\t\t\t\t\t\t\tkey={link.href}\r\n\t\t\t\t\t\t\t\thref={link.href}\r\n\t\t\t\t\t\t\t\tclassName=\"hover:text-foreground\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{link.label}\r\n\t\t\t\t\t\t\t</Link>\r\n\t\t\t\t\t\t))}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div className=\"flex flex-wrap justify-center space-x-4 text-foreground\">\r\n\t\t\t\t\t\t{socialLinks.map((social) => {\r\n\t\t\t\t\t\t\tconst Icon = ICONS[social.icon] ?? Github;\r\n\t\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\t\tkey={social.href}\r\n\t\t\t\t\t\t\t\t\thref={social.href}\r\n\t\t\t\t\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\t\t\t\t\trel=\"noopener noreferrer\"\r\n\t\t\t\t\t\t\t\t\tclassName={`hover:${social.hoverColor || \"text-foreground\"}`}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<Icon size={24} />\r\n\t\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t})}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div className=\"border-t border-gray-200 mt-5\">\r\n\t\t\t\t\t<div className=\"mt-5 text-center text-sm text-foreground\">\r\n\t\t\t\t\t\t<p>\r\n\t\t\t\t\t\t\t&copy; {new Date().getFullYear()} {brandName}. All rights\r\n\t\t\t\t\t\t\treserved.\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</footer>\r\n\t);\r\n};\r\n\r\nexport default FooterThird;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Footers"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "brandName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "navigationLinks",
+        "type": "SimpleFooterLink[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "socialLinks",
+        "type": "SimpleFooterSocialLink[]",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/simple-footer"
+  }
+}

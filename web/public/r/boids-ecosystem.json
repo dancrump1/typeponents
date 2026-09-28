@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "boids-ecosystem",
+  "type": "registry:ui",
+  "title": "Boids Ecosystem",
+  "description": "Dark canvas backdrop of small coloured triangles that flock together and turn as a group, like birds.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/boids-ecosystem.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/boids-ecosystem.tsx",
+      "content": "\"use client\";\r\n\r\nimport { type RefObject, useEffect, useRef } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport interface BoidAgent {\r\n    x: number;\r\n    y: number;\r\n    vx: number;\r\n    vy: number;\r\n    color: string;\r\n}\r\n\r\n/**\r\n * Force point that pulls boids toward (x, y). Coordinates are normalized 0..1\r\n * across the canvas, so callers don't need to know the canvas pixel size.\r\n */\r\nexport interface BoidAttractor {\r\n    x: number;\r\n    y: number;\r\n    /** 0 = no pull, 0.05 = gentle, 0.15 = strong. Default 0.05. */\r\n    strength?: number;\r\n    /** Pixel radius of influence. Default 220. */\r\n    radius?: number;\r\n}\r\n\r\ninterface BoidsEcosystemProps {\r\n    count?: number;\r\n    background?: string;\r\n    palette?: string[];\r\n    cursorRadius?: number;\r\n    /** Force points the flock is drawn toward. Read live, safe to mutate by ref. */\r\n    attractors?: BoidAttractor[];\r\n    /**\r\n     * Receives the live agents array on mount. Mutate-in-place by the simulation;\r\n     * read positions from animation frames in the parent (do NOT trigger React state from this).\r\n     */\r\n    agentsRef?: RefObject<BoidAgent[] | null>;\r\n    /** Triangle reads as flock; dot reads as ambient activity. */\r\n    agentShape?: \"triangle\" | \"dot\";\r\n    className?: string;\r\n    children?: React.ReactNode;\r\n}\r\n\r\nconst DEFAULT_PALETTE = [\"#f5f5f4\", \"#fde68a\", \"#93c5fd\", \"#fca5a5\"];\r\n\r\nexport default function BoidsEcosystem({\r\n    count = 120,\r\n    background = \"#0b0b12\",\r\n    palette = DEFAULT_PALETTE,\r\n    cursorRadius = 90,\r\n    attractors,\r\n    agentsRef,\r\n    agentShape = \"triangle\",\r\n    className,\r\n    children,\r\n}: BoidsEcosystemProps) {\r\n    const canvasRef = useRef<HTMLCanvasElement>(null);\r\n    const cursorRef = useRef<{ x: number; y: number; active: boolean }>({\r\n        x: 0,\r\n        y: 0,\r\n        active: false,\r\n    });\r\n    // All non-`count` props read from this ref each frame, so prop changes\r\n    // don't tear down the simulation.\r\n    const liveRef = useRef({ background, palette, cursorRadius, attractors, agentShape });\r\n    liveRef.current = { background, palette, cursorRadius, attractors, agentShape };\r\n\r\n    useEffect(() => {\r\n        const canvas = canvasRef.current;\r\n        if (!canvas) return;\r\n        const ctx = canvas.getContext(\"2d\");\r\n        if (!ctx) return;\r\n\r\n        const dpr = Math.min(window.devicePixelRatio || 1, 2);\r\n        const agents: BoidAgent[] = [];\r\n\r\n        const resize = () => {\r\n            const rect = canvas.getBoundingClientRect();\r\n            canvas.width = rect.width * dpr;\r\n            canvas.height = rect.height * dpr;\r\n            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);\r\n        };\r\n        resize();\r\n        const ro = new ResizeObserver(resize);\r\n        ro.observe(canvas);\r\n\r\n        const w = () => canvas.width / dpr;\r\n        const h = () => canvas.height / dpr;\r\n\r\n        const initialPalette = liveRef.current.palette;\r\n        for (let i = 0; i < count; i++) {\r\n            const a = Math.random() * Math.PI * 2;\r\n            const s = 0.6 + Math.random() * 0.6;\r\n            agents.push({\r\n                x: Math.random() * w(),\r\n                y: Math.random() * h(),\r\n                vx: Math.cos(a) * s,\r\n                vy: Math.sin(a) * s,\r\n                color: initialPalette[Math.floor(Math.random() * initialPalette.length)],\r\n            });\r\n        }\r\n        if (agentsRef) agentsRef.current = agents;\r\n\r\n        const perception = 36;\r\n        const maxSpeed = 1.8;\r\n\r\n        let raf = 0;\r\n        const step = () => {\r\n            const { background: bg, cursorRadius: cr, attractors: atts } = liveRef.current;\r\n            const W = w();\r\n            const H = h();\r\n\r\n            ctx.fillStyle = `${bg}dd`;\r\n            ctx.fillRect(0, 0, W, H);\r\n\r\n            for (const a of agents) {\r\n                let ax = 0;\r\n                let ay = 0;\r\n                let sx = 0;\r\n                let sy = 0;\r\n                let cx = 0;\r\n                let cy = 0;\r\n                let n = 0;\r\n\r\n                for (const b of agents) {\r\n                    if (a === b) continue;\r\n                    const dx = b.x - a.x;\r\n                    const dy = b.y - a.y;\r\n                    const d2 = dx * dx + dy * dy;\r\n                    if (d2 < perception * perception) {\r\n                        ax += b.vx;\r\n                        ay += b.vy;\r\n                        cx += b.x;\r\n                        cy += b.y;\r\n                        if (d2 < 18 * 18 && d2 > 0.0001) {\r\n                            const d = Math.sqrt(d2);\r\n                            sx -= dx / d;\r\n                            sy -= dy / d;\r\n                        }\r\n                        n++;\r\n                    }\r\n                }\r\n                if (n > 0) {\r\n                    a.vx += (ax / n - a.vx) * 0.04;\r\n                    a.vy += (ay / n - a.vy) * 0.04;\r\n                    a.vx += (cx / n - a.x) * 0.0006;\r\n                    a.vy += (cy / n - a.y) * 0.0006;\r\n                    a.vx += sx * 0.06;\r\n                    a.vy += sy * 0.06;\r\n                }\r\n\r\n                if (atts?.length) {\r\n                    for (const att of atts) {\r\n                        const tx = att.x * W;\r\n                        const ty = att.y * H;\r\n                        const dx = tx - a.x;\r\n                        const dy = ty - a.y;\r\n                        const d = Math.hypot(dx, dy) || 1;\r\n                        const radius = att.radius ?? 220;\r\n                        if (d < radius) {\r\n                            const f = ((radius - d) / radius) * (att.strength ?? 0.05);\r\n                            a.vx += (dx / d) * f;\r\n                            a.vy += (dy / d) * f;\r\n                        }\r\n                    }\r\n                }\r\n\r\n                if (cursorRef.current.active) {\r\n                    const dx = a.x - cursorRef.current.x;\r\n                    const dy = a.y - cursorRef.current.y;\r\n                    const d = Math.hypot(dx, dy);\r\n                    if (d < cr && d > 0) {\r\n                        const f = (cr - d) / cr;\r\n                        a.vx += (dx / d) * f * 0.6;\r\n                        a.vy += (dy / d) * f * 0.6;\r\n                    }\r\n                }\r\n\r\n                const sp = Math.hypot(a.vx, a.vy);\r\n                if (sp > maxSpeed) {\r\n                    a.vx = (a.vx / sp) * maxSpeed;\r\n                    a.vy = (a.vy / sp) * maxSpeed;\r\n                }\r\n                a.x += a.vx;\r\n                a.y += a.vy;\r\n\r\n                if (a.x < 0) a.x += W;\r\n                if (a.x > W) a.x -= W;\r\n                if (a.y < 0) a.y += H;\r\n                if (a.y > H) a.y -= H;\r\n\r\n                ctx.fillStyle = a.color;\r\n                ctx.globalAlpha = 0.88;\r\n                if (liveRef.current.agentShape === \"dot\") {\r\n                    ctx.beginPath();\r\n                    ctx.arc(a.x, a.y, 1.8, 0, Math.PI * 2);\r\n                    ctx.fill();\r\n                } else {\r\n                    const angle = Math.atan2(a.vy, a.vx);\r\n                    ctx.save();\r\n                    ctx.translate(a.x, a.y);\r\n                    ctx.rotate(angle);\r\n                    ctx.beginPath();\r\n                    ctx.moveTo(6, 0);\r\n                    ctx.lineTo(-4, 3);\r\n                    ctx.lineTo(-4, -3);\r\n                    ctx.closePath();\r\n                    ctx.fill();\r\n                    ctx.restore();\r\n                }\r\n            }\r\n            raf = requestAnimationFrame(step);\r\n        };\r\n        raf = requestAnimationFrame(step);\r\n\r\n        // Listen on window so events bubble through any overlay (links, content\r\n        // wrappers, etc.). Bounds-check inside the handler so the flock only\r\n        // reacts when the cursor is within the canvas itself.\r\n        const onMove = (e: PointerEvent) => {\r\n            const r = canvas.getBoundingClientRect();\r\n            const x = e.clientX - r.left;\r\n            const y = e.clientY - r.top;\r\n            cursorRef.current.x = x;\r\n            cursorRef.current.y = y;\r\n            cursorRef.current.active = x >= 0 && x <= r.width && y >= 0 && y <= r.height;\r\n        };\r\n        const onPageLeave = () => {\r\n            cursorRef.current.active = false;\r\n        };\r\n        window.addEventListener(\"pointermove\", onMove);\r\n        document.documentElement.addEventListener(\"pointerleave\", onPageLeave);\r\n        window.addEventListener(\"blur\", onPageLeave);\r\n\r\n        return () => {\r\n            cancelAnimationFrame(raf);\r\n            ro.disconnect();\r\n            window.removeEventListener(\"pointermove\", onMove);\r\n            document.documentElement.removeEventListener(\"pointerleave\", onPageLeave);\r\n            window.removeEventListener(\"blur\", onPageLeave);\r\n            if (agentsRef) agentsRef.current = null;\r\n        };\r\n    }, [count, agentsRef]);\r\n\r\n    return (\r\n        <div className={cn(\"relative h-full w-full overflow-hidden rounded-lg\", className)}>\r\n            <canvas ref={canvasRef} className=\"absolute inset-0 h-full w-full\" style={{ background }} />\r\n            {children && (\r\n                <div className=\"relative z-10 flex h-full items-center justify-center pointer-events-none\">\r\n                    {children}\r\n                </div>\r\n            )}\r\n        </div>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "Runs on its own — the flock drifts, splits and regroups without stopping, wrapping around the edges of the frame; moving the pointer over it pushes the nearby birds away, and they close back in once it leaves.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "count",
+        "type": "number",
+        "default": "120",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "background",
+        "type": "string",
+        "default": "\"#0b0b12\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "palette",
+        "type": "string[]",
+        "default": "DEFAULT_PALETTE",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cursorRadius",
+        "type": "number",
+        "default": "90",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "attractors",
+        "type": "BoidAttractor[]",
+        "description": "Force points the flock is drawn toward. Read live, safe to mutate by ref.",
+        "required": false
+      },
+      {
+        "name": "agentsRef",
+        "type": "RefObject<BoidAgent[] | null>",
+        "description": "Receives the live agents array on mount. Mutate-in-place by the simulation;\r\nread positions from animation frames in the parent (do NOT trigger React state from this).",
+        "required": false
+      },
+      {
+        "name": "agentShape",
+        "type": "\"triangle\" | \"dot\"",
+        "default": "\"triangle\"",
+        "description": "Triangle reads as flock; dot reads as ambient activity.",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/boids-ecosystem"
+  }
+}

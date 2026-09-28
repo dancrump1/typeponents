@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "random-letter-swap-hover",
+  "type": "registry:ui",
+  "title": "Random Letter Swap Hover",
+  "description": "Text label whose characters flip over to an identical copy in a shuffled order, so the swap scatters across the word.",
+  "dependencies": [
+    "lodash",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/random-letter-swap-hover.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/random-letter-swap-hover.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport { debounce } from \"lodash\";\nimport { DynamicAnimationOptions, motion, useAnimate } from \"motion/react\";\n\n// Credit:\n// https://www.fancycomponents.dev/docs/components/text/random-letter-swap\n\ninterface TextProps {\n\tlabel: string;\n\treverse?: boolean;\n\ttransition?: DynamicAnimationOptions;\n\tstaggerDuration?: number;\n\tclassName?: string;\n\tonClick?: () => void;\n}\n\nconst RandomLetterSwapForward = ({\n\tlabel,\n\treverse = true,\n\ttransition = {\n\t\ttype: \"spring\",\n\t\tduration: 0.8,\n\t},\n\tstaggerDuration = 0.02,\n\tclassName,\n\tonClick,\n\t...props\n}: TextProps) => {\n\tconst [scope, animate] = useAnimate();\n\tconst [blocked, setBlocked] = useState(false);\n\n\tconst mergeTransition = (\n\t\ttransition: DynamicAnimationOptions,\n\t\ti: number\n\t) => ({\n\t\t...transition,\n\t\tdelay: i * staggerDuration,\n\t});\n\n\tconst shuffledIndices = Array.from(\n\t\t{ length: label.length },\n\t\t(_, i) => i\n\t).sort(() => Math.random() - 0.5);\n\n\tconst hoverStart = debounce(\n\t\t() => {\n\t\t\tif (blocked) return;\n\t\t\tsetBlocked(true);\n\n\t\t\tfor (let i = 0; i < label.length; i++) {\n\t\t\t\tconst randomIndex = shuffledIndices[i];\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ty: reverse ? \"100%\" : \"-100%\",\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t).then(() => {\n\t\t\t\t\tanimate(\n\t\t\t\t\t\t\".letter-\" + randomIndex,\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ty: 0,\n\t\t\t\t\t\t},\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\tduration: 0,\n\t\t\t\t\t\t}\n\t\t\t\t\t);\n\t\t\t\t});\n\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-secondary-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ttop: \"0%\",\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t)\n\t\t\t\t\t.then(() => {\n\t\t\t\t\t\tanimate(\n\t\t\t\t\t\t\t\".letter-secondary-\" + randomIndex,\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\ttop: reverse ? \"-100%\" : \"100%\",\n\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\tduration: 0,\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t);\n\t\t\t\t\t})\n\t\t\t\t\t.then(() => {\n\t\t\t\t\t\tif (i === label.length - 1) {\n\t\t\t\t\t\t\tsetBlocked(false);\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\t\t\t}\n\t\t},\n\t\t100,\n\t\t{ leading: true, trailing: true }\n\t);\n\n\treturn (\n\t\t<motion.span\n\t\t\tclassName={`flex justify-center items-center relative overflow-hidden ${className}`}\n\t\t\tonHoverStart={hoverStart}\n\t\t\tonClick={onClick}\n\t\t\tref={scope}\n\t\t\t{...props}\n\t\t>\n\t\t\t<span className=\"sr-only\">{label}</span>\n\n\t\t\t{label.split(\"\").map((letter: string, i: number) => {\n\t\t\t\treturn (\n\t\t\t\t\t<span\n\t\t\t\t\t\tclassName=\"whitespace-pre relative flex\"\n\t\t\t\t\t\tkey={i + \"random-letter-swap\"}\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tclassName={`relative pb-2 letter-${i}`}\n\t\t\t\t\t\t\tstyle={{ top: 0 }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{letter}\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tclassName={`absolute letter-secondary-${i}`}\n\t\t\t\t\t\t\taria-hidden={true}\n\t\t\t\t\t\t\tstyle={{ top: reverse ? \"-100%\" : \"100%\" }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{letter}\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t</span>\n\t\t\t\t);\n\t\t\t})}\n\t\t</motion.span>\n\t);\n};\n\nconst RandomLetterSwapPingPong = ({\n\tlabel,\n\treverse = true,\n\ttransition = {\n\t\ttype: \"spring\",\n\t\tduration: 0.8,\n\t},\n\tstaggerDuration = 0.02,\n\tclassName,\n\tonClick,\n\t...props\n}: TextProps) => {\n\tconst [scope, animate] = useAnimate();\n\tconst [blocked, setBlocked] = useState(false);\n\n\tconst mergeTransition = (\n\t\ttransition: DynamicAnimationOptions,\n\t\ti: number\n\t) => ({\n\t\t...transition,\n\t\tdelay: i * staggerDuration,\n\t});\n\n\tconst shuffledIndices = Array.from(\n\t\t{ length: label.length },\n\t\t(_, i) => i\n\t).sort(() => Math.random() - 0.5);\n\n\tconst hoverStart = debounce(\n\t\t() => {\n\t\t\tif (blocked) return;\n\t\t\tsetBlocked(true);\n\n\t\t\tfor (let i = 0; i < label.length; i++) {\n\t\t\t\tconst randomIndex = shuffledIndices[i];\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ty: reverse ? \"100%\" : \"-100%\",\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t);\n\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-secondary-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ttop: \"0%\",\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t);\n\t\t\t}\n\t\t},\n\t\t100,\n\t\t{ leading: true, trailing: true }\n\t);\n\n\tconst hoverEnd = debounce(\n\t\t() => {\n\t\t\tsetBlocked(false);\n\n\t\t\tfor (let i = 0; i < label.length; i++) {\n\t\t\t\tconst randomIndex = shuffledIndices[i];\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ty: 0,\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t);\n\n\t\t\t\tanimate(\n\t\t\t\t\t\".letter-secondary-\" + randomIndex,\n\t\t\t\t\t{\n\t\t\t\t\t\ttop: reverse ? \"-100%\" : \"100%\",\n\t\t\t\t\t},\n\t\t\t\t\tmergeTransition(transition, i)\n\t\t\t\t);\n\t\t\t}\n\t\t},\n\t\t100,\n\t\t{ leading: true, trailing: true }\n\t);\n\n\treturn (\n\t\t<motion.span\n\t\t\tclassName={`flex justify-center items-center relative overflow-hidden  ${className} `}\n\t\t\tonHoverStart={hoverStart}\n\t\t\tonHoverEnd={hoverEnd}\n\t\t\tonClick={onClick}\n\t\t\tref={scope}\n\t\t\t{...props}\n\t\t>\n\t\t\t<span className=\"sr-only\">{label}</span>\n\n\t\t\t{label.split(\"\").map((letter: string, i: number) => {\n\t\t\t\treturn (\n\t\t\t\t\t<span\n\t\t\t\t\t\tclassName=\"whitespace-pre relative flex\"\n\t\t\t\t\t\tkey={i + \"random-letter-swap-hover\"}\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tclassName={`relative pb-2 letter-${i}`}\n\t\t\t\t\t\t\tstyle={{ top: 0 }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{letter}\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tclassName={`absolute letter-secondary-${i}`}\n\t\t\t\t\t\t\taria-hidden={true}\n\t\t\t\t\t\t\tstyle={{ top: reverse ? \"-100%\" : \"100%\" }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{letter}\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t</span>\n\t\t\t\t);\n\t\t\t})}\n\t\t</motion.span>\n\t);\n};\n\nexport { RandomLetterSwapForward, RandomLetterSwapPingPong };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Hovering the label slides letters out one at a time in random order while matching letters drop in behind them. One variant plays the swap through once; the other holds it and runs it back in reverse when the pointer leaves.",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/random-letter-swap",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "label",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "reverse",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "any",
+        "default": "{ type: \"spring\", duration: 0.8, }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "staggerDuration",
+        "type": "number",
+        "default": "0.02",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/random-letter-swap-hover"
+  }
+}

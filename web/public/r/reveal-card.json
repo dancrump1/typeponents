@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "reveal-card",
+  "type": "registry:ui",
+  "title": "Reveal Card",
+  "description": "Card covered by a full-bleed image that slides away diagonally to expose a title block and a More link.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/reveal-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/reveal-card.tsx",
+      "content": "import { motion } from \"motion/react\";\r\nimport { FiArrowUpRight } from \"react-icons/fi\";\r\n\r\n\r\n\r\nconst RevealCard = ({\r\n    imgSrc,\r\n    title,\r\n    description,\r\n}: {\r\n    imgSrc: string;\r\n    title: string;\r\n    description: string;\r\n}) => {\r\n    return (\r\n        <motion.div whileHover=\"hover\" className=\"w-full h-[300px] relative\">\r\n            <div className=\"h-1/2 p-6 flex flex-col justify-center bg-black\">\r\n                <h3 className=\"text-xl mb-2 font-semibold text-white\">{title}</h3>\r\n                <p className=\"text-sm font-light text-slate-300\">{description}</p>\r\n            </div>\r\n            <motion.div\r\n                initial={{\r\n                    top: \"0%\",\r\n                    right: \"0%\",\r\n                }}\r\n                variants={{\r\n                    hover: {\r\n                        top: \"50%\",\r\n                        right: \"50%\",\r\n                    },\r\n                }}\r\n                className=\"absolute inset-0 bg-slate-200 z-10\"\r\n                style={{\r\n                    backgroundImage: `url(${imgSrc})`,\r\n                    backgroundSize: \"cover\",\r\n                    backgroundPosition: \"center\",\r\n                }}\r\n            />\r\n            <a\r\n                href=\"#\"\r\n                rel=\"nofollow\"\r\n                className=\"w-1/2 h-1/2 absolute bottom-0 right-0 z-0 grid place-content-center bg-white text-black hover:text-indigo-500 transition-colors\"\r\n            >\r\n                <div className=\"flex items-center\">\r\n                    <span className=\"text-xs\">MORE</span>\r\n                    <FiArrowUpRight className=\"text-lg\" />\r\n                </div>\r\n            </a>\r\n        </motion.div>\r\n    );\r\n};\r\n\r\nexport default RevealCard;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering slides the image panel down and to the right, uncovering the dark title and description above it and a white More corner beneath; the panel slides back over as soon as the pointer leaves.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "imgSrc",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/reveal-card"
+  }
+}

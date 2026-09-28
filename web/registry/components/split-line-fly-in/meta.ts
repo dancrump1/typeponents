@@ -1,0 +1,38 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "split-line-fly-in",
+	title: "Split Line Fly In",
+	description: "A scroll-driven text animation component where lines fly in from opposite sides of the viewport and settle at the center.",
+	interaction: "Lines fly in from left and right boundaries as the user scrolls down.",
+	categories: ["Text Animations"],
+	tags: ["scroll-driven"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/split-line-fly-in",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "text", type: "string" },
+		{ name: "lines", type: "string[]" },
+		{ name: "direction", type: "\"left\" | \"right\" | \"alternate\"", default: "\"alternate\"" },
+		{ name: "itemClassName", type: "string" },
+		{ name: "scrollContainerRef", type: "React.RefObject<HTMLElement | null>" },
+		{ name: "offset", type: "((number | (`${number}` | (\"start\" | \"end\" | \"center\") | …", default: "[\"start end\", \"end 60%\"]" },
+		{ name: "flyInDistance", type: "number" },
+		{ name: "blurStart", type: "number" },
+		{ name: "wordSpacingStart", type: "number" },
+		{ name: "wordSpacingEnd", type: "number" },
+		{ name: "staggerFactor", type: "number" },
+		{ name: "animationDuration", type: "number" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "accordion-solutions",
+  "type": "registry:ui",
+  "title": "Accordion Solutions",
+  "description": "Stacked list of solution cards beside a large preview image, with one card expanded at a time.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/accordion-solutions.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/accordion-solutions.tsx",
+      "content": "import { Dispatch, SetStateAction, useState } from \"react\";\r\nimport { FiArrowRight } from \"react-icons/fi\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n\r\nconst AccordionSolutions = ({ solutions }: {\r\n    solutions: {\r\n        id: number;\r\n        title: string;\r\n        description: string;\r\n        imgSrc: string;\r\n    }[];\r\n}) => {\r\n    const [open, setOpen] = useState(solutions[0].id);\r\n    const imgSrc = solutions.find((s) => s.id === open)?.imgSrc;\r\n    return (\r\n        <section className=\"px-8 py-12 bg-white\">\r\n            <div className=\"w-full max-w-5xl mx-auto grid gap-8 grid-cols-1 lg:grid-cols-[1fr_350px]\">\r\n                <div>\r\n                    <h3 className=\"text-4xl font-bold mb-8\">Solutions</h3>\r\n                    <div className=\"flex flex-col gap-4\">\r\n                        {solutions.map((q) => {\r\n                            return (\r\n                                <Solution {...q} key={q.id} open={open} setOpen={setOpen} index={q.id} />\r\n                            );\r\n                        })}\r\n                    </div>\r\n                </div>\r\n                <AnimatePresence mode=\"wait\">\r\n                    <motion.div\r\n                        initial={{ opacity: 0 }}\r\n                        animate={{ opacity: 1 }}\r\n                        exit={{ opacity: 0 }}\r\n                        key={imgSrc}\r\n                        className=\"bg-slate-300 rounded-2xl aspect-[4/3] lg:aspect-auto\"\r\n                        style={{\r\n                            backgroundImage: `url(${imgSrc})`,\r\n                            backgroundPosition: \"center\",\r\n                            backgroundSize: \"cover\",\r\n                        }}\r\n                    />\r\n                </AnimatePresence>\r\n            </div>\r\n        </section>\r\n    );\r\n};\r\n\r\nconst Solution = ({\r\n    title,\r\n    description,\r\n    index,\r\n    open,\r\n    setOpen,\r\n}: {\r\n    title: string;\r\n    description: string;\r\n    index: number;\r\n    open: number;\r\n    setOpen: Dispatch<SetStateAction<number>>;\r\n}) => {\r\n    const isOpen = index === open;\r\n\r\n    return (\r\n        <div\r\n            onClick={() => setOpen(index)}\r\n            className=\"p-0.5 rounded-lg relative overflow-hidden cursor-pointer\"\r\n        >\r\n            <motion.div\r\n                initial={false}\r\n                animate={{\r\n                    height: isOpen ? \"240px\" : \"72px\",\r\n                }}\r\n                className=\"p-6 rounded-[7px] bg-white flex flex-col justify-between relative z-20\"\r\n            >\r\n                <div>\r\n                    <motion.p\r\n                        initial={false}\r\n                        animate={{\r\n                            color: isOpen ? \"rgba(0, 0, 0, 0)\" : \"rgba(0, 0, 0, 1)\",\r\n                        }}\r\n                        className=\"text-xl font-medium w-fit bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text\"\r\n                    >\r\n                        {title}\r\n                    </motion.p>\r\n                    <motion.p\r\n                        initial={false}\r\n                        animate={{\r\n                            opacity: isOpen ? 1 : 0,\r\n                        }}\r\n                        className=\"mt-4 bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent\"\r\n                    >\r\n                        {description}\r\n                    </motion.p>\r\n                </div>\r\n                <motion.button\r\n                    initial={false}\r\n                    animate={{\r\n                        opacity: isOpen ? 1 : 0,\r\n                    }}\r\n                    className=\"-ml-6 -mr-6 -mb-6 mt-4 py-2 rounded-b-md flex items-center justify-center gap-1 group transition-[gap] bg-gradient-to-r from-violet-600 to-indigo-600 text-white\"\r\n                >\r\n                    <span>Learn more</span>\r\n                    <FiArrowRight className=\"group-hover:translate-x-1 transition-transform\" />\r\n                </motion.button>\r\n            </motion.div>\r\n            <motion.div\r\n                initial={false}\r\n                animate={{\r\n                    opacity: isOpen ? 1 : 0,\r\n                }}\r\n                className=\"absolute inset-0 z-10 bg-gradient-to-r from-violet-600 to-indigo-600\"\r\n            />\r\n            <div className=\"absolute inset-0 z-0 bg-slate-200\" />\r\n        </div>\r\n    );\r\n};\r\n\r\nexport default AccordionSolutions;\r\n\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Accordions"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Clicking a card grows it to reveal its description and a Learn more bar over a violet gradient, collapses the one that was open, and cross-fades the preview image to match.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "solutions",
+        "type": "{ id: number; title: string; description: string; imgSrc:…",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/accordion-solutions"
+  }
+}

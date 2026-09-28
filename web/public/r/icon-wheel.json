@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "icon-wheel",
+  "type": "registry:ui",
+  "title": "Icon Wheel",
+  "description": "A rotating wheel that displays your tech stack icons in continuous motion. Perfect for showcasing programming languages and frameworks on your portfolio with smooth animations and hover effects.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/icon-wheel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/icon-wheel.tsx",
+      "content": "'use client';\r\n\r\nimport React from 'react';\r\nimport { motion } from 'framer-motion';\r\nimport Image from 'next/image';\r\nimport { cn } from '@/lib/utils';\r\n\r\ntype IconWheelProps = {\r\n  icons: Array<string>;\r\n  radius?: number;\r\n  className?: string;\r\n};\r\n\r\nconst IconWheel = ({ icons, radius = 200, className }: IconWheelProps) => {\r\n  const centerX = 32; // Center of the wheel (half of the container width)\r\n  const centerY = 32; // Center of the wheel (half of the container height)\r\n  const angleStep = (2 * Math.PI) / icons.length; // Angle between each item\r\n\r\n  return (\r\n    <motion.div\r\n      initial={{\r\n        opacity: 0\r\n      }}\r\n      whileInView={{\r\n        opacity: 1,\r\n        transition: {\r\n          delay: 0.5,\r\n          duration: 0.5\r\n        }\r\n      }}\r\n      viewport={{\r\n        once: true\r\n      }}\r\n      animate={{\r\n        rotateZ: 360,\r\n        transition: { duration: 10, ease: 'linear', repeat: Infinity }\r\n      }}\r\n      className={cn(\r\n        'relative h-[250px] sm:h-[500px] w-[250px] sm:w-[500px] flex items-center justify-center my-10',\r\n        className\r\n      )}\r\n    >\r\n      {icons.map((url, i) => {\r\n        const angle = i * angleStep; // Angle for the current icon\r\n        const x = centerX + radius * Math.cos(angle) - 32; // Subtract half of img width (64/2)\r\n        const y = centerY + radius * Math.sin(angle) - 32; // Subtract half of img height (64/2)\r\n\r\n        return (\r\n          <motion.div\r\n            animate={{\r\n              rotateZ: -360,\r\n              transition: { duration: 10, ease: 'linear', repeat: Infinity }\r\n            }}\r\n            whileHover={{\r\n              scale: 1.2\r\n            }}\r\n            key={`techstackwheel${i}`}\r\n            initial={{ x, y }}\r\n            className=\"absolute rounded-full\"\r\n          >\r\n            <Image src={url} height={64} width={64} alt=\"techstackwheel\" />\r\n          </motion.div>\r\n        );\r\n      })}\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nexport default IconWheel;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Icons orbit in a slowly rotating wheel; hover scales the one under the pointer.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/iconwheel",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "icons",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "default": "200",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/icon-wheel"
+  }
+}

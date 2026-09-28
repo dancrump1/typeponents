@@ -1,0 +1,105 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-bounce",
+  "type": "registry:ui",
+  "title": "Text Bounce",
+  "description": "Heading whose individual letters shy away from the pointer and spring back.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/text-split2.json",
+    "text-split2"
+  ],
+  "files": [
+    {
+      "path": "components/ui/text-bounce.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-bounce.tsx",
+      "content": "\"use client\"\n\nimport { useAnimate } from \"motion/react\"\nimport type React from \"react\"\nimport type { RenderProp } from \"@/hooks/use-render\"\nimport { TextSplit } from \"@/components/ui/text-split2\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/text/text-bounce\n\nexport type TextBounceProps = {\n    children: string\n    pause?: number\n    outDuration?: number\n    inDuration?: number\n    bounce?: number\n    distance?: number\n    rotation?: number\n    render?: RenderProp\n}\n\ntype LetterProps = { char: string } & Required<\n    Pick<\n        TextBounceProps,\n        \"pause\" | \"outDuration\" | \"inDuration\" | \"bounce\" | \"distance\" | \"rotation\"\n    >\n>\n\nfunction Letter({ char, pause, outDuration, inDuration, bounce, distance, rotation }: LetterProps) {\n    const [scope, animate] = useAnimate<HTMLSpanElement>()\n\n    const handlePointerEnter = async (event: React.PointerEvent<HTMLSpanElement>) => {\n        const el = scope.current\n        if (!el) return\n\n        const rect = el.getBoundingClientRect()\n\n        const cx = rect.left + rect.width / 2\n        const cy = rect.top + rect.height / 2\n        const dx = cx - event.clientX\n        const dy = cy - event.clientY\n        const dist = Math.sqrt(dx * dx + dy * dy) || 1\n        const nx = dx / dist\n        const ny = dy / dist\n\n        await animate([\n            [\n                el,\n                { x: nx * distance, y: ny * distance, rotate: nx * rotation },\n                { duration: outDuration, ease: \"circOut\" },\n            ],\n            [\n                el,\n                { x: 0, y: 0, rotate: 0 },\n                { type: \"spring\", duration: inDuration, bounce, delay: pause },\n            ],\n        ])\n    }\n\n    return (\n        <span\n            ref={scope}\n            className=\"inline-block will-change-transform whitespace-pre\"\n            onPointerEnter={handlePointerEnter}\n        >\n            {char}\n        </span>\n    )\n}\n\nexport function TextBounce({\n    children,\n    pause = 0,\n    outDuration = 0.35,\n    inDuration = 0.8,\n    bounce = 0.5,\n    distance = 35,\n    rotation = 25,\n    render,\n}: TextBounceProps) {\n    return (\n        <TextSplit\n            render={render}\n            showMask={false}\n            splitBy=\"letters\"\n            renderItems={(char, index) => {\n                return (\n                    <Letter\n                        key={index}\n                        char={char}\n                        pause={pause}\n                        outDuration={outDuration}\n                        inDuration={inDuration}\n                        bounce={bounce}\n                        distance={distance}\n                        rotation={rotation}\n                    />\n                )\n            }}\n        >\n            {children}\n        </TextSplit>\n    )\n}\n"
+    },
+    {
+      "path": "hooks/use-render.ts",
+      "type": "registry:hook",
+      "target": "hooks/use-render.ts",
+      "content": "// biome-ignore-all lint/suspicious/noExplicitAny: prop merging is inherently dynamic\n/**\n * Inspired by Base UI's `useRender` + `mergeProps`, intentionally simplified for this\n * library's scope at the moment.\n *\n * Chosen over polymorphic prop: cleaner TypeScript, integrates better with other\n * component (Next/Image, design systems, third-party UI libraries)\n *\n * @see https://base-ui.com/react/utils/use-render\n * @see https://base-ui.com/react/utils/merge-props\n */\nimport { cloneElement, isValidElement, type ReactElement, type Ref } from \"react\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/text/text-bounce\n\ntype AnyProps = Record<string, any>\n\ntype RenderFunction<S> = (props: AnyProps, state: S) => ReactElement\n\nexport type RenderProp<S = void> = ReactElement | RenderFunction<S>\n\ntype UseRenderOptions<S> = {\n    render: RenderProp<S> | undefined\n    props: AnyProps\n    state?: S\n    defaultElement: ReactElement\n}\n\nexport function useRender<S = void>(options: UseRenderOptions<S>): ReactElement<AnyProps> {\n    const { render, props, state, defaultElement } = options\n    const target = render ?? defaultElement\n\n    // Function form: consumer wires props themselves, no merging needed.\n    if (typeof target === \"function\") {\n        return target(props, state as S) as ReactElement<AnyProps>\n    }\n\n    // Element form: clone and merge our internal props with whatever the consumer set on the element.\n    const targetProps = (isValidElement(target) ? target.props : {}) as AnyProps\n    return cloneElement(target, mergeProps(props, targetProps)) as ReactElement<AnyProps>\n}\n\nfunction mergeProps(internal: AnyProps, external: AnyProps): AnyProps {\n    const merged: AnyProps = { ...internal }\n\n    for (const key in external) {\n        const internalValue = internal[key]\n        const externalValue = external[key]\n\n        if (key === \"className\" && typeof externalValue === \"string\") {\n            merged[key] = [internalValue, externalValue].filter(Boolean).join(\" \")\n        } else if (key === \"style\" && externalValue && typeof externalValue === \"object\") {\n            merged[key] = { ...internalValue, ...externalValue }\n        } else if (key === \"ref\") {\n            merged[key] = composeRefs(internalValue, externalValue)\n        } else if (\n            key.startsWith(\"on\") &&\n            typeof internalValue === \"function\" &&\n            typeof externalValue === \"function\"\n        ) {\n            // External handler runs first so consumers can stopPropagation before our logic fires.\n            merged[key] = chainFunctions(externalValue, internalValue)\n        } else {\n            merged[key] = externalValue\n        }\n    }\n\n    return merged\n}\n\nfunction chainFunctions(...fns: Array<(...args: any[]) => void>) {\n    return (...args: any[]) => {\n        for (const fn of fns) fn(...args)\n    }\n}\n\nfunction composeRefs<T>(...refs: Array<Ref<T> | undefined>) {\n    return (node: T) => {\n        for (const ref of refs) {\n            if (typeof ref === \"function\") ref(node)\n            else if (ref != null) (ref as { current: T | null }).current = node\n        }\n    }\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations",
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "Moving the pointer across the text pushes each letter it touches away from the cursor with a slight tilt; the letter then springs back to its place with a soft overshoot.",
+    "inspiration": {
+      "source": "Atelier UI",
+      "url": "https://www.atelier-ui.com/en/docs/components/text/text-bounce",
+      "authorUrl": "https://www.atelier-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "pause",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "outDuration",
+        "type": "number",
+        "default": "0.35",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "inDuration",
+        "type": "number",
+        "default": "0.8",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "bounce",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distance",
+        "type": "number",
+        "default": "35",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rotation",
+        "type": "number",
+        "default": "25",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "render",
+        "type": "RenderProp",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-bounce"
+  }
+}

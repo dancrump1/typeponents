@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "folding-logos",
+  "type": "registry:ui",
+  "title": "Folding Logos",
+  "description": "Folding Logos",
+  "dependencies": [
+    "motion",
+    "react-icons",
+    "tailwind-merge"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/folding-logos.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/folding-logos.tsx",
+      "content": "import React, { ReactElement, useEffect, useRef, useState } from \"react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\nimport { SiGithub, SiGoogle, SiMeta, SiTwitch } from \"react-icons/si\";\r\nimport { twMerge } from \"tailwind-merge\";\r\nimport { FiArrowUpRight } from \"react-icons/fi\";\r\n\r\n// Credit:\r\n// https://www.hover.dev/components/testimonials\r\n\r\nexport const FoldingLogos = () => {\r\n    return (\r\n        <section className=\"flex flex-col items-center justify-center gap-12 bg-neutral-950 px-4 py-24 md:flex-row\">\r\n            <Copy />\r\n            <LogoRolodex\r\n                items={[\r\n\r\n                    <LogoItem key={2} className=\"bg-green-300 text-neutral-900\">\r\n                        <SiGoogle />\r\n                    </LogoItem>,\r\n                    <LogoItem key={3} className=\"bg-blue-300 text-neutral-900\">\r\n                        <SiMeta />\r\n                    </LogoItem>,\r\n                    <LogoItem key={4} className=\"bg-white text-black\">\r\n                        <SiGithub />\r\n                    </LogoItem>,\r\n                    <LogoItem key={5} className=\"bg-purple-300 text-neutral-900\">\r\n                        <SiTwitch />\r\n                    </LogoItem>,\r\n                ]}\r\n            />\r\n        </section>\r\n    );\r\n};\r\n\r\nconst Copy = () => (\r\n    <div className=\"max-w-lg text-center md:text-start\">\r\n        <h2 className=\"mb-3 text-4xl text-white\">Work with the best</h2>\r\n        <p className=\"mb-6 text-sm leading-relaxed text-neutral-400\">\r\n            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Molestiae, ullam\r\n            tenetur quam debitis illo nemo aliquid animi ad provident?\r\n        </p>\r\n        <a\r\n            href=\"#\"\r\n            className=\"group text-sm uppercase text-indigo-300 transition-colors hover:text-indigo-400\"\r\n        >\r\n            See case studies\r\n            <FiArrowUpRight className=\"inline-block text-base transition-transform group-hover:rotate-45\" />\r\n        </a>\r\n    </div>\r\n);\r\n\r\nconst DELAY_IN_MS = 2500;\r\nconst TRANSITION_DURATION_IN_SECS = 1.5;\r\n\r\nconst LogoRolodex = ({ items }: { items: ReactElement[] }) => {\r\n    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);\r\n    const [index, setIndex] = useState(0);\r\n\r\n    useEffect(() => {\r\n        intervalRef.current = setInterval(() => {\r\n            setIndex((pv) => pv + 1);\r\n        }, DELAY_IN_MS);\r\n\r\n        return () => {\r\n            clearInterval(intervalRef.current || undefined);\r\n        };\r\n    }, []);\r\n\r\n    return (\r\n        <div\r\n            style={{\r\n                transform: \"rotateY(-20deg)\",\r\n                transformStyle: \"preserve-3d\",\r\n            }}\r\n            className=\"relative z-0 h-44 w-60 shrink-0 rounded-xl border border-neutral-700 bg-neutral-800\"\r\n        >\r\n            <AnimatePresence mode=\"sync\">\r\n                <motion.div\r\n                    style={{\r\n                        y: \"-50%\",\r\n                        x: \"-50%\",\r\n                        clipPath: \"polygon(0 0, 100% 0, 100% 50%, 0 50%)\",\r\n                        zIndex: -index,\r\n                        backfaceVisibility: \"hidden\",\r\n                    }}\r\n                    key={index}\r\n                    transition={{\r\n                        duration: TRANSITION_DURATION_IN_SECS,\r\n                        ease: \"easeInOut\",\r\n                    }}\r\n                    initial={{ rotateX: \"0deg\" }}\r\n                    animate={{ rotateX: \"0deg\" }}\r\n                    exit={{ rotateX: \"-180deg\" }}\r\n                    className=\"absolute left-1/2 top-1/2\"\r\n                >\r\n                    {items[index % items.length]}\r\n                </motion.div>\r\n                <motion.div\r\n                    style={{\r\n                        y: \"-50%\",\r\n                        x: \"-50%\",\r\n                        clipPath: \"polygon(0 50%, 100% 50%, 100% 100%, 0 100%)\",\r\n                        zIndex: index,\r\n                        backfaceVisibility: \"hidden\",\r\n                    }}\r\n                    key={(index + 1) * 2}\r\n                    initial={{ rotateX: \"180deg\" }}\r\n                    animate={{ rotateX: \"0deg\" }}\r\n                    exit={{ rotateX: \"0deg\" }}\r\n                    transition={{\r\n                        duration: TRANSITION_DURATION_IN_SECS,\r\n                        ease: \"easeInOut\",\r\n                    }}\r\n                    className=\"absolute left-1/2 top-1/2\"\r\n                >\r\n                    {items[index % items.length]}\r\n                </motion.div>\r\n            </AnimatePresence>\r\n\r\n            <hr\r\n                style={{\r\n                    transform: \"translateZ(1px)\",\r\n                }}\r\n                className=\"absolute left-0 right-0 top-1/2 z-[999999999] -translate-y-1/2 border-t-2 border-neutral-800\"\r\n            />\r\n        </div>\r\n    );\r\n};\r\n\r\nconst LogoItem = ({\r\n    children,\r\n    className,\r\n}: {\r\n    children: React.ReactNode;\r\n    className?: string;\r\n}) => {\r\n    return (\r\n        <div\r\n            className={twMerge(\r\n                \"grid h-36 w-52 place-content-center rounded-lg bg-neutral-700 text-6xl text-neutral-50\",\r\n                className\r\n            )}\r\n        >\r\n            {children}\r\n        </div>\r\n    );\r\n};"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Hover.dev",
+      "url": "https://www.hover.dev/components/testimonials",
+      "authorUrl": "https://www.hover.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/folding-logos"
+  }
+}

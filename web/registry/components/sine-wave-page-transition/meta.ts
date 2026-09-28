@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "sine-wave-page-transition",
+	title: "Sine Wave Page Transition",
+	description: "A visually stunning full-screen wipe transition where staggered panels ripple in and out in a normalized sine wave delay pattern.",
+	interaction: "Programmatically triggered on route change or view swaps, showing a smooth staggered sine wave curtain drop or row sweep across the viewport.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/sine-wave-page-transition",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "trigger", type: "number", required: true },
+		{ name: "onViewSwap", type: "(() => void)" },
+		{ name: "className", type: "string" },
+		{ name: "panelClassName", type: "string" },
+		{ name: "columns", type: "number", default: "20" },
+		{ name: "duration", type: "number", default: "0.5" },
+		{ name: "maxDelay", type: "number", default: "0.4" },
+		{ name: "ease", type: "Easing | Easing[]", default: "[0.76, 0, 0.24, 1]" },
+		{ name: "direction", type: "\"bottom\" | \"left\" | \"right\" | \"top\"", default: "\"top\"" },
+		{ name: "exitOpposite", type: "boolean", default: "true" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

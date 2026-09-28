@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spotlight-button",
+  "type": "registry:ui",
+  "title": "Spotlight Button",
+  "description": "Spotlight Button",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spotlight-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spotlight-button.tsx",
+      "content": "import { motion } from \"motion/react\";\r\nimport { useEffect, useRef } from \"react\";\r\n\r\n\r\n\r\nconst SpotlightButton = () => {\r\n    const btnRef = useRef<HTMLButtonElement | null>(null);\r\n    const spanRef = useRef<HTMLSpanElement | null>(null);\r\n\r\n    useEffect(() => {\r\n        const handleMouseMove = (e: MouseEvent) => {\r\n            const { width } = (e.target as HTMLElement)?.getBoundingClientRect();\r\n            const offset = e.offsetX;\r\n            const left = `${(offset / width) * 100}%`;\r\n\r\n            spanRef.current!.animate({ left }, { duration: 250, fill: \"forwards\" });\r\n        };\r\n\r\n        const handleMouseLeave = () => {\r\n            spanRef.current!.animate(\r\n                { left: \"50%\" },\r\n                { duration: 100, fill: \"forwards\" }\r\n            );\r\n        };\r\n\r\n        btnRef?.current?.addEventListener(\"mousemove\", handleMouseMove);\r\n        btnRef?.current?.addEventListener(\"mouseleave\", handleMouseLeave);\r\n\r\n        return () => {\r\n            btnRef?.current?.removeEventListener(\"mousemove\", handleMouseMove);\r\n            btnRef?.current?.removeEventListener(\"mouseleave\", handleMouseLeave);\r\n        };\r\n    }, []);\r\n\r\n    return (\r\n        <motion.button\r\n            whileTap={{ scale: 0.985 }}\r\n            ref={btnRef}\r\n            className=\"relative w-full max-w-xs overflow-hidden rounded-lg bg-slate-950 px-4 py-3 text-lg font-medium text-white\"\r\n        >\r\n            <span className=\"pointer-events-none relative z-10 mix-blend-difference\">\r\n                Hover me\r\n            </span>\r\n            <span\r\n                ref={spanRef}\r\n                className=\"pointer-events-none absolute left-[50%] top-[50%] h-32 w-32 -translate-x-[50%] -translate-y-[50%] rounded-full bg-slate-100\"\r\n            />\r\n        </motion.button>\r\n    );\r\n};\r\n\r\nexport default SpotlightButton;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spotlight-button"
+  }
+}

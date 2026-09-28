@@ -1,0 +1,114 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "compare",
+  "type": "registry:ui",
+  "title": "Compare",
+  "description": "Before and after image comparison split by a glowing vertical divider that throws off sparks.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/sparkles.json",
+    "sparkles"
+  ],
+  "files": [
+    {
+      "path": "components/ui/compare.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/compare.tsx",
+      "content": "\"use client\";\n\nimport React, { useCallback, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\nimport { SparklesCore } from \"@/components/ui/sparkles\";\n\n//ui.aceternity.com/components/compare\n\ninterface CompareProps {\n\tfirstImage?: string;\n\tsecondImage?: string;\n\tclassName?: string;\n\tfirstImageClassName?: string;\n\tsecondImageClassname?: string;\n\tinitialSliderPercentage?: number;\n\tslideMode?: \"hover\" | \"drag\";\n\tshowHandlebar?: boolean;\n\tautoplay?: boolean;\n\tautoplayDuration?: number;\n}\nexport const Compare = ({\n\tfirstImage = \"\",\n\tsecondImage = \"\",\n\tclassName,\n\tfirstImageClassName,\n\tsecondImageClassname,\n\tinitialSliderPercentage = 50,\n\tslideMode = \"hover\",\n\tshowHandlebar = true,\n\tautoplay = false,\n\tautoplayDuration = 5000,\n}: CompareProps) => {\n\tconst [sliderXPercent, setSliderXPercent] = useState(\n\t\tinitialSliderPercentage\n\t);\n\tconst [isDragging, setIsDragging] = useState(false);\n\n\tconst sliderRef = useRef<HTMLDivElement>(null);\n\n\tconst [isMouseOver, setIsMouseOver] = useState(false);\n\n\tconst autoplayRef = useRef<NodeJS.Timeout | null>(null);\n\n\tconst startAutoplay = useCallback(() => {\n\t\tif (!autoplay) return;\n\n\t\tconst startTime = Date.now();\n\t\tconst animate = () => {\n\t\t\tconst elapsedTime = Date.now() - startTime;\n\t\t\tconst progress =\n\t\t\t\t(elapsedTime % (autoplayDuration * 2)) / autoplayDuration;\n\t\t\tconst percentage =\n\t\t\t\tprogress <= 1 ? progress * 100 : (2 - progress) * 100;\n\n\t\t\tsetSliderXPercent(percentage);\n\t\t\tautoplayRef.current = setTimeout(animate, 16); // ~60fps\n\t\t};\n\n\t\tanimate();\n\t}, [autoplay, autoplayDuration]);\n\n\tconst stopAutoplay = useCallback(() => {\n\t\tif (autoplayRef.current) {\n\t\t\tclearTimeout(autoplayRef.current);\n\t\t\tautoplayRef.current = null;\n\t\t}\n\t}, []);\n\n\tuseEffect(() => {\n\t\tstartAutoplay();\n\t\treturn () => stopAutoplay();\n\t}, [startAutoplay, stopAutoplay]);\n\n\tfunction mouseEnterHandler() {\n\t\tsetIsMouseOver(true);\n\t\tstopAutoplay();\n\t}\n\n\tfunction mouseLeaveHandler() {\n\t\tsetIsMouseOver(false);\n\t\tif (slideMode === \"hover\") {\n\t\t\tsetSliderXPercent(initialSliderPercentage);\n\t\t}\n\t\tif (slideMode === \"drag\") {\n\t\t\tsetIsDragging(false);\n\t\t}\n\t\tstartAutoplay();\n\t}\n\n\tconst handleStart = useCallback(\n\t\t(clientX: number) => {\n\t\t\tif (slideMode === \"drag\") {\n\t\t\t\tsetIsDragging(true);\n\t\t\t}\n\t\t},\n\t\t[slideMode]\n\t);\n\n\tconst handleEnd = useCallback(() => {\n\t\tif (slideMode === \"drag\") {\n\t\t\tsetIsDragging(false);\n\t\t}\n\t}, [slideMode]);\n\n\tconst handleMove = useCallback(\n\t\t(clientX: number) => {\n\t\t\tif (!sliderRef.current) return;\n\t\t\tif (slideMode === \"hover\" || (slideMode === \"drag\" && isDragging)) {\n\t\t\t\tconst rect = sliderRef.current.getBoundingClientRect();\n\t\t\t\tconst x = clientX - rect.left;\n\t\t\t\tconst percent = (x / rect.width) * 100;\n\t\t\t\trequestAnimationFrame(() => {\n\t\t\t\t\tsetSliderXPercent(Math.max(0, Math.min(100, percent)));\n\t\t\t\t});\n\t\t\t}\n\t\t},\n\t\t[slideMode, isDragging]\n\t);\n\n\tconst handleMouseDown = useCallback(\n\t\t(e: React.MouseEvent) => handleStart(e.clientX),\n\t\t[handleStart]\n\t);\n\tconst handleMouseUp = useCallback(() => handleEnd(), [handleEnd]);\n\tconst handleMouseMove = useCallback(\n\t\t(e: React.MouseEvent) => handleMove(e.clientX),\n\t\t[handleMove]\n\t);\n\n\tconst handleTouchStart = useCallback(\n\t\t(e: React.TouchEvent) => {\n\t\t\tif (!autoplay) {\n\t\t\t\thandleStart(e.touches[0].clientX);\n\t\t\t}\n\t\t},\n\t\t[handleStart, autoplay]\n\t);\n\n\tconst handleTouchEnd = useCallback(() => {\n\t\tif (!autoplay) {\n\t\t\thandleEnd();\n\t\t}\n\t}, [handleEnd, autoplay]);\n\n\tconst handleTouchMove = useCallback(\n\t\t(e: React.TouchEvent) => {\n\t\t\tif (!autoplay) {\n\t\t\t\thandleMove(e.touches[0].clientX);\n\t\t\t}\n\t\t},\n\t\t[handleMove, autoplay]\n\t);\n\n\treturn (\n\t\t<div\n\t\t\tref={sliderRef}\n\t\t\tclassName={cn(\"w-[400px] h-[400px] overflow-hidden\", className)}\n\t\t\tstyle={{\n\t\t\t\tposition: \"relative\",\n\t\t\t\tcursor: slideMode === \"drag\" ? \"grab\" : \"col-resize\",\n\t\t\t}}\n\t\t\tonMouseMove={handleMouseMove}\n\t\t\tonMouseLeave={mouseLeaveHandler}\n\t\t\tonMouseEnter={mouseEnterHandler}\n\t\t\tonMouseDown={handleMouseDown}\n\t\t\tonMouseUp={handleMouseUp}\n\t\t\tonTouchStart={handleTouchStart}\n\t\t\tonTouchEnd={handleTouchEnd}\n\t\t\tonTouchMove={handleTouchMove}\n\t\t>\n\t\t\t<AnimatePresence initial={false}>\n\t\t\t\t<motion.div\n\t\t\t\t\tclassName=\"h-full w-px absolute top-0 m-auto z-30 bg-linear-to-b from-transparent from-5% to-95% via-indigo-500 to-transparent\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tleft: `${sliderXPercent}%`,\n\t\t\t\t\t\ttop: \"0\",\n\t\t\t\t\t\tzIndex: 40,\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={{ duration: 0 }}\n\t\t\t\t>\n\t\t\t\t\t<div className=\"w-36 h-full mask-[radial-gradient(100px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-indigo-400 via-transparent to-transparent z-20 opacity-50\" />\n\t\t\t\t\t<div className=\"w-10 h-1/2 mask-[radial-gradient(50px_at_left,white,transparent)] absolute top-1/2 -translate-y-1/2 left-0 bg-linear-to-r from-cyan-400 via-transparent to-transparent z-10 opacity-100\" />\n\t\t\t\t\t<div className=\"w-10 h-3/4 top-1/2 -translate-y-1/2 absolute -right-10 mask-[radial-gradient(100px_at_left,white,transparent)]\">\n\t\t\t\t\t\t<MemoizedSparklesCore\n\t\t\t\t\t\t\tbackground=\"transparent\"\n\t\t\t\t\t\t\tminSize={0.4}\n\t\t\t\t\t\t\tmaxSize={1}\n\t\t\t\t\t\t\tparticleDensity={1200}\n\t\t\t\t\t\t\tclassName=\"w-full h-full\"\n\t\t\t\t\t\t\tparticleColor=\"#FFFFFF\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t\t{showHandlebar && (\n\t\t\t\t\t\t<div className=\"h-5 w-5 rounded-md top-1/2 -translate-y-1/2 bg-background z-30 -right-2.5 absolute   flex items-center justify-center shadow-[0px_-1px_0px_0px_#FFFFFF40]\">\n\t\t\t\t\t\t\t...{\" \"}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t)}\n\t\t\t\t</motion.div>\n\t\t\t</AnimatePresence>\n\t\t\t<div className=\"overflow-hidden w-full h-full relative z-20 pointer-events-none\">\n\t\t\t\t<AnimatePresence initial={false}>\n\t\t\t\t\t{firstImage ? (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\"absolute inset-0 z-20 rounded-2xl shrink-0 w-full h-full select-none overflow-hidden\",\n\t\t\t\t\t\t\t\tfirstImageClassName\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\tclipPath: `inset(0 ${100 - sliderXPercent}% 0 0)`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{ duration: 0 }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\talt=\"first image\"\n\t\t\t\t\t\t\t\tsrc={firstImage}\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"absolute inset-0  z-20 rounded-2xl shrink-0 w-full h-full select-none\",\n\t\t\t\t\t\t\t\t\tfirstImageClassName\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t\tdraggable={false}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t) : null}\n\t\t\t\t</AnimatePresence>\n\t\t\t</div>\n\n\t\t\t<AnimatePresence initial={false}>\n\t\t\t\t{secondImage ? (\n\t\t\t\t\t<motion.img\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\"absolute top-0 left-0 z-19  rounded-2xl w-full h-full select-none\",\n\t\t\t\t\t\t\tsecondImageClassname\n\t\t\t\t\t\t)}\n\t\t\t\t\t\talt=\"second image\"\n\t\t\t\t\t\tsrc={secondImage}\n\t\t\t\t\t\tdraggable={false}\n\t\t\t\t\t/>\n\t\t\t\t) : null}\n\t\t\t</AnimatePresence>\n\t\t</div>\n\t);\n};\n\nconst MemoizedSparklesCore = React.memo(SparklesCore);\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "drag",
+      "hover",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "Moving the pointer across the frame sweeps the divider along with it and wipes between the two images, or in drag mode you grab the handle instead; left alone with autoplay on, the divider slides back and forth by itself.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "firstImage",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "secondImage",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "firstImageClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "secondImageClassname",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "initialSliderPercentage",
+        "type": "number",
+        "default": "50",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "slideMode",
+        "type": "\"hover\" | \"drag\"",
+        "default": "\"hover\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showHandlebar",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoplay",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoplayDuration",
+        "type": "number",
+        "default": "5000",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/compare"
+  }
+}

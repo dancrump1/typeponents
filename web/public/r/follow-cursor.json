@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "follow-cursor",
+  "type": "registry:ui",
+  "title": "Follow Cursor",
+  "description": "Follow Cursor",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/follow-cursor.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/follow-cursor.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef } from \"react\";\n\nimport { motion, useMotionValue, useSpring } from \"motion/react\";\n\n// Credit:\n// https://www.sparkui.site/components/mouse-follower\n\nexport default function MouseFollower({ container }) {\n\tconst cursor = useRef(null);\n\tconst cursorSize = 15;\n\n\tconst mouse = {\n\t\tx: useMotionValue(0),\n\t\ty: useMotionValue(0),\n\t};\n\n\t// Smooth out the mouse values\n\tconst smoothOptions = { damping: 20, stiffness: 300, mass: 0.5 };\n\tconst smoothMouse = {\n\t\tx: useSpring(mouse.x, smoothOptions),\n\t\ty: useSpring(mouse.y, smoothOptions),\n\t};\n\n\tconst manageMouseMove = (e) => {\n\t\tconst { clientX, clientY } = e;\n\n\t\t// Move custom cursor to follow the mouse\n\t\tmouse.x.set(clientX - cursorSize / 2);\n\t\tmouse.y.set(clientY - cursorSize / 2);\n\t};\n\n\tuseEffect(() => {\n\t\tcontainer\n\t\t\t? container.addEventListener(\"mousemove\", manageMouseMove)\n\t\t\t: window.addEventListener(\"mousemove\", manageMouseMove);\n\n\t\treturn () => {\n\t\t\tcontainer\n\t\t\t\t? container.removeEventListener(\"mousemove\", manageMouseMove)\n\t\t\t\t: window.removeEventListener(\"mousemove\", manageMouseMove);\n\t\t};\n\t}, [container]);\n\n\treturn (\n\t\t<motion.div\n\t\t\tstyle={{\n\t\t\t\tleft: smoothMouse.x,\n\t\t\t\ttop: smoothMouse.y,\n\t\t\t\tpointerEvents: \"none\",\n\t\t\t\twidth: cursorSize,\n\t\t\t\theight: cursorSize,\n\t\t\t}}\n\t\t\tclassName={`h-4 w-4 fixed rounded-full bg-background`}\n\t\t\tref={cursor}\n\t\t/>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Spark UI",
+      "url": "https://www.sparkui.site/components/mouse-follower",
+      "authorUrl": "https://www.sparkui.site",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/follow-cursor"
+  }
+}

@@ -1,0 +1,201 @@
+# Page Transitions
+
+- Categories: Utilities
+- Tags: hover
+- Import: `@/components/ui/page-transitions/component`
+
+## Install
+
+```bash
+npx shadcn@latest add https://components.drivedev.net/r/page-transitions.json
+```
+
+This rewrites imports to match the target project's `components.json` aliases, so `cn` and any hooks land in the right place automatically.
+
+## Dependencies
+
+- `@gsap/react`
+- `gsap`
+- `next-transition-router`
+- `split-type`
+
+## Registry dependencies
+
+- `scrolltrigger-replication`
+
+## Usage
+
+```tsx
+import HeroHome from "./component";
+import { TransitionProvider } from "./transition-provider";
+import { GsapProvider } from "@/registry/components/scrolltrigger-replication/gsap-provider";
+import { LenisProvider } from "@/registry/components/scrolltrigger-replication/lenis-provider";
+
+export default function Usage() {
+	return (
+		<TransitionProvider>
+			<LenisProvider>
+				<div className="flex min-h-svh justify-between flex-col gap-y-12 lg:min-h-screen lg:gap-y-20">
+					<HeroHome />
+				</div>
+			</LenisProvider>
+			<GsapProvider scrollTrigger />
+		</TransitionProvider>
+	);
+}
+```
+
+## Source
+
+### `components/ui/page-transitions/component.tsx`
+
+```tsx
+"use client";
+
+import { useRef } from "react";
+
+import Image from "next/image";
+import Link from "next/link";
+
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import SplitType, { TargetElement } from "split-type";
+
+import { pages } from "./data";
+
+export default function HeroHome() {
+	const sectionRef = useRef<HTMLDivElement>(null);
+
+	useGSAP(
+		() => {
+			const pageTitle = sectionRef.current!.querySelector(
+				".page-title"
+			)! as TargetElement;
+			const subpageTitle =
+				sectionRef.current!.querySelectorAll(".subpage-title")!;
+
+			const pageTitleSplit = new SplitType(pageTitle, {
+				types: "lines,words,chars",
+				lineClass: "overflow-hidden",
+			});
+
+			const tl = gsap.timeline({
+				paused: true,
+				defaults: { ease: "expo.out", duration: 1.5 },
+				delay: 1.5,
+			});
+
+			tl.set(pageTitle, { opacity: 1 });
+			tl.set(".subpage-image", { opacity: 1 });
+			tl.set(".subpage-divider", {
+				opacity: 1,
+				transformOrigin: "left",
+			});
+
+			tl.fromTo(
+				pageTitleSplit.words,
+				{
+					yPercent: 100,
+				},
+				{
+					yPercent: 0,
+					stagger: 0.05,
+				}
+			)
+				.fromTo(
+					".subpage-image",
+					{ scale: 1.2, height: "0%" },
+					{ scale: 1, height: "100%", stagger: 0.1 },
+					"<"
+				)
+				.fromTo(
+					".subpage-divider",
+					{ scaleX: 0 },
+					{ scaleX: 1, stagger: 0.1 },
+					"<"
+				)
+				.fromTo(
+					subpageTitle,
+					{ y: 20, opacity: 0 },
+					{ y: 0, opacity: 1, stagger: 0.1 },
+					"<"
+				);
+
+			tl.play();
+		},
+		{ scope: sectionRef }
+	);
+	return (
+		<section
+			className="flex flex-col justify-end gap-y-12 overflow-hidden pb-[8vw] lg:gap-y-20 lg:pb-[2vw]"
+			ref={sectionRef}
+		>
+			<h1 className="page-title mb-[5vw] max-w-6xl overflow-hidden font-roboto text-[clamp(6vw,8vw,80px)] uppercase leading-none opacity-0 lg:mb-[3vw]">
+				A creative platform built on depth, motion and precision
+			</h1>
+
+			<div className="grid grid-cols-2 gap-[2vw] lg:grid-cols-4 lg:gap-[1vw]">
+				{pages.map((page, index) => {
+					return (
+						<Link
+							href={`/${page.slug}`}
+							key={index + "hero-home"}
+							className="group"
+						>
+							<div className="relative aspect-square overflow-hidden transition-[border-radius] duration-500 group-hover:rounded-[50%]">
+								<Image
+									src={page.image}
+									alt={page.slug}
+									fill
+									priority
+									sizes="25vw"
+									className="subpage-image h-0 object-cover opacity-0"
+								/>
+							</div>
+							<div className="subpage-divider my-2 h-px w-full scale-x-0 bg-charleston-green opacity-0 lg:my-3"></div>
+							<div className="subpage-title font-roboto text-[3vw] uppercase opacity-0 lg:text-[1.2vw]">
+								{page.slug} Effect
+							</div>
+						</Link>
+					);
+				})}
+			</div>
+		</section>
+	);
+}
+```
+
+### `components/ui/page-transitions/data.ts`
+
+```tsx
+export const pages = [
+    {
+        slug: "layer",
+        image: "/itjustworks.jpg",
+        title: "Layer Depth",
+        description:
+            "A clean, stacked design that emphasizes depth and separation between content sections.",
+    },
+    {
+        slug: "slide",
+        image: "/itjustworks.jpg",
+        title: "Slide Motion",
+        description:
+            "A sleek style focusing on horizontal or vertical sliding transitions for dynamic navigation.",
+    },
+    {
+        slug: "pixel",
+        image: "/itjustworks.jpg",
+        title: "Pixel Grid",
+        description:
+            "A grid-based layout with sharp edges and precision, giving a modern and structured feel.",
+    },
+    {
+        slug: "zoom",
+        image: "/itjustworks.jpg",
+        title: "Zoom Focus",
+        description:
+            "A bold, interactive approach with zoom-in effects to highlight focal points and visuals.",
+    },
+];
+```

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "oss-registry": {
+      "command": "node",
+      "args": ["${workspaceFolder}/mcp-server/dist/index.js"],
+      "env": {
+        "REGISTRY_ROOT": "${workspaceFolder}"
+      }
+    }
+  }
+}

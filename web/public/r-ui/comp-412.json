@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-412",
+  "type": "registry:component",
+  "title": "Comp 412",
+  "description": "Comp 412",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-412.tsx",
+      "content": "export default function Component() {\r\n  return (\r\n    <div className=\"bg-background flex items-center rounded-full border p-1 shadow-xs\">\r\n      <div className=\"flex -space-x-1.5\">\r\n        <img\r\n          className=\"ring-background rounded-full ring-1\"\r\n          src=\"/avatar-80-03.jpg\"\r\n          width={20}\r\n          height={20}\r\n          alt=\"Avatar 01\"\r\n        />\r\n        <img\r\n          className=\"ring-background rounded-full ring-1\"\r\n          src=\"/avatar-80-04.jpg\"\r\n          width={20}\r\n          height={20}\r\n          alt=\"Avatar 02\"\r\n        />\r\n        <img\r\n          className=\"ring-background rounded-full ring-1\"\r\n          src=\"/avatar-80-05.jpg\"\r\n          width={20}\r\n          height={20}\r\n          alt=\"Avatar 03\"\r\n        />\r\n        <img\r\n          className=\"ring-background rounded-full ring-1\"\r\n          src=\"/avatar-80-06.jpg\"\r\n          width={20}\r\n          height={20}\r\n          alt=\"Avatar 04\"\r\n        />\r\n      </div>\r\n      <p className=\"text-muted-foreground px-2 text-xs\">\r\n        Trusted by <strong className=\"text-foreground font-medium\">60K+</strong>{\" \"}\r\n        developers.\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

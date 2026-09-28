@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "curved-navbar",
+  "type": "registry:ui",
+  "title": "Curved Navbar",
+  "description": "Curved Navbar",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/curved-navbar.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/curved-navbar.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useState } from \"react\";\r\n\r\nimport Link from \"next/link\";\r\nimport { usePathname } from \"next/navigation\";\r\n\r\nimport { motion } from \"motion/react\";\r\nimport { IoClose } from \"react-icons/io5\";\r\n\r\n// Credit:\r\n// https://www.sparkui.site/components/curved-navbar\r\n\r\nconst navItems = [\r\n\t{\r\n\t\ttitle: \"Home\",\r\n\t\thref: \"/\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"Work\",\r\n\t\thref: \"/work\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"About\",\r\n\t\thref: \"/about\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"Contact\",\r\n\t\thref: \"/contact\",\r\n\t},\r\n];\r\nconst menuSlide = {\r\n\tinitial: { x: \"calc(100% + 100px)\" },\r\n\tenter: { x: \"0\", transition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } },\r\n\texit: {\r\n\t\tx: \"calc(100% + 100px)\",\r\n\t\ttransition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },\r\n\t},\r\n};\r\nconst slide = {\r\n\tinitial: { x: 80 },\r\n\tenter: (i) => ({\r\n\t\tx: 0,\r\n\t\ttransition: { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.05 * i },\r\n\t}),\r\n\texit: (i) => ({\r\n\t\tx: 80,\r\n\t\ttransition: { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.05 * i },\r\n\t}),\r\n};\r\nconst scale = {\r\n\topen: { scale: 1, transition: { duration: 0.3 } },\r\n\tclosed: { scale: 0, transition: { duration: 0.4 } },\r\n};\r\nfunction Curve() {\r\n\tconst initialPath = `M100 0 L200 0 L200 ${window.innerHeight} L100 ${\r\n\t\twindow.innerHeight\r\n\t} Q-100 ${window.innerHeight / 2} 100 0`;\r\n\tconst targetPath = `M100 0 L200 0 L200 ${window.innerHeight} L100 ${\r\n\t\twindow.innerHeight\r\n\t} Q100 ${window.innerHeight / 2} 100 0`;\r\n\r\n\tconst curve = {\r\n\t\tinitial: {\r\n\t\t\td: initialPath,\r\n\t\t},\r\n\t\tenter: {\r\n\t\t\td: targetPath,\r\n\t\t\ttransition: { duration: 1, ease: [0.76, 0, 0.24, 1] },\r\n\t\t},\r\n\t\texit: {\r\n\t\t\td: initialPath,\r\n\t\t\ttransition: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },\r\n\t\t},\r\n\t};\r\n\r\n\treturn (\r\n\t\t<svg\r\n\t\t\tclassName={`absolute top-0 -left-[99px] w-[100px] stroke-none h-full fill-[rgb(255,224,69)]`}\r\n\t\t>\r\n\t\t\t<motion.path\r\n\t\t\t\tvariants={curve}\r\n\t\t\t\tinitial=\"initial\"\r\n\t\t\t\tanimate=\"enter\"\r\n\t\t\t\texit=\"exit\"\r\n\t\t\t></motion.path>\r\n\t\t</svg>\r\n\t);\r\n}\r\nfunction Footer() {\r\n\treturn (\r\n\t\t<div className={`flex w-full text-sm justify-between`}>\r\n\t\t\t<a>Link 1</a>\r\n\t\t\t<a>Link 2</a>\r\n\t\t\t<a>Link 3</a>\r\n\t\t\t<a>Link 4</a>\r\n\t\t</div>\r\n\t);\r\n}\r\nfunction NavLink({ data, isActive, setSelectedIndicator }) {\r\n\tconst { title, href, index } = data;\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName={`relative flex items-center`}\r\n\t\t\tonMouseEnter={() => {\r\n\t\t\t\tsetSelectedIndicator(href);\r\n\t\t\t}}\r\n\t\t\tcustom={index}\r\n\t\t\tvariants={slide}\r\n\t\t\tinitial=\"initial\"\r\n\t\t\tanimate=\"enter\"\r\n\t\t\texit=\"exit\"\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tvariants={scale}\r\n\t\t\t\tanimate={isActive ? \"open\" : \"closed\"}\r\n\t\t\t\tclassName={`w-2.5 h-2.5 bg-background rounded-full absolute -left-8`}\r\n\t\t\t></motion.div>\r\n\t\t\t<Link href={href} className=\"uppercase font-black\">\r\n\t\t\t\t{title}\r\n\t\t\t</Link>\r\n\t\t</motion.div>\r\n\t);\r\n}\r\nexport default function CurvedNavbar({ isActive, setIsActive }) {\r\n\tconst pathname = usePathname();\r\n\tconst [selectedIndicator, setSelectedIndicator] = useState(pathname);\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tvariants={menuSlide}\r\n\t\t\tinitial=\"initial\"\r\n\t\t\tanimate=\"enter\"\r\n\t\t\texit=\"exit\"\r\n\t\t\tclassName={`h-screen w-screen max-w-(--breakpoint-sm) fixed right-0 top-0 text-foreground bg-[rgb(255,224,69)] z-10`}\r\n\t\t>\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"w-full flex justify-end text-3xl p-4\"\r\n\t\t\t\tonClick={() => setIsActive(false)}\r\n\t\t\t>\r\n\t\t\t\t<IoClose className=\"text-3xl\" />\r\n\t\t\t</div>\r\n\t\t\t<div\r\n\t\t\t\tclassName={`styles.body h-full p-24 flex flex-col justify-between`}\r\n\t\t\t>\r\n\t\t\t\t<div\r\n\t\t\t\t\tonMouseLeave={() => {\r\n\t\t\t\t\t\tsetSelectedIndicator(pathname);\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName={`flex flex-col text-5xl gap-3 mt-20`}\r\n\t\t\t\t>\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName={`text-foreground border-b border-gray-800 uppercase text-sm mb-10`}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<p>Brand Logo</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t{navItems.map((data, index) => {\r\n\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t<NavLink\r\n\t\t\t\t\t\t\t\tkey={index + \"curved-nav\"}\r\n\t\t\t\t\t\t\t\tdata={{ ...data, index }}\r\n\t\t\t\t\t\t\t\tisActive={selectedIndicator == data.href}\r\n\t\t\t\t\t\t\t\tsetSelectedIndicator={setSelectedIndicator}\r\n\t\t\t\t\t\t\t></NavLink>\r\n\t\t\t\t\t\t);\r\n\t\t\t\t\t})}\r\n\t\t\t\t</div>\r\n\t\t\t\t<Footer />\r\n\t\t\t</div>\r\n\t\t\t<Curve />\r\n\t\t</motion.div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Spark UI",
+      "url": "https://www.sparkui.site/components/curved-navbar",
+      "authorUrl": "https://www.sparkui.site",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/curved-navbar"
+  }
+}

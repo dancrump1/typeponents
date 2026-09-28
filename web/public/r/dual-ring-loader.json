@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dual-ring-loader",
+  "type": "registry:ui",
+  "title": "Dual Ring Loader",
+  "description": "Loading spinner built from two concentric rings, each with a gap in its outline, the smaller one nested inside the larger.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dual-ring-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dual-ring-loader.tsx",
+      "content": "const DualRingSpinnerLoader = () => {\n\treturn (\n\t\t<>\n\t\t\t<style>\n\t\t\t\t{`\n          @keyframes spin {\n            0% {\n              rotate: 0deg;\n              scale: 1;\n            }\n            30% {\n              rotate: 20deg;\n              scale: 0.9;\n            }\n            100% {\n              rotate: -360deg;\n              scale: 1;\n            }\n          }\n        `}\n\t\t\t</style>\n\t\t\t<div className=\"relative flex items-center justify-center\">\n\t\t\t\t<div\n\t\t\t\t\tclassName=\"repeat-infinite size-12 rounded-full border-4 border-neutral-700 border-t-transparent ease-in-out dark:invert\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tanimationName: \"spin\",\n\t\t\t\t\t\tanimationDuration: \"1.5s\",\n\t\t\t\t\t}}\n\t\t\t\t/>\n\t\t\t\t<div\n\t\t\t\t\tclassName=\"repeat-infinite direction-reverse absolute size-9 rounded-full border-4 border-neutral-700 border-b-transparent ease-in-out dark:invert\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tanimationName: \"spin\",\n\t\t\t\t\t\tanimationDuration: \"2s\",\n\t\t\t\t\t}}\n\t\t\t\t/>\n\t\t\t\t<span className=\"sr-only\">Loading...</span>\n\t\t\t</div>\n\t\t</>\n\t);\n};\n\nexport default DualRingSpinnerLoader;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "Runs on its own — the two rings turn in opposite directions at different speeds and dip slightly smaller at the start of each turn, so their gaps keep drifting out of alignment.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dual-ring-loader"
+  }
+}

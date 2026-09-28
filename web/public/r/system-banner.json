@@ -1,0 +1,69 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "system-banner",
+  "type": "registry:ui",
+  "title": "System Banner",
+  "description": "System Banner",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/system-banner.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/system-banner.tsx",
+      "content": "// Credit:\r\n// https://ui.8starlabs.com/docs/components/system-banner\r\n\r\ninterface SystemBannerProps {\r\n    text?: string;\r\n    color?: string;\r\n    size?: \"xs\" | \"sm\" | \"md\" | \"lg\";\r\n    show?: boolean;\r\n}\r\n\r\nconst sizeClasses: Record<NonNullable<SystemBannerProps[\"size\"]>, string> = {\r\n    xs: \"text-[10px] px-1 py-0.5\",\r\n    sm: \"text-xs px-2 py-0.5\",\r\n    md: \"text-sm px-3 py-1\",\r\n    lg: \"text-base px-4 py-1.5\"\r\n};\r\n\r\nexport function SystemBanner({\r\n    text = \"Development Mode\",\r\n    color = \"bg-orange-500\",\r\n    size = \"xs\",\r\n    show = true\r\n}: SystemBannerProps) {\r\n    if (!show) return null;\r\n    return (\r\n        <div\r\n            className={`\r\n        fixed top-0 left-0 w-full h-0.5 z-50 flex justify-center\r\n        ${typeof color === \"string\" && color.startsWith(\"#\") ? \"\" : color}\r\n      `}\r\n            style={\r\n                typeof color === \"string\" && color.startsWith(\"#\")\r\n                    ? { backgroundColor: color }\r\n                    : undefined\r\n            }\r\n        >\r\n            <span\r\n                className={`\r\n          absolute -bottom-4 text-white font-bold rounded shadow-md\r\n          ${sizeClasses[size]}\r\n          ${typeof color === \"string\" && color.startsWith(\"#\") ? \"\" : color}\r\n        `}\r\n                style={\r\n                    typeof color === \"string\" && color.startsWith(\"#\")\r\n                        ? { backgroundColor: color }\r\n                        : undefined\r\n                }\r\n            >\r\n                {text}\r\n            </span>\r\n        </div>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "ui.8starlabs.com",
+      "url": "https://ui.8starlabs.com/docs/components/system-banner",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "default": "\"Development Mode\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"bg-orange-500\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "\"xs\" | \"sm\" | \"md\" | \"lg\"",
+        "default": "\"xs\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "show",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/system-banner"
+  }
+}

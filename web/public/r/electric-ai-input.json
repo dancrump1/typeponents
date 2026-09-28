@@ -1,0 +1,112 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "electric-ai-input",
+  "type": "registry:ui",
+  "title": "Electric AI Input",
+  "description": "A modern AI-style input component with file upload support. Features smooth loading animations, customizable colors, and an intuitive interface perfect for AI chat applications.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/electric-ai-input.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/electric-ai-input.tsx",
+      "content": "'use client';\r\n\r\nimport { cn } from '@/lib/utils';\r\nimport { ArrowUp, LoaderCircle, Paperclip, X } from 'lucide-react';\r\nimport React, { DetailedHTMLProps, ButtonHTMLAttributes, useRef, useEffect, useState } from 'react';\r\nimport { AnimatePresence, motion, useAnimationControls } from 'framer-motion';\r\n\r\ntype ActionButtonProps = {\r\n  className?: string;\r\n  children?: React.ReactNode;\r\n} & DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;\r\n\r\nconst ActionButton = ({ className, children, ...props }: ActionButtonProps) => {\r\n  return (\r\n    <button\r\n      {...props}\r\n      className={cn(\r\n        'p-2 bg-orange-500 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm rounded-lg',\r\n        className\r\n      )}\r\n    >\r\n      {children}\r\n    </button>\r\n  );\r\n};\r\n\r\nconst Placeholder = ({ placeholder }: { placeholder: string }) => {\r\n  return (\r\n    <div className=\"flex items-center justify-start gap-0\">\r\n      {placeholder.split('').map((word, i) => {\r\n        if (word === ' ')\r\n          return <span key={`placeholder-text-${i}-${word}`} className=\"w-1\"></span>;\r\n        return (\r\n          <motion.span\r\n            initial={{ opacity: 0, y: 10 }}\r\n            animate={{ opacity: 1, y: 0 }}\r\n            transition={{\r\n              duration: 0.25,\r\n              delay: i * 0.01,\r\n              type: 'spring'\r\n            }}\r\n            key={`placeholder-text-${i}-${word}`}\r\n            className=\"text-white/60 font-extralight\"\r\n          >\r\n            {word}\r\n          </motion.span>\r\n        );\r\n      })}\r\n    </div>\r\n  );\r\n};\r\n\r\ntype AiInputProps = {\r\n  width?: string;\r\n  className?: string;\r\n  placeholder?: string;\r\n  style?: React.CSSProperties;\r\n  rows?: number;\r\n  mainColor?: string;\r\n  backgroundColor?: string;\r\n  onSubmit?: (value: string, file: File | null) => void | Promise<void>;\r\n  animationStyle?: 'orbit' | 'pulse';\r\n} & Omit<React.ComponentProps<'textarea'>, 'onSubmit'>;\r\n\r\nconst AiInput = ({\r\n  width = '400px',\r\n  className,\r\n  placeholder = 'Ask me anything...',\r\n  style,\r\n  mainColor = '#FFDC00',\r\n  backgroundColor = '#111111',\r\n  rows = 2,\r\n  onSubmit,\r\n  animationStyle = 'orbit',\r\n  ...props\r\n}: AiInputProps) => {\r\n  const textareaRef = useRef<HTMLTextAreaElement>(null);\r\n  const fileInputRef = useRef<HTMLInputElement>(null);\r\n  const containerRef = useRef<HTMLDivElement>(null);\r\n  const submitButtonRef = useRef<HTMLButtonElement>(null);\r\n\r\n  const [containerSize, setContainerSize] = useState<{ width: number; height: number }>({\r\n    width: 0,\r\n    height: 0\r\n  });\r\n  const [value, setValue] = useState('');\r\n  const [file, setFile] = useState<File | null>(null);\r\n  const [isLoading, setIsLoading] = useState(false);\r\n  const [clipPath, setClipPath] = useState<string>('');\r\n\r\n  const leftBlob = useAnimationControls();\r\n  const rightBlob = useAnimationControls();\r\n\r\n  useEffect(() => {\r\n    if (!containerRef.current) {\r\n      return;\r\n    }\r\n\r\n    const updateContainerSize = () => {\r\n      if (!containerRef.current) {\r\n        return;\r\n      }\r\n\r\n      const containerRect = containerRef.current.getBoundingClientRect();\r\n      setContainerSize({ width: containerRect.width, height: containerRect.height });\r\n    };\r\n\r\n    const resizeObserver = new ResizeObserver((entries) => {\r\n      entries.forEach(() => {\r\n        updateContainerSize();\r\n      });\r\n    });\r\n\r\n    resizeObserver.observe(containerRef.current);\r\n    updateContainerSize();\r\n    return () => {\r\n      resizeObserver.disconnect();\r\n    };\r\n  }, [containerRef.current, rows]);\r\n\r\n  useEffect(() => {\r\n    if (!containerRef.current) {\r\n      return;\r\n    }\r\n\r\n    const updateClipPath = () => {\r\n      setClipPath(\r\n        `polygon(evenodd, 86.5px 78.5px, 78.5px 86.5px, 78.5px 100%, 0% 100%, 0% 0%, 100% 0%, 100% 100%, 78.5px 100%, 78.5px ${\r\n          73.5 + containerSize.height\r\n        }px, 86.5px ${82 + containerSize.height}px, ${73.5 + containerSize.width}px ${\r\n          82 + containerSize.height\r\n        }px, ${82 + containerSize.width}px ${73.5 + containerSize.height}px, ${\r\n          82 + containerSize.width\r\n        }px  86.5px, ${73.5 + containerSize.width}px  78.5px)`\r\n      );\r\n    };\r\n\r\n    const resizeObserver = new ResizeObserver((entries) => {\r\n      entries.forEach(() => {\r\n        updateClipPath();\r\n      });\r\n    });\r\n\r\n    resizeObserver.observe(containerRef.current);\r\n    updateClipPath();\r\n    return () => {\r\n      resizeObserver.disconnect();\r\n    };\r\n  }, [containerSize, rows]);\r\n\r\n  const startAnimation = async () => {\r\n    leftBlob.stop();\r\n    rightBlob.stop();\r\n    Promise.all([\r\n      leftBlob.start({\r\n        opacity: 1,\r\n        transition: {\r\n          duration: 0.5,\r\n          ease: 'easeOut'\r\n        }\r\n      }),\r\n      rightBlob.start({\r\n        opacity: 1,\r\n        transition: {\r\n          duration: 0.5,\r\n          ease: 'easeOut'\r\n        }\r\n      })\r\n    ]);\r\n    await Promise.all([\r\n      leftBlob.start({\r\n        top: animationStyle === 'orbit' ? '0%' : '50%',\r\n        left: animationStyle === 'orbit' ? '50%' : '0%',\r\n        translateY: '-50%',\r\n        translateX: '-50%',\r\n        transition: {\r\n          duration: 0.2,\r\n          ease: 'linear'\r\n        }\r\n      }),\r\n      rightBlob.start({\r\n        top: animationStyle === 'orbit' ? '100%' : '50%',\r\n        left: animationStyle === 'orbit' ? '50%' : '0%',\r\n        translateY: '-50%',\r\n        translateX: '-50%',\r\n        transition: {\r\n          duration: 0.2,\r\n          ease: 'linear'\r\n        }\r\n      })\r\n    ]);\r\n  };\r\n\r\n  const thinkingAnimation = async () => {\r\n    Promise.all([\r\n      leftBlob.start({\r\n        left:\r\n          animationStyle === 'orbit'\r\n            ? ['50%', '100%', '100%', '0%', '0%', '50%']\r\n            : ['0%', '0%', '100%', '100%'],\r\n        top:\r\n          animationStyle === 'orbit'\r\n            ? ['0%', '0%', '100%', '100%', '0%', '0%']\r\n            : ['50%', '0%', '0%', '50%'],\r\n        width: animationStyle === 'orbit' ? '80px' : ['80px', '80px', '150px', '20px'],\r\n        transition: {\r\n          repeat: Infinity,\r\n          repeatType: 'loop',\r\n          duration: animationStyle === 'orbit' ? 1 : 0.8,\r\n          ease: 'linear'\r\n        }\r\n      }),\r\n      rightBlob.start({\r\n        left:\r\n          animationStyle === 'orbit'\r\n            ? ['50%', '0%', '0%', '100%', '100%', '50%']\r\n            : ['0%', '0%', '100%', '100%'],\r\n        top:\r\n          animationStyle === 'orbit'\r\n            ? ['100%', '100%', '0%', '0%', '100%', '100%']\r\n            : ['50%', '100%', '100%', '50%'],\r\n        width: animationStyle === 'orbit' ? '80px' : ['80px', '80px', '150px', '20px'],\r\n        transition: {\r\n          repeat: Infinity,\r\n          repeatType: 'loop',\r\n          duration: animationStyle === 'orbit' ? 1 : 0.8,\r\n          ease: 'linear'\r\n        }\r\n      })\r\n    ]);\r\n  };\r\n\r\n  const exitAnimation = async () => {\r\n    await Promise.all([\r\n      leftBlob.start({\r\n        opacity: 0,\r\n        transition: {\r\n          duration: 0.5,\r\n          ease: 'easeOut'\r\n        }\r\n      }),\r\n      rightBlob.start({\r\n        opacity: 0,\r\n        transition: {\r\n          duration: 0.5,\r\n          ease: 'easeOut'\r\n        }\r\n      })\r\n    ]);\r\n    Promise.all([leftBlob.stop(), rightBlob.stop()]);\r\n    await Promise.all([\r\n      leftBlob.set({\r\n        top: '0%',\r\n        left: '0%',\r\n        translateY: '-50%',\r\n        translateX: '-40%',\r\n        transition: {\r\n          duration: 0.1,\r\n          ease: 'linear'\r\n        }\r\n      }),\r\n      rightBlob.set({\r\n        top: '100%',\r\n        left: '100%',\r\n        translateY: '-50%',\r\n        translateX: '-60%',\r\n        transition: {\r\n          duration: 0.1,\r\n          ease: 'linear'\r\n        }\r\n      })\r\n    ]);\r\n  };\r\n\r\n  const loadingAnimation = async () => {\r\n    await startAnimation();\r\n    await thinkingAnimation();\r\n  };\r\n\r\n  const handleOnClickOutsideTextArea = (e: React.MouseEvent<HTMLTextAreaElement>) => {\r\n    e.stopPropagation();\r\n    e.preventDefault();\r\n    textareaRef.current?.focus();\r\n  };\r\n\r\n  // ? Update this function to handle form submissions\r\n  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {\r\n    e.stopPropagation();\r\n    e.preventDefault();\r\n    textareaRef.current?.blur();\r\n    const temp = value;\r\n    const tempFile = file;\r\n    setValue('');\r\n    setFile(null);\r\n    setIsLoading(true);\r\n    await loadingAnimation();\r\n    try {\r\n      await onSubmit?.(temp, tempFile);\r\n    } catch (error) {\r\n      console.error(error);\r\n    }\r\n    await exitAnimation();\r\n    setIsLoading(false);\r\n  };\r\n\r\n  const handleFileInputClick = async (e: React.MouseEvent<HTMLButtonElement>) => {\r\n    e.stopPropagation();\r\n    e.preventDefault();\r\n    fileInputRef.current?.click();\r\n  };\r\n\r\n  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {\r\n    if (e.key === 'Enter' && !e.shiftKey) {\r\n      e.preventDefault();\r\n      submitButtonRef.current?.click();\r\n    }\r\n  };\r\n\r\n  // ? Update this function to handle file uploads\r\n  const handleFileInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {\r\n    e.stopPropagation();\r\n    e.preventDefault();\r\n    const files = e.target.files;\r\n    if (files) {\r\n      setFile(files[0]);\r\n    }\r\n  };\r\n\r\n  const handleFileInputRemove = async (e: React.MouseEvent<HTMLButtonElement>) => {\r\n    e.stopPropagation();\r\n    e.preventDefault();\r\n    setFile(null);\r\n  };\r\n\r\n  return (\r\n    <div style={{ width }} className=\"w-full relative flex items-center justify-center\">\r\n      <span\r\n        style={{\r\n          clipPath: clipPath,\r\n          backgroundColor: `${backgroundColor}a5`\r\n        }}\r\n        className=\"absolute inset-[-80px] z-[1]\"\r\n      ></span>\r\n\r\n      <motion.span\r\n        initial={{\r\n          top: animationStyle === 'orbit' ? '0%' : '50%',\r\n          left: '0%',\r\n          translateY: '-50%',\r\n          translateX: '-40%',\r\n          height: '80px',\r\n          width: '80px'\r\n        }}\r\n        animate={leftBlob}\r\n        style={{\r\n          background: `radial-gradient(ellipse,color-mix(in srgb,${mainColor},30% white),transparent 50%)`\r\n        }}\r\n        className={cn('inline-block absolute opacity-0 z-[0]')}\r\n      />\r\n      <motion.span\r\n        initial={{\r\n          top: animationStyle === 'orbit' ? '100%' : '50%',\r\n          left: animationStyle === 'orbit' ? '100%' : '0%',\r\n          translateY: '-50%',\r\n          translateX: '-60%',\r\n          height: '80px',\r\n          width: '80px'\r\n        }}\r\n        animate={rightBlob}\r\n        style={{\r\n          background: `radial-gradient(ellipse,color-mix(in srgb,${mainColor},30% white),transparent 50%)`\r\n        }}\r\n        className={cn('inline-block absolute top-full opacity-0 z-[0]')}\r\n      />\r\n\r\n      <div\r\n        style={{ width }}\r\n        ref={containerRef}\r\n        className={cn(\r\n          'border-2 border-white/10 hover:border-white/15 focus-within:hover:border-white/20 focus-within:border-white/20',\r\n          'rounded-xl bg-black relative z-20 transition-all duration-200',\r\n          isLoading && '!border-transparent'\r\n        )}\r\n      >\r\n        {!value && (\r\n          <div className=\"absolute inset-0 px-3 py-2 pointer-events-none\">\r\n            <Placeholder placeholder={placeholder} />\r\n          </div>\r\n        )}\r\n\r\n        <textarea\r\n          onClick={handleOnClickOutsideTextArea}\r\n          style={{\r\n            resize: 'none',\r\n            ...style\r\n          }}\r\n          value={value}\r\n          onChange={(e) => setValue(e.target.value)}\r\n          onKeyDown={handleKeyDown}\r\n          className={cn(\r\n            'w-full px-3 py-2 placeholder:text-white/40 text-white/80 bg-transparent outline-none',\r\n            className\r\n          )}\r\n          rows={rows}\r\n          ref={textareaRef}\r\n          {...props}\r\n        />\r\n        <div\r\n          onClick={() => {\r\n            textareaRef.current?.focus();\r\n          }}\r\n          className=\"flex items-center justify-end p-1 gap-1\"\r\n        >\r\n          {file && (\r\n            <button\r\n              onClick={handleFileInputRemove}\r\n              className=\"flex items-center gap-1 px-2 py-2 hover:bg-zinc-900 rounded-full cursor-pointer\"\r\n            >\r\n              <p className=\"text-xs text-white/80\">{file.name}</p>\r\n              <X size={16} className=\"text-white/80\" />\r\n            </button>\r\n          )}\r\n          <input\r\n            type=\"file\"\r\n            ref={fileInputRef}\r\n            className=\"hidden\"\r\n            onChange={handleFileInputChange}\r\n          />\r\n          <ActionButton onClick={handleFileInputClick} className=\"bg-zinc-800 shadow-sm rounded-lg\">\r\n            <Paperclip size={16} />\r\n          </ActionButton>\r\n          <ActionButton\r\n            ref={submitButtonRef}\r\n            onClick={handleSubmit}\r\n            disabled={isLoading || value.length === 0}\r\n            style={{\r\n              backgroundColor: mainColor\r\n            }}\r\n            className=\"shadow-sm rounded-lg text-black\"\r\n          >\r\n            <AnimatePresence mode=\"popLayout\" initial={false}>\r\n              {isLoading ? (\r\n                <motion.span\r\n                  initial={{ opacity: 0, filter: 'blur(3px)', scale: 0 }}\r\n                  animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}\r\n                  exit={{ opacity: 0, filter: 'blur(3px)', scale: 0 }}\r\n                  transition={{ duration: 0.25, ease: 'easeOut' }}\r\n                  key=\"loading-icon\"\r\n                  className=\"h-full w-full flex items-center justify-center\"\r\n                >\r\n                  <LoaderCircle size={16} className=\"animate-spin\" />\r\n                </motion.span>\r\n              ) : (\r\n                <motion.span\r\n                  initial={{ opacity: 0, filter: 'blur(3px)', scale: 0 }}\r\n                  animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}\r\n                  exit={{ opacity: 0, filter: 'blur(3px)', scale: 0 }}\r\n                  transition={{ duration: 0.25, ease: 'easeOut' }}\r\n                  key=\"arrow-up-icon\"\r\n                  className=\"h-full w-full flex items-center justify-center\"\r\n                >\r\n                  <ArrowUp size={16} />\r\n                </motion.span>\r\n              )}\r\n            </AnimatePresence>\r\n          </ActionButton>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default AiInput;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "keyboard",
+      "responsive"
+    ],
+    "interaction": "Type a prompt, attach a file, and watch an orbit or pulse animation while it submits.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/electricaiinput",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "width",
+        "type": "string",
+        "default": "'400px'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "placeholder",
+        "type": "string",
+        "default": "'Ask me anything...'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "React.CSSProperties",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rows",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mainColor",
+        "type": "string",
+        "default": "'#FFDC00'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "default": "'#111111'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSubmit",
+        "type": "((value: string, file: File | null) => void | Promise<void>)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationStyle",
+        "type": "\"orbit\" | \"pulse\"",
+        "default": "'orbit'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/electric-ai-input"
+  }
+}

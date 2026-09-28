@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "background-gradient",
+  "type": "registry:ui",
+  "title": "Background Gradient",
+  "description": "Card wrapper ringed by a four-colour radial gradient with a blurred glow behind it.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/background-gradient.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/background-gradient.tsx",
+      "content": "import React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\nexport const BackgroundGradient = ({\n\tchildren,\n\tclassName,\n\tcontainerClassName,\n\tanimate = true,\n}: {\n\tchildren?: React.ReactNode;\n\tclassName?: string;\n\tcontainerClassName?: string;\n\tanimate?: boolean;\n}) => {\n\tconst variants = {\n\t\tinitial: {\n\t\t\tbackgroundPosition: \"0 50%\",\n\t\t},\n\t\tanimate: {\n\t\t\tbackgroundPosition: [\"0, 50%\", \"100% 50%\", \"0 50%\"],\n\t\t},\n\t};\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\"relative p-[4px] group max-w-sm\", containerClassName)}\n\t\t>\n\t\t\t<motion.div\n\t\t\t\tvariants={animate ? variants : undefined}\n\t\t\t\tinitial={animate ? \"initial\" : undefined}\n\t\t\t\tanimate={animate ? \"animate\" : undefined}\n\t\t\t\ttransition={\n\t\t\t\t\tanimate\n\t\t\t\t\t\t? {\n\t\t\t\t\t\t\t\tduration: 5,\n\t\t\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\t\t\trepeatType: \"reverse\",\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t: undefined\n\t\t\t\t}\n\t\t\t\tstyle={{\n\t\t\t\t\tbackgroundSize: animate ? \"400% 400%\" : undefined,\n\t\t\t\t}}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"absolute inset-0 rounded-3xl z-1 opacity-60 group-hover:opacity-100 blur-xl  transition duration-500\",\n\t\t\t\t\t\" bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]\"\n\t\t\t\t)}\n\t\t\t/>\n\t\t\t<motion.div\n\t\t\t\tvariants={animate ? variants : undefined}\n\t\t\t\tinitial={animate ? \"initial\" : undefined}\n\t\t\t\tanimate={animate ? \"animate\" : undefined}\n\t\t\t\ttransition={\n\t\t\t\t\tanimate\n\t\t\t\t\t\t? {\n\t\t\t\t\t\t\t\tduration: 5,\n\t\t\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\t\t\trepeatType: \"reverse\",\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t: undefined\n\t\t\t\t}\n\t\t\t\tstyle={{\n\t\t\t\t\tbackgroundSize: animate ? \"400% 400%\" : undefined,\n\t\t\t\t}}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"absolute inset-0 rounded-3xl z-1\",\n\t\t\t\t\t\"bg-[radial-gradient(circle_farthest-side_at_0_100%,#00ccb1,transparent),radial-gradient(circle_farthest-side_at_100%_0,#7b61ff,transparent),radial-gradient(circle_farthest-side_at_100%_100%,#ffc414,transparent),radial-gradient(circle_farthest-side_at_0_0,#1ca0fb,#141316)]\"\n\t\t\t\t)}\n\t\t\t/>\n\n\t\t\t<div className={cn(\"relative z-10\", className)}>{children}</div>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Runs on its own — the gradient slides back and forth around the edge of the card in a slow loop, and the outer glow brightens while the pointer is over it.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animate",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/background-gradient"
+  }
+}

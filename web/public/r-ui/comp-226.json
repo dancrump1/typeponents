@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-226",
+  "type": "registry:component",
+  "title": "Comp 226",
+  "description": "Comp 226",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-226.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Label } from \"@/components/ui/label\";\r\nimport {\r\n\tSelect,\r\n\tSelectContent,\r\n\tSelectGroup,\r\n\tSelectItem,\r\n\tSelectLabel,\r\n\tSelectTrigger,\r\n\tSelectValue,\r\n} from \"@/components/ui/select\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<Label htmlFor={id}>Options with avatar</Label>\r\n\t\t\t<Select defaultValue=\"1\">\r\n\t\t\t\t<SelectTrigger\r\n\t\t\t\t\tid={id}\r\n\t\t\t\t\tclassName=\"ps-2 [&>span]:flex [&>span]:items-center [&>span]:gap-2 [&>span_img]:shrink-0\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<SelectValue placeholder=\"Select framework\" />\r\n\t\t\t\t</SelectTrigger>\r\n\t\t\t\t<SelectContent className=\"[&_*[role=option]]:ps-2 [&_*[role=option]]:pe-8 [&_*[role=option]>span]:start-auto [&_*[role=option]>span]:inset-e-2 [&_*[role=option]>span]:flex [&_*[role=option]>span]:items-center [&_*[role=option]>span]:gap-2\">\r\n\t\t\t\t\t<SelectGroup>\r\n\t\t\t\t\t\t<SelectLabel className=\"ps-2\">Impersonate user</SelectLabel>\r\n\t\t\t\t\t\t<SelectItem value=\"1\">\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"size-5 rounded\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-01.jpg\"\r\n\t\t\t\t\t\t\t\talt=\"Frank Allison\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<span className=\"truncate\">Jenny Hamilton</span>\r\n\t\t\t\t\t\t</SelectItem>\r\n\t\t\t\t\t\t<SelectItem value=\"2\">\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"size-5 rounded\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-02.jpg\"\r\n\t\t\t\t\t\t\t\talt=\"Xavier Guerra\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<span className=\"truncate\">Paul Smith</span>\r\n\t\t\t\t\t\t</SelectItem>\r\n\t\t\t\t\t\t<SelectItem value=\"3\">\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"size-5 rounded\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-03.jpg\"\r\n\t\t\t\t\t\t\t\talt=\"Anne Kelley\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<span className=\"truncate\">Luna Wyen</span>\r\n\t\t\t\t\t\t</SelectItem>\r\n\t\t\t\t\t</SelectGroup>\r\n\t\t\t\t</SelectContent>\r\n\t\t\t</Select>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

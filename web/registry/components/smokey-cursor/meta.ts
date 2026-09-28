@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "smokey-cursor",
+	title: "Smokey Cursor",
+	description: "",
+	interaction: "",
+	categories: ["Cursor & Pointer Effects"],
+	tags: ["webgl", "canvas", "cursor-tracking", "autoplay"],
+	inspiration: {
+		source: "pro.lightswind.com",
+		url: "https://pro.lightswind.com/",
+		relationship: "adaptation",
+	},
+	dependencies: [],
+	registryDependencies: [],
+	props: [
+		{ name: "SIM_RESOLUTION", type: "number", default: "128" },
+		{ name: "DYE_RESOLUTION", type: "number", default: "1440" },
+		{ name: "CAPTURE_RESOLUTION", type: "number", default: "512" },
+		{ name: "DENSITY_DISSIPATION", type: "number", default: "3.5" },
+		{ name: "VELOCITY_DISSIPATION", type: "number", default: "2" },
+		{ name: "PRESSURE", type: "number", default: "0.1" },
+		{ name: "PRESSURE_ITERATIONS", type: "number", default: "20" },
+		{ name: "CURL", type: "number", default: "3" },
+		{ name: "SPLAT_RADIUS", type: "number", default: "0.2" },
+		{ name: "SPLAT_FORCE", type: "number", default: "6000" },
+		{ name: "SHADING", type: "boolean", default: "true" },
+		{ name: "COLOR_UPDATE_SPEED", type: "number", default: "10" },
+		{ name: "BACK_COLOR", type: "ColorRGB", default: "{ r: 0.5, g: 0, b: 0 }" },
+		{ name: "TRANSPARENT", type: "boolean", default: "true" },
+	],
+	risk: { heavy: true, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

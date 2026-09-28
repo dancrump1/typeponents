@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-card",
+  "type": "registry:ui",
+  "title": "Hover Card",
+  "description": "Hover Card",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-card.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, useMotionTemplate, useMotionValue } from \"motion/react\";\n\n// https://ui.aceternity.com/components/evervault-card\n\nexport const EvervaultCard = ({\n\ttext,\n\tclassName,\n}: {\n\ttext?: string;\n\tclassName?: string;\n}) => {\n\tlet mouseX = useMotionValue(0);\n\tlet mouseY = useMotionValue(0);\n\n\tconst [randomString, setRandomString] = useState(\"\");\n\n\tuseEffect(() => {\n\t\tlet str = generateRandomString(1500);\n\t\tsetRandomString(str);\n\t}, []);\n\n\tfunction onMouseMove({ currentTarget, clientX, clientY }: any) {\n\t\tlet { left, top } = currentTarget.getBoundingClientRect();\n\t\tmouseX.set(clientX - left);\n\t\tmouseY.set(clientY - top);\n\n\t\tconst str = generateRandomString(1500);\n\t\tsetRandomString(str);\n\t}\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"p-0.5  bg-transparent aspect-square  flex items-center justify-center w-full h-full relative\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t<div\n\t\t\t\tonMouseMove={onMouseMove}\n\t\t\t\tclassName=\"group/card rounded-3xl w-full relative overflow-hidden bg-transparent flex items-center justify-center h-full\"\n\t\t\t>\n\t\t\t\t<CardPattern\n\t\t\t\t\tmouseX={mouseX}\n\t\t\t\t\tmouseY={mouseY}\n\t\t\t\t\trandomString={randomString}\n\t\t\t\t/>\n\t\t\t\t<div className=\"relative z-10 flex items-center justify-center\">\n\t\t\t\t\t<div className=\"relative h-44 w-44  rounded-full flex items-center justify-center text-foreground font-bold text-4xl\">\n\t\t\t\t\t\t<div className=\"absolute w-full h-full bg-background/80 dark:bg-background/80 blur-xs rounded-full\" />\n\t\t\t\t\t\t<span className=\"dark:text-foreground text-foreground z-20\">\n\t\t\t\t\t\t\t{text}\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport function CardPattern({ mouseX, mouseY, randomString }: any) {\n\tlet maskImage = useMotionTemplate`radial-gradient(250px at ${mouseX}px ${mouseY}px, white, transparent)`;\n\tlet style = { maskImage, WebkitMaskImage: maskImage };\n\n\treturn (\n\t\t<div className=\"pointer-events-none\">\n\t\t\t<div className=\"absolute inset-0 rounded-2xl  mask-[linear-gradient(white,transparent)] group-hover/card:opacity-50\"></div>\n\t\t\t<motion.div\n\t\t\t\tclassName=\"absolute inset-0 rounded-2xl bg-linear-to-r from-green-500 to-blue-700 opacity-0  group-hover/card:opacity-100 backdrop-blur-xl transition duration-500\"\n\t\t\t\tstyle={style}\n\t\t\t/>\n\t\t\t<motion.div\n\t\t\t\tclassName=\"absolute inset-0 rounded-2xl opacity-0 mix-blend-overlay  group-hover/card:opacity-100\"\n\t\t\t\tstyle={style}\n\t\t\t>\n\t\t\t\t<p className=\"absolute inset-x-0 text-xs h-full wrap-break-word whitespace-pre-wrap text-foreground font-mono font-bold transition duration-500\">\n\t\t\t\t\t{randomString}\n\t\t\t\t</p>\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n}\n\nconst characters =\n\t\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";\nexport const generateRandomString = (length: number) => {\n\tlet result = \"\";\n\tfor (let i = 0; i < length; i++) {\n\t\tresult += characters.charAt(\n\t\t\tMath.floor(Math.random() * characters.length)\n\t\t);\n\t}\n\treturn result;\n};\n\nexport const Icon = ({ className, ...rest }: any) => {\n\treturn (\n\t\t<svg\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\tfill=\"none\"\n\t\t\tviewBox=\"0 0 24 24\"\n\t\t\tstrokeWidth=\"1.5\"\n\t\t\tstroke=\"currentColor\"\n\t\t\tclassName={className}\n\t\t\t{...rest}\n\t\t>\n\t\t\t<path\n\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\td=\"M12 6v12m6-6H6\"\n\t\t\t/>\n\t\t</svg>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/evervault-card",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-card"
+  }
+}

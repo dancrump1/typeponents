@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-531",
+  "type": "registry:component",
+  "title": "Comp 531",
+  "description": "Comp 531",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-531.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineContent,\r\n\tTimelineDate,\r\n\tTimelineHeader,\r\n\tTimelineIndicator,\r\n\tTimelineItem,\r\n\tTimelineSeparator,\r\n\tTimelineTitle,\r\n} from \"@/components/ui/timeline\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: \"Mar 15, 2024\",\r\n\t\ttitle: \"Project Kickoff\",\r\n\t\tdescription:\r\n\t\t\t\"Initial team meeting and project scope definition. Established key milestones and resource allocation.\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: \"Mar 22, 2024\",\r\n\t\ttitle: \"Design Phase\",\r\n\t\tdescription:\r\n\t\t\t\"Completed wireframes and user interface mockups. Stakeholder review and feedback incorporated.\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: \"Apr 5, 2024\",\r\n\t\ttitle: \"Development Sprint\",\r\n\t\tdescription:\r\n\t\t\t\"Backend API implementation and frontend component development in progress.\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tdate: \"Apr 19, 2024\",\r\n\t\ttitle: \"Testing & Deployment\",\r\n\t\tdescription:\r\n\t\t\t\"Quality assurance testing, performance optimization, and production deployment preparation.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline defaultValue={3}>\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tstep={item.id}\r\n\t\t\t\t\tclassName=\"sm:group-data-[orientation=vertical]/timeline:ms-32\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<TimelineHeader>\r\n\t\t\t\t\t\t<TimelineSeparator />\r\n\t\t\t\t\t\t<TimelineDate className=\"sm:group-data-[orientation=vertical]/timeline:absolute sm:group-data-[orientation=vertical]/timeline:-left-32 sm:group-data-[orientation=vertical]/timeline:w-20 sm:group-data-[orientation=vertical]/timeline:text-right\">\r\n\t\t\t\t\t\t\t{item.date}\r\n\t\t\t\t\t\t</TimelineDate>\r\n\t\t\t\t\t\t<TimelineTitle className=\"sm:-mt-0.5\">\r\n\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t</TimelineTitle>\r\n\t\t\t\t\t\t<TimelineIndicator />\r\n\t\t\t\t\t</TimelineHeader>\r\n\t\t\t\t\t<TimelineContent>{item.description}</TimelineContent>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

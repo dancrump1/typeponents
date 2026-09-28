@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "media-between-text",
+  "type": "registry:ui",
+  "title": "Media Between Text",
+  "description": "Media Between Text",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/media-between-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/media-between-text.tsx",
+      "content": "\"use client\";\r\n\r\nimport { forwardRef, useImperativeHandle, useRef, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion, useInView, UseInViewOptions, Variants } from \"motion/react\";\r\n\r\ntype MediaBetweenTextProps = {\r\n\tfirstText: string;\r\n\tsecondText: string;\r\n\t// Media props\r\n\tmediaUrl: string;\r\n\tmediaType: \"image\" | \"video\";\r\n\tmediaContainerClassName?: string;\r\n\tfallbackUrl?: string;\r\n\t// Video props\r\n\tautoPlay?: boolean;\r\n\tloop?: boolean;\r\n\tmuted?: boolean;\r\n\tplaysInline?: boolean;\r\n\t// Image props\r\n\talt?: string;\r\n\t// Animation props\r\n\ttriggerType?: \"hover\" | \"ref\" | \"inView\";\r\n\tcontainerRef?: React.RefObject<HTMLDivElement>;\r\n\tuseInViewOptionsProp?: UseInViewOptions;\r\n\tanimationVariants?: {\r\n\t\tinitial: Variants[\"initial\"];\r\n\t\tanimate: Variants[\"animate\"];\r\n\t};\r\n\tclassName?: string;\r\n\t// Text styling\r\n\tleftTextClassName?: string;\r\n\trightTextClassName?: string;\r\n};\r\n\r\nexport type MediaBetweenTextRef = {\r\n\tanimate: () => void;\r\n\treset: () => void;\r\n};\r\n\r\nconst MediaBetweenText = forwardRef<MediaBetweenTextRef, MediaBetweenTextProps>(\r\n\t(\r\n\t\t{\r\n\t\t\tfirstText,\r\n\t\t\tsecondText,\r\n\t\t\tmediaUrl,\r\n\t\t\tmediaType,\r\n\t\t\tmediaContainerClassName,\r\n\t\t\tfallbackUrl,\r\n\t\t\tautoPlay = true,\r\n\t\t\tloop = true,\r\n\t\t\tmuted = true,\r\n\t\t\tplaysInline = true,\r\n\t\t\talt,\r\n\t\t\ttriggerType = \"hover\",\r\n\t\t\tcontainerRef,\r\n\t\t\tuseInViewOptionsProp = {\r\n\t\t\t\tonce: true,\r\n\t\t\t\tamount: 0.5,\r\n\t\t\t\troot: containerRef,\r\n\t\t\t},\r\n\t\t\tanimationVariants = {\r\n\t\t\t\tinitial: { width: 0, opacity: 1 },\r\n\t\t\t\tanimate: {\r\n\t\t\t\t\twidth: \"auto\",\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: { duration: 0.4, type: \"spring\", bounce: 0 },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t\tclassName,\r\n\t\t\tleftTextClassName,\r\n\t\t\trightTextClassName,\r\n\t\t},\r\n\t\tref\r\n\t) => {\r\n\t\tconst componentRef = useRef<HTMLDivElement>(null);\r\n\t\tconst [isAnimating, setIsAnimating] = useState(false);\r\n\r\n\t\tconst isInView =\r\n\t\t\ttriggerType === \"inView\"\r\n\t\t\t\t? useInView(componentRef || containerRef, useInViewOptionsProp)\r\n\t\t\t\t: false;\r\n\t\tconst [isHovered, setIsHovered] = useState(false);\r\n\r\n\t\tuseImperativeHandle(ref, () => ({\r\n\t\t\tanimate: () => setIsAnimating(true),\r\n\t\t\treset: () => setIsAnimating(false),\r\n\t\t}));\r\n\r\n\t\tconst shouldAnimate =\r\n\t\t\ttriggerType === \"hover\"\r\n\t\t\t\t? isHovered\r\n\t\t\t\t: triggerType === \"inView\"\r\n\t\t\t\t\t? isInView\r\n\t\t\t\t\t: triggerType === \"ref\"\r\n\t\t\t\t\t\t? isAnimating\r\n\t\t\t\t\t\t: false;\r\n\r\n\t\treturn (\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\"flex\", className)}\r\n\t\t\t\tref={componentRef}\r\n\t\t\t\tonMouseEnter={() => triggerType === \"hover\" && setIsHovered(true)}\r\n\t\t\t\tonMouseLeave={() => triggerType === \"hover\" && setIsHovered(false)}\r\n\t\t\t>\r\n\t\t\t\t<motion.p layout className={leftTextClassName}>\r\n\t\t\t\t\t{firstText}\r\n\t\t\t\t</motion.p>\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tclassName={mediaContainerClassName}\r\n\t\t\t\t\tvariants={animationVariants}\r\n\t\t\t\t\tinitial=\"initial\"\r\n\t\t\t\t\tanimate={shouldAnimate ? \"animate\" : \"initial\"}\r\n\t\t\t\t>\r\n\t\t\t\t\t{mediaType === \"video\" ? (\r\n\t\t\t\t\t\t<video\r\n\t\t\t\t\t\t\tclassName=\"w-full h-full object-cover\"\r\n\t\t\t\t\t\t\tautoPlay={autoPlay}\r\n\t\t\t\t\t\t\tloop={loop}\r\n\t\t\t\t\t\t\tmuted={muted}\r\n\t\t\t\t\t\t\tplaysInline={playsInline}\r\n\t\t\t\t\t\t\tposter={fallbackUrl}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<source src={mediaUrl} type=\"video/mp4\" />\r\n\t\t\t\t\t\t</video>\r\n\t\t\t\t\t) : (\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tsrc={mediaUrl}\r\n\t\t\t\t\t\t\talt={alt || `${firstText} ${secondText}`}\r\n\t\t\t\t\t\t\tclassName=\"w-full h-full object-cover\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t)}\r\n\t\t\t\t</motion.div>\r\n\t\t\t\t<motion.p layout className={rightTextClassName}>\r\n\t\t\t\t\t{secondText}\r\n\t\t\t\t</motion.p>\r\n\t\t\t</div>\r\n\t\t);\r\n\t}\r\n);\r\n\r\nexport default MediaBetweenText;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven",
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/media-between-text"
+  }
+}

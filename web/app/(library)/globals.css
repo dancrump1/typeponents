@@ -1,0 +1,609 @@
+@import 'tailwindcss';
+
+@plugin 'tailwindcss-animate';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Above fullscreen/fixed component demos (some use z-[999999999]) */
+  --z-index-tour: 9999999999;
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+@utility center-component {
+  @apply h-[96vh] w-full flex justify-center items-center bg-black;
+}
+
+@utility note {
+  @apply underline underline-offset-2;
+}
+
+@utility pattern-boxes {
+  background-color: #fdfdfd;
+  background-image:
+    linear-gradient(#f6f6f6 1px, transparent 1px),
+    linear-gradient(to right, #f6f6f6 1px, #fdfdfd 1px);
+  background-size: 20px 20px;
+  position: relative;
+
+  &::after {
+    content: '';
+    @apply bg-linear-to-b from-white/50 to-white block w-full h-[50%] absolute bottom-0 z-1 rounded-bl-md rounded-br-md;
+  }
+}
+
+@utility mail-sidebar {
+
+  /* sidebar */
+  & nav a {
+    @apply text-gray-400 hover:text-white py-[10px] px-3 rounded-md hover:bg-gray-800 inline-block relative;
+  }
+
+  & nav a.active {
+    @apply text-white bg-gray-800;
+  }
+
+  & nav a.active::after {
+    @apply content-[""] absolute top-0 -right-[27px] block w-[4px] h-full bg-blue-600 rounded-md;
+  }
+
+  & .nav-bottom a.logout {
+    @apply text-rose-500;
+  }
+}
+
+@utility active {
+  .mail-sidebar nav &a {
+    @apply text-white bg-gray-800;
+  }
+
+  .mail-sidebar nav &a::after {
+    @apply content-[""] absolute top-0 -right-[27px] block w-[4px] h-full bg-blue-600 rounded-md;
+  }
+}
+
+@utility nav-bottom {
+  .mail-sidebar & a.logout {
+    @apply text-rose-500;
+  }
+}
+
+@utility logout {
+  .mail-sidebar .nav-bottom &a {
+    @apply text-rose-500;
+  }
+}
+
+@utility tutup {
+  /* /// */
+
+  &::after {
+    content: '';
+    @apply block h-1.5 w-3 bg-white absolute left-0 bottom-0 right-0;
+  }
+}
+
+@utility receipt {
+  overflow: hidden;
+}
+
+@utility receipt-content {
+  animation: thermalPrint 6s ease-out forwards;
+}
+
+@utility receipt-content-s {
+  animation: thermalPrints 2s ease-out forwards;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 10% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+
+  }
+
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+}
+
+@layer utilities {
+  [data-rehype-pretty-code-fragment] {
+    @apply relative text-white;
+  }
+
+  [data-rehype-pretty-code-fragment] code {
+    @apply grid min-w-full wrap-break-word rounded-none border-0 bg-transparent p-0;
+    counter-reset: line;
+    box-decoration-break: clone;
+  }
+
+  [data-rehype-pretty-code-fragment] .line {
+    @apply px-4 min-h-4 py-0.5 w-full inline-block;
+  }
+
+  [data-rehype-pretty-code-fragment] [data-line-numbers] .line {
+    @apply px-2;
+  }
+
+  [data-rehype-pretty-code-fragment] [data-line-numbers]>.line::before {
+    @apply text-zinc-50/40 text-xs;
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 1.8rem;
+    margin-right: 1.4rem;
+    text-align: right;
+  }
+
+  [data-rehype-pretty-code-fragment] .line--highlighted {
+    @apply bg-zinc-700/50;
+  }
+
+  [data-rehype-pretty-code-fragment] .line-highlighted span {
+    @apply relative;
+  }
+
+  [data-rehype-pretty-code-fragment] .word--highlighted {
+    @apply rounded-md bg-zinc-700/50 border-zinc-700/70 p-1;
+  }
+
+  .dark [data-rehype-pretty-code-fragment] .word--highlighted {
+    @apply bg-zinc-900;
+  }
+
+  [data-rehype-pretty-code-title] {
+    @apply mt-2 pt-6 px-4 text-sm font-medium text-foreground;
+  }
+
+  [data-rehype-pretty-code-title]+pre {
+    @apply mt-2;
+  }
+
+  .options-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    height: 100vh;
+    font-family: 'Roboto', sans-serif;
+    transition: 0.25s;
+    background: #f5f5f5;
+  }
+
+  .options-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    overflow: hidden;
+    min-width: 600px;
+    max-width: 900px;
+    width: calc(100% - 100px);
+    height: 400px;
+  }
+
+  .option-item {
+    position: relative;
+    overflow: hidden;
+    min-width: 60px;
+    margin: 10px;
+    background-size: auto 120%;
+    background-position: center;
+    cursor: pointer;
+    transition: 0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95);
+    border-radius: 30px;
+    flex-grow: 1;
+  }
+
+  .option-item.active {
+    flex-grow: 10000;
+    transform: scale(1);
+    max-width: 600px;
+    margin: 0px;
+    border-radius: 40px;
+    background-size: auto 100%;
+  }
+
+  .option-item.active .option-shadow {
+    box-shadow: none;
+  }
+
+  .option-item:not(.active) .option-shadow {
+    bottom: -40px;
+    box-shadow: none;
+  }
+
+  .option-item.active .option-label {
+    bottom: 20px;
+    left: 20px;
+  }
+
+  .option-item:not(.active) .option-label {
+    bottom: 10px;
+    left: 10px;
+  }
+
+  .option-item.active .option-info>div {
+    left: 0px;
+    opacity: 1;
+  }
+
+  .option-item:not(.active) .option-info>div {
+    left: 20px;
+    opacity: 0;
+  }
+
+  .option-shadow {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 120px;
+    transition: 0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95);
+  }
+
+  .option-label {
+    display: flex;
+    position: absolute;
+    right: 0px;
+    height: 40px;
+    transition: 0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95);
+  }
+
+  .option-icon {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    min-width: 40px;
+    max-width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    background-color: white;
+  }
+
+  .option-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 10px;
+    color: white;
+    white-space: pre;
+  }
+
+  .option-info>div {
+    position: relative;
+    transition:
+      0.5s cubic-bezier(0.05, 0.61, 0.41, 0.95),
+      opacity 0.5s ease-out;
+  }
+
+  .option-main {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .option-sub {
+    transition-delay: 0.1s;
+  }
+
+  .inactive-options {
+    display: none;
+  }
+
+  /* Tablet and Mobile Responsive Styles */
+  @media screen and (max-width: 1024px) {
+    .options-container {
+      padding: 20px;
+      height: auto;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .options-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-width: auto;
+      max-width: none;
+      width: 100%;
+      height: auto;
+      align-items: center;
+    }
+
+    /* Active option takes full width and proper height */
+    .option-item.active {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      height: 300px;
+      margin: 0 0 30px 0;
+      border-radius: 25px;
+      background-size: cover;
+      flex-grow: 0;
+      transform: none;
+    }
+
+    /* Ensure content is in bottom left */
+    .option-item.active .option-label {
+      bottom: 25px;
+      left: 25px;
+      right: auto;
+      height: 40px;
+    }
+
+    .option-item.active .option-info>div {
+      left: 0px;
+      opacity: 1;
+    }
+
+    /* Hide inactive options from normal flow and show as icons */
+    .option-item:not(.active) {
+      display: none;
+    }
+
+    /* Show inactive options as circular icons */
+    .inactive-options {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .inactive-option {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      overflow: hidden;
+    }
+
+    .inactive-option::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 50%;
+    }
+
+    .inactive-option-inner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 1;
+    }
+  }
+
+  /* Mobile specific adjustments */
+  @media screen and (max-width: 768px) {
+    .option-item.active {
+      height: 250px;
+      border-radius: 20px;
+      max-width: 400px;
+    }
+
+    .option-item.active .option-label {
+      bottom: 20px;
+      left: 20px;
+    }
+
+    .inactive-option {
+      width: 60px;
+      height: 60px;
+    }
+
+    .inactive-option-inner {
+      width: 35px;
+      height: 35px;
+      font-size: 16px;
+    }
+  }
+
+  /* Small mobile adjustments */
+  @media screen and (max-width: 480px) {
+    .option-item.active {
+      height: 220px;
+      border-radius: 18px;
+    }
+
+    .option-item.active .option-label {
+      bottom: 18px;
+      left: 18px;
+    }
+
+    .option-main {
+      font-size: 1.1rem;
+    }
+
+    .inactive-option {
+      width: 50px;
+      height: 50px;
+    }
+
+    .inactive-option-inner {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
+    }
+  }
+}
+
+@keyframes thermalPrint {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes thermalPrints {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

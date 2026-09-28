@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-50",
+  "type": "registry:component",
+  "title": "Comp 50",
+  "description": "Comp 50",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-50.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useId } from \"react\";\r\n\r\nimport { Input } from \"@/components/ui/input\";\r\nimport { CreditCardIcon } from \"lucide-react\";\r\nimport { usePaymentInputs } from \"react-payment-inputs\";\r\nimport images, { type CardImages } from \"react-payment-inputs/images\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\tconst {\r\n\t\tmeta,\r\n\t\tgetCardNumberProps,\r\n\t\tgetExpiryDateProps,\r\n\t\tgetCVCProps,\r\n\t\tgetCardImageProps,\r\n\t} = usePaymentInputs();\r\n\r\n\treturn (\r\n\t\t<div className=\"not-first:*:mt-2\">\r\n\t\t\t<legend className=\"text-foreground text-sm font-medium\">\r\n\t\t\t\tCard Details\r\n\t\t\t</legend>\r\n\t\t\t<div className=\"rounded-md shadow-2xs\">\r\n\t\t\t\t<div className=\"relative focus-within:z-10\">\r\n\t\t\t\t\t<Input\r\n\t\t\t\t\t\tclassName=\"peer rounded-b-none pe-9 shadow-none [direction:inherit]\"\r\n\t\t\t\t\t\t{...getCardNumberProps()}\r\n\t\t\t\t\t\tid={`number-${id}`}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<div className=\"text-muted-foreground/80 pointer-events-none absolute inset-y-0 inset-e-0 flex items-center justify-center pe-3 peer-disabled:opacity-50\">\r\n\t\t\t\t\t\t{meta.cardType ? (\r\n\t\t\t\t\t\t\t<svg\r\n\t\t\t\t\t\t\t\tclassName=\"overflow-hidden rounded-sm\"\r\n\t\t\t\t\t\t\t\t{...getCardImageProps({\r\n\t\t\t\t\t\t\t\t\timages: images as unknown as CardImages,\r\n\t\t\t\t\t\t\t\t})}\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t) : (\r\n\t\t\t\t\t\t\t<CreditCardIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div className=\"-mt-px flex\">\r\n\t\t\t\t\t<div className=\"min-w-0 flex-1 focus-within:z-10\">\r\n\t\t\t\t\t\t<Input\r\n\t\t\t\t\t\t\tclassName=\"rounded-e-none rounded-t-none shadow-none [direction:inherit]\"\r\n\t\t\t\t\t\t\t{...getExpiryDateProps()}\r\n\t\t\t\t\t\t\tid={`expiry-${id}`}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div className=\"-ms-px min-w-0 flex-1 focus-within:z-10\">\r\n\t\t\t\t\t\t<Input\r\n\t\t\t\t\t\t\tclassName=\"rounded-s-none rounded-t-none shadow-none [direction:inherit]\"\r\n\t\t\t\t\t\t\t{...getCVCProps()}\r\n\t\t\t\t\t\t\tid={`cvc-${id}`}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tBuilt with{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\thref=\"https://github.com/medipass/react-payment-inputs\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener nofollow\"\r\n\t\t\t\t>\r\n\t\t\t\t\tReact Payment Inputs\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/input.tsx",
+      "content": "// SHADCN UI GENERATED CODE\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\nexport interface InputProps\n\textends React.InputHTMLAttributes<HTMLInputElement> {}\n\nconst Input = React.forwardRef<HTMLInputElement, InputProps>(\n\t({ className, type, ...props }, ref) => {\n\t\treturn (\n\t\t\t<input\n\t\t\t\ttype={type}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t/>\n\t\t);\n\t}\n);\nInput.displayName = \"Input\";\n\nexport { Input };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

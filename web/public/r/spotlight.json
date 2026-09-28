@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spotlight",
+  "type": "registry:ui",
+  "title": "Spotlight",
+  "description": "Spotlight",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spotlight.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spotlight.tsx",
+      "content": "\"use client\";\n\nimport React, { useCallback, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, SpringOptions, useSpring, useTransform } from \"motion/react\";\n\nexport type SpotlightProps = {\n\tclassName?: string;\n\tsize?: number;\n\tspringOptions?: SpringOptions;\n};\n\nexport function Spotlight({\n\tclassName,\n\tsize = 200,\n\tspringOptions = { bounce: 0 },\n}: SpotlightProps) {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst [isHovered, setIsHovered] = useState(false);\n\tconst [parentElement, setParentElement] = useState<HTMLElement | null>(null);\n\n\tconst mouseX = useSpring(0, springOptions);\n\tconst mouseY = useSpring(0, springOptions);\n\n\tconst spotlightLeft = useTransform(mouseX, (x) => `${x - size / 2}px`);\n\tconst spotlightTop = useTransform(mouseY, (y) => `${y - size / 2}px`);\n\n\tuseEffect(() => {\n\t\tif (containerRef.current) {\n\t\t\tconst parent = containerRef.current.parentElement;\n\t\t\tif (parent) {\n\t\t\t\tparent.style.position = \"relative\";\n\t\t\t\tparent.style.overflow = \"hidden\";\n\t\t\t\tsetParentElement(parent);\n\t\t\t}\n\t\t}\n\t}, []);\n\n\tconst handleMouseMove = useCallback(\n\t\t(event: MouseEvent) => {\n\t\t\tif (!parentElement) return;\n\t\t\tconst { left, top } = parentElement.getBoundingClientRect();\n\t\t\tmouseX.set(event.clientX - left);\n\t\t\tmouseY.set(event.clientY - top);\n\t\t},\n\t\t[mouseX, mouseY, parentElement]\n\t);\n\n\tuseEffect(() => {\n\t\tif (!parentElement) return;\n\n\t\tconst abortController = new AbortController();\n\n\t\tparentElement.addEventListener(\"mousemove\", handleMouseMove, {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\t\tparentElement.addEventListener(\"mouseenter\", () => setIsHovered(true), {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\t\tparentElement.addEventListener(\"mouseleave\", () => setIsHovered(false), {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\n\t\treturn () => {\n\t\t\tabortController.abort();\n\t\t};\n\t}, [parentElement, handleMouseMove]);\n\n\treturn (\n\t\t<motion.div\n\t\t\tref={containerRef}\n\t\t\tclassName={cn(\n\t\t\t\t\"pointer-events-none absolute rounded-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops),transparent_80%)] blur-xl transition-opacity duration-200\",\n\t\t\t\t\"from-background via-background to-background\",\n\t\t\t\tisHovered ? \"opacity-100\" : \"opacity-0\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tstyle={{\n\t\t\t\twidth: size,\n\t\t\t\theight: size,\n\t\t\t\tleft: spotlightLeft,\n\t\t\t\ttop: spotlightTop,\n\t\t\t}}\n\t\t/>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "default": "200",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "springOptions",
+        "type": "SpringOptions",
+        "default": "{ bounce: 0 }",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spotlight"
+  }
+}

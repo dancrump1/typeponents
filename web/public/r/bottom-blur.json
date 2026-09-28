@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bottom-blur",
+  "type": "registry:ui",
+  "title": "Bottom Blur",
+  "description": "Strip pinned across the bottom of the viewport that blurs whatever passes behind it, in steps from clear to heavy.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/bottom-blur.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/bottom-blur.tsx",
+      "content": "// credit:\n// https://cuicui.day/other/creative-effects\n\nexport const BottomBlurOut = () => {\n  return (\n    <div className=\"gradient-blur fixed z-10 pointer-events-none before:absolute before:inset-0 after:absolute after:inset-0 before:z-1 h-[7%] bottom-0 inset-x-0 before:backdrop-blur-[0.5px] after:backdrop-blur-[32px]\">\n      <style>{gradientBlurCss}</style>\n      {Array.from({ length: 5 }).map((_, index) => (\n        <div\n          // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>\n          key={`${index}-bottom-blur-out`}\n          className=\"absolute inset-0\"\n          style={{\n            zIndex: index + 2,\n            backdropFilter: `blur(${2 ** index}px)`,\n            WebkitBackdropFilter: `blur(${2 ** index}px)`,\n          }}\n        />\n      ))}\n    </div>\n  );\n};\n\nconst gradientBlurCss = `\n.gradient-blur:before {\n    -webkit-mask: linear-gradient(180deg, transparent 0%, #000 12.5%, #000 25%, transparent 37.5%);\n    mask: linear-gradient(180deg, transparent 0%, #000 12.5%, #000 25%, transparent 37.5%);\n}\n\n.gradient-blur > div:nth-of-type(1) {\n    -webkit-mask: linear-gradient(180deg, transparent 12.5%, #000 25%, #000 37.5%, transparent 50%);\n    mask: linear-gradient(180deg, transparent 12.5%, #000 25%, #000 37.5%, transparent 50%);\n}\n\n.gradient-blur > div:nth-of-type(2) {\n    -webkit-mask: linear-gradient(180deg, transparent 25%, #000 37.5%, #000 50%, transparent 62.5%);\n    mask: linear-gradient(180deg, transparent 25%, #000 37.5%, #000 50%, transparent 62.5%);\n}\n\n.gradient-blur > div:nth-of-type(3) {\n    -webkit-mask: linear-gradient(180deg, transparent 37.5%, #000 50%, #000 62.5%, transparent 75%);\n    mask: linear-gradient(180deg, transparent 37.5%, #000 50%, #000 62.5%, transparent 75%);\n}\n\n.gradient-blur > div:nth-of-type(4) {\n    -webkit-mask: linear-gradient(180deg, transparent 50%, #000 62.5%, #000 75%, transparent 87.5%);\n    mask: linear-gradient(180deg, transparent 50%, #000 62.5%, #000 75%, transparent 87.5%);\n}\n\n.gradient-blur > div:nth-of-type(5) {\n    -webkit-mask: linear-gradient(180deg, transparent 62.5%, #000 75%, #000 87.5%, transparent);\n    mask: linear-gradient(180deg, transparent 62.5%, #000 75%, #000 87.5%, transparent);\n}\n\n.gradient-blur:after {\n    -webkit-mask: linear-gradient(180deg, transparent 75%, #000 87.5%, #000);\n    mask: linear-gradient(180deg, transparent 75%, #000 87.5%, #000);\n}\n`;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "Static — the strip sits over the bottom of the screen at all times, so content softens and disappears into it as you scroll rather than cutting off at an edge.",
+    "inspiration": {
+      "source": "cuicui.day",
+      "url": "https://cuicui.day/other/creative-effects",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/bottom-blur"
+  }
+}

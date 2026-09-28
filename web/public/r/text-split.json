@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-split",
+  "type": "registry:ui",
+  "title": "Text Split",
+  "description": "Text Split",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-split.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-split.tsx",
+      "content": "\"use client\";\n\nimport { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"framer-motion\";\n\n// Credit:\n// https://berlix.vercel.app/docs/text-split\n\ninterface TextSplitProps {\n\tchildren: string;\n\tclassName?: string;\n\ttopClassName?: string;\n\tbottomClassName?: string;\n\tmaxMove?: number;\n\tfalloff?: number;\n}\n\nconst TextSplit = ({\n\tchildren,\n\tclassName,\n\ttopClassName,\n\tbottomClassName,\n\tmaxMove = 50,\n\tfalloff = 0.3,\n}: TextSplitProps) => {\n\tconst [hoverIndex, setHoverIndex] = useState<number | null>(null);\n\n\tconst getOffset = (index: number) => {\n\t\tif (hoverIndex === null) return 0;\n\t\tconst distance = Math.abs(index - hoverIndex);\n\t\treturn Math.max(0, maxMove * (1 - distance * falloff));\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\"relative flex items-center justify-center \", className)}\n\t\t>\n\t\t\t{children.split(\"\").map((char, index) => {\n\t\t\t\tconst offset = getOffset(index);\n\t\t\t\tconst displayChar = char === \" \" ? \"\\u00A0\" : char;\n\n\t\t\t\treturn (\n\t\t\t\t\t<div\n\t\t\t\t\t\tkey={`${char}-${index}`}\n\t\t\t\t\t\tclassName=\"relative flex flex-col h-[1em] w-auto leading-none\"\n\t\t\t\t\t\tonMouseEnter={() => setHoverIndex(index)}\n\t\t\t\t\t\tonMouseLeave={() => setHoverIndex(null)}\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tinitial={false}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\ty: `-${offset}%`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{ duration: 0.3, ease: \"easeInOut\" }}\n\t\t\t\t\t\t\tclassName={cn(\"overflow-hidden\", topClassName)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{displayChar}\n\t\t\t\t\t\t</motion.span>\n\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tinitial={false}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\ty: `${offset}%`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{ duration: 0.3, ease: \"easeInOut\" }}\n\t\t\t\t\t\t\tclassName={cn(\"overflow-hidden\", bottomClassName)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<span className=\"block -translate-y-1/2\">\n\t\t\t\t\t\t\t\t{displayChar}\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t</div>\n\t\t\t\t);\n\t\t\t})}\n\t\t</div>\n\t);\n};\n\nexport default TextSplit;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "berlix.vercel.app",
+      "url": "https://berlix.vercel.app/docs/text-split",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "topClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "bottomClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxMove",
+        "type": "number",
+        "default": "50",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "falloff",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-split"
+  }
+}

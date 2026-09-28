@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-highlighter",
+  "type": "registry:ui",
+  "title": "Text Highlighter",
+  "description": "Marker-pen highlight that sweeps across a phrase, in any of four directions and following the line wraps.",
+  "dependencies": [
+    "lenis",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-highlighter.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-highlighter.tsx",
+      "content": "\"use client\";\n\nimport {\n\tElementType,\n\tforwardRef,\n\tuseEffect,\n\tuseImperativeHandle,\n\tuseMemo,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, Transition, useInView, UseInViewOptions } from \"motion/react\";\n\n// Credit:\n// https://www.fancycomponents.dev/docs/components/text/text-highlighter\n\ntype HighlightDirection = \"ltr\" | \"rtl\" | \"ttb\" | \"btt\";\n\ntype TextHighlighterProps = {\n\t/**\n\t * The text content to be highlighted\n\t */\n\tchildren: React.ReactNode;\n\n\t/**\n\t * HTML element to render as\n\t * @default \"p\"\n\t */\n\tas?: ElementType;\n\n\t/**\n\t * How to trigger the animation\n\t * @default \"inView\"\n\t */\n\ttriggerType?: \"hover\" | \"ref\" | \"inView\" | \"auto\";\n\n\t/**\n\t * Animation transition configuration\n\t * @default { duration: 0.4, type: \"spring\", bounce: 0 }\n\t */\n\ttransition?: Transition;\n\n\t/**\n\t * Options for useInView hook when triggerType is \"inView\"\n\t */\n\tuseInViewOptions?: UseInViewOptions;\n\n\t/**\n\t * Class name for the container element\n\t */\n\tclassName?: string;\n\n\t/**\n\t * Highlight color (CSS color string). Also can be a function that returns a color string, eg:\n\t * @default 'hsl(60, 90%, 68%)' (yellow)\n\t */\n\thighlightColor?: string;\n\n\t/**\n\t * Direction of the highlight animation\n\t * @default \"ltr\" (left to right)\n\t */\n\tdirection?: HighlightDirection;\n} & React.HTMLAttributes<HTMLElement>;\n\nexport type TextHighlighterRef = {\n\t/**\n\t * Trigger the highlight animation\n\t * @param direction - Optional direction override for this animation\n\t */\n\tanimate: (direction?: HighlightDirection) => void;\n\n\t/**\n\t * Reset the highlight animation\n\t */\n\treset: () => void;\n};\n\nexport const TextHighlighter = forwardRef<\n\tTextHighlighterRef,\n\tTextHighlighterProps\n>(\n\t(\n\t\t{\n\t\t\tchildren,\n\t\t\tas = \"span\",\n\t\t\ttriggerType = \"inView\",\n\t\t\ttransition = { type: \"spring\", duration: 1, delay: 0, bounce: 0 },\n\t\t\tuseInViewOptions = {\n\t\t\t\tonce: true,\n\t\t\t\tinitial: false,\n\t\t\t\tamount: 0.1,\n\t\t\t},\n\t\t\tclassName,\n\t\t\thighlightColor = \"hsl(25, 90%, 80%)\",\n\t\t\tdirection = \"ltr\",\n\t\t\t...props\n\t\t},\n\t\tref\n\t) => {\n\t\tconst componentRef = useRef<HTMLDivElement>(null);\n\t\tconst [isAnimating, setIsAnimating] = useState(false);\n\t\tconst [isHovered, setIsHovered] = useState(false);\n\t\tconst [currentDirection, setCurrentDirection] =\n\t\t\tuseState<HighlightDirection>(direction);\n\n\t\t// this allows us to change the direction whenever the direction prop changes\n\t\tuseEffect(() => {\n\t\t\tsetCurrentDirection(direction);\n\t\t}, [direction]);\n\n\t\tconst isInView =\n\t\t\ttriggerType === \"inView\"\n\t\t\t\t? useInView(componentRef, useInViewOptions)\n\t\t\t\t: false;\n\n\t\tuseImperativeHandle(ref, () => ({\n\t\t\tanimate: (animationDirection?: HighlightDirection) => {\n\t\t\t\tif (animationDirection) {\n\t\t\t\t\tsetCurrentDirection(animationDirection);\n\t\t\t\t}\n\t\t\t\tsetIsAnimating(true);\n\t\t\t},\n\t\t\treset: () => setIsAnimating(false),\n\t\t}));\n\n\t\tconst shouldAnimate =\n\t\t\ttriggerType === \"hover\"\n\t\t\t\t? isHovered\n\t\t\t\t: triggerType === \"inView\"\n\t\t\t\t\t? isInView\n\t\t\t\t\t: triggerType === \"ref\"\n\t\t\t\t\t\t? isAnimating\n\t\t\t\t\t\t: triggerType === \"auto\"\n\t\t\t\t\t\t\t? true\n\t\t\t\t\t\t\t: false;\n\n\t\tconst ElementTag = as || \"span\";\n\n\t\t// Get background size based on direction\n\t\tconst getBackgroundSize = (animated: boolean) => {\n\t\t\tswitch (currentDirection) {\n\t\t\t\tcase \"ltr\":\n\t\t\t\t\treturn animated ? \"100% 100%\" : \"0% 100%\";\n\t\t\t\tcase \"rtl\":\n\t\t\t\t\treturn animated ? \"100% 100%\" : \"0% 100%\";\n\t\t\t\tcase \"ttb\":\n\t\t\t\t\treturn animated ? \"100% 100%\" : \"100% 0%\";\n\t\t\t\tcase \"btt\":\n\t\t\t\t\treturn animated ? \"100% 100%\" : \"100% 0%\";\n\t\t\t\tdefault:\n\t\t\t\t\treturn animated ? \"100% 100%\" : \"0% 100%\";\n\t\t\t}\n\t\t};\n\n\t\t// Get background position based on direction\n\t\tconst getBackgroundPosition = () => {\n\t\t\tswitch (currentDirection) {\n\t\t\t\tcase \"ltr\":\n\t\t\t\t\treturn \"0% 0%\";\n\t\t\t\tcase \"rtl\":\n\t\t\t\t\treturn \"100% 0%\";\n\t\t\t\tcase \"ttb\":\n\t\t\t\t\treturn \"0% 0%\";\n\t\t\t\tcase \"btt\":\n\t\t\t\t\treturn \"0% 100%\";\n\t\t\t\tdefault:\n\t\t\t\t\treturn \"0% 0%\";\n\t\t\t}\n\t\t};\n\n\t\tconst animatedSize = useMemo(\n\t\t\t() => getBackgroundSize(shouldAnimate),\n\t\t\t[shouldAnimate, currentDirection]\n\t\t);\n\t\tconst initialSize = useMemo(\n\t\t\t() => getBackgroundSize(false),\n\t\t\t[currentDirection]\n\t\t);\n\t\tconst backgroundPosition = useMemo(\n\t\t\t() => getBackgroundPosition(),\n\t\t\t[currentDirection]\n\t\t);\n\n\t\tconst highlightStyle = {\n\t\t\tbackgroundImage: `linear-gradient(${highlightColor}, ${highlightColor})`,\n\t\t\tbackgroundRepeat: \"no-repeat\",\n\t\t\tbackgroundPosition: backgroundPosition,\n\t\t\tbackgroundSize: animatedSize,\n\t\t\tboxDecorationBreak: \"clone\",\n\t\t\tWebkitBoxDecorationBreak: \"clone\",\n\t\t} as React.CSSProperties;\n\n\t\treturn (\n\t\t\t<ElementTag\n\t\t\t\tref={componentRef}\n\t\t\t\tonMouseEnter={() => triggerType === \"hover\" && setIsHovered(true)}\n\t\t\t\tonMouseLeave={() => triggerType === \"hover\" && setIsHovered(false)}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t<motion.span\n\t\t\t\t\tclassName={cn(\"inline\", className)}\n\t\t\t\t\tstyle={highlightStyle}\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\tbackgroundSize: animatedSize,\n\t\t\t\t\t}}\n\t\t\t\t\tinitial={{\n\t\t\t\t\t\tbackgroundSize: initialSize,\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={transition}\n\t\t\t\t>\n\t\t\t\t\t{children}\n\t\t\t\t</motion.span>\n\t\t\t</ElementTag>\n\t\t);\n\t}\n);\n\nTextHighlighter.displayName = \"TextHighlighter\";\n\nexport default TextHighlighter;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "The colour band wipes across the words like a highlighter stroke, left to right by default; it can be set to fire when the text scrolls into view, on hover, or straight away on load.",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/text/text-highlighter",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-highlighter"
+  }
+}

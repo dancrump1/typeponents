@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "progressive-blur",
+  "type": "registry:ui",
+  "title": "Progressive Blur",
+  "description": "Layered blur overlay that ramps from clear to fully blurred across one chosen edge of whatever sits behind it.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/progressive-blur.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/progressive-blur.tsx",
+      "content": "\"use client\";\n\nimport { cn } from \"@/lib/utils\";\nimport { HTMLMotionProps, motion } from \"motion/react\";\n\n// Credit:\n// https://motion-primitives.com/docs/progressive-blur\n\nexport const GRADIENT_ANGLES = {\n\ttop: 0,\n\tright: 90,\n\tbottom: 180,\n\tleft: 270,\n};\n\nexport type ProgressiveBlurProps = {\n\tdirection?: keyof typeof GRADIENT_ANGLES;\n\tblurLayers?: number;\n\tclassName?: string;\n\tblurIntensity?: number;\n} & HTMLMotionProps<\"div\">;\n\nexport function ProgressiveBlur({\n\tdirection = \"bottom\",\n\tblurLayers = 8,\n\tclassName,\n\tblurIntensity = 0.25,\n\t...props\n}: ProgressiveBlurProps) {\n\tconst layers = Math.max(blurLayers, 2);\n\tconst segmentSize = 1 / (blurLayers + 1);\n\n\treturn (\n\t\t<div className={cn(\"relative\", className)}>\n\t\t\t{Array.from({ length: layers }).map((_, index) => {\n\t\t\t\tconst angle = GRADIENT_ANGLES[direction];\n\t\t\t\tconst gradientStops = [\n\t\t\t\t\tindex * segmentSize,\n\t\t\t\t\t(index + 1) * segmentSize,\n\t\t\t\t\t(index + 2) * segmentSize,\n\t\t\t\t\t(index + 3) * segmentSize,\n\t\t\t\t].map(\n\t\t\t\t\t(pos, posIndex) =>\n\t\t\t\t\t\t`rgba(255, 255, 255, ${\n\t\t\t\t\t\t\tposIndex === 1 || posIndex === 2 ? 1 : 0\n\t\t\t\t\t\t}) ${pos * 100}%`\n\t\t\t\t);\n\n\t\t\t\tconst gradient = `linear-gradient(${angle}deg, ${gradientStops.join(\n\t\t\t\t\t\", \"\n\t\t\t\t)})`;\n\n\t\t\t\treturn (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tkey={index + \"progressive-blur\"}\n\t\t\t\t\t\tclassName=\"pointer-events-none absolute inset-0 rounded-[inherit]\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tmaskImage: gradient,\n\t\t\t\t\t\t\tWebkitMaskImage: gradient,\n\t\t\t\t\t\t\tbackdropFilter: `blur(${index * blurIntensity}px)`,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\t{...props}\n\t\t\t\t\t/>\n\t\t\t\t);\n\t\t\t})}\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [],
+    "interaction": "Static on its own, holding a soft blur over an image edge so caption text stays readable; in the demo the second image fades its blur and caption in on hover and back out when the pointer leaves.",
+    "inspiration": {
+      "source": "Motion Primitives",
+      "url": "https://motion-primitives.com/docs/progressive-blur",
+      "authorUrl": "https://motion-primitives.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "direction",
+        "type": "\"top\" | \"right\" | \"bottom\" | \"left\"",
+        "default": "\"bottom\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blurLayers",
+        "type": "number",
+        "default": "8",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "blurIntensity",
+        "type": "number",
+        "default": "0.25",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/progressive-blur"
+  }
+}

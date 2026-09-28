@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "movie-gallery",
+  "type": "registry:ui",
+  "title": "Movie Gallery",
+  "description": "Movie Gallery",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/movie-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/movie-gallery.tsx",
+      "content": "import React, { SetStateAction, useState } from \"react\";\r\n\r\nimport { Bookmark, ChevronRight } from \"lucide-react\";\r\nimport {\r\n\tAnimatePresence,\r\n\tmotion,\r\n\tMotionConfig,\r\n\tuseAnimate,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://pro.bossadizenith.me/\r\n\r\nconst transition = {\r\n\ttype: \"spring\",\r\n\tbounce: 0.1,\r\n\tduration: 0.5,\r\n};\r\n\r\ntype Movie = {\r\n\titem: number;\r\n\tname: string;\r\n\tpreview: string;\r\n};\r\n\r\nconst movies: Movie[] = [\r\n\t{ item: 1, name: \"Succession\", preview: \"/itjustworks.jpg\" },\r\n\t{ item: 2, name: \"Black Mirror\", preview: \"/itjustworks.jpg\" },\r\n\t{ item: 3, name: \"Dune\", preview: \"/itjustworks.jpg\" },\r\n];\r\n\r\nconst MovieGallery = () => {\r\n\tconst [hover, setHover] = useState<Movie | null>(null);\r\n\r\n\treturn (\r\n\t\t<MotionConfig transition={transition}>\r\n\t\t\t<div className=\"size-full  flex items-center justify-center\">\r\n\t\t\t\t<div className=\"flex gap-5\">\r\n\t\t\t\t\t{movies.map((movie, index) => (\r\n\t\t\t\t\t\t<Movie\r\n\t\t\t\t\t\t\tkey={index + \"movie-gallery\"}\r\n\t\t\t\t\t\t\tsetHover={setHover}\r\n\t\t\t\t\t\t\thover={hover}\r\n\t\t\t\t\t\t\tmovie={movie}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</MotionConfig>\r\n\t);\r\n};\r\n\r\ninterface MovieProps {\r\n\thover: Movie | null;\r\n\tmovie: Movie;\r\n\tsetHover: React.Dispatch<SetStateAction<Movie | null>>;\r\n}\r\n\r\nconst Movie = ({ setHover, hover, movie }: MovieProps) => {\r\n\tconst [scope, animate] = useAnimate();\r\n\tconst [isBookmarked, setIsBookmarked] = useState(false);\r\n\r\n\tconst handleClick = () => {\r\n\t\tanimate(scope.current, { rotate: [0, 20, -20, 0] }, { duration: 0.5 });\r\n\t\tsetIsBookmarked((prev) => !prev);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName=\"border bg-background flex items-center justify-center rounded-3xl overflow-clip relative group\"\r\n\t\t\tanimate={{\r\n\t\t\t\twidth: hover && hover.item === movie.item ? 300 : 160,\r\n\t\t\t\theight: 200,\r\n\t\t\t\tbackgroundImage: `url(${movie.preview})`,\r\n\t\t\t\tbackgroundSize: \"cover\",\r\n\t\t\t\tbackgroundPosition: \"center\",\r\n\t\t\t}}\r\n\t\t\tonMouseEnter={() => setHover(movie)}\r\n\t\t\tonMouseLeave={() => setHover(null)}\r\n\t\t>\r\n\t\t\t<div className=\"absolute flex items-end justify-center top-0 left-0 size-full bg-primary/20 transition-opacity duration-300 opacity-0 group-hover:opacity-100 text-foreground\">\r\n\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t{hover && hover.item === movie.item && (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tclassName=\"w-full h-3/4 p-5 space-y-2\"\r\n\t\t\t\t\t\t\tinitial={{ x: 100, opacity: 0 }}\r\n\t\t\t\t\t\t\tanimate={{ x: 0, opacity: 1 }}\r\n\t\t\t\t\t\t\texit={{ x: 100, opacity: 0 }}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<motion.h1\r\n\t\t\t\t\t\t\t\tlayoutId={`movie-${movie.item}-title`}\r\n\t\t\t\t\t\t\t\tclassName=\"font-semibold text-xl\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{movie.name}\r\n\t\t\t\t\t\t\t</motion.h1>\r\n\t\t\t\t\t\t\t<motion.p\r\n\t\t\t\t\t\t\t\tclassName=\"min-w-80\"\r\n\t\t\t\t\t\t\t\tlayoutId={`movie-${movie.item}-description`}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\tnothing . {movie.item} . graound\r\n\t\t\t\t\t\t\t</motion.p>\r\n\t\t\t\t\t\t\t<motion.button className=\"bg-primary/80 dark:bg-background text-sm flex gap-2 text-foreground items-center rounded-full px-3 py-1.5\">\r\n\t\t\t\t\t\t\t\tWatch{\" \"}\r\n\t\t\t\t\t\t\t\t<span>\r\n\t\t\t\t\t\t\t\t\t<ChevronRight className=\"size-4\" />\r\n\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t</motion.button>{\" \"}\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t)}\r\n\t\t\t\t</AnimatePresence>\r\n\t\t\t\t<button\r\n\t\t\t\t\tref={scope}\r\n\t\t\t\t\tonClick={handleClick}\r\n\t\t\t\t\tclassName=\"absolute top-3 right-3 size-10 flex items-center justify-center outline-hidden\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<Bookmark\r\n\t\t\t\t\t\tclassName={`${\r\n\t\t\t\t\t\t\tisBookmarked ? \"fill-white\" : \"fill-transparent\"\r\n\t\t\t\t\t\t}`}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</button>\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport default MovieGallery;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "pro.bossadizenith.me",
+      "url": "https://pro.bossadizenith.me/",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/movie-gallery"
+  }
+}

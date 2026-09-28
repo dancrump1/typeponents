@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-73",
+  "type": "registry:component",
+  "title": "Comp 73",
+  "description": "Comp 73",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-73.tsx",
+      "content": "import { useId } from \"react\"\r\n\r\nexport default function Component() {\r\n  const id = useId()\r\n  return (\r\n    <div className=\"border-input bg-background focus-within:border-ring focus-within:ring-ring/50 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40 has-aria-invalid:border-destructive relative rounded-md border shadow-2xs transition-[color,box-shadow] outline-hidden focus-within:ring-[3px] has-disabled:pointer-events-none has-disabled:cursor-not-allowed has-disabled:opacity-50 *:has-[input:is(:disabled)]:pointer-events-none\">\r\n      <label\r\n        htmlFor={id}\r\n        className=\"text-foreground block px-3 pt-2 text-xs font-medium\"\r\n      >\r\n        Textarea with inset label\r\n      </label>\r\n      <textarea\r\n        id={id}\r\n        className=\"text-foreground placeholder:text-muted-foreground/70 flex min-h-[70px] w-full bg-transparent px-3 pb-2 text-sm focus-visible:outline-hidden\"\r\n      />\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

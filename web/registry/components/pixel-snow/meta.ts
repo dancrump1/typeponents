@@ -1,0 +1,31 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "pixel-snow",
+	title: "Pixel Snow",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["webgl", "scroll-driven", "autoplay"],
+	dependencies: ["three"],
+	registryDependencies: [],
+	props: [
+		{ name: "color", type: "string", default: "'#ffffff'" },
+		{ name: "flakeSize", type: "number", default: "0.01" },
+		{ name: "minFlakeSize", type: "number", default: "1.25" },
+		{ name: "pixelResolution", type: "number", default: "200" },
+		{ name: "speed", type: "number", default: "1.25" },
+		{ name: "depthFade", type: "number", default: "8" },
+		{ name: "farPlane", type: "number", default: "20" },
+		{ name: "brightness", type: "number", default: "1" },
+		{ name: "gamma", type: "number", default: "0.4545" },
+		{ name: "density", type: "number", default: "0.3" },
+		{ name: "variant", type: "\"square\" | \"round\" | \"snowflake\"", default: "'square'" },
+		{ name: "direction", type: "number", default: "125" },
+		{ name: "className", type: "string", default: "''" },
+		{ name: "style", type: "CSSProperties", default: "{}" },
+	],
+	risk: { heavy: true, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

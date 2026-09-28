@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "infinite-carousel",
+  "type": "registry:ui",
+  "title": "Infinite Carousel",
+  "description": "Infinite Carousel",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/infinite-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/infinite-carousel.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useState } from \"react\";\r\n\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.pldkhoa.dev/playground/infinite-carousel\r\n\r\ninterface LogoRowProps {\r\n\tlogos: (typeof items)[number][number][];\r\n\tindex: number;\r\n\tactiveIndex: number;\r\n}\r\n\r\nconst items = [\r\n\t[\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Airbnb.svg?updatedAt=1740896261205\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Lemon%20Squeezy%20-%20Long.svg?updatedAt=1740898819817\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Instagram%20-%20Long.svg?updatedAt=1740896256882\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Slack.svg?updatedAt=1740896256826\",\r\n\t],\r\n\t[\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Netflix.svg?updatedAt=1740896256859\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Framer.svg?updatedAt=1740896256791\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/LinkedIn%20-%20Long.svg?updatedAt=1740898819402\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/medium.svg?updatedAt=1740896256752\",\r\n\t],\r\n\t[\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/facebook.svg?updatedAt=1740896256947\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Tesla.svg?updatedAt=1740896256927\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Mailchimp.svg?updatedAt=1740896256732\",\r\n\t\t\"https://ik.imagekit.io/khoaphan/playground/Infinite%20Carousel/Microsoft.svg?updatedAt=1740896256652\",\r\n\t],\r\n];\r\n\r\nexport default function InfiniteCarousel() {\r\n\tconst [activeIndex, setActiveIndex] = useState(0);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst nextIndex = activeIndex === items.length - 1 ? 0 : activeIndex + 1;\r\n\t\tconst intervalId = setInterval(() => setActiveIndex(nextIndex), 3000);\r\n\r\n\t\treturn () => clearInterval(intervalId);\r\n\t}, [activeIndex]);\r\n\r\n\treturn (\r\n\t\t<article className=\"relative grid min-h-80 place-items-center rounded-xl border border-white/10 bg-background/5 p-3 md:aspect-[2] md:min-h-0\">\r\n\t\t\t<div className=\"relative h-40 w-full\">\r\n\t\t\t\t{items.map((logos, index) => (\r\n\t\t\t\t\t<LogoRow\r\n\t\t\t\t\t\tkey={index + \"infinite-carousel\"}\r\n\t\t\t\t\t\tactiveIndex={activeIndex}\r\n\t\t\t\t\t\tlogos={logos}\r\n\t\t\t\t\t\tindex={index}\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</article>\r\n\t);\r\n}\r\n\r\nconst LogoRow = ({ logos, index, activeIndex }: LogoRowProps) => {\r\n\tconst isActive = index === activeIndex;\r\n\r\n\treturn (\r\n\t\t<AnimatePresence>\r\n\t\t\t{isActive && (\r\n\t\t\t\t<div className=\"absolute left-0 top-0 grid h-full w-full md:gap-x-6 md:px-8 grid-cols-4 gap-3 px-5\">\r\n\t\t\t\t\t{logos.map((logo, logoIndex) => (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tkey={logoIndex}\r\n\t\t\t\t\t\t\tinitial={{ y: 40, opacity: 0, filter: \"blur(10px)\" }}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\texit={{ y: -40, opacity: 0, filter: \"blur(10px)\" }}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\tduration: 1.5,\r\n\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\tdelay: logoIndex * 0.15,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc={logo}\r\n\t\t\t\t\t\t\t\tloading=\"lazy\"\r\n\t\t\t\t\t\t\t\tclassName=\"h-full w-full object-contain\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</div>\r\n\t\t\t)}\r\n\t\t</AnimatePresence>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "spring",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "pldkhoa",
+      "url": "https://www.pldkhoa.dev/playground/infinite-carousel",
+      "authorUrl": "https://www.pldkhoa.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/infinite-carousel"
+  }
+}

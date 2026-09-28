@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "timeline",
+  "type": "registry:ui",
+  "title": "Timeline",
+  "description": "Vertical timeline of dated events.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/timeline.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/timeline.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useRef, useState } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { motion, useScroll, useTransform } from \"motion/react\";\n\n//ui.aceternity.com/components/timeline\n\ninterface TimelineEntry {\n\ttitle: string;\n\tdecade: string;\n\tcopy: string;\n\timages: {\n\t\turl: string;\n\t\talt: string;\n\t};\n}\n\nconst decades = [\n\t\"1800s\",\n\t\"1900s\",\n\t\"1910s\",\n\t\"1920s\",\n\t\"1930s\",\n\t\"1940s\",\n\t\"1950s\",\n\t\"1960s\",\n\t\"1970s\",\n\t\"1980s\",\n\t\"1990s\",\n\t\"2000s\",\n\t\"2010s\",\n\t\"2020s\",\n\t\"2030s\",\n];\n\nexport const Timeline = ({ data }: { data: TimelineEntry[] }) => {\n\tconst ref = useRef<HTMLDivElement>(null);\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst [height, setHeight] = useState(0);\n\n\tconst mungedDecadeData = [\n\t\t{\n\t\t\tyear: decades[0],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[0]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[1],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[1]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[2],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[2]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[2],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[2]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[3],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[3]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[4],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[4]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[5],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[5]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[6],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[6]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[7],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[7]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[8],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[8]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[9],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[9]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[10],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[10]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[11],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[11]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[12],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[12]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[13],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[13]),\n\t\t},\n\t\t{\n\t\t\tyear: decades[14],\n\t\t\tdata: data.filter((entry) => entry.decade === decades[14]),\n\t\t},\n\t];\n\n\tuseEffect(() => {\n\t\tif (ref.current) {\n\t\t\tconst rect = ref.current.getBoundingClientRect();\n\t\t\tsetHeight(rect.height);\n\t\t}\n\t}, [ref]);\n\n\tconst { scrollYProgress } = useScroll({\n\t\ttarget: containerRef,\n\t\toffset: [\"start 10%\", \"end 50%\"],\n\t});\n\n\tconst heightTransform = useTransform(scrollYProgress, [0, 1], [0, height]);\n\tconst opacityTransform = useTransform(scrollYProgress, [0, 0.1], [0, 1]);\n\n\treturn (\n\t\t<div className=\"w-full\" ref={containerRef}>\n\t\t\t<div ref={ref} className=\"relative\">\n\t\t\t\t{decades\n\t\t\t\t\t.filter(\n\t\t\t\t\t\t(decade) =>\n\t\t\t\t\t\t\tmungedDecadeData.find((data) => data.year === decade)\n\t\t\t\t\t\t\t\t?.data[0]?.title\n\t\t\t\t\t)\n\t\t\t\t\t.map((item, index) => (\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tkey={index + \"timeline-item\"}\n\t\t\t\t\t\t\tclassName=\"flex justify-start md:gap-16 md:mr-[5%]\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<div className=\"pt-28 min-w-16 max-w-xs md:w-full bg-backgroundSecondary\">\n\t\t\t\t\t\t\t\t<div className=\"sticky flex flex-col md:flex-row z-40 items-center top-40 self-start\">\n\t\t\t\t\t\t\t\t\t<div className=\"h-10 absolute left-3 md:left-6 w-10 rounded-full bg-background border-4 ring-2 ring-white flex items-center justify-center\"></div>\n\t\t\t\t\t\t\t\t\t<h2 className=\"hidden md:block text-xl md:pl-20 md:text-5xl font-swiss-black text-foreground lowercase\">\n\t\t\t\t\t\t\t\t\t\t{item}\n\t\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</div>\n\n\t\t\t\t\t\t\t<div className=\"relative w-full pl-8 pt-16 mr-8\">\n\t\t\t\t\t\t\t\t<h2 className=\"md:hidden block text-2xl mb-4 text-left font-swiss-black lowercase\">\n\t\t\t\t\t\t\t\t\t{item}\n\t\t\t\t\t\t\t\t</h2>\n\t\t\t\t\t\t\t\t{mungedDecadeData.map((decadeData, index) => {\n\t\t\t\t\t\t\t\t\tif (decadeData.year !== item) return null;\n\n\t\t\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t\t\t<div className=\"my-3\">\n\t\t\t\t\t\t\t\t\t\t\t{decadeData.data.map((data) => (\n\t\t\t\t\t\t\t\t\t\t\t\t<div className=\"flex justify-between flex-col gap-3 md:gap-20 mb-16 md:flex-row lg:mx-auto\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div className=\"max-w-xl\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t<h3>{data.title}</h3>\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<div className=\"flex flex-col gap-6\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{data?.images?.map((image) => (\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tsrc={image.url}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\talt={image?.alt || image.title}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\twidth={350}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\theight={290}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"max-h-[75vh] object-cover\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tstyle={\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\timage.focalPoint\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t? {\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tobjectPosition: `${\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\timage\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t.focalPoint[0] *\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t100\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}% ${\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\timage\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t.focalPoint[1] *\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t100\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}%`,\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t: {}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\t\t})}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t))}\n\t\t\t\t<div\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\theight: height + \"px\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute left-8 md:left-11 top-0 overflow-hidden w-[2px] bg-[linear-gradient(to_bottom,var(--tw-gradient-stops))] from-transparent from-0% via-background dark:via-background to-transparent to-99%  mask-[linear-gradient(to_bottom,transparent_0%,black_10%,black_90%,transparent_100%)] \"\n\t\t\t\t>\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\theight: heightTransform,\n\t\t\t\t\t\t\topacity: opacityTransform,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tclassName=\"absolute inset-x-0 top-0 w-[2px] bg-linear-to-t from-background via-background to-transparent from-0% via-10% rounded-full\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Data & Tables"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Scroll through stacked events; each node marks a point in time.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "data",
+        "type": "TimelineEntry[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/timeline"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lane-card",
+  "type": "registry:ui",
+  "title": "Lane Card",
+  "description": "Lane Card",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/lane-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/lane-card.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion } from \"motion/react\";\r\n\r\nconst Lane = ({ children, ...props }) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\r\n\tconst [timeoutRef, setTimeoutRef] = useState();\r\n\r\n\tconst [columns, setColumnEl] = useState();\r\n\r\n\tconst childRef = useRef(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tsetColumnEl(document.getElementsByClassName(\"scroll-column\"));\r\n\t}, []);\r\n\r\n\tconst childrenWithPassedHoverStatus = children?.map((child, i) => {\r\n\t\treturn {\r\n\t\t\t...child,\r\n\t\t\tprops: {\r\n\t\t\t\t...child.props,\r\n\t\t\t\tisHovered,\r\n\t\t\t\tposition: i + 1,\r\n\t\t\t\tchildRef: i == 0 ? childRef : null,\r\n\t\t\t},\r\n\t\t};\r\n\t});\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tonMouseEnter={({ target }) => {\r\n\t\t\t\tsetTimeoutRef(setTimeout(() => setIsHovered(true), 200));\r\n\t\t\t}}\r\n\t\t\tonMouseLeave={({ target }) => {\r\n\t\t\t\t[...columns].forEach((column) => (column.scrollTop = 0));\r\n\r\n\t\t\t\tif (timeoutRef) {\r\n\t\t\t\t\tclearTimeout(timeoutRef);\r\n\t\t\t\t\tsetTimeoutRef(null);\r\n\t\t\t\t}\r\n\r\n\t\t\t\tsetTimeout(() => {\r\n\t\t\t\t\tsetIsHovered(false);\r\n\t\t\t\t}, 200);\r\n\t\t\t}}\r\n\t\t\tstyle={{\r\n\t\t\t\theight:\r\n\t\t\t\t\t100 * (children.length - 1) +\r\n\t\t\t\t\t\tchildRef?.current?.getBoundingClientRect().height || 0,\r\n\t\t\t}}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"scroll-column w-fit gap-3 overflow-y-auto h-full min-w-[250px] overflow-x-hidden self-start transition-all flex-col justify-content-between mx-2 px-3 py-2 scroll-smooth relative flex bg-background\",\r\n\t\t\t\tisHovered ? \"overflow-y-auto\" : \"overflow-y-hidden\"\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t{!!children.length && childrenWithPassedHoverStatus}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport const ListCard = ({ card, isHovered, position, childRef, ...props }) => {\r\n\t// Open more details\r\n\tconst [openCard, setOpenCard] = useState(false);\r\n\r\n\tconst [hoverState, setHoverState] = useState(isHovered || false);\r\n\r\n\tconst cardData = card?.title ? card : props;\r\n\r\n\t// On mount:\r\n\t// 1) pull list of selected cards\r\n\t// 2) set color of text to average color of image\r\n\tuseEffect(() => {\r\n\t\tsetHoverState(isHovered);\r\n\t}, []);\r\n\r\n\tuseEffect(() => {\r\n\t\tsetHoverState(isHovered);\r\n\t}, [isHovered]);\r\n\r\n\tconst variants = {\r\n\t\thover: { translateY: \"0\", height: \"100%\" },\r\n\t\tstack: {\r\n\t\t\ttranslateY: `calc(-95px * ${position - 1})`,\r\n\t\t\theight: position === 1 ? \"100%\" : \"100px\",\r\n\t\t},\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tkey={cardData.title}\r\n\t\t\tonClick={() => setOpenCard(!openCard)}\r\n\t\t\t// onMouseLeave={() => setOpenCard(false)}\r\n\t\t\tstyle={\r\n\t\t\t\tisHovered || position === 1\r\n\t\t\t\t\t? {\r\n\t\t\t\t\t\t\tzIndex: Math.round(10 / position),\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t: {\r\n\t\t\t\t\t\t\tzIndex: Math.round(10 / position),\r\n\t\t\t\t\t\t}\r\n\t\t\t}\r\n\t\t\tinitial={\"stack\"}\r\n\t\t\tref={childRef}\r\n\t\t\tvariants={variants}\r\n\t\t\ttransition={{ ease: \"linear\", duration: 0.25 }}\r\n\t\t\tanimate={isHovered ? \"hover\" : \"stack\"}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"group border relative overflow-hidden rounded-lg max-h-[80vh] shadow-xl h-full bg-transparent w-full\"\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t{(cardData.images?.length || cardData.img?.src) && (\r\n\t\t\t\t<Image\r\n\t\t\t\t\tsrc={\r\n\t\t\t\t\t\tcardData.images?.length\r\n\t\t\t\t\t\t\t? cardData.images[0].url\r\n\t\t\t\t\t\t\t: cardData.img?.src\r\n\t\t\t\t\t}\r\n\t\t\t\t\theight={\r\n\t\t\t\t\t\tcardData.images?.length ? cardData.images[0].height : 200\r\n\t\t\t\t\t}\r\n\t\t\t\t\twidth={cardData.images?.length ? cardData.images[0]?.width : 300}\r\n\t\t\t\t\talt=\"test1\"\r\n\t\t\t\t\tcrossOrigin=\"anonymous\"\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t`peer h-full w-full object-cover pb-[75px] object-center ${cardData.title} bg-background`\r\n\t\t\t\t\t)}\r\n\t\t\t\t/>\r\n\t\t\t)}\r\n\r\n\t\t\t<span className=\"group-hover:visible invisible absolute inset-0 bg-background/30 text-foreground text-center content-center\">\r\n\t\t\t\tClick to reveal more\r\n\t\t\t</span>\r\n\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"bg-background w-full absolute h-[75px] top-[calc(100%-75px)] bottom-0 transition-all duration-500\",\r\n\t\t\t\t\topenCard && \"h-full top-0 bottom-0\"\r\n\t\t\t\t)}\r\n\t\t\t>\r\n\t\t\t\t<div className=\"flex\">\r\n\t\t\t\t\t<h2 className=\"font-spectral px-5\">{cardData.title}</h2>\r\n\t\t\t\t</div>\r\n\t\t\t\t<span\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"block opacity-0 text-foreground font-spectral px-5 mt-6\",\r\n\t\t\t\t\t\topenCard && \"opacity-100 duration-100\"\r\n\t\t\t\t\t)}\r\n\t\t\t\t>\r\n\t\t\t\t\tLook at this card!\r\n\t\t\t\t</span>\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport default Lane;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/lane-card"
+  }
+}

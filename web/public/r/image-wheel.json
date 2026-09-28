@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "image-wheel",
+  "type": "registry:ui",
+  "title": "Image Wheel",
+  "description": "Image Wheel",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/image-wheel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/image-wheel.tsx",
+      "content": "import { useRef, useState } from \"react\";\r\n\r\nimport { X } from \"lucide-react\";\r\nimport {\r\n\tanimate,\r\n\tAnimatePresence,\r\n\tmotion,\r\n\tuseMotionValue,\r\n\tuseMotionValueEvent,\r\n} from \"motion/react\";\r\n\r\n// Credit:\r\n// https://pro.bossadizenith.me/\r\n\r\ninterface Element {\r\n\tid: number;\r\n\timg: string;\r\n}\r\n\r\nconst items: Element[] = [\r\n\t{\r\n\t\tid: 1,\r\n\t\timg: \"https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\timg: \"https://media.istockphoto.com/id/1168977609/photo/paparazzi-photographer-in-petropolis-rio-de-janeiro.jpg?s=612x612&w=0&k=20&c=R0XWB0-J0s-kbWfW6RgYGvNGMxnMSProeb8_KH-D2AA=\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\timg: \"https://cdn.create.vista.com/api/media/small/137693132/stock-photo-woman-photographer-holding-a-camera-in-the-wild-for-take-a-photo\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\timg: \"https://media.istockphoto.com/id/1049506008/photo/senior-african-american-woman-hiking-with-camera.jpg?b=1&s=612x612&w=0&k=20&c=xqaVJQFpF2KmL04zaVK_FF0CFAlaZdF39nRKOTBnBC4=\",\r\n\t},\r\n\t{\r\n\t\tid: 5,\r\n\t\timg: \"https://media.istockphoto.com/id/1336160936/photo/freelance-female-photographer-holding-a-camera.jpg?s=612x612&w=0&k=20&c=zlUnQT31KdlJCfDycdJauJVeiKO11IhtjESAjZhaTvQ=\",\r\n\t},\r\n\t{\r\n\t\tid: 6,\r\n\t\timg: \"https://st3.depositphotos.com/3433891/33505/i/450/depositphotos_335052976-stock-photo-young-african-american-photographer-woman.jpg\",\r\n\t},\r\n\t{\r\n\t\tid: 7,\r\n\t\timg: \"https://st4.depositphotos.com/13194036/22991/i/450/depositphotos_229919434-stock-photo-beautiful-smiling-girl-using-photo.jpg\",\r\n\t},\r\n\t{\r\n\t\tid: 8,\r\n\t\timg: \"https://st4.depositphotos.com/13194036/i/600/depositphotos_229919408-stock-photo-beautiful-young-woman-using-photo.jpg\",\r\n\t},\r\n\t{\r\n\t\tid: 9,\r\n\t\timg: \"https://img.freepik.com/premium-photo/young-photographer-standing-front-reflective-umbrella_53876-82660.jpg\",\r\n\t},\r\n\t{\r\n\t\tid: 10,\r\n\t\timg: \"https://img.freepik.com/premium-photo/side-view-woman-working-as-photographer_23-2150506106.jpg\",\r\n\t},\r\n\t{\r\n\t\tid: 11,\r\n\t\timg: \"https://media.istockphoto.com/id/1069722364/photo/young-african-photographer-at-work-at-studio.jpg?s=612x612&w=0&k=20&c=sgY8pDSSNSj4YIZYBVb-N2vW4TlV9ZNjXTdMFhJ1new=\",\r\n\t},\r\n\t{\r\n\t\tid: 12,\r\n\t\timg: \"https://media.istockphoto.com/id/121349708/photo/young-asian-girl-taking-a-photo.jpg?s=612x612&w=0&k=20&c=GRstiRHSDMhnSYlGOmlSe2_tv0Hrk_ogJmMydfE-nbI=\",\r\n\t},\r\n];\r\n\r\nconst ImageWheel = () => {\r\n\tconst [activeElement, setActiveElement] = useState<Element | null>(null);\r\n\r\n\tconst motionX = useMotionValue(0);\r\n\tconst rotate = useMotionValue(0);\r\n\tconst accumulatedRotation = useRef(0);\r\n\r\n\tconst radius = 190;\r\n\tconst snapAngle = 360 / items.length;\r\n\r\n\tuseMotionValueEvent(motionX, \"change\", (latest) => {\r\n\t\trotate.set(accumulatedRotation.current + latest / 5);\r\n\t});\r\n\r\n\tconst handleDrag = (_: any, info: any) => {\r\n\t\tmotionX.set(info.offset.x);\r\n\t};\r\n\r\n\tconst handleDragEnd = () => {\r\n\t\tconst currentRotation = rotate.get();\r\n\t\tconst normalizedRotation = ((currentRotation % 360) + 360) % 360;\r\n\t\tconst nearestMultiple =\r\n\t\t\tMath.round(normalizedRotation / snapAngle) * snapAngle;\r\n\t\tconst finalRotation =\r\n\t\t\tMath.floor(currentRotation / 360) * 360 + nearestMultiple;\r\n\r\n\t\taccumulatedRotation.current = finalRotation;\r\n\r\n\t\tanimate(rotate, finalRotation, {\r\n\t\t\ttype: \"spring\",\r\n\t\t\tstiffness: 300,\r\n\t\t\tdamping: 30,\r\n\t\t});\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"relative size-full flex items-center justify-center\">\r\n\t\t\t<div className=\"relative size-full flex items-center justify-center overflow-hidden rounded-xl bg-background p-4\">\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tdrag=\"x\"\r\n\t\t\t\t\tdragConstraints={{ left: 0, right: 0 }}\r\n\t\t\t\t\tdragElastic={0}\r\n\t\t\t\t\tonDrag={handleDrag}\r\n\t\t\t\t\tonDragEnd={handleDragEnd}\r\n\t\t\t\t\tstyle={{ rotate }}\r\n\t\t\t\t\tclassName=\"relative size-full cursor-grab rounded-lg bg-transparent flex items-center justify-center active:cursor-grabbing\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{items.map((ele, index) => {\r\n\t\t\t\t\t\tconst angle = (index / items.length) * 2 * Math.PI;\r\n\t\t\t\t\t\tconst x = radius * Math.cos(angle);\r\n\t\t\t\t\t\tconst y = radius * Math.sin(angle);\r\n\t\t\t\t\t\tconst rotation = (index * 360) / items.length;\r\n\r\n\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tkey={ele.id}\r\n\t\t\t\t\t\t\t\tclassName=\"absolute size-20 p-1 cursor-pointer shadow-lg shadow-black/10 rounded-lg\"\r\n\t\t\t\t\t\t\t\tstyle={{ x, y, rotate: rotation }}\r\n\t\t\t\t\t\t\t\tonClick={() => setActiveElement(ele)}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<motion.img\r\n\t\t\t\t\t\t\t\t\tsrc={ele.img}\r\n\t\t\t\t\t\t\t\t\talt=\"Image\"\r\n\t\t\t\t\t\t\t\t\tlayoutId={`spinner-${ele.id}`}\r\n\t\t\t\t\t\t\t\t\tclassName=\"size-full object-cover rounded-lg border-2 border-white\"\r\n\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t);\r\n\t\t\t\t\t})}\r\n\t\t\t\t</motion.div>\r\n\t\t\t\t<h1 className=\"text-foreground text-4xl font-bold absolute bottom-0 left-0 right-0 top-0 m-auto size-fit z-10\">\r\n\t\t\t\t\tSpin\r\n\t\t\t\t</h1>\r\n\t\t\t</div>\r\n\t\t\t<ActiveItem\r\n\t\t\t\tactiveElement={activeElement}\r\n\t\t\t\tsetActiveElement={setActiveElement}\r\n\t\t\t/>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\ninterface ActiveItemProps {\r\n\tactiveElement: Element | null;\r\n\tsetActiveElement: (element: Element | null) => void;\r\n}\r\n\r\nconst ActiveItem = ({ activeElement, setActiveElement }: ActiveItemProps) => {\r\n\treturn (\r\n\t\t<AnimatePresence>\r\n\t\t\t{activeElement && (\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tinitial={{ opacity: 0 }}\r\n\t\t\t\t\tanimate={{ opacity: 1 }}\r\n\t\t\t\t\texit={{ opacity: 0 }}\r\n\t\t\t\t\ttransition={{ duration: 0.3 }}\r\n\t\t\t\t\tclassName=\"absolute inset-0 flex items-center justify-center z-20 bg-background\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tlayoutId={`spinner-${activeElement.id}`}\r\n\t\t\t\t\t\tclassName=\"w-[400px] h-[400px] rounded-3xl overflow-hidden relative bg-background p-2 shadow-lg shadow-black/10\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\tclassName=\"absolute right-5 top-5 size-10 text-foreground bg-primary/50 backdrop-blur-md rounded-full flex items-center justify-center\"\r\n\t\t\t\t\t\t\tonClick={() => setActiveElement(null)}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<X className=\"w-6 h-6\" />\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t\t<motion.img\r\n\t\t\t\t\t\t\tsrc={activeElement.img}\r\n\t\t\t\t\t\t\talt=\"Image\"\r\n\t\t\t\t\t\t\tclassName=\"w-full h-full object-cover rounded-2xl border-2 border-white\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t)}\r\n\t\t</AnimatePresence>\r\n\t);\r\n};\r\n\r\nexport default ImageWheel;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries",
+      "Images"
+    ],
+    "tags": [
+      "spring",
+      "drag"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "pro.bossadizenith.me",
+      "url": "https://pro.bossadizenith.me/",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/image-wheel"
+  }
+}

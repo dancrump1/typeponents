@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "terminal",
+  "type": "registry:ui",
+  "title": "Terminal",
+  "description": "Terminal",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/terminal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/terminal.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useState } from \"react\";\r\n\r\nfunction Terminal() {\r\n\tconst [enteredText, setEnteredText] = useState(\"\");\r\n\tconst [enteringText, setEnteringText] = useState(false);\r\n\r\n\tuseEffect(() => {\r\n\t\twindow.onclick = () => {\r\n\t\t\tsetEnteringText(false);\r\n\t\t};\r\n\r\n\t\tdocument\r\n\t\t\t.getElementById(\"myTextFieldContainer\")\r\n\t\t\t?.addEventListener(\"click\", () => {\r\n\t\t\t\tdocument.getElementById(\"myTextField\")?.focus();\r\n\t\t\t});\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"dark:text-foreground dark:bg-background\">\r\n\t\t\t<section className=\"mx-40\">\r\n\t\t\t\t<div\r\n\t\t\t\t\tid=\"myTextFieldContainer\"\r\n\t\t\t\t\tonClick={(e) => {\r\n\t\t\t\t\t\te.stopPropagation();\r\n\t\t\t\t\t\tsetEnteringText(true);\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName=\"mx-auto relative h-96 w-full max-w-[1500px] cursor-text rounded-lg bg-slate-950/70 font-mono shadow-xl backdrop-blur-sm\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<div className=\"sticky top-0 flex w-full items-center gap-1 bg-slate-900 p-3\">\r\n\t\t\t\t\t\t<div className=\"h-3 w-3 rounded-full bg-red-500\"></div>\r\n\t\t\t\t\t\t<div className=\"h-3 w-3 rounded-full bg-yellow-500\"></div>\r\n\t\t\t\t\t\t<div className=\"h-3 w-3 rounded-full bg-green-500\"></div>\r\n\t\t\t\t\t\t<span className=\"absolute left-[50%] -translate-x-[50%]\">\r\n\t\t\t\t\t\t\tterminal\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div className=\"p-2 text-lg\">\r\n\t\t\t\t\t\t<p>Put whatever text you want here</p>\r\n\t\t\t\t\t\t<p className=\"overflow-hidden whitespace-nowrap font-light\">\r\n\t\t\t\t\t\t\t*******************************\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t<p>\r\n\t\t\t\t\t\t\tFake entrance question\r\n\t\t\t\t\t\t\t<span className=\"text-purple-400\"> your value?</span>\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t<form>\r\n\t\t\t\t\t\t\t<input\r\n\t\t\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\t\t\tclassName=\"sr-only absolute h-full top-0 w-full\"\r\n\t\t\t\t\t\t\t\tautoComplete=\"off\"\r\n\t\t\t\t\t\t\t\tname=\"text\"\r\n\t\t\t\t\t\t\t\tid=\"myTextField\"\r\n\t\t\t\t\t\t\t\tvalue={enteredText}\r\n\t\t\t\t\t\t\t\tonChange={(e) => {\r\n\t\t\t\t\t\t\t\t\tsetEnteredText(e.target.value);\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t\t<p>\r\n\t\t\t\t\t\t\t<span className=\"text-emerald-400\">$</span>\r\n\t\t\t\t\t\t\t<span className=\"opacity-50\">Enter email: </span>\r\n\t\t\t\t\t\t\t<span>{enteredText}</span>\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\tclassName={\r\n\t\t\t\t\t\t\t\t\tenteringText\r\n\t\t\t\t\t\t\t\t\t\t? `ml-0.5 inline-block h-5 w-2 translate-y-1 bg-slate-400 animate-blink`\r\n\t\t\t\t\t\t\t\t\t\t: \"hidden\"\r\n\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t></span>\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</section>\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nexport default Terminal;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/terminal"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "takeover-links",
+  "type": "registry:ui",
+  "title": "Takeover Links",
+  "description": "Takeover Links",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/takeover-links.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/takeover-links.tsx",
+      "content": "import React, { Dispatch, SetStateAction, useEffect } from \"react\";\r\nimport { motion, useAnimate } from \"motion/react\";\r\n\r\n\r\n\r\n\r\nexport const UnderlayTransition = ({ active }: { active: number | null }) => {\r\n    const [underlayScope, animateUnderlay] = useAnimate();\r\n\r\n    useEffect(() => {\r\n        if (active) {\r\n            animateUnderlay(\r\n                underlayScope.current,\r\n                {\r\n                    top: [\"100%\", \"0%\", \"0%\"],\r\n                    bottom: [\"0%\", \"0%\", \"100%\"],\r\n                },\r\n                { duration: 1.5, ease: \"easeInOut\" }\r\n            );\r\n        }\r\n    }, [active]);\r\n\r\n    return (\r\n        <div\r\n            ref={underlayScope}\r\n            className=\"absolute bottom-0 left-0 right-0 top-full z-10 bg-neutral-300\"\r\n        />\r\n    );\r\n};\r\n\r\nexport const AnimatedLink = ({\r\n    children,\r\n    href,\r\n    setActive,\r\n    active,\r\n    id,\r\n}: {\r\n    children: string;\r\n    href: string;\r\n    setActive: Dispatch<SetStateAction<number | null>>;\r\n    active: number | null;\r\n    id: number;\r\n}) => {\r\n    return (\r\n        <motion.a\r\n            onMouseEnter={() => {\r\n                setActive(id);\r\n            }}\r\n            href={href}\r\n            animate={active === id || active === null ? \"active\" : \"inactive\"}\r\n            variants={{\r\n                active: {\r\n                    opacity: 1,\r\n                },\r\n                inactive: {\r\n                    opacity: 0.25,\r\n                },\r\n            }}\r\n            transition={{\r\n                duration: 0.25,\r\n                ease: \"easeInOut\",\r\n                staggerChildren: 0.075,\r\n            }}\r\n            whileHover=\"hovered\"\r\n            className=\"flex overflow-hidden py-2 text-5xl font-thin uppercase md:text-6xl lg:text-8xl\"\r\n        >\r\n            {children.split(\"\").map((ch, idx) => {\r\n                return (\r\n                    <motion.span\r\n                        className=\"block\"\r\n                        initial={false}\r\n                        variants={{\r\n                            hovered: {\r\n                                y: [\"0%\", \"-110%\", \"110%\", \"0%\"],\r\n                                opacity: [1, 0, 0, 1],\r\n                            },\r\n                        }}\r\n                        transition={{\r\n                            duration: 1,\r\n                            ease: \"easeInOut\",\r\n                        }}\r\n                        key={idx}\r\n                    >\r\n                        {ch}\r\n                    </motion.span>\r\n                );\r\n            })}\r\n        </motion.a>\r\n    );\r\n};\r\n\r\nexport const LinkImage = ({\r\n    imgSrc,\r\n    active,\r\n    id,\r\n}: {\r\n    imgSrc: string;\r\n    active: number | null;\r\n    id: number;\r\n}) => {\r\n    return (\r\n        <motion.div\r\n            className=\"absolute inset-0 z-0\"\r\n            animate={active === id ? \"active\" : \"inactive\"}\r\n            variants={{\r\n                active: {\r\n                    opacity: 0.25,\r\n                },\r\n                inactive: {\r\n                    opacity: 0,\r\n                },\r\n            }}\r\n            transition={{\r\n                duration: 0.5,\r\n                ease: \"easeInOut\",\r\n                delay: 0.5,\r\n            }}\r\n            style={{\r\n                backgroundImage: `url(${imgSrc})`,\r\n                backgroundSize: \"cover\",\r\n                backgroundPosition: \"center\",\r\n                filter: \"blur(8px)\",\r\n                opacity: 0,\r\n            }}\r\n        />\r\n    );\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "active",
+        "type": "number | null",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/takeover-links"
+  }
+}

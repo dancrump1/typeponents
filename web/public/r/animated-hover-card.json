@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "animated-hover-card",
+  "type": "registry:ui",
+  "title": "Animated Hover Card",
+  "description": "Tall gradient card with a title and a subtitle that stays hidden until you hover.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/animated-hover-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/animated-hover-card.tsx",
+      "content": "// .card {\r\n//     aspect-ratio: 1 / 1.6;\r\n//     border: 0.2vmin solid rgb(109, 0, 252);\r\n//     cursor: pointer;\r\n//     position: relative;\r\n//     width: 45vmin;\r\n//     overflow: hidden;\r\n//   }\r\n\r\n//   .card:hover:before {\r\n//     background-position: 100% 100%;\r\n//     transform: scale(1.08, 1.03);\r\n//   }\r\n\r\n//   .card:hover > .content {\r\n//     background-position: -10% 0%;\r\n//   }\r\n\r\n//   .card:hover > .card-icon {\r\n//     color: white;\r\n//   }\r\n\r\n//   .card:hover > .content > .cardsubtitle > .cardsubtitle-word {\r\n//     opacity: 1;\r\n//     transform: translateY(0%);\r\n//     transition: opacity 0ms, transform 200ms cubic-bezier(.90, .06, .15, .90);\r\n//   }\r\n\r\n//   .card:before {\r\n//     background: linear-gradient(\r\n//       130deg,\r\n//       transparent 0% 33%,\r\n//       var(--g1) 66%,\r\n//       var(--g2) 83.5%,\r\n//       var(--g3) 100%\r\n//     );\r\n//     background-position: 0% 0%;\r\n//     background-size: 300% 300%;\r\n//     content: \"\";\r\n//     height: 100%;\r\n//     left: 0px;\r\n//     pointer-events: none;\r\n//     position: absolute;\r\n//     top: 0px;\r\n//     transition: background-position 350ms ease, transform 350ms ease;\r\n//     width: 100%;\r\n//     z-index: 1;\r\n//   }\r\n\r\n//   .content {\r\n//     background-image: radial-gradient(\r\n//       rgba(255, 255, 255, 0.2) 8%,\r\n//       transparent 8%\r\n//     );\r\n//     background-position: 0% 0%;\r\n//     background-size: 5vmin 5vmin;\r\n//     height: 100%;\r\n//     padding: 5vmin;\r\n//     position: relative;\r\n//     transition: background-position 350ms ease;\r\n//     z-index: 2;\r\n//   }\r\n\r\n//   .content:hover {\r\n//     opacity: 75%;\r\n//   }\r\n\r\n//   .cardtitle,\r\n//   .cardsubtitle {\r\n//     color: white;\r\n//     font-family: \"Anek Latin\", sans-serif;\r\n//     font-weight: 400;\r\n//     margin: 0px;\r\n//   }\r\n\r\n//   .cardtitle {\r\n//     font-size: 4vmin;\r\n//     font-weight: bold;\r\n//     transition: opacity 350ms ease;\r\n//   }\r\n\r\n//   .cardsubtitle {\r\n//     font-size: 3vmin;\r\n//     margin-top: 2vmin;\r\n//   }\r\n\r\n//   .cardsubtitle-word {\r\n//     display: inline-block;\r\n//     margin: 0vmin 0.3vmin;\r\n//     opacity: 0;\r\n//     position: relative;\r\n//     transform: translateY(40%);\r\n//     transition: none;\r\n//   }\r\n\r\n//   .card-icon {\r\n//     bottom: 0px;\r\n//     color: rgba(255, 255, 255, 0.5);\r\n//     font-size: 7vmin;\r\n//     left: 0px;\r\n//     margin: 5vmin;\r\n//     position: absolute;\r\n//     transition: color 250ms ease;\r\n//     z-index: 2;\r\n//   }\r\n\r\nimport React from \"react\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://ui.noxhd.com/components/animated-card/\r\n\r\nconst AnimatedCard = ({ title, subtitle }) => {\r\n\tconst textVariants = {\r\n\t\tinitial: {\r\n\t\t\topacity: 0,\r\n\t\t\ty: -20,\r\n\t\t},\r\n\t\tanimate: {\r\n\t\t\topacity: 1,\r\n\t\t\ty: 0,\r\n\t\t},\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"flex justify-center content-center m-10\">\r\n\t\t\t<motion.div\r\n\t\t\t\tinitial=\"initial\"\r\n\t\t\t\twhileHover=\"animate\"\r\n\t\t\t\ttransition={{ staggerChildren: 0.05 }}\r\n\t\t\t\tclassName={\"card\"}\r\n\t\t\t>\r\n\t\t\t\t<div className={\"content\"}>\r\n\t\t\t\t\t<h3 className={\"cardtitle\"}>{title}</h3>\r\n\t\t\t\t\t<div className={\"cardsubtitle\"}>\r\n\t\t\t\t\t\t{subtitle.split(\"\").map((char, i) => {\r\n\t\t\t\t\t\t\treturn (\r\n\t\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tmarginRight: char === \" \" ? \"0.4rem\" : \"0.1\",\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\tkey={\"hover-card\" + i}\r\n\t\t\t\t\t\t\t\t\tclassName=\"inline-block relative\"\r\n\t\t\t\t\t\t\t\t\tvariants={textVariants}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{char}\r\n\t\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t})}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</motion.div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default AnimatedCard;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering the card reveals the subtitle one character at a time, each letter dropping into place a beat after the one before it.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/animated-hover-card"
+  }
+}

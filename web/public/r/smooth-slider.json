@@ -1,0 +1,44 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "smooth-slider",
+  "type": "registry:ui",
+  "title": "Smooth Slider",
+  "description": "Smooth Slider",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/smooth-slider.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/smooth-slider.tsx",
+      "content": "\"use client\";\n\nimport React, {\n\tcreateContext,\n\tuseContext,\n\tuseEffect,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { ChevronLeft, ChevronRight } from \"lucide-react\";\n\n// Credit:\n// https://aetherui.in/docs/smooth-slider#installation\n\ntype AnimatedCardContextType = {\n\tisHovered: boolean;\n\tsetIsHovered: React.Dispatch<React.SetStateAction<boolean>>;\n};\n\nconst AnimatedCardContext = createContext<AnimatedCardContextType | null>(null);\n\nexport const useAnimatedCard = () => {\n\tconst context = useContext(AnimatedCardContext);\n\tif (!context) {\n\t\tthrow new Error(\n\t\t\t\"useAnimatedCard must be used within a AnimatedCard Profvider\"\n\t\t);\n\t}\n\n\treturn context;\n};\n\ntype AnimatedSliderProps = {\n\ttitle?: string;\n\tchildren: React.ReactNode;\n\tclassName?: string;\n\tgap?: number;\n\tscrollAmount?: number;\n} & React.ComponentProps<\"div\">;\n\nfunction AnimatedSlider({\n\tgap = 16,\n\tscrollAmount = 300,\n\t...props\n}: AnimatedSliderProps) {\n\tconst sliderRef = useRef<HTMLDivElement>(null);\n\tconst [showLeftArrow, setShowLeftArrow] = useState(false);\n\tconst [showRightArrow, setShowRightArrow] = useState(true);\n\n\tconst checkArrows = () => {\n\t\tif (!sliderRef.current) return;\n\n\t\tconst { scrollLeft, scrollWidth, clientWidth } = sliderRef.current;\n\t\tsetShowLeftArrow(scrollLeft > 0);\n\t\tsetShowRightArrow(scrollLeft < scrollWidth - clientWidth - 10); // when there is enough space to scroll to the right\n\t\tconsole.log(\"scrolLeft\", scrollLeft > 0);\n\t\tconsole.log(\"scrollWidth\", scrollLeft < scrollWidth - clientWidth - 10);\n\t};\n\n\tuseEffect(() => {\n\t\tconst slider = sliderRef.current;\n\t\tif (!slider) return;\n\n\t\tslider.addEventListener(\"scroll\", checkArrows);\n\t\twindow.addEventListener(\"resize\", checkArrows);\n\n\t\tcheckArrows();\n\n\t\treturn () => {\n\t\t\tslider.removeEventListener(\"scroll\", checkArrows);\n\t\t\twindow.removeEventListener(\"resize\", checkArrows);\n\t\t};\n\t}, []);\n\n\tconst scrollHandler = (direction: \"left\" | \"right\") => {\n\t\tif (!sliderRef.current) return;\n\n\t\tconst currentScroll = sliderRef.current.scrollLeft;\n\t\t// left: 500-300 (move 300 units to left), right: 500+300 (move 300 units to right)\n\t\tconst newScrollLeft =\n\t\t\tdirection === \"left\"\n\t\t\t\t? currentScroll - scrollAmount\n\t\t\t\t: currentScroll + scrollAmount;\n\n\t\tsliderRef.current.scrollTo({\n\t\t\tleft: newScrollLeft,\n\t\t\tbehavior: \"smooth\",\n\t\t});\n\t};\n\n\treturn (\n\t\t<div className={cn(\"w-full\", props.className)} {...props}>\n\t\t\t{props.title && (\n\t\t\t\t<h2 className=\"text-primary mb-4 text-2xl font-bold\">\n\t\t\t\t\t{props.title}\n\t\t\t\t</h2>\n\t\t\t)}\n\n\t\t\t<div className=\"group relative\">\n\t\t\t\t<div\n\t\t\t\t\tref={sliderRef}\n\t\t\t\t\tclassName=\"scrollbar-hide flex overflow-x-auto pb-4\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tscrollbarWidth: \"none\",\n\t\t\t\t\t\tmsOverflowStyle: \"none\",\n\t\t\t\t\t\tgap: `${gap}px`,\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{props.children}\n\t\t\t\t</div>\n\n\t\t\t\t{showLeftArrow && (\n\t\t\t\t\t<button\n\t\t\t\t\t\tonClick={() => scrollHandler(\"left\")}\n\t\t\t\t\t\tclassName=\"absolute top-1/2 left-0 z-10 -translate-x-2 -translate-y-1/2 scale-0 rounded-full bg-background/50 p-2 text-foreground transition-transform group-hover:translate-x-2 group-hover:scale-100\"\n\t\t\t\t\t\taria-label=\"Scroll left\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<ChevronLeft className=\"h-6 w-6\" />\n\t\t\t\t\t</button>\n\t\t\t\t)}\n\n\t\t\t\t{showRightArrow && (\n\t\t\t\t\t<button\n\t\t\t\t\t\tonClick={() => scrollHandler(\"right\")}\n\t\t\t\t\t\tclassName=\"absolute top-1/2 right-0 z-10 translate-x-2 -translate-y-1/2 scale-0 rounded-full bg-background/50 p-2 text-foreground transition-transform group-hover:-translate-x-2 group-hover:scale-100\"\n\t\t\t\t\t\taria-label=\"Scroll right\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<ChevronRight className=\"h-6 w-6\" />\n\t\t\t\t\t</button>\n\t\t\t\t)}\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n\nAnimatedSlider.displayName = \"AnimatedSlider\";\n\ntype AnimatedCardProps = {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n\tdefaultWidth?: string;\n\texpandedWidth?: string;\n\theight?: string;\n\ttransitionDuration?: string;\n\ttransitionEasing?:\n\t\t| \"linear\"\n\t\t| \"ease\"\n\t\t| \"ease-in\"\n\t\t| \"ease-out\"\n\t\t| \"ease-in-out\"\n\t\t| `cubic-bezier(${number}, ${number}, ${number}, ${number})`;\n} & React.ComponentProps<\"div\">;\n\nfunction AnimatedCard({\n\tchildren,\n\tclassName,\n\tdefaultWidth = \"180px\",\n\texpandedWidth = \"320px\",\n\theight = \"270px\",\n\ttransitionDuration = \"0.4s\",\n\ttransitionEasing = \"ease\",\n\t...props\n}: AnimatedCardProps) {\n\tconst [isHovered, setIsHovered] = useState(false);\n\n\treturn (\n\t\t<AnimatedCardContext.Provider value={{ isHovered, setIsHovered }}>\n\t\t\t<div\n\t\t\t\tclassName={cn(\"relative shrink-0 cursor-pointer\", className)}\n\t\t\t\tonMouseEnter={() => setIsHovered(true)}\n\t\t\t\tonMouseLeave={() => setIsHovered(false)}\n\t\t\t\tstyle={{\n\t\t\t\t\twidth: isHovered ? expandedWidth : defaultWidth,\n\t\t\t\t\theight,\n\t\t\t\t\ttransition: `width ${transitionDuration} ${transitionEasing}`,\n\t\t\t\t}}\n\t\t\t\t{...props}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</div>\n\t\t</AnimatedCardContext.Provider>\n\t);\n}\n\nAnimatedCard.displayName = \"AnimatedCard\";\n\ntype CardContentProps = {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n\tdefaultAspectRatio?: string;\n\texpandedAspectRatio?: string;\n} & React.ComponentProps<\"div\">;\n\nfunction CardContent({\n\tclassName,\n\tchildren,\n\tdefaultAspectRatio = \"aspect-2/3\",\n\texpandedAspectRatio = \"aspect-video\",\n\t...props\n}: CardContentProps) {\n\tconst { isHovered } = useAnimatedCard();\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative h-full w-full overflow-hidden rounded-lg transition-[aspect-ratio] duration-[400] ease-in\",\n\t\t\t\tisHovered ? expandedAspectRatio : defaultAspectRatio,\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\t{...props}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n}\n\nCardContent.displayName = \"CardContent\";\n\ntype OnHoverProps = {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n\tfadeInDuration?: string;\n} & React.ComponentProps<\"div\">;\n\nfunction OnHover({\n\tclassName,\n\tchildren,\n\tfadeInDuration = \"0.3s\",\n\t...props\n}: OnHoverProps) {\n\tconst { isHovered } = useAnimatedCard();\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"absolute inset-0 flex flex-col justify-end bg-linear-to-t from-background/90 via-background/60 to-transparent p-4 transition-[transform,opacity] duration-300 ease-in-out\",\n\t\t\t\tisHovered\n\t\t\t\t\t? \"translate-y-0 opacity-100\"\n\t\t\t\t\t: \"translate-y-full opacity-0\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tstyle={{\n\t\t\t\tanimation: `fadeIn ${fadeInDuration} ease-in-out`,\n\t\t\t}}\n\t\t\t{...props}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n}\n\nOnHover.displayName = \"OnHover\";\n\ntype DefaultViewProps = {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n} & React.ComponentProps<\"div\">;\n\nfunction DefaultView({ className, children, ...props }: DefaultViewProps) {\n\tconst { isHovered } = useAnimatedCard();\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"fade-in-20 absolute right-0 bottom-0 left-0 truncate p-2 text-sm font-medium text-foreground transition-[transform,opacity] duration-200 ease-in-out\",\n\t\t\t\t!isHovered\n\t\t\t\t\t? \"translate-y-0 opacity-100\"\n\t\t\t\t\t: \"translate-y-full opacity-0\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\t{...props}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n}\n\nDefaultView.displayName = \"DefaultView\";\n\nexport { AnimatedSlider, AnimatedCard, CardContent, OnHover, DefaultView };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "aetherui.in",
+      "url": "https://aetherui.in/docs/smooth-slider#installation",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/smooth-slider"
+  }
+}

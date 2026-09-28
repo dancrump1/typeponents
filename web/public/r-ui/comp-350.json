@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-350",
+  "type": "registry:component",
+  "title": "Comp 350",
+  "description": "Comp 350",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-350.tsx",
+      "content": "import {\r\n\tAccordion,\r\n\tAccordionContent,\r\n\tAccordionItem,\r\n\tAccordionTrigger,\r\n} from \"@/components/ui/accordion\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: \"1\",\r\n\t\ttitle: \"What makes Origin UI different?\",\r\n\t\tcontent:\r\n\t\t\t\"Origin UI focuses on developer experience and performance. Built with TypeScript, it offers excellent type safety, follows accessibility standards, and provides comprehensive documentation with regular updates.\",\r\n\t},\r\n\t{\r\n\t\tid: \"2\",\r\n\t\ttitle: \"How can I customize the components?\",\r\n\t\tcontent:\r\n\t\t\t\"Use our CSS variables for global styling, or className and style props for component-specific changes. We support CSS modules, Tailwind, and dark mode out of the box.\",\r\n\t},\r\n\t{\r\n\t\tid: \"3\",\r\n\t\ttitle: \"Is Origin UI optimized for performance?\",\r\n\t\tcontent:\r\n\t\t\t\"Yes, with tree-shaking, code splitting, and minimal runtime overhead. Most components are under 5KB gzipped.\",\r\n\t},\r\n\t{\r\n\t\tid: \"4\",\r\n\t\ttitle: \"How accessible are the components?\",\r\n\t\tcontent:\r\n\t\t\t\"All components follow WAI-ARIA standards, featuring proper ARIA attributes, keyboard navigation, and screen reader support. Regular testing ensures compatibility with NVDA, VoiceOver, and JAWS.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"space-y-4\">\r\n\t\t\t<h2 className=\"text-xl font-bold\">Table w/ left chevron</h2>\r\n\t\t\t<Accordion\r\n\t\t\t\ttype=\"single\"\r\n\t\t\t\tcollapsible\r\n\t\t\t\tclassName=\"w-full -space-y-px\"\r\n\t\t\t\tdefaultValue=\"3\"\r\n\t\t\t>\r\n\t\t\t\t{items.map((item) => (\r\n\t\t\t\t\t<AccordionItem\r\n\t\t\t\t\t\tvalue={item.id}\r\n\t\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\t\tclassName=\"bg-background has-focus-visible:border-ring has-focus-visible:ring-ring/50 relative border px-4 py-1 outline-hidden first:rounded-t-md last:rounded-b-md last:border-b has-focus-visible:z-10 has-focus-visible:ring-[3px]\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<AccordionTrigger className=\"justify-start gap-3 rounded-md py-2 text-[15px] leading-6 outline-hidden hover:no-underline focus-visible:ring-0 [&>svg]:-order-1\">\r\n\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t</AccordionTrigger>\r\n\t\t\t\t\t\t<AccordionContent className=\"text-muted-foreground ps-7 pb-2\">\r\n\t\t\t\t\t\t\t{item.content}\r\n\t\t\t\t\t\t</AccordionContent>\r\n\t\t\t\t\t</AccordionItem>\r\n\t\t\t\t))}\r\n\t\t\t</Accordion>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

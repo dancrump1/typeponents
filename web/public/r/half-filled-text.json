@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "half-filled-text",
+  "type": "registry:ui",
+  "title": "Half Filled Text",
+  "description": "Half Filled Text",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/half-filled-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/half-filled-text.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\n// Credit:\r\n// https://namer-ui.netlify.app/components\r\n\r\ninterface HalfFilledTextProps {\r\n\tinscription: string;\r\n\tfontSize: string;\r\n\tfillColor: string;\r\n\toutlineColor: string;\r\n\toutlineWidth: string;\r\n}\r\n\r\nconst HalfFilledText: React.FC<HalfFilledTextProps> = ({\r\n\tinscription,\r\n\tfontSize,\r\n\tfillColor,\r\n\toutlineColor,\r\n\toutlineWidth,\r\n}) => {\r\n\treturn (\r\n\t\t<section style={sectionStyle}>\r\n\t\t\t<div style={contentStyle}>\r\n\t\t\t\t<h2\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t...h2Style,\r\n\t\t\t\t\t\tfontSize,\r\n\t\t\t\t\t\tcolor: \"transparent\",\r\n\t\t\t\t\t\tWebkitTextStroke: `${outlineWidth} ${outlineColor}`,\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t{inscription}\r\n\t\t\t\t</h2>\r\n\t\t\t\t<h2\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t...h2Style,\r\n\t\t\t\t\t\tfontSize,\r\n\t\t\t\t\t\tcolor: fillColor,\r\n\t\t\t\t\t\tanimation: \"animate 4s ease-in-out infinite\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t{inscription}\r\n\t\t\t\t</h2>\r\n\t\t\t</div>\r\n\t\t\t<style jsx>{`\r\n\t\t\t\t@import url(\"https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900\");\r\n\r\n\t\t\t\t@keyframes animate {\r\n\t\t\t\t\t0%,\r\n\t\t\t\t\t100% {\r\n\t\t\t\t\t\tclip-path: polygon(\r\n\t\t\t\t\t\t\t0% 45%,\r\n\t\t\t\t\t\t\t16% 44%,\r\n\t\t\t\t\t\t\t33% 50%,\r\n\t\t\t\t\t\t\t54% 60%,\r\n\t\t\t\t\t\t\t70% 61%,\r\n\t\t\t\t\t\t\t84% 59%,\r\n\t\t\t\t\t\t\t100% 52%,\r\n\t\t\t\t\t\t\t100% 100%,\r\n\t\t\t\t\t\t\t0% 100%\r\n\t\t\t\t\t\t);\r\n\t\t\t\t\t}\r\n\t\t\t\t\t50% {\r\n\t\t\t\t\t\tclip-path: polygon(\r\n\t\t\t\t\t\t\t0% 60%,\r\n\t\t\t\t\t\t\t15% 65%,\r\n\t\t\t\t\t\t\t34% 66%,\r\n\t\t\t\t\t\t\t51% 62%,\r\n\t\t\t\t\t\t\t67% 50%,\r\n\t\t\t\t\t\t\t84% 45%,\r\n\t\t\t\t\t\t\t100% 46%,\r\n\t\t\t\t\t\t\t100% 100%,\r\n\t\t\t\t\t\t\t0% 100%\r\n\t\t\t\t\t\t);\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t`}</style>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nconst sectionStyle: React.CSSProperties = {\r\n\tdisplay: \"flex\",\r\n\tbackground: \"#000\",\r\n\talignItems: \"center\",\r\n\tjustifyContent: \"center\",\r\n};\r\n\r\nconst contentStyle: React.CSSProperties = {\r\n\tposition: \"relative\",\r\n};\r\n\r\nconst h2Style: React.CSSProperties = {\r\n\tposition: \"absolute\",\r\n\ttransform: \"translate(-50%, -50%)\",\r\n\tmargin: 0,\r\n\tpadding: 0,\r\n\tboxSizing: \"border-box\",\r\n\tfontFamily: '\"Poppins\", sans-serif',\r\n};\r\n\r\nexport default HalfFilledText;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "Namer UI",
+      "url": "https://namer-ui.netlify.app/components",
+      "authorUrl": "https://namer-ui.netlify.app",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "inscription",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "fontSize",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "fillColor",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "outlineColor",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "outlineWidth",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/half-filled-text"
+  }
+}

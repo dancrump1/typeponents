@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "canvas-reveal",
+  "type": "registry:ui",
+  "title": "Canvas Reveal",
+  "description": "Full-panel grid of tiny coloured dots rendered on a canvas, fading out into the background at the top.",
+  "dependencies": [
+    "@react-three/fiber",
+    "motion",
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/canvas-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/canvas-reveal.tsx",
+      "content": "\"use client\";\n\nimport React, { useMemo, useRef } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { Canvas, useFrame, useThree } from \"@react-three/fiber\";\nimport {\n\tCustomBlending,\n\tGLSL3,\n\tMesh,\n\tOneFactor,\n\tShaderMaterial as ShaderThree,\n\tSrcAlphaFactor,\n\tVector2,\n\tVector3,\n} from \"three\";\n\n// https://ui.aceternity.com/components/canvas-reveal-effect\n\nexport const CanvasRevealEffect = ({\n\tanimationSpeed = 0.4,\n\topacities = [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1],\n\tcolors = [[0, 255, 255]],\n\tcontainerClassName,\n\tdotSize,\n\tshowGradient = true,\n}: {\n\t/**\n\t * 0.1 - slower\n\t * 1.0 - faster\n\t */\n\tanimationSpeed?: number;\n\topacities?: number[];\n\tcolors?: number[][];\n\tcontainerClassName?: string;\n\tdotSize?: number;\n\tshowGradient?: boolean;\n}) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\"h-full relative bg-background w-full\", containerClassName)}\n\t\t>\n\t\t\t<div className=\"h-full w-full\">\n\t\t\t\t<DotMatrix\n\t\t\t\t\tcolors={colors ?? [[0, 255, 255]]}\n\t\t\t\t\tdotSize={dotSize ?? 3}\n\t\t\t\t\topacities={\n\t\t\t\t\t\topacities ?? [0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0.8, 0.8, 1]\n\t\t\t\t\t}\n\t\t\t\t\tshader={`\n              float animation_speed_factor = ${animationSpeed.toFixed(1)};\n              float intro_offset = distance(u_resolution / 2.0 / u_total_size, st2) * 0.01 + (random(st2) * 0.15);\n              opacity *= step(intro_offset, u_time * animation_speed_factor);\n              opacity *= clamp((1.0 - step(intro_offset + 0.1, u_time * animation_speed_factor)) * 1.25, 1.0, 1.25);\n            `}\n\t\t\t\t\tcenter={[\"x\", \"y\"]}\n\t\t\t\t/>\n\t\t\t</div>\n\t\t\t{showGradient && (\n\t\t\t\t<div className=\"absolute inset-0 bg-linear-to-t from-background to-84%\" />\n\t\t\t)}\n\t\t</div>\n\t);\n};\n\ninterface DotMatrixProps {\n\tcolors?: number[][];\n\topacities?: number[];\n\ttotalSize?: number;\n\tdotSize?: number;\n\tshader?: string;\n\tcenter?: (\"x\" | \"y\")[];\n}\n\nconst DotMatrix: React.FC<DotMatrixProps> = ({\n\tcolors = [[0, 0, 0]],\n\topacities = [0.04, 0.04, 0.04, 0.04, 0.04, 0.08, 0.08, 0.08, 0.08, 0.14],\n\ttotalSize = 4,\n\tdotSize = 2,\n\tshader = \"\",\n\tcenter = [\"x\", \"y\"],\n}) => {\n\tconst uniforms = React.useMemo(() => {\n\t\tlet colorsArray = [\n\t\t\tcolors[0],\n\t\t\tcolors[0],\n\t\t\tcolors[0],\n\t\t\tcolors[0],\n\t\t\tcolors[0],\n\t\t\tcolors[0],\n\t\t];\n\t\tif (colors.length === 2) {\n\t\t\tcolorsArray = [\n\t\t\t\tcolors[0],\n\t\t\t\tcolors[0],\n\t\t\t\tcolors[0],\n\t\t\t\tcolors[1],\n\t\t\t\tcolors[1],\n\t\t\t\tcolors[1],\n\t\t\t];\n\t\t} else if (colors.length === 3) {\n\t\t\tcolorsArray = [\n\t\t\t\tcolors[0],\n\t\t\t\tcolors[0],\n\t\t\t\tcolors[1],\n\t\t\t\tcolors[1],\n\t\t\t\tcolors[2],\n\t\t\t\tcolors[2],\n\t\t\t];\n\t\t}\n\n\t\treturn {\n\t\t\tu_colors: {\n\t\t\t\tvalue: colorsArray.map((color) => [\n\t\t\t\t\tcolor[0] / 255,\n\t\t\t\t\tcolor[1] / 255,\n\t\t\t\t\tcolor[2] / 255,\n\t\t\t\t]),\n\t\t\t\ttype: \"uniform3fv\",\n\t\t\t},\n\t\t\tu_opacities: {\n\t\t\t\tvalue: opacities,\n\t\t\t\ttype: \"uniform1fv\",\n\t\t\t},\n\t\t\tu_total_size: {\n\t\t\t\tvalue: totalSize,\n\t\t\t\ttype: \"uniform1f\",\n\t\t\t},\n\t\t\tu_dot_size: {\n\t\t\t\tvalue: dotSize,\n\t\t\t\ttype: \"uniform1f\",\n\t\t\t},\n\t\t};\n\t}, [colors, opacities, totalSize, dotSize]);\n\n\treturn (\n\t\t<Shader\n\t\t\tsource={`\n        precision mediump float;\n        in vec2 fragCoord;\n\n        uniform float u_time;\n        uniform float u_opacities[10];\n        uniform vec3 u_colors[6];\n        uniform float u_total_size;\n        uniform float u_dot_size;\n        uniform vec2 u_resolution;\n        out vec4 fragColor;\n        float PHI = 1.61803398874989484820459;\n        float random(vec2 xy) {\n            return fract(tan(distance(xy * PHI, xy) * 0.5) * xy.x);\n        }\n        float map(float value, float min1, float max1, float min2, float max2) {\n            return min2 + (value - min1) * (max2 - min2) / (max1 - min1);\n        }\n        void main() {\n            vec2 st = fragCoord.xy;\n            ${\n\t\t\t\t\tcenter.includes(\"x\")\n\t\t\t\t\t\t? \"st.x -= abs(floor((mod(u_resolution.x, u_total_size) - u_dot_size) * 0.5));\"\n\t\t\t\t\t\t: \"\"\n\t\t\t\t}\n            ${\n\t\t\t\t\tcenter.includes(\"y\")\n\t\t\t\t\t\t? \"st.y -= abs(floor((mod(u_resolution.y, u_total_size) - u_dot_size) * 0.5));\"\n\t\t\t\t\t\t: \"\"\n\t\t\t\t}\n      float opacity = step(0.0, st.x);\n      opacity *= step(0.0, st.y);\n\n      vec2 st2 = vec2(int(st.x / u_total_size), int(st.y / u_total_size));\n\n      float frequency = 5.0;\n      float show_offset = random(st2);\n      float rand = random(st2 * floor((u_time / frequency) + show_offset + frequency) + 1.0);\n      opacity *= u_opacities[int(rand * 10.0)];\n      opacity *= 1.0 - step(u_dot_size / u_total_size, fract(st.x / u_total_size));\n      opacity *= 1.0 - step(u_dot_size / u_total_size, fract(st.y / u_total_size));\n\n      vec3 color = u_colors[int(show_offset * 6.0)];\n\n      ${shader}\n\n      fragColor = vec4(color, opacity);\n      fragColor.rgb *= fragColor.a;\n        }`}\n\t\t\tuniforms={uniforms}\n\t\t\tmaxFps={60}\n\t\t/>\n\t);\n};\n\ntype Uniforms = {\n\t[key: string]: {\n\t\tvalue: number[] | number[][] | number;\n\t\ttype: string;\n\t};\n};\nconst ShaderMaterial = ({\n\tsource,\n\tuniforms,\n\tmaxFps = 60,\n}: {\n\tsource: string;\n\thovered?: boolean;\n\tmaxFps?: number;\n\tuniforms: Uniforms;\n}) => {\n\tconst { size } = useThree();\n\tconst ref = useRef<Mesh>();\n\tlet lastFrameTime = 0;\n\n\tuseFrame(({ clock }) => {\n\t\tif (!ref.current) return;\n\t\tconst timestamp = clock.getElapsedTime();\n\t\tif (timestamp - lastFrameTime < 1 / maxFps) {\n\t\t\treturn;\n\t\t}\n\t\tlastFrameTime = timestamp;\n\n\t\tconst material: any = ref.current.material;\n\t\tconst timeLocation = material.uniforms.u_time;\n\t\ttimeLocation.value = timestamp;\n\t});\n\n\tconst getUniforms = () => {\n\t\tconst preparedUniforms: any = {};\n\n\t\tfor (const uniformName in uniforms) {\n\t\t\tconst uniform: any = uniforms[uniformName];\n\n\t\t\tswitch (uniform.type) {\n\t\t\t\tcase \"uniform1f\":\n\t\t\t\t\tpreparedUniforms[uniformName] = {\n\t\t\t\t\t\tvalue: uniform.value,\n\t\t\t\t\t\ttype: \"1f\",\n\t\t\t\t\t};\n\t\t\t\t\tbreak;\n\t\t\t\tcase \"uniform3f\":\n\t\t\t\t\tpreparedUniforms[uniformName] = {\n\t\t\t\t\t\tvalue: new Vector3().fromArray(uniform.value),\n\t\t\t\t\t\ttype: \"3f\",\n\t\t\t\t\t};\n\t\t\t\t\tbreak;\n\t\t\t\tcase \"uniform1fv\":\n\t\t\t\t\tpreparedUniforms[uniformName] = {\n\t\t\t\t\t\tvalue: uniform.value,\n\t\t\t\t\t\ttype: \"1fv\",\n\t\t\t\t\t};\n\t\t\t\t\tbreak;\n\t\t\t\tcase \"uniform3fv\":\n\t\t\t\t\tpreparedUniforms[uniformName] = {\n\t\t\t\t\t\tvalue: uniform.value.map((v: number[]) =>\n\t\t\t\t\t\t\tnew Vector3().fromArray(v)\n\t\t\t\t\t\t),\n\t\t\t\t\t\ttype: \"3fv\",\n\t\t\t\t\t};\n\t\t\t\t\tbreak;\n\t\t\t\tcase \"uniform2f\":\n\t\t\t\t\tpreparedUniforms[uniformName] = {\n\t\t\t\t\t\tvalue: new Vector2().fromArray(uniform.value),\n\t\t\t\t\t\ttype: \"2f\",\n\t\t\t\t\t};\n\t\t\t\t\tbreak;\n\t\t\t\tdefault:\n\t\t\t\t\tconsole.error(`Invalid uniform type for '${uniformName}'.`);\n\t\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\n\t\tpreparedUniforms[\"u_time\"] = { value: 0, type: \"1f\" };\n\t\tpreparedUniforms[\"u_resolution\"] = {\n\t\t\tvalue: new Vector2(size.width * 2, size.height * 2),\n\t\t}; // Initialize u_resolution\n\t\treturn preparedUniforms;\n\t};\n\n\t// Shader material\n\tconst material = useMemo(() => {\n\t\tconst materialObject = new ShaderThree({\n\t\t\tvertexShader: `\n      precision mediump float;\n      in vec2 coordinates;\n      uniform vec2 u_resolution;\n      out vec2 fragCoord;\n      void main(){\n        float x = position.x;\n        float y = position.y;\n        gl_Position = vec4(x, y, 0.0, 1.0);\n        fragCoord = (position.xy + vec2(1.0)) * 0.5 * u_resolution;\n        fragCoord.y = u_resolution.y - fragCoord.y;\n      }\n      `,\n\t\t\tfragmentShader: source,\n\t\t\tuniforms: getUniforms(),\n\t\t\tglslVersion: GLSL3,\n\t\t\tblending: CustomBlending,\n\t\t\tblendSrc: SrcAlphaFactor,\n\t\t\tblendDst: OneFactor,\n\t\t});\n\n\t\treturn materialObject;\n\t}, [size.width, size.height, source]);\n\n\treturn (\n\t\t<mesh ref={ref as any}>\n\t\t\t<planeGeometry args={[2, 2]} />\n\t\t\t<primitive object={material} attach=\"material\" />\n\t\t</mesh>\n\t);\n};\n\nconst Shader: React.FC<ShaderProps> = ({ source, uniforms, maxFps = 60 }) => {\n\treturn (\n\t\t<Canvas className=\"absolute inset-0  h-full w-full\">\n\t\t\t<ShaderMaterial source={source} uniforms={uniforms} maxFps={maxFps} />\n\t\t</Canvas>\n\t);\n};\ninterface ShaderProps {\n\tsource: string;\n\tuniforms: {\n\t\t[key: string]: {\n\t\t\tvalue: number[] | number[][] | number;\n\t\t\ttype: string;\n\t\t};\n\t};\n\tmaxFps?: number;\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "webgl"
+    ],
+    "interaction": "On load the dots sweep in from the centre outwards, then keep flickering on their own at random, each one changing colour and brightness; it ignores the pointer.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/canvas-reveal-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "animationSpeed",
+        "type": "number",
+        "default": "0.4",
+        "description": "0.1 - slower\n1.0 - faster",
+        "required": false
+      },
+      {
+        "name": "opacities",
+        "type": "number[]",
+        "default": "[0.3, 0.3, 0.3, 0.5, 0.5, 0.5, 0.8, 0…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "number[][]",
+        "default": "[[0, 255, 255]]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "dotSize",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showGradient",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/canvas-reveal"
+  }
+}

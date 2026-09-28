@@ -1,0 +1,57 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "smooth-cursor",
+  "type": "registry:ui",
+  "title": "Smooth Cursor",
+  "description": "Smooth Cursor",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/smooth-cursor.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/smooth-cursor.tsx",
+      "content": "\"use client\";\n\nimport { FC, JSX, useEffect, useRef, useState } from \"react\";\n\nimport { motion, useSpring } from \"motion/react\";\n\ninterface Position {\n\tx: number;\n\ty: number;\n}\n\nexport interface SmoothCursorProps {\n\tcursor?: JSX.Element;\n\tspringConfig?: {\n\t\tdamping: number;\n\t\tstiffness: number;\n\t\tmass: number;\n\t\trestDelta: number;\n\t};\n}\n\nconst DefaultCursorSVG: FC = () => {\n\treturn (\n\t\t<svg\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\twidth={50}\n\t\t\theight={54}\n\t\t\tviewBox=\"0 0 50 54\"\n\t\t\tfill=\"none\"\n\t\t\tstyle={{ scale: 0.5 }}\n\t\t>\n\t\t\t<g filter=\"url(#filter0_d_91_7928)\">\n\t\t\t\t<path\n\t\t\t\t\td=\"M42.6817 41.1495L27.5103 6.79925C26.7269 5.02557 24.2082 5.02558 23.3927 6.79925L7.59814 41.1495C6.75833 42.9759 8.52712 44.8902 10.4125 44.1954L24.3757 39.0496C24.8829 38.8627 25.4385 38.8627 25.9422 39.0496L39.8121 44.1954C41.6849 44.8902 43.4884 42.9759 42.6817 41.1495Z\"\n\t\t\t\t\tfill=\"black\"\n\t\t\t\t/>\n\t\t\t\t<path\n\t\t\t\t\td=\"M43.7146 40.6933L28.5431 6.34306C27.3556 3.65428 23.5772 3.69516 22.3668 6.32755L6.57226 40.6778C5.3134 43.4156 7.97238 46.298 10.803 45.2549L24.7662 40.109C25.0221 40.0147 25.2999 40.0156 25.5494 40.1082L39.4193 45.254C42.2261 46.2953 44.9254 43.4347 43.7146 40.6933Z\"\n\t\t\t\t\tstroke=\"white\"\n\t\t\t\t\tstrokeWidth={2.25825}\n\t\t\t\t/>\n\t\t\t</g>\n\t\t\t<defs>\n\t\t\t\t<filter\n\t\t\t\t\tid=\"filter0_d_91_7928\"\n\t\t\t\t\tx={0.602397}\n\t\t\t\t\ty={0.952444}\n\t\t\t\t\twidth={49.0584}\n\t\t\t\t\theight={52.428}\n\t\t\t\t\tfilterUnits=\"userSpaceOnUse\"\n\t\t\t\t\tcolorInterpolationFilters=\"sRGB\"\n\t\t\t\t>\n\t\t\t\t\t<feFlood floodOpacity={0} result=\"BackgroundImageFix\" />\n\t\t\t\t\t<feColorMatrix\n\t\t\t\t\t\tin=\"SourceAlpha\"\n\t\t\t\t\t\ttype=\"matrix\"\n\t\t\t\t\t\tvalues=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0\"\n\t\t\t\t\t\tresult=\"hardAlpha\"\n\t\t\t\t\t/>\n\t\t\t\t\t<feOffset dy={2.25825} />\n\t\t\t\t\t<feGaussianBlur stdDeviation={2.25825} />\n\t\t\t\t\t<feComposite in2=\"hardAlpha\" operator=\"out\" />\n\t\t\t\t\t<feColorMatrix\n\t\t\t\t\t\ttype=\"matrix\"\n\t\t\t\t\t\tvalues=\"0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0\"\n\t\t\t\t\t/>\n\t\t\t\t\t<feBlend\n\t\t\t\t\t\tmode=\"normal\"\n\t\t\t\t\t\tin2=\"BackgroundImageFix\"\n\t\t\t\t\t\tresult=\"effect1_dropShadow_91_7928\"\n\t\t\t\t\t/>\n\t\t\t\t\t<feBlend\n\t\t\t\t\t\tmode=\"normal\"\n\t\t\t\t\t\tin=\"SourceGraphic\"\n\t\t\t\t\t\tin2=\"effect1_dropShadow_91_7928\"\n\t\t\t\t\t\tresult=\"shape\"\n\t\t\t\t\t/>\n\t\t\t\t</filter>\n\t\t\t</defs>\n\t\t</svg>\n\t);\n};\n\nexport function SmoothCursor({\n\tcursor = <DefaultCursorSVG />,\n\tspringConfig = {\n\t\tdamping: 45,\n\t\tstiffness: 400,\n\t\tmass: 1,\n\t\trestDelta: 0.001,\n\t},\n}: SmoothCursorProps) {\n\tconst [isMoving, setIsMoving] = useState(false);\n\tconst lastMousePos = useRef<Position>({ x: 0, y: 0 });\n\tconst velocity = useRef<Position>({ x: 0, y: 0 });\n\tconst lastUpdateTime = useRef(Date.now());\n\tconst previousAngle = useRef(0);\n\tconst accumulatedRotation = useRef(0);\n\n\tconst cursorX = useSpring(0, springConfig);\n\tconst cursorY = useSpring(0, springConfig);\n\tconst rotation = useSpring(0, {\n\t\t...springConfig,\n\t\tdamping: 60,\n\t\tstiffness: 300,\n\t});\n\tconst scale = useSpring(1, {\n\t\t...springConfig,\n\t\tstiffness: 500,\n\t\tdamping: 35,\n\t});\n\n\tuseEffect(() => {\n\t\tconst updateVelocity = (currentPos: Position) => {\n\t\t\tconst currentTime = Date.now();\n\t\t\tconst deltaTime = currentTime - lastUpdateTime.current;\n\n\t\t\tif (deltaTime > 0) {\n\t\t\t\tvelocity.current = {\n\t\t\t\t\tx: (currentPos.x - lastMousePos.current.x) / deltaTime,\n\t\t\t\t\ty: (currentPos.y - lastMousePos.current.y) / deltaTime,\n\t\t\t\t};\n\t\t\t}\n\n\t\t\tlastUpdateTime.current = currentTime;\n\t\t\tlastMousePos.current = currentPos;\n\t\t};\n\n\t\tconst smoothMouseMove = (e: MouseEvent) => {\n\t\t\tconst currentPos = { x: e.clientX, y: e.clientY };\n\t\t\tupdateVelocity(currentPos);\n\n\t\t\tconst speed = Math.sqrt(\n\t\t\t\tMath.pow(velocity.current.x, 2) + Math.pow(velocity.current.y, 2)\n\t\t\t);\n\n\t\t\tcursorX.set(currentPos.x);\n\t\t\tcursorY.set(currentPos.y);\n\n\t\t\tif (speed > 0.1) {\n\t\t\t\tconst currentAngle =\n\t\t\t\t\tMath.atan2(velocity.current.y, velocity.current.x) *\n\t\t\t\t\t\t(180 / Math.PI) +\n\t\t\t\t\t90;\n\n\t\t\t\tlet angleDiff = currentAngle - previousAngle.current;\n\t\t\t\tif (angleDiff > 180) angleDiff -= 360;\n\t\t\t\tif (angleDiff < -180) angleDiff += 360;\n\t\t\t\taccumulatedRotation.current += angleDiff;\n\t\t\t\trotation.set(accumulatedRotation.current);\n\t\t\t\tpreviousAngle.current = currentAngle;\n\n\t\t\t\tscale.set(0.95);\n\t\t\t\tsetIsMoving(true);\n\n\t\t\t\tconst timeout = setTimeout(() => {\n\t\t\t\t\tscale.set(1);\n\t\t\t\t\tsetIsMoving(false);\n\t\t\t\t}, 150);\n\n\t\t\t\treturn () => clearTimeout(timeout);\n\t\t\t}\n\t\t};\n\n\t\tlet rafId: number;\n\t\tconst throttledMouseMove = (e: MouseEvent) => {\n\t\t\tif (rafId) return;\n\n\t\t\trafId = requestAnimationFrame(() => {\n\t\t\t\tsmoothMouseMove(e);\n\t\t\t\trafId = 0;\n\t\t\t});\n\t\t};\n\n\t\tdocument.body.style.cursor = \"none\";\n\t\twindow.addEventListener(\"mousemove\", throttledMouseMove);\n\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"mousemove\", throttledMouseMove);\n\t\t\tdocument.body.style.cursor = \"auto\";\n\t\t\tif (rafId) cancelAnimationFrame(rafId);\n\t\t};\n\t}, [cursorX, cursorY, rotation, scale]);\n\n\treturn (\n\t\t<motion.div\n\t\t\tstyle={{\n\t\t\t\tposition: \"fixed\",\n\t\t\t\tleft: cursorX,\n\t\t\t\ttop: cursorY,\n\t\t\t\ttranslateX: \"-50%\",\n\t\t\t\ttranslateY: \"-50%\",\n\t\t\t\trotate: rotation,\n\t\t\t\tscale: scale,\n\t\t\t\tzIndex: 100,\n\t\t\t\tpointerEvents: \"none\",\n\t\t\t\twillChange: \"transform\",\n\t\t\t}}\n\t\t\tinitial={{ scale: 0 }}\n\t\t\tanimate={{ scale: 1 }}\n\t\t\ttransition={{\n\t\t\t\ttype: \"spring\",\n\t\t\t\tstiffness: 400,\n\t\t\t\tdamping: 30,\n\t\t\t}}\n\t\t>\n\t\t\t{cursor}\n\t\t</motion.div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "cursor",
+        "type": "JSX.Element",
+        "default": "<DefaultCursorSVG />",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "springConfig",
+        "type": "{ damping: number; stiffness: number; mass: number; restD…",
+        "default": "{ damping: 45, stiffness: 400, mass: …",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/smooth-cursor"
+  }
+}

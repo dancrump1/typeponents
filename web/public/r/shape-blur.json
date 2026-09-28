@@ -1,0 +1,105 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "shape-blur",
+  "type": "registry:ui",
+  "title": "Shape Blur",
+  "description": "Shape Blur",
+  "dependencies": [
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/shape-blur.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/shape-blur.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { FC, useEffect, useRef } from \"react\";\r\n\r\n// Three.js has no built-in TypeScript support.\r\n// Installing @types/three is optional but helps avoid type errors.\r\nimport * as THREE from \"three\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/backgrounds/shape-blur\r\n\r\n// Example Usage\r\n{\r\n\t/* <div style={{position: 'relative', height: '500px', overflow: 'hidden'}}>\r\n<ShapeBlur\r\n  variation={0}\r\n  pixelRatioProp={window.devicePixelRatio || 1}\r\n  shapeSize={0.5}\r\n  roundness={0.5}\r\n  borderSize={0.05}\r\n  circleSize={0.5}\r\n  circleEdge={1}\r\n/>\r\n</div> */\r\n}\r\n\r\n// Vertex Shader\r\nconst vertexShader = /* glsl */ `\r\nvarying vec2 v_texcoord;\r\nvoid main() {\r\n    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n    v_texcoord = uv;\r\n}\r\n`;\r\n\r\n// Fragment Shader\r\nconst fragmentShader = /* glsl */ `\r\nvarying vec2 v_texcoord;\r\n\r\nuniform vec2 u_mouse;\r\nuniform vec2 u_resolution;\r\nuniform float u_pixelRatio;\r\n\r\nuniform float u_shapeSize;\r\nuniform float u_roundness;\r\nuniform float u_borderSize;\r\nuniform float u_circleSize;\r\nuniform float u_circleEdge;\r\n\r\n#ifndef PI\r\n#define PI 3.1415926535897932384626433832795\r\n#endif\r\n#ifndef TWO_PI\r\n#define TWO_PI 6.2831853071795864769252867665590\r\n#endif\r\n\r\n#ifndef VAR\r\n#define VAR 0\r\n#endif\r\n\r\n#ifndef FNC_COORD\r\n#define FNC_COORD\r\nvec2 coord(in vec2 p) {\r\n    p = p / u_resolution.xy;\r\n    if (u_resolution.x > u_resolution.y) {\r\n        p.x *= u_resolution.x / u_resolution.y;\r\n        p.x += (u_resolution.y - u_resolution.x) / u_resolution.y / 2.0;\r\n    } else {\r\n        p.y *= u_resolution.y / u_resolution.x;\r\n        p.y += (u_resolution.x - u_resolution.y) / u_resolution.x / 2.0;\r\n    }\r\n    p -= 0.5;\r\n    p *= vec2(-1.0, 1.0);\r\n    return p;\r\n}\r\n#endif\r\n\r\n#define st0 coord(gl_FragCoord.xy)\r\n#define mx coord(u_mouse * u_pixelRatio)\r\n\r\nfloat sdRoundRect(vec2 p, vec2 b, float r) {\r\n    vec2 d = abs(p - 0.5) * 4.2 - b + vec2(r);\r\n    return min(max(d.x, d.y), 0.0) + length(max(d, 0.0)) - r;\r\n}\r\nfloat sdCircle(in vec2 st, in vec2 center) {\r\n    return length(st - center) * 2.0;\r\n}\r\nfloat sdPoly(in vec2 p, in float w, in int sides) {\r\n    float a = atan(p.x, p.y) + PI;\r\n    float r = TWO_PI / float(sides);\r\n    float d = cos(floor(0.5 + a / r) * r - a) * length(max(abs(p) * 1.0, 0.0));\r\n    return d * 2.0 - w;\r\n}\r\n\r\nfloat aastep(float threshold, float value) {\r\n    float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;\r\n    return smoothstep(threshold - afwidth, threshold + afwidth, value);\r\n}\r\nfloat fill(in float x) { return 1.0 - aastep(0.0, x); }\r\nfloat fill(float x, float size, float edge) {\r\n    return 1.0 - smoothstep(size - edge, size + edge, x);\r\n}\r\nfloat stroke(in float d, in float t) { return (1.0 - aastep(t, abs(d))); }\r\nfloat stroke(float x, float size, float w, float edge) {\r\n    float d = smoothstep(size - edge, size + edge, x + w * 0.5) - smoothstep(size - edge, size + edge, x - w * 0.5);\r\n    return clamp(d, 0.0, 1.0);\r\n}\r\n\r\nfloat strokeAA(float x, float size, float w, float edge) {\r\n    float afwidth = length(vec2(dFdx(x), dFdy(x))) * 0.70710678;\r\n    float d = smoothstep(size - edge - afwidth, size + edge + afwidth, x + w * 0.5)\r\n            - smoothstep(size - edge - afwidth, size + edge + afwidth, x - w * 0.5);\r\n    return clamp(d, 0.0, 1.0);\r\n}\r\n\r\nvoid main() {\r\n    vec2 st = st0 + 0.5;\r\n    vec2 posMouse = mx * vec2(1., -1.) + 0.5;\r\n\r\n    float size = u_shapeSize;\r\n    float roundness = u_roundness;\r\n    float borderSize = u_borderSize;\r\n    float circleSize = u_circleSize;\r\n    float circleEdge = u_circleEdge;\r\n\r\n    float sdfCircle = fill(\r\n        sdCircle(st, posMouse),\r\n        circleSize,\r\n        circleEdge\r\n    );\r\n\r\n    float sdf;\r\n    if (VAR == 0) {\r\n        sdf = sdRoundRect(st, vec2(size), roundness);\r\n        sdf = strokeAA(sdf, 0.0, borderSize, sdfCircle) * 4.0;\r\n    } else if (VAR == 1) {\r\n        sdf = sdCircle(st, vec2(0.5));\r\n        sdf = fill(sdf, 0.6, sdfCircle) * 1.2;\r\n    } else if (VAR == 2) {\r\n        sdf = sdCircle(st, vec2(0.5));\r\n        sdf = strokeAA(sdf, 0.58, 0.02, sdfCircle) * 4.0;\r\n    } else if (VAR == 3) {\r\n        sdf = sdPoly(st - vec2(0.5, 0.45), 0.3, 3);\r\n        sdf = fill(sdf, 0.05, sdfCircle) * 1.4;\r\n    }\r\n\r\n    vec3 color = vec3(sdf);\r\n    float alpha = step(0.01, sdf);\r\n    gl_FragColor = vec4(color.rgb, alpha);\r\n}\r\n`;\r\n\r\n// Define the Props interface\r\ninterface ShapeBlurProps {\r\n\tclassName?: string;\r\n\tvariation?: number;\r\n\tpixelRatioProp?: number;\r\n\tshapeSize?: number;\r\n\troundness?: number;\r\n\tborderSize?: number;\r\n\tcircleSize?: number;\r\n\tcircleEdge?: number;\r\n}\r\n\r\nconst ShapeBlur: FC<ShapeBlurProps> = ({\r\n\tclassName = \"\",\r\n\tvariation = 0,\r\n\tpixelRatioProp = 2,\r\n\tshapeSize = 1.2,\r\n\troundness = 0.4,\r\n\tborderSize = 0.05,\r\n\tcircleSize = 0.3,\r\n\tcircleEdge = 0.5,\r\n}) => {\r\n\tconst mountRef = useRef<HTMLDivElement | null>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst mount = mountRef.current;\r\n\t\tif (!mount) return;\r\n\r\n\t\tlet animationFrameId: number;\r\n\t\tlet time = 0,\r\n\t\t\tlastTime = 0;\r\n\r\n\t\tconst vMouse = new THREE.Vector2();\r\n\t\tconst vMouseDamp = new THREE.Vector2();\r\n\t\tconst vResolution = new THREE.Vector2();\r\n\r\n\t\tlet w = 1,\r\n\t\t\th = 1;\r\n\r\n\t\tconst scene = new THREE.Scene();\r\n\t\tconst camera = new THREE.OrthographicCamera();\r\n\t\tcamera.position.z = 1;\r\n\r\n\t\tconst renderer = new THREE.WebGLRenderer({ alpha: true });\r\n\t\trenderer.setClearColor(0x000000, 0);\r\n\t\tmount.appendChild(renderer.domElement);\r\n\r\n\t\tconst geo = new THREE.PlaneGeometry(1, 1);\r\n\t\tconst material = new THREE.ShaderMaterial({\r\n\t\t\tvertexShader,\r\n\t\t\tfragmentShader,\r\n\t\t\tuniforms: {\r\n\t\t\t\tu_mouse: { value: vMouseDamp },\r\n\t\t\t\tu_resolution: { value: vResolution },\r\n\t\t\t\tu_pixelRatio: { value: pixelRatioProp },\r\n\t\t\t\tu_shapeSize: { value: shapeSize },\r\n\t\t\t\tu_roundness: { value: roundness },\r\n\t\t\t\tu_borderSize: { value: borderSize },\r\n\t\t\t\tu_circleSize: { value: circleSize },\r\n\t\t\t\tu_circleEdge: { value: circleEdge },\r\n\t\t\t},\r\n\t\t\tdefines: { VAR: variation },\r\n\t\t\ttransparent: true,\r\n\t\t});\r\n\r\n\t\tconst quad = new THREE.Mesh(geo, material);\r\n\t\tscene.add(quad);\r\n\r\n\t\tconst onPointerMove = (e: PointerEvent | MouseEvent) => {\r\n\t\t\tif (!mount) return;\r\n\t\t\tconst rect = mount.getBoundingClientRect();\r\n\t\t\tvMouse.set(e.clientX - rect.left, e.clientY - rect.top);\r\n\t\t};\r\n\r\n\t\tdocument.addEventListener(\"mousemove\", onPointerMove);\r\n\t\tdocument.addEventListener(\"pointermove\", onPointerMove);\r\n\r\n\t\tconst resize = () => {\r\n\t\t\tif (!mountRef.current) return;\r\n\t\t\tconst container = mountRef.current;\r\n\t\t\tw = container.clientWidth;\r\n\t\t\th = container.clientHeight;\r\n\t\t\tconst dpr = Math.min(window.devicePixelRatio || 1, 2);\r\n\r\n\t\t\trenderer.setSize(w, h);\r\n\t\t\trenderer.setPixelRatio(dpr);\r\n\r\n\t\t\tcamera.left = -w / 2;\r\n\t\t\tcamera.right = w / 2;\r\n\t\t\tcamera.top = h / 2;\r\n\t\t\tcamera.bottom = -h / 2;\r\n\t\t\tcamera.updateProjectionMatrix();\r\n\r\n\t\t\tquad.scale.set(w, h, 1);\r\n\t\t\tvResolution.set(w, h).multiplyScalar(dpr);\r\n\t\t\tmaterial.uniforms.u_pixelRatio.value = dpr;\r\n\t\t};\r\n\r\n\t\tresize();\r\n\t\twindow.addEventListener(\"resize\", resize);\r\n\r\n\t\tconst ro = new ResizeObserver(() => resize());\r\n\t\tro.observe(mountRef.current as Element);\r\n\r\n\t\tconst update = () => {\r\n\t\t\ttime = performance.now() * 0.001;\r\n\t\t\tconst dt = time - lastTime;\r\n\t\t\tlastTime = time;\r\n\r\n\t\t\tvMouseDamp.x = THREE.MathUtils.damp(vMouseDamp.x, vMouse.x, 8, dt);\r\n\t\t\tvMouseDamp.y = THREE.MathUtils.damp(vMouseDamp.y, vMouse.y, 8, dt);\r\n\r\n\t\t\trenderer.render(scene, camera);\r\n\t\t\tanimationFrameId = requestAnimationFrame(update);\r\n\t\t};\r\n\t\tupdate();\r\n\r\n\t\treturn () => {\r\n\t\t\tcancelAnimationFrame(animationFrameId);\r\n\t\t\twindow.removeEventListener(\"resize\", resize);\r\n\t\t\tro.disconnect();\r\n\t\t\tdocument.removeEventListener(\"mousemove\", onPointerMove);\r\n\t\t\tdocument.removeEventListener(\"pointermove\", onPointerMove);\r\n\t\t\tmount.removeChild(renderer.domElement);\r\n\t\t\trenderer.dispose();\r\n\t\t};\r\n\t}, [\r\n\t\tvariation,\r\n\t\tpixelRatioProp,\r\n\t\tshapeSize,\r\n\t\troundness,\r\n\t\tborderSize,\r\n\t\tcircleSize,\r\n\t\tcircleEdge,\r\n\t]);\r\n\r\n\treturn <div ref={mountRef} className={`w-full h-full ${className}`} />;\r\n};\r\n\r\nexport default ShapeBlur;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/backgrounds/shape-blur",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variation",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pixelRatioProp",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "shapeSize",
+        "type": "number",
+        "default": "1.2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "roundness",
+        "type": "number",
+        "default": "0.4",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderSize",
+        "type": "number",
+        "default": "0.05",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "circleSize",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "circleEdge",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/shape-blur"
+  }
+}

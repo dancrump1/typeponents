@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flower-menu",
+  "type": "registry:ui",
+  "title": "Flower Menu",
+  "description": "Flower Menu",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/flower-menu.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/flower-menu.tsx",
+      "content": "import { useState } from \"react\";\n\nimport Link from \"next/link\";\n\n// Credit:\n// https://animata.design/docs/list/flower-menu\n\ntype MenuItem = {\n\ticon: React.ComponentType<React.SVGProps<SVGSVGElement>>;\n\thref: string;\n};\n\ntype FlowerMenuProps = {\n\tmenuItems: MenuItem[];\n\ticonColor?: string;\n\tbackgroundColor?: string;\n\tanimationDuration?: number;\n\ttogglerSize?: number;\n};\n\nconst MenuToggler = ({\n\tisOpen,\n\tonChange,\n\tbackgroundColor,\n\ticonColor,\n\tanimationDuration,\n\ttogglerSize,\n\ticonSize,\n}: {\n\tisOpen: boolean;\n\tonChange: () => void;\n\tbackgroundColor: string;\n\ticonColor: string;\n\tanimationDuration: number;\n\ttogglerSize: number;\n\ticonSize: number;\n}) => {\n\tconst lineHeight = iconSize * 0.1;\n\tconst lineWidth = iconSize * 0.8;\n\tconst lineSpacing = iconSize * 0.25;\n\n\treturn (\n\t\t<>\n\t\t\t<input\n\t\t\t\tid=\"menu-toggler\"\n\t\t\t\ttype=\"checkbox\"\n\t\t\t\tchecked={isOpen}\n\t\t\t\tonChange={onChange}\n\t\t\t\tclassName=\"absolute inset-0 z-10 m-auto cursor-pointer opacity-0\"\n\t\t\t\tstyle={{ width: togglerSize, height: togglerSize }}\n\t\t\t/>\n\t\t\t<label\n\t\t\t\thtmlFor=\"menu-toggler\"\n\t\t\t\tclassName=\"absolute inset-0 z-20 m-auto flex cursor-pointer items-center justify-center rounded-full transition-[background-color,color,width,height]\"\n\t\t\t\tstyle={{\n\t\t\t\t\tbackgroundColor,\n\t\t\t\t\tcolor: iconColor,\n\t\t\t\t\ttransitionDuration: `${animationDuration}ms`,\n\t\t\t\t\twidth: togglerSize,\n\t\t\t\t\theight: togglerSize,\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<span\n\t\t\t\t\tclassName=\"relative flex flex-col items-center justify-center\"\n\t\t\t\t\tstyle={{ width: iconSize, height: iconSize }}\n\t\t\t\t>\n\t\t\t\t\t{[0, 1, 2].map((i) => (\n\t\t\t\t\t\t<span\n\t\t\t\t\t\t\tkey={i + \"flower-span\"}\n\t\t\t\t\t\t\tclassName={`absolute bg-current transition-[opacity,tranform] ${\n\t\t\t\t\t\t\t\tisOpen && i === 0\n\t\t\t\t\t\t\t\t\t? \"opacity-0\"\n\t\t\t\t\t\t\t\t\t: isOpen\n\t\t\t\t\t\t\t\t\t\t? `${i === 1 ? \"rotate-45\" : \"-rotate-45\"}`\n\t\t\t\t\t\t\t\t\t\t: \"\"\n\t\t\t\t\t\t\t}`}\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\ttransitionDuration: `${animationDuration}ms`,\n\t\t\t\t\t\t\t\twidth: lineWidth,\n\t\t\t\t\t\t\t\theight: lineHeight,\n\t\t\t\t\t\t\t\ttop: isOpen\n\t\t\t\t\t\t\t\t\t? `calc(50% - ${lineHeight / 2}px)`\n\t\t\t\t\t\t\t\t\t: `calc(50% + ${(i - 1) * lineSpacing}px - ${\n\t\t\t\t\t\t\t\t\t\t\tlineHeight / 2\n\t\t\t\t\t\t\t\t\t\t}px)`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t/>\n\t\t\t\t\t))}\n\t\t\t\t</span>\n\t\t\t</label>\n\t\t</>\n\t);\n};\n\nconst MenuItem = ({\n\titem,\n\tindex,\n\tisOpen,\n\ticonColor,\n\tbackgroundColor,\n\tanimationDuration,\n\titemCount,\n\titemSize,\n\ticonSize,\n}: {\n\titem: MenuItem;\n\tindex: number;\n\tisOpen: boolean;\n\ticonColor: string;\n\tbackgroundColor: string;\n\tanimationDuration: number;\n\titemCount: number;\n\titemSize: number;\n\ticonSize: number;\n}) => {\n\tconst Icon = item.icon;\n\treturn (\n\t\t<li\n\t\t\tclassName={`absolute inset-0 m-auto transition-[opacity,width,height,transform] ${\n\t\t\t\tisOpen ? \"opacity-100\" : \"opacity-0\"\n\t\t\t}`}\n\t\t\tstyle={{\n\t\t\t\twidth: itemSize,\n\t\t\t\theight: itemSize,\n\t\t\t\ttransform: isOpen\n\t\t\t\t\t? `rotate(${(360 / itemCount) * index}deg) translateX(-${\n\t\t\t\t\t\t\titemSize + 30\n\t\t\t\t\t\t}px)`\n\t\t\t\t\t: \"none\",\n\t\t\t\ttransitionDuration: `${animationDuration}ms`,\n\t\t\t}}\n\t\t>\n\t\t\t<Link\n\t\t\t\thref={item.href}\n\t\t\t\ttarget=\"_blank\"\n\t\t\t\trel=\"noopener noreferrer\"\n\t\t\t\tclassName={`flex h-full w-full items-center justify-center rounded-full opacity-60 transition-[transform,opacity,color,background-color] duration-100 ${\n\t\t\t\t\tisOpen ? \"pointer-events-auto\" : \"pointer-events-none\"\n\t\t\t\t} group hover:scale-125 hover:opacity-100`}\n\t\t\t\tstyle={{\n\t\t\t\t\tbackgroundColor,\n\t\t\t\t\tcolor: iconColor,\n\t\t\t\t\ttransform: `rotate(-${(360 / itemCount) * index}deg)`,\n\t\t\t\t\ttransitionDuration: `${animationDuration}ms`,\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<Icon\n\t\t\t\t\tclassName=\"transition-transform duration-200 group-hover:scale-125\"\n\t\t\t\t\tstyle={{ width: iconSize, height: iconSize }}\n\t\t\t\t/>\n\t\t\t</Link>\n\t\t</li>\n\t);\n};\n\nexport default function FlowerMenu({\n\tmenuItems,\n\ticonColor = \"white\",\n\tbackgroundColor = \"rgba(255, 255, 255, 0.2)\",\n\tanimationDuration = 500,\n\ttogglerSize = 40,\n}: FlowerMenuProps) {\n\tconst [isOpen, setIsOpen] = useState(false);\n\tconst itemCount = menuItems.length;\n\tconst itemSize = togglerSize * 2;\n\tconst iconSize = Math.max(24, Math.floor(togglerSize * 0.6));\n\n\treturn (\n\t\t<nav\n\t\t\tclassName=\"relative min-h-64\"\n\t\t\tstyle={{ width: togglerSize * 3, height: togglerSize * 3 }}\n\t\t>\n\t\t\t<MenuToggler\n\t\t\t\tisOpen={isOpen}\n\t\t\t\tonChange={() => setIsOpen(!isOpen)}\n\t\t\t\tbackgroundColor={backgroundColor}\n\t\t\t\ticonColor={iconColor}\n\t\t\t\tanimationDuration={animationDuration}\n\t\t\t\ttogglerSize={togglerSize}\n\t\t\t\ticonSize={iconSize}\n\t\t\t/>\n\t\t\t<ul className=\"absolute inset-0 m-0 h-full w-full list-none p-0\">\n\t\t\t\t{menuItems.map((item, index) => (\n\t\t\t\t\t<MenuItem\n\t\t\t\t\t\tkey={index + \"flower-item\"}\n\t\t\t\t\t\titem={item}\n\t\t\t\t\t\tindex={index}\n\t\t\t\t\t\tisOpen={isOpen}\n\t\t\t\t\t\ticonColor={iconColor}\n\t\t\t\t\t\tbackgroundColor={backgroundColor}\n\t\t\t\t\t\tanimationDuration={animationDuration}\n\t\t\t\t\t\titemCount={itemCount}\n\t\t\t\t\t\titemSize={itemSize}\n\t\t\t\t\t\ticonSize={iconSize}\n\t\t\t\t\t/>\n\t\t\t\t))}\n\t\t\t</ul>\n\t\t</nav>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "animata.design",
+      "url": "https://animata.design/docs/list/flower-menu",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "menuItems",
+        "type": "MenuItem[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "iconColor",
+        "type": "string",
+        "default": "\"white\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backgroundColor",
+        "type": "string",
+        "default": "\"rgba(255, 255, 255, 0.2)\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDuration",
+        "type": "number",
+        "default": "500",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "togglerSize",
+        "type": "number",
+        "default": "40",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/flower-menu"
+  }
+}

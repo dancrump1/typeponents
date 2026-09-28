@@ -1,0 +1,39 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ping-pong",
+  "type": "registry:ui",
+  "title": "Ping Pong",
+  "description": "Ping Pong",
+  "dependencies": [
+    "gsap",
+    "react-inlinesvg"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/ping-pong.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/ping-pong.tsx",
+      "content": "import React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport gsap from \"gsap\";\r\nimport SVG from \"react-inlinesvg\";\r\n\r\nconst pingpongRepeatCount = 3;\r\nconst pingpongDelay = 25;\r\n\r\nconst PingPong = () => {\r\n\tconst scrollContainerRef = useRef();\r\n\tconst [scrollHeight, setScrollHeight] = useState(0);\r\n\tconst [scrollTop, setScrollTop] = useState(0);\r\n\tconst [scrollOffset, setScrollOffset] = useState(0);\r\n\tconst [scrollClient, setScrollClient] = useState(0);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (document !== undefined) {\r\n\t\t\tlet scrollHeightPercentage = (scrollHeight * scrollTop) / scrollOffset;\r\n\r\n\t\t\tconst movePingpong = () => {\r\n\t\t\t\t// Move pinpong svg\r\n\t\t\t\tscrollContainerRef.current.addEventListener(\"scroll\", () => {\r\n\t\t\t\t\tif (!!document.getElementsByClassName(\"pingpong\")?.length) {\r\n\t\t\t\t\t\tconst heightPercentage =\r\n\t\t\t\t\t\t\tscrollTop / (scrollOffset - scrollClient);\r\n\t\t\t\t\t\tscrollHeightPercentage = scrollHeight * heightPercentage;\r\n\r\n\t\t\t\t\t\t// Move pingpong match w/ slider\r\n\t\t\t\t\t\tgsap.to(\".pingpong\", {\r\n\t\t\t\t\t\t\ttop: scrollHeightPercentage,\r\n\t\t\t\t\t\t\tduration: 0.01,\r\n\t\t\t\t\t\t});\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t};\r\n\r\n\t\t\tconst animatePingpong = () => {\r\n\t\t\t\t// Animate Pingpong\r\n\t\t\t\tif (!!document.getElementsByClassName(\"pingpong\")?.length) {\r\n\t\t\t\t\t// set pingpong match on table\r\n\t\t\t\t\tgsap.set(\".pingpong\", {\r\n\t\t\t\t\t\ttop: scrollHeightPercentage,\r\n\t\t\t\t\t});\r\n\r\n\t\t\t\t\t// start ball at lower player\r\n\t\t\t\t\tgsap.set(\".pingpong > svg > path:last-of-type\", {\r\n\t\t\t\t\t\tx: -55,\r\n\t\t\t\t\t\ty: 35,\r\n\t\t\t\t\t});\r\n\r\n\t\t\t\t\t// Show pingpong match\r\n\t\t\t\t\tgsap.to(\".pingpong\", {\r\n\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\tdelay: pingpongDelay,\r\n\t\t\t\t\t});\r\n\r\n\t\t\t\t\t// bounce of middle table\r\n\t\t\t\t\tgsap.to(\".pingpong > svg > path:last-of-type\", {\r\n\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\ty: 100,\r\n\t\t\t\t\t\trepeat: pingpongRepeatCount,\r\n\t\t\t\t\t\trepeatDelay: 3,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\tdelay: pingpongDelay + 1,\r\n\t\t\t\t\t});\r\n\t\t\t\t\t// go to top player\r\n\t\t\t\t\tgsap.to(\".pingpong > svg > path:last-of-type\", {\r\n\t\t\t\t\t\tx: 70,\r\n\t\t\t\t\t\ty: 25,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\trepeat: pingpongRepeatCount,\r\n\t\t\t\t\t\trepeatDelay: 3,\r\n\t\t\t\t\t\tdelay: pingpongDelay + 2.5,\r\n\t\t\t\t\t});\r\n\t\t\t\t\t// back to middle table\r\n\t\t\t\t\tgsap.to(\".pingpong > svg > path:last-of-type\", {\r\n\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\ty: 100,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\trepeat: pingpongRepeatCount,\r\n\t\t\t\t\t\trepeatDelay: 3,\r\n\t\t\t\t\t\tdelay: pingpongDelay + 3.5,\r\n\t\t\t\t\t});\r\n\t\t\t\t\t// back to lower player\r\n\t\t\t\t\tgsap.to(\".pingpong > svg > path:last-of-type\", {\r\n\t\t\t\t\t\tx: -55,\r\n\t\t\t\t\t\ty: 35,\r\n\t\t\t\t\t\trepeat: pingpongRepeatCount,\r\n\t\t\t\t\t\trepeatDelay: 3,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\tdelay: pingpongDelay + 4.5,\r\n\t\t\t\t\t});\r\n\r\n\t\t\t\t\t//  hide table\r\n\t\t\t\t\tgsap.to(\".pingpong\", {\r\n\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\tduration: 1,\r\n\t\t\t\t\t\tdelay: pingpongDelay + 13,\r\n\t\t\t\t\t\tonComplete: () =>\r\n\t\t\t\t\t\t\t[...document.querySelectorAll(\".pingpong\")][0]?.remove(),\r\n\t\t\t\t\t});\r\n\t\t\t\t}\r\n\t\t\t};\r\n\r\n\t\t\tanimatePingpong();\r\n\t\t\tmovePingpong();\r\n\t\t}\r\n\t}, [scrollHeight]);\r\n\r\n\tuseEffect(() => {\r\n\t\tsetScrollHeight(scrollContainerRef.current.scrollHeight);\r\n\t\tsetScrollTop(scrollContainerRef.current.scrollTop);\r\n\t\tsetScrollOffset(scrollContainerRef.current.offsetHeight);\r\n\t\tsetScrollClient(scrollContainerRef.current.clientHeight);\r\n\t}, [scrollContainerRef.current]);\r\n\r\n\treturn (\r\n\t\t<section\r\n\t\t\tref={scrollContainerRef}\r\n\t\t\tclassName=\"h-[25vh] w-full overflow-y-scroll relative\"\r\n\t\t>\r\n\t\t\t<div className=\"pingpong absolute opacity-0 -right-[100px] z-15 -rotate-90 pointer-events-none\">\r\n\t\t\t\t<SVG src={\"./pingpong.svg\"} />\r\n\t\t\t</div>\r\n\t\t\t<div className=\"h-screen w-full\">example content</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nexport default PingPong;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/ping-pong"
+  }
+}

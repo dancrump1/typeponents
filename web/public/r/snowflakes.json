@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "snowflakes",
+  "type": "registry:ui",
+  "title": "Snowflakes",
+  "description": "Snowflakes",
+  "dependencies": [
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/snowflakes.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/snowflakes.tsx",
+      "content": "import * as THREE from \"three\";\r\nimport { GUI } from \"three/addons/libs/lil-gui.module.min.js\";\r\nimport Stats from \"three/addons/libs/stats.module.js\";\r\n\r\nlet camera, scene, renderer, stats, parameters;\r\nlet mouseX = 0,\r\n\tmouseY = 0;\r\n\r\nlet windowHalfX = window.innerWidth / 2;\r\nlet windowHalfY = window.innerHeight / 2;\r\n\r\nconst materials = [];\r\n\r\ninit();\r\n\r\nfunction init() {\r\n\tcamera = new THREE.PerspectiveCamera(\r\n\t\t75,\r\n\t\twindow.innerWidth / window.innerHeight,\r\n\t\t1,\r\n\t\t2000\r\n\t);\r\n\tcamera.position.z = 1000;\r\n\r\n\tscene = new THREE.Scene();\r\n\tscene.fog = new THREE.FogExp2(0x000000, 0.0008);\r\n\r\n\tconst geometry = new THREE.BufferGeometry();\r\n\tconst vertices = [];\r\n\r\n\tconst textureLoader = new THREE.TextureLoader();\r\n\r\n\tconst assignSRGB = (texture) => {\r\n\t\ttexture.colorSpace = THREE.SRGBColorSpace;\r\n\t};\r\n\r\n\tconst sprite1 = textureLoader.load(\r\n\t\t\"textures/sprites/snowflake1.png\",\r\n\t\tassignSRGB\r\n\t);\r\n\tconst sprite2 = textureLoader.load(\r\n\t\t\"textures/sprites/snowflake2.png\",\r\n\t\tassignSRGB\r\n\t);\r\n\tconst sprite3 = textureLoader.load(\r\n\t\t\"textures/sprites/snowflake3.png\",\r\n\t\tassignSRGB\r\n\t);\r\n\tconst sprite4 = textureLoader.load(\r\n\t\t\"textures/sprites/snowflake4.png\",\r\n\t\tassignSRGB\r\n\t);\r\n\tconst sprite5 = textureLoader.load(\r\n\t\t\"textures/sprites/snowflake5.png\",\r\n\t\tassignSRGB\r\n\t);\r\n\r\n\tfor (let i = 0; i < 10000; i++) {\r\n\t\tconst x = Math.random() * 2000 - 1000;\r\n\t\tconst y = Math.random() * 2000 - 1000;\r\n\t\tconst z = Math.random() * 2000 - 1000;\r\n\r\n\t\tvertices.push(x, y, z);\r\n\t}\r\n\r\n\tgeometry.setAttribute(\r\n\t\t\"position\",\r\n\t\tnew THREE.Float32BufferAttribute(vertices, 3)\r\n\t);\r\n\r\n\tparameters = [\r\n\t\t[[1.0, 0.2, 0.5], sprite2, 20],\r\n\t\t[[0.95, 0.1, 0.5], sprite3, 15],\r\n\t\t[[0.9, 0.05, 0.5], sprite1, 10],\r\n\t\t[[0.85, 0, 0.5], sprite5, 8],\r\n\t\t[[0.8, 0, 0.5], sprite4, 5],\r\n\t];\r\n\r\n\tfor (let i = 0; i < parameters.length; i++) {\r\n\t\tconst color = parameters[i][0];\r\n\t\tconst sprite = parameters[i][1];\r\n\t\tconst size = parameters[i][2];\r\n\r\n\t\tmaterials[i] = new THREE.PointsMaterial({\r\n\t\t\tsize: size,\r\n\t\t\tmap: sprite,\r\n\t\t\tblending: THREE.AdditiveBlending,\r\n\t\t\tdepthTest: false,\r\n\t\t\ttransparent: true,\r\n\t\t});\r\n\t\tmaterials[i].color.setHSL(\r\n\t\t\tcolor[0],\r\n\t\t\tcolor[1],\r\n\t\t\tcolor[2],\r\n\t\t\tTHREE.SRGBColorSpace\r\n\t\t);\r\n\r\n\t\tconst particles = new THREE.Points(geometry, materials[i]);\r\n\r\n\t\tparticles.rotation.x = Math.random() * 6;\r\n\t\tparticles.rotation.y = Math.random() * 6;\r\n\t\tparticles.rotation.z = Math.random() * 6;\r\n\r\n\t\tscene.add(particles);\r\n\t}\r\n\r\n\t//\r\n\r\n\trenderer = new THREE.WebGLRenderer();\r\n\trenderer.setPixelRatio(window.devicePixelRatio);\r\n\trenderer.setSize(window.innerWidth, window.innerHeight);\r\n\trenderer.setAnimationLoop(animate);\r\n\tdocument.body.appendChild(renderer.domElement);\r\n\r\n\t//\r\n\r\n\tstats = new Stats();\r\n\tdocument.body.appendChild(stats.dom);\r\n\r\n\t//\r\n\r\n\tconst gui = new GUI();\r\n\r\n\tconst params = {\r\n\t\ttexture: true,\r\n\t};\r\n\r\n\tgui.add(params, \"texture\").onChange(function (value) {\r\n\t\tfor (let i = 0; i < materials.length; i++) {\r\n\t\t\tmaterials[i].map = value === true ? parameters[i][1] : null;\r\n\t\t\tmaterials[i].needsUpdate = true;\r\n\t\t}\r\n\t});\r\n\r\n\tgui.open();\r\n\r\n\tdocument.body.style.touchAction = \"none\";\r\n\tdocument.body.addEventListener(\"pointermove\", onPointerMove);\r\n\r\n\t//\r\n\r\n\twindow.addEventListener(\"resize\", onWindowResize);\r\n}\r\n\r\nfunction onWindowResize() {\r\n\twindowHalfX = window.innerWidth / 2;\r\n\twindowHalfY = window.innerHeight / 2;\r\n\r\n\tcamera.aspect = window.innerWidth / window.innerHeight;\r\n\tcamera.updateProjectionMatrix();\r\n\r\n\trenderer.setSize(window.innerWidth, window.innerHeight);\r\n}\r\n\r\nfunction onPointerMove(event) {\r\n\tif (event.isPrimary === false) return;\r\n\r\n\tmouseX = event.clientX - windowHalfX;\r\n\tmouseY = event.clientY - windowHalfY;\r\n}\r\n\r\n//\r\n\r\nfunction animate() {\r\n\trender();\r\n\tstats.update();\r\n}\r\n\r\nfunction render() {\r\n\tconst time = Date.now() * 0.00005;\r\n\r\n\tcamera.position.x += (mouseX - camera.position.x) * 0.05;\r\n\tcamera.position.y += (-mouseY - camera.position.y) * 0.05;\r\n\r\n\tcamera.lookAt(scene.position);\r\n\r\n\tfor (let i = 0; i < scene.children.length; i++) {\r\n\t\tconst object = scene.children[i];\r\n\r\n\t\tif (object instanceof THREE.Points) {\r\n\t\t\tobject.rotation.y = time * (i < 4 ? i + 1 : -(i + 1));\r\n\t\t}\r\n\t}\r\n\r\n\tfor (let i = 0; i < materials.length; i++) {\r\n\t\tconst color = parameters[i][0];\r\n\r\n\t\tconst h = ((360 * (color[0] + time)) % 360) / 360;\r\n\t\tmaterials[i].color.setHSL(h, color[1], color[2], THREE.SRGBColorSpace);\r\n\t}\r\n\r\n\trenderer.render(scene, camera);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/snowflakes"
+  }
+}

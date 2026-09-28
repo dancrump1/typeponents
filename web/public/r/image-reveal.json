@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "image-reveal",
+  "type": "registry:ui",
+  "title": "Image Reveal",
+  "description": "Image Reveal",
+  "dependencies": [
+    "lucide-react",
+    "usehooks-ts"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/image-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/image-reveal.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useCallback, useEffect, useRef, useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { MoveUpRight } from \"lucide-react\";\r\nimport { useMediaQuery } from \"usehooks-ts\";\r\n\r\n// Credit:\r\n// https://www.ui-layouts.com/components/image-reveal\r\n\r\ninterface ImageData {\r\n\tid: number;\r\n\tsrc: string;\r\n\talt: string;\r\n}\r\n\r\nconst images: ImageData[] = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t\talt: \"Image Mousetrail\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t\talt: \"Spotlight Cards\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t\talt: \"Sparkles Effects\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t\talt: \"Horizontal Scroll\",\r\n\t},\r\n];\r\n\r\nconst ImageReveal: React.FC = () => {\r\n\tconst isDesktop = useMediaQuery(\"(min-width: 768px)\");\r\n\tconst [activeImage, setActiveImage] = useState<ImageData | null>(null);\r\n\tconst [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });\r\n\tconst [opacity, setOpacity] = useState(0);\r\n\tconst [scale, setScale] = useState(0.5);\r\n\tconst timeoutRef = useRef<NodeJS.Timeout | null>(null);\r\n\tconst requestRef = useRef<number | null>(null);\r\n\tconst prevCursorPosition = useRef({ x: 0, y: 0 });\r\n\r\n\tconst handleMouseMove = useCallback((e: MouseEvent) => {\r\n\t\tconst { clientX, clientY } = e;\r\n\t\tconst dx = clientX - prevCursorPosition.current.x;\r\n\t\tconst dy = clientY - prevCursorPosition.current.y;\r\n\r\n\t\t// Apply easing to the cursor movement\r\n\t\tconst easeAmount = 0.2;\r\n\t\tconst newX = prevCursorPosition.current.x + dx * easeAmount;\r\n\t\tconst newY = prevCursorPosition.current.y + dy * easeAmount;\r\n\r\n\t\tsetCursorPosition({ x: newX, y: newY });\r\n\t\tprevCursorPosition.current = { x: newX, y: newY };\r\n\t}, []);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst updateCursorPosition = (e: MouseEvent) => {\r\n\t\t\tif (requestRef.current) return;\r\n\t\t\trequestRef.current = requestAnimationFrame(() => {\r\n\t\t\t\thandleMouseMove(e);\r\n\t\t\t\trequestRef.current = null;\r\n\t\t\t});\r\n\t\t};\r\n\r\n\t\twindow.addEventListener(\"mousemove\", updateCursorPosition);\r\n\t\treturn () => {\r\n\t\t\twindow.removeEventListener(\"mousemove\", updateCursorPosition);\r\n\t\t\tif (requestRef.current) cancelAnimationFrame(requestRef.current);\r\n\t\t};\r\n\t}, [handleMouseMove]);\r\n\r\n\tconst handleImageHover = useCallback(\r\n\t\t(image: ImageData) => {\r\n\t\t\tif (activeImage !== image) {\r\n\t\t\t\tsetActiveImage(image);\r\n\t\t\t\tif (timeoutRef.current) clearTimeout(timeoutRef.current);\r\n\t\t\t\ttimeoutRef.current = setTimeout(() => {\r\n\t\t\t\t\tsetOpacity(1);\r\n\t\t\t\t\tsetScale(1);\r\n\t\t\t\t}, 50);\r\n\t\t\t} else {\r\n\t\t\t\tsetOpacity(1);\r\n\t\t\t\tsetScale(1);\r\n\t\t\t}\r\n\t\t},\r\n\t\t[activeImage]\r\n\t);\r\n\r\n\tconst handleMouseLeave = useCallback(() => {\r\n\t\tsetOpacity(0);\r\n\t\tsetScale(0.5);\r\n\t\tif (timeoutRef.current) clearTimeout(timeoutRef.current);\r\n\t\ttimeoutRef.current = setTimeout(() => {\r\n\t\t\tsetActiveImage(null);\r\n\t\t}, 300);\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"relative w-full min-h-fit dark:bg-linear-to-b from-background from-10% to-background to-100% bg-background rounded-md border\"\r\n\t\t\tonMouseLeave={handleMouseLeave}\r\n\t\t>\r\n\t\t\t{images?.map((image, i) => (\r\n\t\t\t\t<div\r\n\t\t\t\t\tkey={image.alt || i + \"image-reveal\"}\r\n\t\t\t\t\tclassName={`p-4 cursor-pointer relative sm:flex items-center justify-between`}\r\n\t\t\t\t\tonMouseEnter={() => handleImageHover(image)}\r\n\t\t\t\t>\r\n\t\t\t\t\t{!isDesktop && (\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tsrc={image?.src}\r\n\t\t\t\t\t\t\tclassName=\"sm:w-32 sm:h-20 w-full h-52 object-cover rounded-md\"\r\n\t\t\t\t\t\t\talt=\"mobileImg\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t)}\r\n\t\t\t\t\t<h2\r\n\t\t\t\t\t\tclassName={`newFont dark:text-foreground uppercase md:text-5xl sm:text-2xl text-xl font-semibold sm:py-6 py-2 leading-[100%] relative ${\r\n\t\t\t\t\t\t\tactiveImage?.id === image?.id\r\n\t\t\t\t\t\t\t\t? \"mix-blend-difference z-20 text-foreground\"\r\n\t\t\t\t\t\t\t\t: \"text-foreground\"\r\n\t\t\t\t\t\t}`}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{image.alt}\r\n\t\t\t\t\t</h2>\r\n\t\t\t\t\t<button\r\n\t\t\t\t\t\tclassName={`sm:block hidden p-4 rounded-full transition-[background-color,color] duration-300 ease-out ${\r\n\t\t\t\t\t\t\tactiveImage?.id === image?.id\r\n\t\t\t\t\t\t\t\t? \"mix-blend-difference z-20 bg-background text-foreground\"\r\n\t\t\t\t\t\t\t\t: \"\"\r\n\t\t\t\t\t\t}`}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<MoveUpRight className=\"w-8 h-8\" />\r\n\t\t\t\t\t</button>\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName={`h-[2px] dark:bg-background bg-background absolute bottom-0 left-0 transition-[width] duration-300 ease-linear ${\r\n\t\t\t\t\t\t\tactiveImage?.id === image?.id ? \"w-full\" : \"w-0\"\r\n\t\t\t\t\t\t}`}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\t\t\t))}\r\n\t\t\t{isDesktop && activeImage && (\r\n\t\t\t\t<Image\r\n\t\t\t\t\theight={200}\r\n\t\t\t\t\twidth={200}\r\n\t\t\t\t\tsrc={activeImage.src}\r\n\t\t\t\t\talt={activeImage.alt}\r\n\t\t\t\t\tclassName={`fixed dark:bg-background bg-background object-cover pointer-events-none z-10 w-[300px] h-[400px] rounded-lg`}\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\tleft: `${cursorPosition.x}px`,\r\n\t\t\t\t\t\ttop: `${cursorPosition.y}px`,\r\n\t\t\t\t\t\ttransform: `translate(-50%, -50%) scale(${scale})`,\r\n\t\t\t\t\t\topacity: opacity,\r\n\t\t\t\t\t}}\r\n\t\t\t\t/>\r\n\t\t\t)}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ImageReveal;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "UI Layouts",
+      "url": "https://www.ui-layouts.com/components/image-reveal",
+      "authorUrl": "https://www.ui-layouts.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/image-reveal"
+  }
+}

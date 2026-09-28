@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "threads",
+  "type": "registry:ui",
+  "title": "Threads",
+  "description": "Threads",
+  "dependencies": [
+    "ogl"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/threads.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/threads.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\nimport { Color, Mesh, Program, Renderer, Triangle } from \"ogl\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/backgrounds/threads\r\n\r\ninterface ThreadsProps {\r\n\tcolor?: [number, number, number];\r\n\tamplitude?: number;\r\n\tdistance?: number;\r\n\tenableMouseInteraction?: boolean;\r\n}\r\n\r\nconst vertexShader = `\r\nattribute vec2 position;\r\nattribute vec2 uv;\r\nvarying vec2 vUv;\r\nvoid main() {\r\n  vUv = uv;\r\n  gl_Position = vec4(position, 0.0, 1.0);\r\n}\r\n`;\r\n\r\nconst fragmentShader = `\r\nprecision highp float;\r\nuniform float iTime;\r\nuniform vec3 iResolution;\r\nuniform vec3 uColor;\r\nuniform float uAmplitude;\r\nuniform float uDistance;\r\nuniform vec2 uMouse;\r\n\r\n#define PI 3.1415926538\r\n\r\nconst int u_line_count = 40;\r\nconst float u_line_width = 7.0;\r\nconst float u_line_blur = 10.0;\r\n\r\nfloat pixel(float count, vec2 resolution) {\r\n    return 1.0 / max(resolution.x, resolution.y) * count;\r\n}\r\n\r\nfloat Perlin2D(vec2 P)\r\n{\r\n    vec2 Pi = floor(P);\r\n    vec4 Pf_Pfmin1 = P.xyxy - vec4(Pi, Pi + 1.0);\r\n    vec4 Pt = vec4(Pi.xy, Pi.xy + 1.0);\r\n    Pt = Pt - floor(Pt * (1.0 / 71.0)) * 71.0;\r\n    Pt += vec2(26.0, 161.0).xyxy;\r\n    Pt *= Pt;\r\n    Pt = Pt.xzxz * Pt.yyww;\r\n    vec4 hash_x = fract(Pt * (1.0 / 951.135664));\r\n    vec4 hash_y = fract(Pt * (1.0 / 642.949883));\r\n    vec4 grad_x = hash_x - 0.49999;\r\n    vec4 grad_y = hash_y - 0.49999;\r\n    vec4 grad_results = inversesqrt(grad_x * grad_x + grad_y * grad_y) * (grad_x * Pf_Pfmin1.xzxz + grad_y * Pf_Pfmin1.yyww);\r\n    grad_results *= 1.4142135623730950488016887242097;\r\n    vec2 blend = Pf_Pfmin1.xy * Pf_Pfmin1.xy * Pf_Pfmin1.xy * (Pf_Pfmin1.xy * (Pf_Pfmin1.xy * 6.0 - 15.0) + 10.0);\r\n    vec4 blend2 = vec4(blend, vec2(1.0 - blend));\r\n    return dot(grad_results, blend2.zxzx * blend2.wwyy);\r\n}\r\n\r\nfloat line(vec2 st, float width, float perc, float offset) {\r\n    float split_offset = (perc * 0.4);\r\n    float split_point = 0.1 + split_offset;\r\n    \r\n    float amplitude_normal = smoothstep(split_point, 0.7, st.x);\r\n    float amplitude_strength = 0.5;\r\n    // Reduced modulation intensity (20% influence from mouse Y)\r\n    float amplitude = amplitude_normal * amplitude_strength * uAmplitude * (1.0 + (uMouse.y - 0.5) * 0.2);\r\n\r\n    // Reduced time modulation (only 1.0 factor)\r\n    float time_scaled = iTime / 10.0 + (uMouse.x - 0.5) * 1.0;\r\n    \r\n    float blur = smoothstep(split_point, split_point + 0.05, st.x) * perc;\r\n\r\n    float xnoise = mix(\r\n        Perlin2D(vec2(time_scaled, st.x + perc) * 2.5),\r\n        Perlin2D(vec2(time_scaled, st.x + time_scaled) * 3.5) / 1.5,\r\n        st.x * 0.3\r\n    );\r\n\r\n    float y = 0.5 + (perc - 0.5) * uDistance + xnoise / 2.0 * amplitude;\r\n\r\n    float line_start = smoothstep(\r\n        y + (width / 2.0) + (u_line_blur * pixel(1.0, iResolution.xy) * blur),\r\n        y,\r\n        st.y\r\n    );\r\n        \r\n    float line_end = smoothstep(\r\n        y,\r\n        y - (width / 2.0) - (u_line_blur * pixel(1.0, iResolution.xy) * blur),\r\n        st.y\r\n    );\r\n    \r\n    return clamp(\r\n        (line_start - line_end) * (1.0 - smoothstep(0.0, 1.0, pow(perc, 0.3))),\r\n        0.0,\r\n        1.0\r\n    );\r\n}\r\n\r\nvoid mainImage( out vec4 fragColor, in vec2 fragCoord )\r\n{\r\n    vec2 uv = fragCoord / iResolution.xy;\r\n    \r\n    float line_strength = 1.0;\r\n\r\n    for (int i = 0; i < u_line_count; i++) {\r\n        line_strength *= (1.0 - line(\r\n            uv,\r\n            u_line_width * pixel(1.0, iResolution.xy) * (1.0 - float(i) / float(u_line_count)),\r\n            float(i) / float(u_line_count),\r\n            (PI * 1.0) * float(i) / float(u_line_count)\r\n        ));\r\n    }\r\n    \r\n    float color = 1.0 - line_strength;\r\n    fragColor = vec4(uColor * color, color);\r\n}\r\n\r\nvoid main() {\r\n    mainImage(gl_FragColor, gl_FragCoord.xy);\r\n}\r\n`;\r\n\r\nconst Threads: React.FC<ThreadsProps> = ({\r\n\tcolor = [1, 1, 1],\r\n\tamplitude = 1,\r\n\tdistance = 0,\r\n\tenableMouseInteraction = false,\r\n\t...rest\r\n}) => {\r\n\tconst containerRef = useRef<HTMLDivElement>(null);\r\n\tconst animationFrameId = useRef<number>();\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!containerRef.current) return;\r\n\t\tconst container = containerRef.current;\r\n\r\n\t\tconst renderer = new Renderer({ dpr: devicePixelRatio, alpha: true });\r\n\t\tconst gl = renderer.gl;\r\n\t\tgl.clearColor(0, 0, 0, 0);\r\n\t\tgl.enable(gl.BLEND);\r\n\t\tgl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);\r\n\t\tcontainer.appendChild(gl.canvas);\r\n\r\n\t\tconst geometry = new Triangle(gl);\r\n\t\tconst program = new Program(gl, {\r\n\t\t\tvertex: vertexShader,\r\n\t\t\tfragment: fragmentShader,\r\n\t\t\tuniforms: {\r\n\t\t\t\tiTime: { value: 0 },\r\n\t\t\t\tiResolution: {\r\n\t\t\t\t\tvalue: new Color(\r\n\t\t\t\t\t\tgl.canvas.width,\r\n\t\t\t\t\t\tgl.canvas.height,\r\n\t\t\t\t\t\tgl.canvas.width / gl.canvas.height\r\n\t\t\t\t\t),\r\n\t\t\t\t},\r\n\t\t\t\tuColor: { value: new Color(...color) },\r\n\t\t\t\tuAmplitude: { value: amplitude },\r\n\t\t\t\tuDistance: { value: distance },\r\n\t\t\t\tuMouse: { value: new Float32Array([0.5, 0.5]) },\r\n\t\t\t},\r\n\t\t});\r\n\t\tconst mesh = new Mesh(gl, { geometry, program });\r\n\r\n\t\tfunction resize() {\r\n\t\t\tconst { clientWidth, clientHeight } = container;\r\n\t\t\trenderer.setSize(clientWidth, clientHeight);\r\n\t\t\tprogram.uniforms.iResolution.value = new Color(\r\n\t\t\t\tclientWidth,\r\n\t\t\t\tclientHeight,\r\n\t\t\t\tclientWidth / clientHeight\r\n\t\t\t);\r\n\t\t}\r\n\t\twindow.addEventListener(\"resize\", resize);\r\n\t\tresize();\r\n\r\n\t\t// Variables to smoothly interpolate the mouse position.\r\n\t\tlet currentMouse = [0.5, 0.5];\r\n\t\tlet targetMouse = [0.5, 0.5];\r\n\r\n\t\tfunction handleMouseMove(e: MouseEvent) {\r\n\t\t\tconst rect = container.getBoundingClientRect();\r\n\t\t\tconst x = (e.clientX - rect.left) / rect.width;\r\n\t\t\tconst y = 1.0 - (e.clientY - rect.top) / rect.height;\r\n\t\t\ttargetMouse = [x, y];\r\n\t\t}\r\n\t\tfunction handleMouseLeave() {\r\n\t\t\ttargetMouse = [0.5, 0.5];\r\n\t\t}\r\n\t\tif (enableMouseInteraction) {\r\n\t\t\tcontainer.addEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\tcontainer.addEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t}\r\n\r\n\t\tfunction update(t: number) {\r\n\t\t\tif (enableMouseInteraction) {\r\n\t\t\t\t// Smoothly interpolate the current mouse position toward the target.\r\n\t\t\t\tconst smoothing = 0.05;\r\n\t\t\t\tcurrentMouse[0] += smoothing * (targetMouse[0] - currentMouse[0]);\r\n\t\t\t\tcurrentMouse[1] += smoothing * (targetMouse[1] - currentMouse[1]);\r\n\t\t\t\tprogram.uniforms.uMouse.value[0] = currentMouse[0];\r\n\t\t\t\tprogram.uniforms.uMouse.value[1] = currentMouse[1];\r\n\t\t\t} else {\r\n\t\t\t\tprogram.uniforms.uMouse.value[0] = 0.5;\r\n\t\t\t\tprogram.uniforms.uMouse.value[1] = 0.5;\r\n\t\t\t}\r\n\t\t\tprogram.uniforms.iTime.value = t * 0.001;\r\n\t\t\trenderer.render({ scene: mesh });\r\n\t\t\tanimationFrameId.current = requestAnimationFrame(update);\r\n\t\t}\r\n\t\tanimationFrameId.current = requestAnimationFrame(update);\r\n\r\n\t\treturn () => {\r\n\t\t\tif (animationFrameId.current)\r\n\t\t\t\tcancelAnimationFrame(animationFrameId.current);\r\n\t\t\twindow.removeEventListener(\"resize\", resize);\r\n\t\t\tif (enableMouseInteraction) {\r\n\t\t\t\tcontainer.removeEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\t\tcontainer.removeEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t\t}\r\n\t\t\tif (container.contains(gl.canvas)) container.removeChild(gl.canvas);\r\n\t\t\tgl.getExtension(\"WEBGL_lose_context\")?.loseContext();\r\n\t\t};\r\n\t}, [color, amplitude, distance, enableMouseInteraction]);\r\n\r\n\treturn (\r\n\t\t<div ref={containerRef} className=\"w-full h-full relative\" {...rest} />\r\n\t);\r\n};\r\n\r\nexport default Threads;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "webgl",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/backgrounds/threads",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "color",
+        "type": "[number, number, number]",
+        "default": "[1, 1, 1]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "amplitude",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "distance",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableMouseInteraction",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/threads"
+  }
+}

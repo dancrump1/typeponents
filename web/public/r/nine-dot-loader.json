@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "nine-dot-loader",
+  "type": "registry:ui",
+  "title": "Nine Dot Loader",
+  "description": "Loading indicator made of a three-by-three grid of rounded dots that pulse out of step with each other.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/nine-dot-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/nine-dot-loader.tsx",
+      "content": "export default function NineDotGridRandom() {\r\n\tconst animationDuration = 1;\r\n\r\n\treturn (\r\n\t\t<>\r\n\t\t\t<style>\r\n\t\t\t\t{`\r\n          @keyframes three-dot-loader-growing {\r\n            0% {\r\n              transform: scale(1) ;\r\n            }\r\n            30% {\r\n              transform: scale(1.5);\r\n            }\r\n            60% {\r\n              transform: scale(1);\r\n            }\r\n          }\r\n        `}\r\n\t\t\t</style>\r\n\r\n\t\t\t<div className=\"grid grid-cols-3 gap-3\">\r\n\t\t\t\t{[...new Array(9)].map((_, index) => (\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName=\"size-5 origin-center rounded-xl bg-background dark:invert\"\r\n\t\t\t\t\t\tkey={index.toString() + \"nine-dot\"}\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tanimationName: \"three-dot-loader-growing\",\r\n\t\t\t\t\t\t\tanimationDuration: `${animationDuration}s`,\r\n\t\t\t\t\t\t\tanimationIterationCount: \"infinite\",\r\n\t\t\t\t\t\t\tanimationDirection: \"both\",\r\n\t\t\t\t\t\t\tanimationTimingFunction: \"ease-in\",\r\n\t\t\t\t\t\t\tanimationDelay: `${Math.random() * (animationDuration / 2)}s`,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "Runs on its own with no input — every dot swells and shrinks on a one-second loop, each starting at a random moment so the grid twinkles rather than beating in unison.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/nine-dot-loader"
+  }
+}

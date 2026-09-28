@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-gallery",
+  "type": "registry:ui",
+  "title": "Hover Gallery",
+  "description": "Hover Gallery",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-gallery.tsx",
+      "content": "\"use client\";\n\nimport { useCallback, useRef, useState } from \"react\";\n\n// Credit:\n// https://starui.link/docs/components/hover-gallery\n\n// Add to CSS\n// @theme {\n//   --ease-spring: linear(\n//     0,\n//     0.009,\n//     0.035 2.1%,\n//     0.141,\n//     0.281 6.7%,\n//     0.723 12.9%,\n//     0.938 16.7%,\n//     1.017,\n//     1.077,\n//     1.121,\n//     1.149 24.3%,\n//     1.159,\n//     1.163,\n//     1.161,\n//     1.154 29.9%,\n//     1.129 32.8%,\n//     1.051 39.6%,\n//     1.017 43.1%,\n//     0.991,\n//     0.977 51%,\n//     0.974 53.8%,\n//     0.975 57.1%,\n//     0.997 69.8%,\n//     1.003 76.9%,\n//     1.004 83.8%,\n//     1\n//   );\n//   --ease-bounce: linear(\n//     0,\n//     0.004,\n//     0.016,\n//     0.035,\n//     0.063,\n//     0.098,\n//     0.141 13.6%,\n//     0.25,\n//     0.391,\n//     0.563,\n//     0.765,\n//     1,\n//     0.891 40.9%,\n//     0.848,\n//     0.813,\n//     0.785,\n//     0.766,\n//     0.754,\n//     0.75,\n//     0.754,\n//     0.766,\n//     0.785,\n//     0.813,\n//     0.848,\n//     0.891 68.2%,\n//     1 72.7%,\n//     0.973,\n//     0.953,\n//     0.941,\n//     0.938,\n//     0.941,\n//     0.953,\n//     0.973,\n//     1,\n//     0.988,\n//     0.984,\n//     0.988,\n//     1\n//   );\n// }\n\nexport interface HoverCardProps {\n\tcards: { name: string; left: string; top: string; right: string }[];\n}\n\nfunction HoverCard({ cards }: HoverCardProps) {\n\tconst ulRef = useRef<HTMLUListElement | null>(null);\n\tconst [index, setIndex] = useState(0);\n\tconst [coordinates, setCoordinates] = useState<{\n\t\ttop: { x: number; y: number; angle: number };\n\t\tleft: { x: number; y: number; angle: number };\n\t\tright: { x: number; y: number; angle: number };\n\t}>();\n\n\tconst handlePointerEnter = useCallback(\n\t\t(e: React.PointerEvent<HTMLParagraphElement>, index: number) => {\n\t\t\tif (!ulRef.current) return;\n\t\t\tconst ulRect = ulRef.current.getBoundingClientRect();\n\t\t\tconst rect = e.currentTarget.getBoundingClientRect();\n\n\t\t\tconst y = rect.top - ulRect.top;\n\t\t\tconst coordinates = {\n\t\t\t\ttop: {\n\t\t\t\t\ty,\n\t\t\t\t\tx: Math.floor(Math.random() * 61) - 30,\n\t\t\t\t\tangle: getRandomAngle(),\n\t\t\t\t},\n\t\t\t\tleft: {\n\t\t\t\t\tx: rect.left - ulRect.left,\n\t\t\t\t\ty,\n\t\t\t\t\tangle: getRandomAngle(),\n\t\t\t\t},\n\t\t\t\tright: {\n\t\t\t\t\tx: rect.right - ulRect.right,\n\t\t\t\t\ty,\n\t\t\t\t\tangle: getRandomAngle(),\n\t\t\t\t},\n\t\t\t};\n\n\t\t\tsetIndex(index);\n\t\t\tsetCoordinates(coordinates);\n\t\t},\n\t\t[cards]\n\t);\n\n\treturn (\n\t\t<div className=\"h-full flex items-center justify-center text-5xl\">\n\t\t\t<ul\n\t\t\t\tref={ulRef}\n\t\t\t\tclassName=\"flex flex-col pointer-events-none items-center font-bold relative group\"\n\t\t\t>\n\t\t\t\t{cards.map((card, index) => (\n\t\t\t\t\t<li key={card.name}>\n\t\t\t\t\t\t<p\n\t\t\t\t\t\t\tclassName=\"cursor-pointer pointer-events-auto w-fit uppercase opacity-25 hover:opacity-100 [transition:opacity_0.15s_var(--ease-in-out),scale_0.5s_var(--ease-bounce)] hover:scale-y-110\"\n\t\t\t\t\t\t\tonPointerEnter={(e) => handlePointerEnter(e, index)}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{card.name}\n\t\t\t\t\t\t</p>\n\t\t\t\t\t</li>\n\t\t\t\t))}\n\n\t\t\t\t<img\n\t\t\t\t\tsrc={cards[index].top}\n\t\t\t\t\tclassName=\"absolute w-40 pointer-events-none scale-0 group-hover:scale-100 group-hover:[transition:scale_0.5s_var(--ease-spring),translate_0.5s_var(--ease-spring),rotate_1s_var(--ease-spring)] [transition:scale_0.2s_var(--ease-in-out)] rounded-md overflow-hidden shadow-xl shadow-black/25\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttranslate: `calc(${\n\t\t\t\t\t\t\tcoordinates?.top?.x ?? 0\n\t\t\t\t\t\t}px) calc(-100% + ${(coordinates?.top?.y ?? 0) - 40}px)`,\n\t\t\t\t\t\trotate: `${coordinates?.top?.angle}deg`,\n\t\t\t\t\t}}\n\t\t\t\t\talt=\"\"\n\t\t\t\t/>\n\n\t\t\t\t<img\n\t\t\t\t\tsrc={cards[index].left}\n\t\t\t\t\tclassName=\"absolute left-0 w-40 pointer-events-none scale-0 group-hover:scale-100 group-hover:[transition:scale_0.5s_var(--ease-spring),translate_0.5s_var(--ease-spring),rotate_1s_var(--ease-spring)] [transition:scale_0.2s_var(--ease-in-out)] rounded-md overflow-hidden shadow-xl shadow-black/25\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttranslate: `calc(-100% + ${\n\t\t\t\t\t\t\tcoordinates?.left?.x ?? 0\n\t\t\t\t\t\t}px - 100px) calc(-50% + ${coordinates?.top?.y ?? 0}px)`,\n\t\t\t\t\t\trotate: `${coordinates?.left?.angle}deg`,\n\t\t\t\t\t}}\n\t\t\t\t\talt=\"\"\n\t\t\t\t/>\n\n\t\t\t\t<img\n\t\t\t\t\tsrc={cards[index].right}\n\t\t\t\t\tclassName=\"absolute right-0 w-40 pointer-events-none scale-0 group-hover:scale-100 group-hover:[transition:scale_0.5s_var(--ease-spring),translate_0.5s_var(--ease-spring),rotate_1s_var(--ease-spring)] [transition:scale_0.2s_var(--ease-in-out)] rounded-md overflow-hidden shadow-xl shadow-black/25\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttranslate: `calc(100% + ${\n\t\t\t\t\t\t\tcoordinates?.right?.x ?? 0\n\t\t\t\t\t\t}px + 100px) calc(-50% + ${coordinates?.top?.y ?? 0}px)`,\n\t\t\t\t\t\trotate: `${coordinates?.right?.angle}deg`,\n\t\t\t\t\t}}\n\t\t\t\t\talt=\"\"\n\t\t\t\t/>\n\t\t\t</ul>\n\t\t</div>\n\t);\n}\n\nfunction getRandomAngle() {\n\treturn Math.floor(Math.random() * 21) - 20;\n}\n\nexport { HoverCard };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/hover-gallery",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-gallery"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sticky-scroll-reveal",
+  "type": "registry:ui",
+  "title": "Sticky Scroll Reveal",
+  "description": "Sticky Scroll Reveal",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sticky-scroll-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sticky-scroll-reveal.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, useMotionValueEvent, useScroll } from \"motion/react\";\n\n// Credit:\n// //https://ui.aceternity.com/components/sticky-scroll-reveal\n\nexport const StickyScroll = ({\n\tcontent,\n\tcontentClassName,\n}: {\n\tcontent: {\n\t\ttitle: string;\n\t\tdescription: string;\n\t\tcontent?: React.ReactNode | any;\n\t}[];\n\tcontentClassName?: string;\n}) => {\n\tconst [activeCard, setActiveCard] = React.useState(0);\n\tconst ref = useRef<any>(null);\n\tconst { scrollYProgress } = useScroll({\n\t\t// uncomment line 22 and comment line 23 if you DONT want the overflow container and want to have it change on the entire page scroll\n\t\ttarget: ref,\n\t\toffset: [\"start start\", \"end start\"],\n\t});\n\tconst cardLength = content.length;\n\n\tuseMotionValueEvent(scrollYProgress, \"change\", (latest) => {\n\t\tconst cardsBreakpoints = content.map((_, index) => index / cardLength);\n\t\tconst closestBreakpointIndex = cardsBreakpoints.reduce(\n\t\t\t(acc, breakpoint, index) => {\n\t\t\t\tconst distance = Math.abs(latest - breakpoint);\n\t\t\t\tif (distance < Math.abs(latest - cardsBreakpoints[acc])) {\n\t\t\t\t\treturn index;\n\t\t\t\t}\n\t\t\t\treturn acc;\n\t\t\t},\n\t\t\t0\n\t\t);\n\t\tsetActiveCard(closestBreakpointIndex);\n\t});\n\n\tconst backgroundColors = [\n\t\t\"#0f172a\", // slate-900\n\t\t\"#000000\", // black\n\t\t\"#171717\", // neutral-900\n\t];\n\tconst linearGradients = [\n\t\t\"linear-gradient(to bottom right, #06b6d4, #10b981)\", // cyan-500 to emerald-500\n\t\t\"linear-gradient(to bottom right, #ec4899, #6366f1)\", // pink-500 to indigo-500\n\t\t\"linear-gradient(to bottom right, #f97316, #eab308)\", // orange-500 to yellow-500\n\t];\n\n\tconst [backgroundGradient, setBackgroundGradient] = useState(\n\t\tlinearGradients[0]\n\t);\n\n\tuseEffect(() => {\n\t\tsetBackgroundGradient(\n\t\t\tlinearGradients[activeCard % linearGradients.length]\n\t\t);\n\t}, [activeCard]);\n\n\treturn (\n\t\t<motion.div\n\t\t\tanimate={{\n\t\t\t\tbackgroundColor:\n\t\t\t\t\tbackgroundColors[activeCard % backgroundColors.length],\n\t\t\t}}\n\t\t\tclassName=\"relative flex justify-center space-x-10 rounded-md p-10\"\n\t\t\tref={ref}\n\t\t>\n\t\t\t<div className=\"div relative flex items-start px-4\">\n\t\t\t\t<div className=\"max-w-2xl\">\n\t\t\t\t\t{content.map((item, index) => (\n\t\t\t\t\t\t<div key={item.title + index} className=\"my-20\">\n\t\t\t\t\t\t\t<motion.h2\n\t\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\topacity: activeCard === index ? 1 : 0.3,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tclassName=\"text-2xl font-bold text-slate-100\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{item.title}\n\t\t\t\t\t\t\t</motion.h2>\n\t\t\t\t\t\t\t<motion.p\n\t\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\topacity: activeCard === index ? 1 : 0.3,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tclassName=\"text-kg mt-10 max-w-sm text-slate-300\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{item.description}\n\t\t\t\t\t\t\t</motion.p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t))}\n\t\t\t\t\t<div className=\"h-40\" />\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<div\n\t\t\t\tstyle={{ background: backgroundGradient }}\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"sticky top-10 hidden h-60 w-80 overflow-hidden rounded-md bg-background lg:block\",\n\t\t\t\t\tcontentClassName\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t{content[activeCard].content ?? null}\n\t\t\t</div>\n\t\t</motion.div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/sticky-scroll-reveal",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "content",
+        "type": "{ title: string; description: string; content?: React.Rea…",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "contentClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sticky-scroll-reveal"
+  }
+}

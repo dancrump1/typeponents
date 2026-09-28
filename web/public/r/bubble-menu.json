@@ -1,0 +1,118 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bubble-menu",
+  "type": "registry:ui",
+  "title": "Bubble Menu",
+  "description": "Floating navigation bar of a logo bubble and a hamburger button that opens a full-screen grid of tilted menu pills.",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/bubble-menu.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/bubble-menu.tsx",
+      "content": "import type { CSSProperties, ReactNode } from \"react\";\nimport { useEffect, useRef, useState } from \"react\";\n\nimport { gsap } from \"gsap\";\n\ntype MenuItem = {\n\tlabel: string;\n\thref: string;\n\tariaLabel?: string;\n\trotation?: number;\n\thoverStyles?: {\n\t\tbgColor?: string;\n\t\ttextColor?: string;\n\t};\n};\n\nexport type BubbleMenuProps = {\n\tlogo: ReactNode | string;\n\tonMenuClick?: (open: boolean) => void;\n\tclassName?: string;\n\tstyle?: CSSProperties;\n\tmenuAriaLabel?: string;\n\tmenuBg?: string;\n\tmenuContentColor?: string;\n\tuseFixedPosition?: boolean;\n\titems?: MenuItem[];\n\tanimationEase?: string;\n\tanimationDuration?: number;\n\tstaggerDelay?: number;\n};\n\nconst DEFAULT_ITEMS: MenuItem[] = [\n\t{\n\t\tlabel: \"home\",\n\t\thref: \"#\",\n\t\tariaLabel: \"Home\",\n\t\trotation: -8,\n\t\thoverStyles: { bgColor: \"#3b82f6\", textColor: \"#ffffff\" },\n\t},\n\t{\n\t\tlabel: \"about\",\n\t\thref: \"#\",\n\t\tariaLabel: \"About\",\n\t\trotation: 8,\n\t\thoverStyles: { bgColor: \"#10b981\", textColor: \"#ffffff\" },\n\t},\n\t{\n\t\tlabel: \"projects\",\n\t\thref: \"#\",\n\t\tariaLabel: \"Documentation\",\n\t\trotation: 8,\n\t\thoverStyles: { bgColor: \"#f59e0b\", textColor: \"#ffffff\" },\n\t},\n\t{\n\t\tlabel: \"blog\",\n\t\thref: \"#\",\n\t\tariaLabel: \"Blog\",\n\t\trotation: 8,\n\t\thoverStyles: { bgColor: \"#ef4444\", textColor: \"#ffffff\" },\n\t},\n\t{\n\t\tlabel: \"contact\",\n\t\thref: \"#\",\n\t\tariaLabel: \"Contact\",\n\t\trotation: -8,\n\t\thoverStyles: { bgColor: \"#8b5cf6\", textColor: \"#ffffff\" },\n\t},\n];\n\nexport default function BubbleMenu({\n\tlogo,\n\tonMenuClick,\n\tclassName,\n\tstyle,\n\tmenuAriaLabel = \"Toggle menu\",\n\tmenuBg = \"#fff\",\n\tmenuContentColor = \"#111\",\n\tuseFixedPosition = false,\n\titems,\n\tanimationEase = \"back.out(1.5)\",\n\tanimationDuration = 0.5,\n\tstaggerDelay = 0.12,\n}: BubbleMenuProps) {\n\tconst [isMenuOpen, setIsMenuOpen] = useState(false);\n\tconst [showOverlay, setShowOverlay] = useState(false);\n\n\tconst overlayRef = useRef<HTMLDivElement>(null);\n\tconst bubblesRef = useRef<HTMLAnchorElement[]>([]);\n\tconst labelRefs = useRef<HTMLSpanElement[]>([]);\n\n\tconst menuItems = items?.length ? items : DEFAULT_ITEMS;\n\n\tconst containerClassName = [\n\t\t\"bubble-menu\",\n\t\tuseFixedPosition ? \"fixed\" : \"absolute\",\n\t\t\"left-0 right-0 top-8\",\n\t\t\"flex items-center justify-between\",\n\t\t\"gap-4 px-8\",\n\t\t\"pointer-events-none\",\n\t\t\"z-1001\",\n\t\tclassName,\n\t]\n\t\t.filter(Boolean)\n\t\t.join(\" \");\n\n\tconst handleToggle = () => {\n\t\tconst nextState = !isMenuOpen;\n\t\tif (nextState) setShowOverlay(true);\n\t\tsetIsMenuOpen(nextState);\n\t\tonMenuClick?.(nextState);\n\t};\n\n\tuseEffect(() => {\n\t\tconst overlay = overlayRef.current;\n\t\tconst bubbles = bubblesRef.current.filter(Boolean);\n\t\tconst labels = labelRefs.current.filter(Boolean);\n\t\tif (!overlay || !bubbles.length) return;\n\n\t\tif (isMenuOpen) {\n\t\t\tgsap.set(overlay, { display: \"flex\" });\n\t\t\tgsap.killTweensOf([...bubbles, ...labels]);\n\t\t\tgsap.set(bubbles, { scale: 0, transformOrigin: \"50% 50%\" });\n\t\t\tgsap.set(labels, { y: 24, autoAlpha: 0 });\n\n\t\t\tbubbles.forEach((bubble, i) => {\n\t\t\t\tconst delay = i * staggerDelay + gsap.utils.random(-0.05, 0.05);\n\t\t\t\tconst tl = gsap.timeline({ delay });\n\t\t\t\ttl.to(bubble, {\n\t\t\t\t\tscale: 1,\n\t\t\t\t\tduration: animationDuration,\n\t\t\t\t\tease: animationEase,\n\t\t\t\t});\n\t\t\t\tif (labels[i]) {\n\t\t\t\t\ttl.to(\n\t\t\t\t\t\tlabels[i],\n\t\t\t\t\t\t{\n\t\t\t\t\t\t\ty: 0,\n\t\t\t\t\t\t\tautoAlpha: 1,\n\t\t\t\t\t\t\tduration: animationDuration,\n\t\t\t\t\t\t\tease: \"power3.out\",\n\t\t\t\t\t\t},\n\t\t\t\t\t\t\"-=\" + animationDuration * 0.9\n\t\t\t\t\t);\n\t\t\t\t}\n\t\t\t});\n\t\t} else if (showOverlay) {\n\t\t\tgsap.killTweensOf([...bubbles, ...labels]);\n\t\t\tgsap.to(labels, {\n\t\t\t\ty: 24,\n\t\t\t\tautoAlpha: 0,\n\t\t\t\tduration: 0.2,\n\t\t\t\tease: \"power3.in\",\n\t\t\t});\n\t\t\tgsap.to(bubbles, {\n\t\t\t\tscale: 0,\n\t\t\t\tduration: 0.2,\n\t\t\t\tease: \"power3.in\",\n\t\t\t\tonComplete: () => {\n\t\t\t\t\tgsap.set(overlay, { display: \"none\" });\n\t\t\t\t\tsetShowOverlay(false);\n\t\t\t\t},\n\t\t\t});\n\t\t}\n\t}, [\n\t\tisMenuOpen,\n\t\tshowOverlay,\n\t\tanimationEase,\n\t\tanimationDuration,\n\t\tstaggerDelay,\n\t]);\n\n\tuseEffect(() => {\n\t\tconst handleResize = () => {\n\t\t\tif (isMenuOpen) {\n\t\t\t\tconst bubbles = bubblesRef.current.filter(Boolean);\n\t\t\t\tconst isDesktop = window.innerWidth >= 900;\n\t\t\t\tbubbles.forEach((bubble, i) => {\n\t\t\t\t\tconst item = menuItems[i];\n\t\t\t\t\tif (bubble && item) {\n\t\t\t\t\t\tconst rotation = isDesktop ? (item.rotation ?? 0) : 0;\n\t\t\t\t\t\tgsap.set(bubble, { rotation });\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t}\n\t\t};\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\treturn () => window.removeEventListener(\"resize\", handleResize);\n\t}, [isMenuOpen, menuItems]);\n\n\treturn (\n\t\t<>\n\t\t\t{/* Workaround for silly Tailwind capabilities */}\n\t\t\t<style>{`\n        .bubble-menu .menu-line {\n          transition: transform 0.3s ease, opacity 0.3s ease;\n          transform-origin: center;\n        }\n        .bubble-menu-items .pill-list .pill-col:nth-child(4):nth-last-child(2) {\n          margin-left: calc(100% / 6);\n        }\n        .bubble-menu-items .pill-list .pill-col:nth-child(4):last-child {\n          margin-left: calc(100% / 3);\n        }\n        @media (min-width: 900px) {\n          .bubble-menu-items .pill-link {\n            transform: rotate(var(--item-rot));\n          }\n          .bubble-menu-items .pill-link:hover {\n            transform: rotate(var(--item-rot)) scale(1.06);\n            background: var(--hover-bg) !important;\n            color: var(--hover-color) !important;\n          }\n          .bubble-menu-items .pill-link:active {\n            transform: rotate(var(--item-rot)) scale(.94);\n          }\n        }\n        @media (max-width: 899px) {\n          .bubble-menu-items {\n            padding-top: 120px;\n            align-items: flex-start;\n          }\n          .bubble-menu-items .pill-list {\n            row-gap: 16px;\n          }\n          .bubble-menu-items .pill-list .pill-col {\n            flex: 0 0 100% !important;\n            margin-left: 0 !important;\n            overflow: visible;\n          }\n          .bubble-menu-items .pill-link {\n            font-size: clamp(1.2rem, 3vw, 4rem);\n            padding: clamp(1rem, 2vw, 2rem) 0;\n            min-height: 80px !important;\n          }\n          .bubble-menu-items .pill-link:hover {\n            transform: scale(1.06);\n            background: var(--hover-bg);\n            color: var(--hover-color);\n          }\n          .bubble-menu-items .pill-link:active {\n            transform: scale(.94);\n          }\n        }\n      `}</style>\n\n\t\t\t<nav\n\t\t\t\tclassName={containerClassName}\n\t\t\t\tstyle={style}\n\t\t\t\taria-label=\"Main navigation\"\n\t\t\t>\n\t\t\t\t<div\n\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\"bubble logo-bubble\",\n\t\t\t\t\t\t\"inline-flex items-center justify-center\",\n\t\t\t\t\t\t\"rounded-full\",\n\t\t\t\t\t\t\"bg-white\",\n\t\t\t\t\t\t\"shadow-[0_4px_16px_rgba(0,0,0,0.12)]\",\n\t\t\t\t\t\t\"pointer-events-auto\",\n\t\t\t\t\t\t\"h-12 md:h-14\",\n\t\t\t\t\t\t\"px-4 md:px-8\",\n\t\t\t\t\t\t\"gap-2\",\n\t\t\t\t\t\t\"will-change-transform\",\n\t\t\t\t\t].join(\" \")}\n\t\t\t\t\taria-label=\"Logo\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tbackground: menuBg,\n\t\t\t\t\t\tminHeight: \"48px\",\n\t\t\t\t\t\tborderRadius: \"9999px\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<span\n\t\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\t\"logo-content\",\n\t\t\t\t\t\t\t\"inline-flex items-center justify-center\",\n\t\t\t\t\t\t\t\"w-[120px] h-full\",\n\t\t\t\t\t\t].join(\" \")}\n\t\t\t\t\t\tstyle={\n\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t[\"--logo-max-height\"]: \"60%\",\n\t\t\t\t\t\t\t\t[\"--logo-max-width\"]: \"100%\",\n\t\t\t\t\t\t\t} as CSSProperties\n\t\t\t\t\t\t}\n\t\t\t\t\t>\n\t\t\t\t\t\t{typeof logo === \"string\" ? (\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc={logo}\n\t\t\t\t\t\t\t\talt=\"Logo\"\n\t\t\t\t\t\t\t\tclassName=\"bubble-logo max-h-[60%] max-w-full object-contain block\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t) : (\n\t\t\t\t\t\t\tlogo\n\t\t\t\t\t\t)}\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\"bubble toggle-bubble menu-btn\",\n\t\t\t\t\t\tisMenuOpen ? \"open\" : \"\",\n\t\t\t\t\t\t\"inline-flex flex-col items-center justify-center\",\n\t\t\t\t\t\t\"rounded-full\",\n\t\t\t\t\t\t\"bg-white\",\n\t\t\t\t\t\t\"shadow-[0_4px_16px_rgba(0,0,0,0.12)]\",\n\t\t\t\t\t\t\"pointer-events-auto\",\n\t\t\t\t\t\t\"w-12 h-12 md:w-14 md:h-14\",\n\t\t\t\t\t\t\"border-0 cursor-pointer p-0\",\n\t\t\t\t\t\t\"will-change-transform\",\n\t\t\t\t\t].join(\" \")}\n\t\t\t\t\tonClick={handleToggle}\n\t\t\t\t\taria-label={menuAriaLabel}\n\t\t\t\t\taria-pressed={isMenuOpen}\n\t\t\t\t\tstyle={{ background: menuBg }}\n\t\t\t\t>\n\t\t\t\t\t<span\n\t\t\t\t\t\tclassName=\"menu-line block mx-auto rounded-[2px]\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\twidth: 26,\n\t\t\t\t\t\t\theight: 2,\n\t\t\t\t\t\t\tbackground: menuContentColor,\n\t\t\t\t\t\t\ttransform: isMenuOpen\n\t\t\t\t\t\t\t\t? \"translateY(4px) rotate(45deg)\"\n\t\t\t\t\t\t\t\t: \"none\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t/>\n\t\t\t\t\t<span\n\t\t\t\t\t\tclassName=\"menu-line short block mx-auto rounded-[2px]\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tmarginTop: \"6px\",\n\t\t\t\t\t\t\twidth: 26,\n\t\t\t\t\t\t\theight: 2,\n\t\t\t\t\t\t\tbackground: menuContentColor,\n\t\t\t\t\t\t\ttransform: isMenuOpen\n\t\t\t\t\t\t\t\t? \"translateY(-4px) rotate(-45deg)\"\n\t\t\t\t\t\t\t\t: \"none\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t/>\n\t\t\t\t</button>\n\t\t\t</nav>\n\n\t\t\t{showOverlay && (\n\t\t\t\t<div\n\t\t\t\t\tref={overlayRef}\n\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\"bubble-menu-items\",\n\t\t\t\t\t\tuseFixedPosition ? \"fixed\" : \"absolute\",\n\t\t\t\t\t\t\"inset-0\",\n\t\t\t\t\t\t\"flex items-center justify-center\",\n\t\t\t\t\t\t\"pointer-events-none\",\n\t\t\t\t\t\t\"z-1000\",\n\t\t\t\t\t].join(\" \")}\n\t\t\t\t\taria-hidden={!isMenuOpen}\n\t\t\t\t>\n\t\t\t\t\t<ul\n\t\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\t\"pill-list\",\n\t\t\t\t\t\t\t\"list-none m-0 px-6\",\n\t\t\t\t\t\t\t\"w-full max-w-[1600px] mx-auto\",\n\t\t\t\t\t\t\t\"flex flex-wrap\",\n\t\t\t\t\t\t\t\"gap-x-0 gap-y-1\",\n\t\t\t\t\t\t\t\"pointer-events-auto\",\n\t\t\t\t\t\t].join(\" \")}\n\t\t\t\t\t\trole=\"menu\"\n\t\t\t\t\t\taria-label=\"Menu links\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{menuItems.map((item, idx) => (\n\t\t\t\t\t\t\t<li\n\t\t\t\t\t\t\t\tkey={idx}\n\t\t\t\t\t\t\t\trole=\"none\"\n\t\t\t\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\t\t\t\"pill-col\",\n\t\t\t\t\t\t\t\t\t\"flex justify-center items-stretch\",\n\t\t\t\t\t\t\t\t\t\"flex-[0_0_calc(100%/3)]\",\n\t\t\t\t\t\t\t\t\t\"box-border\",\n\t\t\t\t\t\t\t\t].join(\" \")}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\trole=\"menuitem\"\n\t\t\t\t\t\t\t\t\thref={item.href}\n\t\t\t\t\t\t\t\t\taria-label={item.ariaLabel || item.label}\n\t\t\t\t\t\t\t\t\tclassName={[\n\t\t\t\t\t\t\t\t\t\t\"pill-link\",\n\t\t\t\t\t\t\t\t\t\t\"w-full\",\n\t\t\t\t\t\t\t\t\t\t\"rounded-[999px]\",\n\t\t\t\t\t\t\t\t\t\t\"no-underline\",\n\t\t\t\t\t\t\t\t\t\t\"bg-white\",\n\t\t\t\t\t\t\t\t\t\t\"text-inherit\",\n\t\t\t\t\t\t\t\t\t\t\"shadow-[0_4px_14px_rgba(0,0,0,0.10)]\",\n\t\t\t\t\t\t\t\t\t\t\"flex items-center justify-center\",\n\t\t\t\t\t\t\t\t\t\t\"relative\",\n\t\t\t\t\t\t\t\t\t\t\"transition-[background,color] duration-300 ease-in-out\",\n\t\t\t\t\t\t\t\t\t\t\"box-border\",\n\t\t\t\t\t\t\t\t\t\t\"whitespace-nowrap overflow-hidden\",\n\t\t\t\t\t\t\t\t\t].join(\" \")}\n\t\t\t\t\t\t\t\t\tstyle={\n\t\t\t\t\t\t\t\t\t\t{\n\t\t\t\t\t\t\t\t\t\t\t[\"--item-rot\"]: `${item.rotation ?? 0}deg`,\n\t\t\t\t\t\t\t\t\t\t\t[\"--pill-bg\"]: menuBg,\n\t\t\t\t\t\t\t\t\t\t\t[\"--pill-color\"]: menuContentColor,\n\t\t\t\t\t\t\t\t\t\t\t[\"--hover-bg\"]:\n\t\t\t\t\t\t\t\t\t\t\t\titem.hoverStyles?.bgColor || \"#f3f4f6\",\n\t\t\t\t\t\t\t\t\t\t\t[\"--hover-color\"]:\n\t\t\t\t\t\t\t\t\t\t\t\titem.hoverStyles?.textColor ||\n\t\t\t\t\t\t\t\t\t\t\t\tmenuContentColor,\n\t\t\t\t\t\t\t\t\t\t\tbackground: \"var(--pill-bg)\",\n\t\t\t\t\t\t\t\t\t\t\tcolor: \"var(--pill-color)\",\n\t\t\t\t\t\t\t\t\t\t\tminHeight: \"var(--pill-min-h, 160px)\",\n\t\t\t\t\t\t\t\t\t\t\tpadding: \"clamp(1.5rem, 3vw, 8rem) 0\",\n\t\t\t\t\t\t\t\t\t\t\tfontSize: \"clamp(1.5rem, 4vw, 4rem)\",\n\t\t\t\t\t\t\t\t\t\t\tfontWeight: 400,\n\t\t\t\t\t\t\t\t\t\t\tlineHeight: 0,\n\t\t\t\t\t\t\t\t\t\t\twillChange: \"transform\",\n\t\t\t\t\t\t\t\t\t\t\theight: 10,\n\t\t\t\t\t\t\t\t\t\t} as CSSProperties\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t\tref={(el) => {\n\t\t\t\t\t\t\t\t\t\tif (el) bubblesRef.current[idx] = el;\n\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<span\n\t\t\t\t\t\t\t\t\t\tclassName=\"pill-label inline-block\"\n\t\t\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\t\t\twillChange: \"transform, opacity\",\n\t\t\t\t\t\t\t\t\t\t\theight: \"1.2em\",\n\t\t\t\t\t\t\t\t\t\t\tlineHeight: 1.2,\n\t\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t\t\tref={(el) => {\n\t\t\t\t\t\t\t\t\t\t\tif (el) labelRefs.current[idx] = el;\n\t\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t{item.label}\n\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t))}\n\t\t\t\t\t</ul>\n\t\t\t\t</div>\n\t\t\t)}\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [],
+    "interaction": "Clicking the hamburger crosses its bars into an X and pops the pills in one after another, each springing up from nothing with its label rising into place; hovering a pill tilts it further and floods it with its own colour.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "logo",
+        "type": "ReactNode",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "onMenuClick",
+        "type": "((open: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "menuAriaLabel",
+        "type": "string",
+        "default": "\"Toggle menu\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "menuBg",
+        "type": "string",
+        "default": "\"#fff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "menuContentColor",
+        "type": "string",
+        "default": "\"#111\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "useFixedPosition",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "items",
+        "type": "MenuItem[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationEase",
+        "type": "string",
+        "default": "\"back.out(1.5)\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDuration",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "staggerDelay",
+        "type": "number",
+        "default": "0.12",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/bubble-menu"
+  }
+}

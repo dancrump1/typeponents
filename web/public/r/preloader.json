@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "preloader",
+  "type": "registry:ui",
+  "title": "Preloader",
+  "description": "Full-screen black loading overlay with a curved bottom edge and a single word cycling through a short phrase.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/mouse-image-trail.json",
+    "mouse-image-trail"
+  ],
+  "files": [
+    {
+      "path": "components/ui/preloader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/preloader.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\n\nimport { motion } from \"motion/react\";\n\nimport { MouseImageTrail } from \"@/components/ui/mouse-image-trail\";\n\n// Credit:\n// https://www.sparkui.site/components/apple-preloader\n\nconst opacity = {\n\tinitial: {\n\t\topacity: 0,\n\t},\n\tenter: {\n\t\topacity: 0.75,\n\t\ttransition: { duration: 1, delay: 0.2 },\n\t},\n};\n\nconst slideUp = {\n\tinitial: {\n\t\ttop: 0,\n\t},\n\texit: {\n\t\ttop: \"-100vh\",\n\t\ttransition: { duration: 0.8, ease: [0.76, 0, 0.24, 1], delay: 0.2 },\n\t},\n};\n\nconst words = [\"Move\", \"yo\", \"mouse\", \"...\", \"see\", \"what\", \"we\", \"got\"];\n\nexport default function Preloader() {\n\tconst [index, setIndex] = useState(0);\n\tconst [dimension, setDimension] = useState({ width: 0, height: 0 });\n\n\tuseEffect(() => {\n\t\tsetDimension({ width: window.innerWidth, height: window.innerHeight });\n\t}, []);\n\n\tuseEffect(() => {\n\t\tif (index === words.length - 1) return;\n\t\tsetTimeout(\n\t\t\t() => {\n\t\t\t\tsetIndex(index + 1);\n\t\t\t},\n\t\t\tindex === 0 ? 1000 : 150\n\t\t);\n\t}, [index]);\n\n\tconst initialPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${\n\t\tdimension.height\n\t} Q${dimension.width / 2} ${dimension.height + 300} 0 ${\n\t\tdimension.height\n\t}  L0 0`;\n\tconst targetPath = `M0 0 L${dimension.width} 0 L${dimension.width} ${\n\t\tdimension.height\n\t} Q${dimension.width / 2} ${dimension.height} 0 ${dimension.height}  L0 0`;\n\n\tconst curve = {\n\t\tinitial: {\n\t\t\td: initialPath,\n\t\t\ttransition: { duration: 0.7, ease: [0.76, 0, 0.24, 1] },\n\t\t},\n\t\texit: {\n\t\t\td: targetPath,\n\t\t\ttransition: { duration: 0.7, ease: [0.76, 0, 0.24, 1], delay: 0.3 },\n\t\t},\n\t};\n\n\treturn (\n\t\t<motion.div\n\t\t\tvariants={slideUp}\n\t\t\tinitial=\"initial\"\n\t\t\texit=\"exit\"\n\t\t\tclassName=\"h-screen w-screen z-501 fixed top-0 left-0 bg-black\"\n\t\t>\n\t\t\t<MouseImageTrail\n\t\t\t\timages={[\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t\t\"/itjustworks.jpg\",\n\t\t\t\t]}\n\t\t\t\trenderImageBuffer={150}\n\t\t\t\trotationRange={25}\n\t\t\t>\n\t\t\t\t<div className=\"h-screen w-screen flex items-center justify-center \">\n\t\t\t\t\t{dimension.width > 0 && (\n\t\t\t\t\t\t<>\n\t\t\t\t\t\t\t<motion.p\n\t\t\t\t\t\t\t\tvariants={opacity}\n\t\t\t\t\t\t\t\tinitial=\"initial\"\n\t\t\t\t\t\t\t\tanimate=\"enter\"\n\t\t\t\t\t\t\t\tclassName=\"flex bg-clip-text bg-linear-to-br to-[rgb(255,255,255,0.5)] from-[rgb(255,255,255,0.58)] font-medium text-[42px] items-center absolute z-1\"\n\t\t\t\t\t\t\t\tstyle={{ color: \"transparent\" }}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{words[index]}\n\t\t\t\t\t\t\t</motion.p>\n\t\t\t\t\t\t\t<svg className=\"absolute top-0 w-full h-[calc(100% + 200px)]\">\n\t\t\t\t\t\t\t\t<motion.path\n\t\t\t\t\t\t\t\t\tvariants={curve}\n\t\t\t\t\t\t\t\t\tinitial=\"initial\"\n\t\t\t\t\t\t\t\t\texit=\"exit\"\n\t\t\t\t\t\t\t\t\tfill=\"#000\"\n\t\t\t\t\t\t\t\t></motion.path>\n\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t</>\n\t\t\t\t\t)}\n\t\t\t\t</div>\n\t\t\t</MouseImageTrail>\n\t\t</motion.div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "On load the words swap out one after another, and moving the pointer leaves a trail of images across the black panel; when loading ends the curved bottom edge flattens and the whole overlay slides up off the screen.",
+    "inspiration": {
+      "source": "Spark UI",
+      "url": "https://www.sparkui.site/components/apple-preloader",
+      "authorUrl": "https://www.sparkui.site",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/preloader"
+  }
+}

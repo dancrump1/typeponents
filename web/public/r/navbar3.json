@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "navbar3",
+  "type": "registry:ui",
+  "title": "Navbar3",
+  "description": "Minimal navigation bar pinned to the top of the page, with a logo, one text link, and a light/dark mode toggle.",
+  "dependencies": [],
+  "registryDependencies": [
+    "mode-toggle"
+  ],
+  "files": [
+    {
+      "path": "components/ui/navbar3.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/navbar3.tsx",
+      "content": "import { ModeToggle } from \"@/components/ui/mode-toggle\";\r\n\r\n// https://www.hover.dev/components/heros\r\nexport const NavBar3 = () => {\r\n\treturn (\r\n\t\t<nav className=\"fixed left-0 right-0 top-0 z-50 flex items-center justify-between px-6 py-3 text-foreground\">\r\n\t\t\t<div className=\"text-foreground dark:text-foreground\">logo</div>\r\n\t\t\t<section className=\"flex gap-2\">\r\n\t\t\t\t<button\r\n\t\t\t\t\t// onClick={() => {\r\n\t\t\t\t\t//   document.getElementById(\"launch-schedule\")?.scrollIntoView({\r\n\t\t\t\t\t//     behavior: \"smooth\",\r\n\t\t\t\t\t//   });\r\n\t\t\t\t\t// }}\r\n\t\t\t\t\tclassName=\"flex items-center gap-1 text-xs hover:text-pink-900 dark:hover:text-pink-300 text-foreground dark:text-foreground\"\r\n\t\t\t\t>\r\n\t\t\t\t\tNav Button\r\n\t\t\t\t</button>\r\n\t\t\t\t<ModeToggle />\r\n\t\t\t</section>\r\n\t\t</nav>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering the nav button tints its label pink; clicking the toggle switches the page between light and dark. The bar stays fixed in place as you scroll.",
+    "inspiration": {
+      "source": "Hover.dev",
+      "url": "https://www.hover.dev/components/heros",
+      "authorUrl": "https://www.hover.dev",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/navbar3"
+  }
+}

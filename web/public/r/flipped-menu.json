@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flipped-menu",
+  "type": "registry:ui",
+  "title": "Flipped Menu",
+  "description": "Flipped Menu",
+  "dependencies": [
+    "@gsap/react",
+    "gsap",
+    "splitting"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/flipped-menu.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/flipped-menu.tsx",
+      "content": "\"use client\";\n\nimport React, { Fragment, useEffect, useRef, useState } from \"react\";\n\nimport { useGSAP } from \"@gsap/react\";\nimport gsap from \"gsap\";\n// @ts-expect-error no modules for typescript\nimport splitting from \"splitting\";\n\nconst dishes = [\"Fish and Chips\", \"Sunday Roast\", \"Shepherd's Pie\"];\nconst navigationLinks = [\"Contact\", \"Recruitment\", \"Privacy\"];\n\nconst FlippedMenu = () => {\n\tconst scope = useRef<HTMLDivElement>(null);\n\tconst [isOpen, setIsOpen] = useState(false);\n\tconst timelineRef = useRef<gsap.core.Timeline | null>(null);\n\tconst btnWord1 = useRef<HTMLSpanElement>(null);\n\tconst btnWord2 = useRef<HTMLSpanElement>(null);\n\tconst menu = useRef<HTMLDivElement>(null);\n\n\tuseGSAP(\n\t\tasync () => {\n\t\t\tif (!splitting && !scope.current) return;\n\t\t\tawait splitting({ target: scope.current });\n\n\t\t\tconst chars1 = btnWord1.current?.querySelectorAll(\".char\");\n\t\t\tconst chars2 = btnWord2.current?.querySelectorAll(\".char\");\n\n\t\t\tgsap.set([btnWord2.current, menu.current], { opacity: 1 });\n\n\t\t\tif (!chars1?.length || !chars2?.length) return;\n\n\t\t\ttimelineRef.current = gsap.timeline({\n\t\t\t\tpaused: true,\n\t\t\t\tdefaults: { duration: 0.4, ease: \"power1.out\", stagger: 0.05 },\n\t\t\t});\n\n\t\t\ttimelineRef.current\n\t\t\t\t.to(chars1, { transformOrigin: \"top\", rotateX: 90 })\n\t\t\t\t.fromTo(\n\t\t\t\t\tchars2,\n\t\t\t\t\t{ rotateX: 90, transformOrigin: \"bottom\" },\n\t\t\t\t\t{ rotateX: 0 },\n\t\t\t\t\t0\n\t\t\t\t)\n\t\t\t\t.fromTo(\n\t\t\t\t\tmenu.current,\n\t\t\t\t\t{\n\t\t\t\t\t\trotateX: 20,\n\t\t\t\t\t\trotateY: -30,\n\t\t\t\t\t\txPercent: -120,\n\t\t\t\t\t\tyPercent: -80,\n\t\t\t\t\t},\n\t\t\t\t\t{\n\t\t\t\t\t\txPercent: 0,\n\t\t\t\t\t\tyPercent: 0,\n\t\t\t\t\t\trotateX: 0,\n\t\t\t\t\t\trotateY: 0,\n\t\t\t\t\t\tease: \"expo.out\",\n\t\t\t\t\t\tduration: 0.6,\n\t\t\t\t\t},\n\t\t\t\t\t0\n\t\t\t\t);\n\t\t},\n\t\t{ scope, dependencies: [splitting] }\n\t);\n\n\tconst handleToggle = () => {\n\t\tif (!timelineRef.current) return;\n\n\t\tif (isOpen) {\n\t\t\ttimelineRef.current.reverse();\n\t\t} else {\n\t\t\ttimelineRef.current.play();\n\t\t}\n\n\t\tsetIsOpen(!isOpen);\n\t};\n\n\treturn (\n\t\t<article\n\t\t\tref={scope}\n\t\t\tclassName=\"relative min-h-96 h-full overflow-hidden bg-background font-herbik text-foreground/90 sm:aspect-3/2 sm:min-h-0\"\n\t\t>\n\t\t\t<div className=\"absolute left-10 top-10 z-10\">\n\t\t\t\t<button\n\t\t\t\t\taria-expanded={isOpen}\n\t\t\t\t\taria-controls=\"menu\"\n\t\t\t\t\tonClick={handleToggle}\n\t\t\t\t\tclassName=\"group relative -rotate-10 rounded-[50%] border border-white bg-background px-7 py-3 text-sm font-bold uppercase shadow-xs shadow-white/30 transition-transform duration-300 ease-out hover:-rotate-14 hover:scale-110 sm:text-base [&_.char]:inline-grid\"\n\t\t\t\t>\n\t\t\t\t\t<span\n\t\t\t\t\t\tref={btnWord1}\n\t\t\t\t\t\tdata-splitting\n\t\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2 inline-grid -translate-x-1/2 -translate-y-1/2 overflow-hidden whitespace-nowrap px-1\"\n\t\t\t\t\t>\n\t\t\t\t\t\tOpen\n\t\t\t\t\t</span>\n\t\t\t\t\t<span\n\t\t\t\t\t\tref={btnWord2}\n\t\t\t\t\t\tdata-splitting\n\t\t\t\t\t\tclassName=\"inline-grid overflow-hidden whitespace-nowrap px-1 opacity-0\"\n\t\t\t\t\t>\n\t\t\t\t\t\tClose\n\t\t\t\t\t</span>\n\t\t\t\t\t<span className=\"absolute left-4 top-1/2 size-1 -translate-y-1/2 rounded-full bg-current transition-[left] duration-300 ease-out group-hover:left-5\"></span>\n\t\t\t\t\t<span className=\"absolute right-4 top-1/2 size-1 -translate-y-1/2 rounded-full bg-current transition-[right] duration-300 ease-out group-hover:right-5\"></span>\n\t\t\t\t</button>\n\t\t\t</div>\n\n\t\t\t<div className=\"absolute left-1/2 top-1/2 size-[95%] -translate-x-1/2 -translate-y-1/2 perspective-normal sm:h-[70%] sm:w-4/5\">\n\t\t\t\t<div\n\t\t\t\t\tref={menu}\n\t\t\t\t\tid=\"menu\"\n\t\t\t\t\tclassName=\"h-full w-full bg-background p-4 opacity-0 shadow-xs shadow-black/80\"\n\t\t\t\t>\n\t\t\t\t\t<div className=\"h-full w-full border-2 border-white p-1\">\n\t\t\t\t\t\t<div className=\"flex h-full w-full flex-col justify-between border border-white p-5 pt-16 sm:p-10 sm:pb-5\">\n\t\t\t\t\t\t\t<div className=\"flex flex-col\">\n\t\t\t\t\t\t\t\t{dishes.map((dish) => {\n\t\t\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t\t\t<button\n\t\t\t\t\t\t\t\t\t\t\tkey={dish}\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"group flex items-center justify-between border-b border-white pl-2 text-lg text-foreground transition duration-300 first-of-type:border-t hover:bg-background hover:text-foreground\"\n\t\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t\t<span>{dish}</span>\n\t\t\t\t\t\t\t\t\t\t\t<span className=\"inline-block border-l border-white p-3\">\n\t\t\t\t\t\t\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tstrokeWidth={1.5}\n\t\t\t\t\t\t\t\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"size-4\"\n\t\t\t\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t\td=\"M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3\"\n\t\t\t\t\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\t\t})}\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<nav className=\"flex items-center justify-end gap-x-2\">\n\t\t\t\t\t\t\t\t{navigationLinks.map((link) => {\n\t\t\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t\t\t<Fragment key={link}>\n\t\t\t\t\t\t\t\t\t\t\t<button className=\"font-poppins text-sm transition duration-300 hover:text-foreground/70\">\n\t\t\t\t\t\t\t\t\t\t\t\t{link}\n\t\t\t\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t\t\t\t\t<span className=\"inline-block size-1 rounded-full bg-background last-of-type:hidden\"></span>\n\t\t\t\t\t\t\t\t\t\t</Fragment>\n\t\t\t\t\t\t\t\t\t);\n\t\t\t\t\t\t\t\t})}\n\t\t\t\t\t\t\t</nav>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</article>\n\t);\n};\n\nexport default FlippedMenu;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": true
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/flipped-menu"
+  }
+}

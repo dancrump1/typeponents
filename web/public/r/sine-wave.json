@@ -1,0 +1,82 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sine-wave",
+  "type": "registry:ui",
+  "title": "Sine Wave",
+  "description": "An animated component that arranges items in a sine wave pattern with smooth spring animations. Perfect for creating dynamic, flowing layouts with customizable amplitude and frequency.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sine-wave.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sine-wave.tsx",
+      "content": "'use client';\n\nimport React from 'react';\r\nimport { motion } from 'framer-motion';\r\nimport Image from 'next/image';\r\nimport { cn } from '@/lib/utils';\r\n\r\nconst SineWave = ({\r\n  items,\r\n  amplitude = 100,\r\n  frequency = 5,\r\n  shouldAnimate = true,\r\n  itemClassName = ''\r\n}: {\r\n  items: { image: string }[];\r\n  amplitude?: number;\r\n  frequency?: number;\r\n  shouldAnimate?: boolean;\r\n  itemClassName?: string;\r\n}) => {\r\n  return (\r\n    <div className=\"w-full h-96 flex items-center justify-center overflow-hidden\">\r\n      <div className=\"flex items-center justify-center gap-4 relative\">\r\n        {items.map((item, index) => {\r\n          const yd = Math.sin((index * Math.PI) / frequency) * amplitude;\r\n\r\n          return (\r\n            <motion.div\r\n              key={`sine-wave-${index}`}\r\n              className=\"relative\"\r\n              initial={{\r\n                opacity: shouldAnimate ? 0 : 1,\r\n                y: shouldAnimate ? 0 : yd\r\n              }}\r\n              animate={{\r\n                opacity: 1,\r\n                y: yd\r\n              }}\r\n              transition={{\r\n                duration: 0.8,\r\n                type: 'spring',\r\n                bounce: 0.5,\r\n                delay: index * 0.05\r\n              }}\r\n            >\r\n              <div className={cn(`w-20 h-20 rounded-xl overflow-hidden`, itemClassName)}>\r\n                <Image\r\n                  src={item.image}\r\n                  alt={`Item ${index + 1}`}\r\n                  width={64}\r\n                  height={64}\r\n                  className=\"w-full h-full object-cover\"\r\n                />\r\n              </div>\r\n            </motion.div>\r\n          );\r\n        })}\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default SineWave;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "Thumbnails settle onto a sine curve with a staggered spring.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/sineWave",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "amplitude",
+        "type": "number",
+        "default": "100",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "frequency",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "shouldAnimate",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "itemClassName",
+        "type": "string",
+        "default": "''",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sine-wave"
+  }
+}

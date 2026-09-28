@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spotlight-cards",
+  "type": "registry:ui",
+  "title": "Spotlight Cards",
+  "description": "Spotlight Cards",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spotlight-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spotlight-cards.tsx",
+      "content": "\"use client\";\r\n\r\n/**\r\n * @author dorianbaffier\r\n * @description Feature grid with aurora ambient, magnetic 3D tilt, and focus-dim siblings.\r\n * @version 2.0.0\r\n * @date 2025-02-20\r\n * @license MIT\r\n * @website https://kokonutui.com\r\n * @github https://github.com/kokonut-labs/kokonutui\r\n */\r\n\r\nimport type { LucideIcon } from \"lucide-react\";\r\nimport { Cloud, Code, Cpu, Globe, Lock, Zap } from \"lucide-react\";\r\nimport { motion, useMotionValue, useSpring, useTransform } from \"motion/react\";\r\nimport { useRef, useState } from \"react\";\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// ─── Constants ──────────────────────────────────────────────────────────────────\r\n\r\nconst TILT_MAX = 9;\r\nconst TILT_SPRING = { stiffness: 300, damping: 28 } as const;\r\nconst GLOW_SPRING = { stiffness: 180, damping: 22 } as const;\r\n\r\n// ─── Data ────────────────────────────────────────────────────────────────────────\r\n\r\nexport interface SpotlightItem {\r\n    icon: LucideIcon;\r\n    title: string;\r\n    description: string;\r\n    color: string;\r\n}\r\n\r\nconst DEFAULT_ITEMS: SpotlightItem[] = [\r\n    {\r\n        icon: Zap,\r\n        title: \"Instant\",\r\n        description:\r\n            \"Sub-100ms latency on every request, globally distributed across every region.\",\r\n        color: \"#f59e0b\",\r\n    },\r\n    {\r\n        icon: Lock,\r\n        title: \"Secure\",\r\n        description:\r\n            \"Zero-trust by default. SOC 2 certified with end-to-end encryption throughout.\",\r\n        color: \"#60a5fa\",\r\n    },\r\n    {\r\n        icon: Globe,\r\n        title: \"Global\",\r\n        description:\r\n            \"Edge-deployed to 300+ locations. Your users always hit a nearby server.\",\r\n        color: \"#34d399\",\r\n    },\r\n    {\r\n        icon: Code,\r\n        title: \"Developer first\",\r\n        description:\r\n            \"Type-safe SDKs in five languages, a complete REST API, and honest docs.\",\r\n        color: \"#a78bfa\",\r\n    },\r\n    {\r\n        icon: Cpu,\r\n        title: \"Scalable\",\r\n        description:\r\n            \"From side project to Series B without touching your infrastructure config.\",\r\n        color: \"#38bdf8\",\r\n    },\r\n    {\r\n        icon: Cloud,\r\n        title: \"Serverless\",\r\n        description:\r\n            \"No servers to provision, patch, or babysit. Just deploy and move on.\",\r\n        color: \"#f472b6\",\r\n    },\r\n];\r\n\r\n// ─── Card ────────────────────────────────────────────────────────────────────────\r\n\r\ninterface CardProps {\r\n    item: SpotlightItem;\r\n    dimmed: boolean;\r\n    onHoverStart: () => void;\r\n    onHoverEnd: () => void;\r\n}\r\n\r\nfunction Card({ item, dimmed, onHoverStart, onHoverEnd }: CardProps) {\r\n    const Icon = item.icon;\r\n    const cardRef = useRef<HTMLDivElement>(null);\r\n\r\n    const normX = useMotionValue(0.5);\r\n    const normY = useMotionValue(0.5);\r\n\r\n    const rawRotateX = useTransform(normY, [0, 1], [TILT_MAX, -TILT_MAX]);\r\n    const rawRotateY = useTransform(normX, [0, 1], [-TILT_MAX, TILT_MAX]);\r\n\r\n    const rotateX = useSpring(rawRotateX, TILT_SPRING);\r\n    const rotateY = useSpring(rawRotateY, TILT_SPRING);\r\n    const glowOpacity = useSpring(0, GLOW_SPRING);\r\n\r\n    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {\r\n        const el = cardRef.current;\r\n        if (!el) {\r\n            return;\r\n        }\r\n        const rect = el.getBoundingClientRect();\r\n        normX.set((e.clientX - rect.left) / rect.width);\r\n        normY.set((e.clientY - rect.top) / rect.height);\r\n    };\r\n\r\n    const handleMouseEnter = () => {\r\n        glowOpacity.set(1);\r\n        onHoverStart();\r\n    };\r\n\r\n    const handleMouseLeave = () => {\r\n        normX.set(0.5);\r\n        normY.set(0.5);\r\n        glowOpacity.set(0);\r\n        onHoverEnd();\r\n    };\r\n\r\n    return (\r\n        <motion.div\r\n            animate={{\r\n                scale: dimmed ? 0.96 : 1,\r\n                opacity: dimmed ? 0.5 : 1,\r\n            }}\r\n            className={cn(\r\n                \"group relative flex flex-col gap-5 overflow-hidden rounded-2xl border p-6\",\r\n                // Light\r\n                \"border-zinc-200 bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)]\",\r\n                // Dark\r\n                \"dark:border-white/6 dark:bg-white/3 dark:shadow-none\",\r\n                \"transition-[border-color] duration-300\",\r\n                \"hover:border-zinc-300 dark:hover:border-white/14\"\r\n            )}\r\n            onMouseEnter={handleMouseEnter}\r\n            onMouseLeave={handleMouseLeave}\r\n            onMouseMove={handleMouseMove}\r\n            ref={cardRef}\r\n            style={{\r\n                rotateX,\r\n                rotateY,\r\n                transformPerspective: 900,\r\n            }}\r\n            transition={{ duration: 0.18, ease: \"easeOut\" }}\r\n        >\r\n            {/* Static accent tint — always visible */}\r\n            <div\r\n                aria-hidden=\"true\"\r\n                className=\"pointer-events-none absolute inset-0 rounded-2xl\"\r\n                style={{\r\n                    background: `radial-gradient(ellipse at 20% 20%, ${item.color}14, transparent 65%)`,\r\n                }}\r\n            />\r\n\r\n            {/* Hover glow layer */}\r\n            <motion.div\r\n                aria-hidden=\"true\"\r\n                className=\"pointer-events-none absolute inset-0 rounded-2xl\"\r\n                style={{\r\n                    opacity: glowOpacity,\r\n                    background: `radial-gradient(ellipse at 20% 20%, ${item.color}2e, transparent 65%)`,\r\n                }}\r\n            />\r\n\r\n            {/* Shimmer sweep */}\r\n            <div\r\n                aria-hidden=\"true\"\r\n                className=\"pointer-events-none absolute inset-y-0 left-0 w-[55%] -translate-x-full -skew-x-12 bg-linear-to-r from-transparent via-white/4.5 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-[280%]\"\r\n            />\r\n\r\n            {/* Icon badge */}\r\n            <div\r\n                className=\"relative z-10 flex h-10 w-10 items-center justify-center rounded-xl\"\r\n                style={{\r\n                    background: `${item.color}18`,\r\n                    boxShadow: `inset 0 0 0 1px ${item.color}30`,\r\n                }}\r\n            >\r\n                <Icon size={17} strokeWidth={1.9} style={{ color: item.color }} />\r\n            </div>\r\n\r\n            {/* Text */}\r\n            <div className=\"relative z-10 flex flex-col gap-2\">\r\n                <h3 className=\"font-semibold text-[14px] text-zinc-900 tracking-tight dark:text-white\">\r\n                    {item.title}\r\n                </h3>\r\n                <p className=\"text-[12.5px] text-zinc-500 leading-relaxed dark:text-white/40\">\r\n                    {item.description}\r\n                </p>\r\n            </div>\r\n\r\n            {/* Accent bottom line */}\r\n            <div\r\n                aria-hidden=\"true\"\r\n                className=\"absolute bottom-0 left-0 h-[2px] w-0 rounded-full transition-all duration-500 group-hover:w-full\"\r\n                style={{\r\n                    background: `linear-gradient(to right, ${item.color}80, transparent)`,\r\n                }}\r\n            />\r\n        </motion.div>\r\n    );\r\n}\r\n\r\nCard.displayName = \"Card\";\r\n\r\n// ─── Main export ──────────────────────────────────────────────────────────────────\r\n\r\nexport interface SpotlightCardsProps {\r\n    items?: SpotlightItem[];\r\n    eyebrow?: string;\r\n    heading?: string;\r\n    className?: string;\r\n}\r\n\r\nexport default function SpotlightCards({\r\n    items = DEFAULT_ITEMS,\r\n    eyebrow = \"Features\",\r\n    heading = \"Everything you need\",\r\n    className,\r\n}: SpotlightCardsProps) {\r\n    const [hoveredTitle, setHoveredTitle] = useState<string | null>(null);\r\n\r\n    return (\r\n        <div\r\n            className={cn(\r\n                \"relative w-full overflow-hidden rounded-2xl px-8 pt-9 pb-10\",\r\n                \"bg-white dark:bg-[#06060f]\",\r\n                className\r\n            )}\r\n        >\r\n            {/* Dot grid — light mode only */}\r\n            <div\r\n                aria-hidden=\"true\"\r\n                className=\"pointer-events-none absolute inset-0 dark:hidden\"\r\n                style={{\r\n                    backgroundImage:\r\n                        \"radial-gradient(circle, rgba(0,0,0,0.055) 1px, transparent 1px)\",\r\n                    backgroundSize: \"22px 22px\",\r\n                }}\r\n            />\r\n\r\n            {/* Header */}\r\n            <div className=\"relative mb-8 flex flex-col gap-1.5\">\r\n                <p className=\"font-semibold text-[10px] text-indigo-600 uppercase tracking-[0.22em] dark:text-indigo-400/80\">\r\n                    {eyebrow}\r\n                </p>\r\n                <h2 className=\"font-semibold text-[22px] text-zinc-900 tracking-tight dark:text-white\">\r\n                    {heading}\r\n                </h2>\r\n            </div>\r\n\r\n            {/* Card grid */}\r\n            <div className=\"relative grid grid-cols-2 gap-3 sm:grid-cols-3\">\r\n                {items.map((item) => (\r\n                    <Card\r\n                        dimmed={hoveredTitle !== null && hoveredTitle !== item.title}\r\n                        item={item}\r\n                        key={item.title}\r\n                        onHoverEnd={() => setHoveredTitle(null)}\r\n                        onHoverStart={() => setHoveredTitle(item.title)}\r\n                    />\r\n                ))}\r\n            </div>\r\n        </div>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards",
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Kokonut UI",
+      "url": "https://kokonutui.com",
+      "authorUrl": "https://kokonutui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "SpotlightItem[]",
+        "default": "DEFAULT_ITEMS",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "eyebrow",
+        "type": "string",
+        "default": "\"Features\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "heading",
+        "type": "string",
+        "default": "\"Everything you need\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spotlight-cards"
+  }
+}

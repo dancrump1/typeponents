@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "masonry-grid",
+  "type": "registry:ui",
+  "title": "Masonry Grid",
+  "description": "A grid layout that arranges items like Pinterest, automatically fitting them together without gaps. Perfect for image galleries and portfolios.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/masonry-grid.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/masonry-grid.tsx",
+      "content": "'use client';\n\nimport React, { useState } from 'react';\r\nimport { motion } from 'framer-motion';\r\nimport Image from 'next/image';\r\n\r\ninterface MasonryGridProps {\r\n  items: { image: string; title: string; description: string }[];\r\n  columns?: number | undefined;\r\n}\r\n\r\nconst MasonryGrid: React.FC<MasonryGridProps> = ({ items, columns = undefined }) => {\r\n  const [imagesLoaded, setImagesLoaded] = useState<{ [key: string]: boolean }>({});\r\n\r\n  if (!items || items.length === 0) {\r\n    return <div className=\"text-center p-4\">No items to display</div>;\r\n  }\r\n\r\n  return (\r\n    <div\r\n      style={{\r\n        columns: columns\r\n      }}\r\n      className={`${\r\n        !columns && 'columns-1 sm:columns-2 md:columns-3 lg:columns-4'\r\n      } gap-2 overflow-y-auto p-3 w-full max-w-4xl hide-scrollbar`}\r\n    >\r\n      {items.map((item, index) => {\r\n        // Calculate row number based on screen size and index\r\n        const getColumnCount = () => {\r\n          if (typeof window === 'undefined') return 1;\r\n          const width = window.innerWidth;\r\n          if (width >= 1024) return 4; // lg\r\n          if (width >= 768) return 3; // md\r\n          if (width >= 640) return 2; // sm\r\n          return 1;\r\n        };\r\n\r\n        const columnCount = getColumnCount();\r\n        const rowIndex = Math.floor(index / columnCount);\r\n\r\n        return (\r\n          <motion.div\r\n            key={index}\r\n            className=\"break-inside-avoid mb-4 relative group rounded-xl overflow-hidden p-1 border-[1px] border-transparent hover:border-[1px] hover:border-neutral-800\"\r\n            initial={{ opacity: 0, y: 20 }}\r\n            animate={{\r\n              opacity: 1,\r\n              y: 0,\r\n              transition: {\r\n                duration: 0.5,\r\n                delay: rowIndex * 0.1,\r\n                ease: 'easeOut'\r\n              }\r\n            }}\r\n            whileHover={{ scale: 1.05 }}\r\n          >\r\n            <div className=\"relative\">\r\n              <div className=\"relative w-full flex gap-1 flex-col items-start justify-start\">\r\n                {!imagesLoaded[item.image] && (\r\n                  <div className=\"absolute inset-0 w-full h-[300px] bg-neutral-500/50 animate-pulse rounded-lg\" />\r\n                )}\r\n                <Image\r\n                  src={item.image}\r\n                  alt={item.title}\r\n                  width={400}\r\n                  height={300}\r\n                  className={`w-full h-auto transition-transform duration-300 rounded-lg ${\r\n                    !imagesLoaded[item.image] ? 'opacity-0' : 'opacity-100'\r\n                  }`}\r\n                  sizes=\"(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw\"\r\n                  onLoad={() => {\r\n                    setImagesLoaded((prev) => ({ ...prev, [item.image]: true }));\r\n                  }}\r\n                  onError={() => {\r\n                    console.error(`Error loading image: ${item.image}`);\r\n                    setImagesLoaded((prev) => ({ ...prev, [item.image]: true }));\r\n                  }}\r\n                />\r\n                {imagesLoaded[item.image] && (\r\n                  <div className=\"w-full\">\r\n                    <h3 className=\"text-sm font-medium\">{item.title}</h3>\r\n                    <p className=\"mt-0 text-xs text-neutral-500 line-clamp-2 overflow-hidden\">\r\n                      {item.description}\r\n                    </p>\r\n                  </div>\r\n                )}\r\n              </div>\r\n            </div>\r\n          </motion.div>\r\n        );\r\n      })}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default MasonryGrid;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Items pack into a Pinterest-style masonry; hover lifts the card.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/masonrygrid",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; title: string; description: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "columns",
+        "type": "number",
+        "default": "undefined",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/masonry-grid"
+  }
+}

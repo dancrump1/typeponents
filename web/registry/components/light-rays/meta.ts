@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "light-rays",
+	title: "Light Rays",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["webgl", "scroll-driven", "cursor-tracking", "autoplay"],
+	inspiration: {
+		source: "React Bits",
+		url: "https://www.reactbits.dev/backgrounds/light-rays",
+		authorUrl: "https://www.reactbits.dev",
+		relationship: "adaptation",
+	},
+	dependencies: ["ogl"],
+	registryDependencies: [],
+	props: [
+		{ name: "raysOrigin", type: "RaysOrigin", default: "\"top-center\"" },
+		{ name: "raysColor", type: "string", default: "DEFAULT_COLOR" },
+		{ name: "raysSpeed", type: "number", default: "1" },
+		{ name: "lightSpread", type: "number", default: "1" },
+		{ name: "rayLength", type: "number", default: "2" },
+		{ name: "pulsating", type: "boolean", default: "false" },
+		{ name: "fadeDistance", type: "number", default: "1.0" },
+		{ name: "saturation", type: "number", default: "1.0" },
+		{ name: "followMouse", type: "boolean", default: "true" },
+		{ name: "mouseInfluence", type: "number", default: "0.1" },
+		{ name: "noiseAmount", type: "number", default: "0.0" },
+		{ name: "distortion", type: "number", default: "0.0" },
+		{ name: "className", type: "string", default: "\"\"" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

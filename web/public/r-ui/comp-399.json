@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-399",
+  "type": "registry:component",
+  "title": "Comp 399",
+  "description": "Comp 399",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-399.tsx",
+      "content": "import { Avatar, AvatarFallback, AvatarImage } from \"@/components/ui/avatar\";\r\nimport { Badge } from \"@/components/ui/badge\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"relative\">\r\n\t\t\t<Avatar className=\"rounded-md\">\r\n\t\t\t\t<AvatarImage src=\"./avatar-80-07.jpg\" alt=\"Kelly King\" />\r\n\t\t\t\t<AvatarFallback>KK</AvatarFallback>\r\n\t\t\t</Avatar>\r\n\t\t\t<Badge className=\"border-background absolute -top-2 left-full min-w-5 -translate-x-3 px-1\">\r\n\t\t\t\t6\r\n\t\t\t</Badge>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/avatar.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as AvatarPrimitive from \"@radix-ui/react-avatar\";\r\n\r\nconst Avatar = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Root\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatar.displayName = AvatarPrimitive.Root.displayName;\r\n\r\nconst AvatarImage = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Image>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Image>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Image\r\n\t\tref={ref}\r\n\t\tclassName={cn(\"aspect-square h-full w-full\", className)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatarImage.displayName = AvatarPrimitive.Image.displayName;\r\n\r\nconst AvatarFallback = React.forwardRef<\r\n\tReact.ElementRef<typeof AvatarPrimitive.Fallback>,\r\n\tReact.ComponentPropsWithoutRef<typeof AvatarPrimitive.Fallback>\r\n>(({ className, ...props }, ref) => (\r\n\t<AvatarPrimitive.Fallback\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"flex h-full w-full items-center justify-center rounded-full bg-muted\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t/>\r\n));\r\nAvatarFallback.displayName = AvatarPrimitive.Fallback.displayName;\r\n\r\nexport { Avatar, AvatarImage, AvatarFallback };\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/badge.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { cva, type VariantProps } from \"class-variance-authority\";\r\n\r\nconst badgeVariants = cva(\r\n\t\"inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-hidden focus:ring-2 focus:ring-ring focus:ring-offset-2\",\r\n\t{\r\n\t\tvariants: {\r\n\t\t\tvariant: {\r\n\t\t\t\tdefault:\r\n\t\t\t\t\t\"border-transparent bg-primary text-primary-foreground hover:bg-primary/80\",\r\n\t\t\t\tsecondary:\r\n\t\t\t\t\t\"border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80\",\r\n\t\t\t\tdestructive:\r\n\t\t\t\t\t\"border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80\",\r\n\t\t\t\toutline: \"text-foreground\",\r\n\t\t\t},\r\n\t\t},\r\n\t\tdefaultVariants: {\r\n\t\t\tvariant: \"default\",\r\n\t\t},\r\n\t}\r\n);\r\n\r\nexport interface BadgeProps\r\n\textends React.HTMLAttributes<HTMLDivElement>,\r\n\t\tVariantProps<typeof badgeVariants> {}\r\n\r\nfunction Badge({ className, variant, ...props }: BadgeProps) {\r\n\treturn (\r\n\t\t<div className={cn(badgeVariants({ variant }), className)} {...props} />\r\n\t);\r\n}\r\n\r\nexport { Badge, badgeVariants };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-squares",
+  "type": "registry:ui",
+  "title": "Hover Squares",
+  "description": "Hover Squares",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-squares.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-squares.tsx",
+      "content": "'use client'\n\nimport React from \"react\";\n\nimport { useAnimate } from \"motion/react\";\nimport {\n\tSiApple,\n\tSiFacebook,\n\tSiGoogle,\n\tSiNextdotjs,\n\tSiNgrx,\n\tSiShopify,\n\tSiSoundcloud,\n\tSiSpotify,\n\tSiTiktok,\n} from \"react-icons/si\";\n\n// www.hover.dev/components/links#clip-path-links\n\nexport const Example = () => {\n\treturn (\n\t\t<div className=\"bg-neutral-50 px-4 py-12\">\n\t\t\t<div className=\"mx-auto max-w-7xl\">\n\t\t\t\t<ClipPathLinks />\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport const ClipPathLinks = () => {\n\treturn (\n\t\t<div className=\"divide-y divide-neutral-900 border border-neutral-900\">\n\t\t\t<div className=\"grid grid-cols-2 divide-x divide-neutral-900\">\n\t\t\t\t<LinkBox Icon={SiGoogle} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiShopify} href=\"#\" />\n\t\t\t</div>\n\t\t\t<div className=\"grid grid-cols-4 divide-x divide-neutral-900\">\n\t\t\t\t<LinkBox Icon={SiApple} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiSoundcloud} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiNextdotjs} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiFacebook} href=\"#\" />\n\t\t\t</div>\n\t\t\t<div className=\"grid grid-cols-3 divide-x divide-neutral-900\">\n\t\t\t\t<LinkBox Icon={SiTiktok} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiSpotify} href=\"#\" />\n\t\t\t\t<LinkBox Icon={SiNgrx} href=\"#\" />\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nconst NO_CLIP = \"polygon(0 0, 100% 0, 100% 100%, 0% 100%)\";\nconst BOTTOM_RIGHT_CLIP = \"polygon(0 0, 100% 0, 0 0, 0% 100%)\";\nconst TOP_RIGHT_CLIP = \"polygon(0 0, 0 100%, 100% 100%, 0% 100%)\";\nconst BOTTOM_LEFT_CLIP = \"polygon(100% 100%, 100% 0, 100% 100%, 0 100%)\";\nconst TOP_LEFT_CLIP = \"polygon(0 0, 100% 0, 100% 100%, 100% 0)\";\n\nconst ENTRANCE_KEYFRAMES = {\n\tleft: [BOTTOM_RIGHT_CLIP, NO_CLIP],\n\tbottom: [BOTTOM_RIGHT_CLIP, NO_CLIP],\n\ttop: [BOTTOM_RIGHT_CLIP, NO_CLIP],\n\tright: [TOP_LEFT_CLIP, NO_CLIP],\n};\n\nconst EXIT_KEYFRAMES = {\n\tleft: [NO_CLIP, TOP_RIGHT_CLIP],\n\tbottom: [NO_CLIP, TOP_RIGHT_CLIP],\n\ttop: [NO_CLIP, TOP_RIGHT_CLIP],\n\tright: [NO_CLIP, BOTTOM_LEFT_CLIP],\n};\n\nconst LinkBox = ({ Icon, href }) => {\n\tconst [scope, animate] = useAnimate();\n\n\tconst getNearestSide = (e) => {\n\t\tconst box = e.target.getBoundingClientRect();\n\n\t\tconst proximityToLeft = {\n\t\t\tproximity: Math.abs(box.left - e.clientX),\n\t\t\tside: \"left\",\n\t\t};\n\t\tconst proximityToRight = {\n\t\t\tproximity: Math.abs(box.right - e.clientX),\n\t\t\tside: \"right\",\n\t\t};\n\t\tconst proximityToTop = {\n\t\t\tproximity: Math.abs(box.top - e.clientY),\n\t\t\tside: \"top\",\n\t\t};\n\t\tconst proximityToBottom = {\n\t\t\tproximity: Math.abs(box.bottom - e.clientY),\n\t\t\tside: \"bottom\",\n\t\t};\n\n\t\tconst sortedProximity = [\n\t\t\tproximityToLeft,\n\t\t\tproximityToRight,\n\t\t\tproximityToTop,\n\t\t\tproximityToBottom,\n\t\t].sort((a, b) => a.proximity - b.proximity);\n\n\t\treturn sortedProximity[0].side;\n\t};\n\n\tconst handleMouseEnter = (e) => {\n\t\tconst side = getNearestSide(e);\n\n\t\tanimate(scope.current, {\n\t\t\tclipPath: ENTRANCE_KEYFRAMES[side],\n\t\t});\n\t};\n\n\tconst handleMouseLeave = (e) => {\n\t\tconst side = getNearestSide(e);\n\n\t\tanimate(scope.current, {\n\t\t\tclipPath: EXIT_KEYFRAMES[side],\n\t\t});\n\t};\n\n\treturn (\n\t\t<a\n\t\t\thref={href}\n\t\t\tonMouseEnter={(e) => {\n\t\t\t\thandleMouseEnter(e);\n\t\t\t}}\n\t\t\tonMouseLeave={(e) => {\n\t\t\t\thandleMouseLeave(e);\n\t\t\t}}\n\t\t\tclassName=\"relative grid h-20 w-full place-content-center sm:h-28 md:h-36\"\n\t\t>\n\t\t\t<Icon className=\"text-xl sm:text-3xl lg:text-4xl\" />\n\n\t\t\t<div\n\t\t\t\tref={scope}\n\t\t\t\tstyle={{\n\t\t\t\t\tclipPath: BOTTOM_RIGHT_CLIP,\n\t\t\t\t}}\n\t\t\t\tclassName=\"absolute inset-0 grid place-content-center bg-neutral-900 text-white\"\n\t\t\t>\n\t\t\t\t<Icon className=\"text-xl sm:text-3xl md:text-4xl\" />\n\t\t\t</div>\n\t\t</a>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-squares"
+  }
+}

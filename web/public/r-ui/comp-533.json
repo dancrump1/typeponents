@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-533",
+  "type": "registry:component",
+  "title": "Comp 533",
+  "description": "Comp 533",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-533.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineContent,\r\n\tTimelineDate,\r\n\tTimelineHeader,\r\n\tTimelineIndicator,\r\n\tTimelineItem,\r\n\tTimelineSeparator,\r\n\tTimelineTitle,\r\n} from \"@/components/ui/timeline\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: \"15 minutes ago\",\r\n\t\ttitle: \"Pull Request Submitted\",\r\n\t\tdescription:\r\n\t\t\t\"Submitted PR #342 with new feature implementation. Waiting for code review from team leads.\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: \"10 minutes ago\",\r\n\t\ttitle: \"CI Pipeline Started\",\r\n\t\tdescription:\r\n\t\t\t\"Automated tests and build process initiated. Running unit tests and code quality checks.\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: \"5 minutes ago\",\r\n\t\ttitle: \"Code Review Feedback\",\r\n\t\tdescription:\r\n\t\t\t\"Received comments on PR. Minor adjustments needed in error handling and documentation.\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\ttitle: \"Changes Pushed\",\r\n\t\tdescription:\r\n\t\t\t\"Implemented requested changes and pushed updates to feature branch. Awaiting final approval.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline defaultValue={3}>\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem key={item.id} step={item.id}>\r\n\t\t\t\t\t<TimelineHeader>\r\n\t\t\t\t\t\t<TimelineSeparator />\r\n\t\t\t\t\t\t<TimelineTitle className=\"-mt-0.5\">\r\n\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t</TimelineTitle>\r\n\t\t\t\t\t\t<TimelineIndicator />\r\n\t\t\t\t\t</TimelineHeader>\r\n\t\t\t\t\t<TimelineContent>\r\n\t\t\t\t\t\t{item.description}\r\n\t\t\t\t\t\t<TimelineDate className=\"mt-2 mb-0\">{item.date}</TimelineDate>\r\n\t\t\t\t\t</TimelineContent>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

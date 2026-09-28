@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ghost-label",
+  "type": "registry:ui",
+  "title": "Ghost Label",
+  "description": "Oversized faint word sitting behind content as a watermark-style background label.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/ghost-label.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/ghost-label.tsx",
+      "content": "import React from \"react\";\n\ntype GhostLabelProps = {\n\ttext: string;\n};\n\nconst GhostLabel: React.FC<GhostLabelProps> = ({ text }: GhostLabelProps) => {\n\treturn (\n\t\t<p className=\"absolute -inset-y-[130px] -inset-x-[30px]  md:-inset-x-[50px] flex text-[150px] font-bold z-0 opacity-10 font-anton\">\n\t\t\t{text}\n\t\t</p>\n\t);\n};\n\nexport default GhostLabel;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [],
+    "interaction": "Static layout — the giant word is painted once behind the content at low opacity and does not respond to input.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/ghost-label"
+  }
+}

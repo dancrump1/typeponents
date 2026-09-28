@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-404",
+  "type": "registry:component",
+  "title": "Comp 404",
+  "description": "Comp 404",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-404.tsx",
+      "content": "export default function Component() {\r\n  return (\r\n    <div className=\"flex -space-x-[0.675rem]\">\r\n      <img\r\n        className=\"ring-background rounded-full ring-2\"\r\n        src=\"/avatar-80-03.jpg\"\r\n        width={36}\r\n        height={36}\r\n        alt=\"Avatar 01\"\r\n      />\r\n      <img\r\n        className=\"ring-background rounded-full ring-2\"\r\n        src=\"/avatar-80-04.jpg\"\r\n        width={36}\r\n        height={36}\r\n        alt=\"Avatar 02\"\r\n      />\r\n      <img\r\n        className=\"ring-background rounded-full ring-2\"\r\n        src=\"/avatar-80-05.jpg\"\r\n        width={36}\r\n        height={36}\r\n        alt=\"Avatar 03\"\r\n      />\r\n      <img\r\n        className=\"ring-background rounded-full ring-2\"\r\n        src=\"/avatar-80-06.jpg\"\r\n        width={36}\r\n        height={36}\r\n        alt=\"Avatar 04\"\r\n      />\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

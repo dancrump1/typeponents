@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "circular-bars-loader",
+  "type": "registry:ui",
+  "title": "Circular Bars Loader",
+  "description": "Circular Bars Loader",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/circular-bars-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/circular-bars-loader.tsx",
+      "content": "const CircularBarsSpinnerLoader = ({\n\tnumberOfBars = 12,\n\twidth = 3,\n\theight = 16,\n}) => {\n\tconst animationDuration = 1.5;\n\tconst delay = animationDuration / numberOfBars;\n\treturn (\n\t\t<>\n\t\t\t<style>\n\t\t\t\t{`\n          @keyframes circular-bars {\n            0% {\n              opacity: 1;\n              rotate: 0deg;\n              scale: 1;\n            }\n            70% {\n              opacity: 0;\n              rotate: -40deg;\n              scale: 0.9;\n            }\n            100% {\n              opacity: 1;\n              rotate: 0deg;\n              scale: 1;\n            }\n          }\n        `}\n\t\t\t</style>\n\t\t\t<div\n\t\t\t\taria-hidden=\"true\"\n\t\t\t\tclassName=\"relative flex size-12 items-center justify-center\"\n\t\t\t>\n\t\t\t\t{[...new Array(numberOfBars)].map((_, index) => (\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"absolute rounded-[1px] bg-background dark:invert\"\n\t\t\t\t\t\t// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>\n\t\t\t\t\t\tkey={`circular-bars-spinner-loader-bar-${index}`}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\twidth: `${width}px`,\n\t\t\t\t\t\t\theight: `${height}px`,\n\t\t\t\t\t\t\ttransform: `rotate(${\n\t\t\t\t\t\t\t\tindex * (360 / numberOfBars)\n\t\t\t\t\t\t\t}deg) translateX(6px) translateY(-16px)`,\n\t\t\t\t\t\t\tanimation: `circular-bars ${animationDuration}s ease-in-out infinite`,\n\t\t\t\t\t\t\tanimationDelay: `-${index * delay}s`,\n\t\t\t\t\t\t}}\n\t\t\t\t\t/>\n\t\t\t\t))}\n\t\t\t\t<span className=\"sr-only\">Loading...</span>\n\t\t\t</div>\n\t\t</>\n\t);\n};\n\nexport default CircularBarsSpinnerLoader;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/circular-bars-loader"
+  }
+}

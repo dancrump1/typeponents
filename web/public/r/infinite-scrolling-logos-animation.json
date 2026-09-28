@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "infinite-scrolling-logos-animation",
+  "type": "registry:ui",
+  "title": "Infinite Scrolling Logos Animation",
+  "description": "Infinite Scrolling Logos Animation",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/infinite-scrolling-logos-animation.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/infinite-scrolling-logos-animation.tsx",
+      "content": "import React from \"react\";\n\nimport Image from \"next/image\";\n\nimport { motion } from \"framer-motion\";\n\nconst CompanyLogoData: Array<{ src: any; alt: string }> = [\n\t{ src: \"/itjustworks.jpg\", alt: \"Acme Logo\" },\n\t{ src: \"/itjustworks.jpg\", alt: \"Quantum Logo\" },\n\t{ src: \"/itjustworks.jpg\", alt: \"Echo Logo\" },\n\t{ src: \"/itjustworks.jpg\", alt: \"Celestial Logo\" },\n\t{ src: \"/itjustworks.jpg\", alt: \"Pulse Logo\" },\n\t{ src: \"/itjustworks.jpg\", alt: \"Apex Logo\" },\n];\n\nconst InfiniteScrollingLogosAnimation = ({ assets }) => {\n\treturn (\n\t\t<div className=\"flex py-8 relative overflow-hidden before:absolute before:left-0 before:top-0 before:z-10 before:h-full before:w-10 before:bg-linear-to-r before:from-background before:to-transparent before:content-[''] after:absolute after:right-0 after:top-0 after:h-full after:w-10 after:bg-linear-to-l after:from-background after:to-transparent after:content-['']\">\n\t\t\t<motion.div\n\t\t\t\ttransition={{\n\t\t\t\t\tduration: 240,\n\t\t\t\t\tease: \"linear\",\n\t\t\t\t\trepeat: Infinity,\n\t\t\t\t}}\n\t\t\t\tinitial={{ translateX: 0 }}\n\t\t\t\tanimate={{ translateX: \"-50%\" }}\n\t\t\t\tclassName=\"flex flex-none gap-16 pr-16\"\n\t\t\t>\n\t\t\t\t{[...new Array(5)].fill(0).map((_, index) => (\n\t\t\t\t\t<React.Fragment key={index + \"infinite-scroll-logo\"}>\n\t\t\t\t\t\t{assets.map(({ url, alt, height, width, title }) => (\n\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\tkey={alt || title}\n\t\t\t\t\t\t\t\tsrc={url}\n\t\t\t\t\t\t\t\talt={alt || title || \"company we worked with\"}\n\t\t\t\t\t\t\t\theight={120}\n\t\t\t\t\t\t\t\twidth={240}\n\t\t\t\t\t\t\t\tclassName=\"h-16 w-auto flex-none\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t))}\n\t\t\t\t\t</React.Fragment>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\nexport default InfiniteScrollingLogosAnimation;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/infinite-scrolling-logos-animation"
+  }
+}

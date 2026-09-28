@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lanyard",
+  "type": "registry:ui",
+  "title": "Lanyard",
+  "description": "Lanyard",
+  "dependencies": [
+    "@react-three/drei",
+    "@react-three/fiber",
+    "@react-three/rapier",
+    "meshline",
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/lanyard.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/lanyard.tsx",
+      "content": "/* eslint-disable react/no-unknown-property */\n\"use client\";\n\nimport { useEffect, useRef, useState } from \"react\";\n\nimport {\n\tEnvironment,\n\tLightformer,\n\tuseGLTF,\n\tuseTexture,\n} from \"@react-three/drei\";\nimport { Canvas, extend, useFrame } from \"@react-three/fiber\";\nimport {\n\tBallCollider,\n\tCuboidCollider,\n\tPhysics,\n\tRigidBody,\n\tRigidBodyProps,\n\tuseRopeJoint,\n\tuseSphericalJoint,\n} from \"@react-three/rapier\";\nimport { MeshLineGeometry, MeshLineMaterial } from \"meshline\";\nimport * as THREE from \"three\";\n\n// Credit:\n// https://www.reactbits.dev/components/lanyard\n\nextend({ MeshLineGeometry, MeshLineMaterial });\n\ninterface LanyardProps {\n\tposition?: [number, number, number];\n\tgravity?: [number, number, number];\n\tfov?: number;\n\ttransparent?: boolean;\n}\n\nexport default function Lanyard({\n\tposition = [0, 0, 30],\n\tgravity = [0, -40, 0],\n\tfov = 20,\n\ttransparent = true,\n}: LanyardProps) {\n\treturn (\n\t\t<div className=\"relative z-0 w-full h-screen flex justify-center items-center transform scale-100 origin-center\">\n\t\t\t<Canvas\n\t\t\t\tcamera={{ position, fov }}\n\t\t\t\tgl={{ alpha: transparent }}\n\t\t\t\tonCreated={({ gl }) =>\n\t\t\t\t\tgl.setClearColor(new THREE.Color(0x000000), transparent ? 0 : 1)\n\t\t\t\t}\n\t\t\t>\n\t\t\t\t<ambientLight intensity={Math.PI} />\n\t\t\t\t<Physics gravity={gravity} timeStep={1 / 60}>\n\t\t\t\t\t<Band />\n\t\t\t\t</Physics>\n\t\t\t\t<Environment blur={0.75}>\n\t\t\t\t\t<Lightformer\n\t\t\t\t\t\tintensity={2}\n\t\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\t\tposition={[0, -1, 5]}\n\t\t\t\t\t\trotation={[0, 0, Math.PI / 3]}\n\t\t\t\t\t\tscale={[100, 0.1, 1]}\n\t\t\t\t\t/>\n\t\t\t\t\t<Lightformer\n\t\t\t\t\t\tintensity={3}\n\t\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\t\tposition={[-1, -1, 1]}\n\t\t\t\t\t\trotation={[0, 0, Math.PI / 3]}\n\t\t\t\t\t\tscale={[100, 0.1, 1]}\n\t\t\t\t\t/>\n\t\t\t\t\t<Lightformer\n\t\t\t\t\t\tintensity={3}\n\t\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\t\tposition={[1, 1, 1]}\n\t\t\t\t\t\trotation={[0, 0, Math.PI / 3]}\n\t\t\t\t\t\tscale={[100, 0.1, 1]}\n\t\t\t\t\t/>\n\t\t\t\t\t<Lightformer\n\t\t\t\t\t\tintensity={10}\n\t\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\t\tposition={[-10, 0, 14]}\n\t\t\t\t\t\trotation={[0, Math.PI / 2, Math.PI / 3]}\n\t\t\t\t\t\tscale={[100, 10, 1]}\n\t\t\t\t\t/>\n\t\t\t\t</Environment>\n\t\t\t</Canvas>\n\t\t</div>\n\t);\n}\n\ninterface BandProps {\n\tmaxSpeed?: number;\n\tminSpeed?: number;\n}\n\nfunction Band({ maxSpeed = 50, minSpeed = 0 }: BandProps) {\n\t// Using \"any\" for refs since the exact types depend on Rapier's internals\n\tconst band = useRef<any>(null);\n\tconst fixed = useRef<any>(null);\n\tconst j1 = useRef<any>(null);\n\tconst j2 = useRef<any>(null);\n\tconst j3 = useRef<any>(null);\n\tconst card = useRef<any>(null);\n\n\tconst vec = new THREE.Vector3();\n\tconst ang = new THREE.Vector3();\n\tconst rot = new THREE.Vector3();\n\tconst dir = new THREE.Vector3();\n\n\tconst segmentProps: any = {\n\t\ttype: \"dynamic\" as RigidBodyProps[\"type\"],\n\t\tcanSleep: true,\n\t\tcolliders: false,\n\t\tangularDamping: 4,\n\t\tlinearDamping: 4,\n\t};\n\n\tconst { nodes, materials } = useGLTF(\"/card.glb\") as any;\n\tconst texture = useTexture(\"/itjustworks.jpg\");\n\tconst [curve] = useState(\n\t\t() =>\n\t\t\tnew THREE.CatmullRomCurve3([\n\t\t\t\tnew THREE.Vector3(),\n\t\t\t\tnew THREE.Vector3(),\n\t\t\t\tnew THREE.Vector3(),\n\t\t\t\tnew THREE.Vector3(),\n\t\t\t])\n\t);\n\tconst [dragged, drag] = useState<false | THREE.Vector3>(false);\n\tconst [hovered, hover] = useState(false);\n\n\tconst [isSmall, setIsSmall] = useState<boolean>(() => {\n\t\tif (typeof window !== \"undefined\") {\n\t\t\treturn window.innerWidth < 1024;\n\t\t}\n\t\treturn false;\n\t});\n\n\tuseEffect(() => {\n\t\tconst handleResize = (): void => {\n\t\t\tsetIsSmall(window.innerWidth < 1024);\n\t\t};\n\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\treturn (): void => window.removeEventListener(\"resize\", handleResize);\n\t}, []);\n\n\tuseRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);\n\tuseRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);\n\tuseRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);\n\tuseSphericalJoint(j3, card, [\n\t\t[0, 0, 0],\n\t\t[0, 1.45, 0],\n\t]);\n\n\tuseEffect(() => {\n\t\tif (hovered) {\n\t\t\tdocument.body.style.cursor = dragged ? \"grabbing\" : \"grab\";\n\t\t\treturn () => {\n\t\t\t\tdocument.body.style.cursor = \"auto\";\n\t\t\t};\n\t\t}\n\t}, [hovered, dragged]);\n\n\tuseFrame((state, delta) => {\n\t\tif (dragged && typeof dragged !== \"boolean\") {\n\t\t\tvec.set(state.pointer.x, state.pointer.y, 0.5).unproject(state.camera);\n\t\t\tdir.copy(vec).sub(state.camera.position).normalize();\n\t\t\tvec.add(dir.multiplyScalar(state.camera.position.length()));\n\t\t\t[card, j1, j2, j3, fixed].forEach((ref) => ref.current?.wakeUp());\n\t\t\tcard.current?.setNextKinematicTranslation({\n\t\t\t\tx: vec.x - dragged.x,\n\t\t\t\ty: vec.y - dragged.y,\n\t\t\t\tz: vec.z - dragged.z,\n\t\t\t});\n\t\t}\n\t\tif (fixed.current) {\n\t\t\t[j1, j2].forEach((ref) => {\n\t\t\t\tif (!ref.current.lerped)\n\t\t\t\t\tref.current.lerped = new THREE.Vector3().copy(\n\t\t\t\t\t\tref.current.translation()\n\t\t\t\t\t);\n\t\t\t\tconst clampedDistance = Math.max(\n\t\t\t\t\t0.1,\n\t\t\t\t\tMath.min(\n\t\t\t\t\t\t1,\n\t\t\t\t\t\tref.current.lerped.distanceTo(ref.current.translation())\n\t\t\t\t\t)\n\t\t\t\t);\n\t\t\t\tref.current.lerped.lerp(\n\t\t\t\t\tref.current.translation(),\n\t\t\t\t\tdelta * (minSpeed + clampedDistance * (maxSpeed - minSpeed))\n\t\t\t\t);\n\t\t\t});\n\t\t\tcurve.points[0].copy(j3.current.translation());\n\t\t\tcurve.points[1].copy(j2.current.lerped);\n\t\t\tcurve.points[2].copy(j1.current.lerped);\n\t\t\tcurve.points[3].copy(fixed.current.translation());\n\t\t\tband.current.geometry.setPoints(curve.getPoints(32));\n\t\t\tang.copy(card.current.angvel());\n\t\t\trot.copy(card.current.rotation());\n\t\t\tcard.current.setAngvel({\n\t\t\t\tx: ang.x,\n\t\t\t\ty: ang.y - rot.y * 0.25,\n\t\t\t\tz: ang.z,\n\t\t\t});\n\t\t}\n\t});\n\n\tcurve.curveType = \"chordal\";\n\ttexture.wrapS = texture.wrapT = THREE.RepeatWrapping;\n\n\treturn (\n\t\t<>\n\t\t\t<group position={[0, 4, 0]}>\n\t\t\t\t<RigidBody\n\t\t\t\t\tref={fixed}\n\t\t\t\t\t{...segmentProps}\n\t\t\t\t\ttype={\"fixed\" as RigidBodyProps[\"type\"]}\n\t\t\t\t/>\n\t\t\t\t<RigidBody\n\t\t\t\t\tposition={[0.5, 0, 0]}\n\t\t\t\t\tref={j1}\n\t\t\t\t\t{...segmentProps}\n\t\t\t\t\ttype={\"dynamic\" as RigidBodyProps[\"type\"]}\n\t\t\t\t>\n\t\t\t\t\t<BallCollider args={[0.1]} />\n\t\t\t\t</RigidBody>\n\t\t\t\t<RigidBody\n\t\t\t\t\tposition={[1, 0, 0]}\n\t\t\t\t\tref={j2}\n\t\t\t\t\t{...segmentProps}\n\t\t\t\t\ttype={\"dynamic\" as RigidBodyProps[\"type\"]}\n\t\t\t\t>\n\t\t\t\t\t<BallCollider args={[0.1]} />\n\t\t\t\t</RigidBody>\n\t\t\t\t<RigidBody\n\t\t\t\t\tposition={[1.5, 0, 0]}\n\t\t\t\t\tref={j3}\n\t\t\t\t\t{...segmentProps}\n\t\t\t\t\ttype={\"dynamic\" as RigidBodyProps[\"type\"]}\n\t\t\t\t>\n\t\t\t\t\t<BallCollider args={[0.1]} />\n\t\t\t\t</RigidBody>\n\t\t\t\t<RigidBody\n\t\t\t\t\tposition={[2, 0, 0]}\n\t\t\t\t\tref={card}\n\t\t\t\t\t{...segmentProps}\n\t\t\t\t\ttype={\n\t\t\t\t\t\tdragged\n\t\t\t\t\t\t\t? (\"kinematicPosition\" as RigidBodyProps[\"type\"])\n\t\t\t\t\t\t\t: (\"dynamic\" as RigidBodyProps[\"type\"])\n\t\t\t\t\t}\n\t\t\t\t>\n\t\t\t\t\t<CuboidCollider args={[0.8, 1.125, 0.01]} />\n\t\t\t\t\t<group\n\t\t\t\t\t\tscale={2.25}\n\t\t\t\t\t\tposition={[0, -1.2, -0.05]}\n\t\t\t\t\t\tonPointerOver={() => hover(true)}\n\t\t\t\t\t\tonPointerOut={() => hover(false)}\n\t\t\t\t\t\tonPointerUp={(e: any) => {\n\t\t\t\t\t\t\te.target.releasePointerCapture(e.pointerId);\n\t\t\t\t\t\t\tdrag(false);\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tonPointerDown={(e: any) => {\n\t\t\t\t\t\t\te.target.setPointerCapture(e.pointerId);\n\t\t\t\t\t\t\tdrag(\n\t\t\t\t\t\t\t\tnew THREE.Vector3()\n\t\t\t\t\t\t\t\t\t.copy(e.point)\n\t\t\t\t\t\t\t\t\t.sub(vec.copy(card.current.translation()))\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<mesh geometry={nodes.card.geometry}>\n\t\t\t\t\t\t\t<meshPhysicalMaterial\n\t\t\t\t\t\t\t\tmap={materials.base.map}\n\t\t\t\t\t\t\t\tmap-anisotropy={16}\n\t\t\t\t\t\t\t\tclearcoat={1}\n\t\t\t\t\t\t\t\tclearcoatRoughness={0.15}\n\t\t\t\t\t\t\t\troughness={0.9}\n\t\t\t\t\t\t\t\tmetalness={0.8}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</mesh>\n\t\t\t\t\t\t<mesh\n\t\t\t\t\t\t\tgeometry={nodes.clip.geometry}\n\t\t\t\t\t\t\tmaterial={materials.metal}\n\t\t\t\t\t\t\tmaterial-roughness={0.3}\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<mesh\n\t\t\t\t\t\t\tgeometry={nodes.clamp.geometry}\n\t\t\t\t\t\t\tmaterial={materials.metal}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</group>\n\t\t\t\t</RigidBody>\n\t\t\t</group>\n\t\t\t<mesh ref={band}>\n\t\t\t\t<meshLineGeometry />\n\t\t\t\t<meshLineMaterial\n\t\t\t\t\tcolor=\"white\"\n\t\t\t\t\tdepthTest={false}\n\t\t\t\t\tresolution={isSmall ? [1000, 2000] : [1000, 1000]}\n\t\t\t\t\tuseMap\n\t\t\t\t\tmap={texture}\n\t\t\t\t\trepeat={[-4, 1]}\n\t\t\t\t\tlineWidth={1}\n\t\t\t\t/>\n\t\t\t</mesh>\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "webgl",
+      "drag"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/components/lanyard",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "position",
+        "type": "[number, number, number]",
+        "default": "[0, 0, 30]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "gravity",
+        "type": "[number, number, number]",
+        "default": "[0, -40, 0]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fov",
+        "type": "number",
+        "default": "20",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transparent",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/lanyard"
+  }
+}

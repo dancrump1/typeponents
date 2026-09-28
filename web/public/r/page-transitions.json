@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "page-transitions",
+  "type": "registry:ui",
+  "title": "Page Transitions",
+  "description": "Page Transitions",
+  "dependencies": [
+    "@gsap/react",
+    "gsap",
+    "next-transition-router",
+    "split-type"
+  ],
+  "registryDependencies": [
+    "scrolltrigger-replication"
+  ],
+  "files": [
+    {
+      "path": "components/ui/page-transitions/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/page-transitions/component.tsx",
+      "content": "\"use client\";\n\nimport { useRef } from \"react\";\n\nimport Image from \"next/image\";\nimport Link from \"next/link\";\n\nimport { useGSAP } from \"@gsap/react\";\nimport gsap from \"gsap\";\nimport SplitType, { TargetElement } from \"split-type\";\n\nimport { pages } from \"./data\";\n\nexport default function HeroHome() {\n\tconst sectionRef = useRef<HTMLDivElement>(null);\n\n\tuseGSAP(\n\t\t() => {\n\t\t\tconst pageTitle = sectionRef.current!.querySelector(\n\t\t\t\t\".page-title\"\n\t\t\t)! as TargetElement;\n\t\t\tconst subpageTitle =\n\t\t\t\tsectionRef.current!.querySelectorAll(\".subpage-title\")!;\n\n\t\t\tconst pageTitleSplit = new SplitType(pageTitle, {\n\t\t\t\ttypes: \"lines,words,chars\",\n\t\t\t\tlineClass: \"overflow-hidden\",\n\t\t\t});\n\n\t\t\tconst tl = gsap.timeline({\n\t\t\t\tpaused: true,\n\t\t\t\tdefaults: { ease: \"expo.out\", duration: 1.5 },\n\t\t\t\tdelay: 1.5,\n\t\t\t});\n\n\t\t\ttl.set(pageTitle, { opacity: 1 });\n\t\t\ttl.set(\".subpage-image\", { opacity: 1 });\n\t\t\ttl.set(\".subpage-divider\", {\n\t\t\t\topacity: 1,\n\t\t\t\ttransformOrigin: \"left\",\n\t\t\t});\n\n\t\t\ttl.fromTo(\n\t\t\t\tpageTitleSplit.words,\n\t\t\t\t{\n\t\t\t\t\tyPercent: 100,\n\t\t\t\t},\n\t\t\t\t{\n\t\t\t\t\tyPercent: 0,\n\t\t\t\t\tstagger: 0.05,\n\t\t\t\t}\n\t\t\t)\n\t\t\t\t.fromTo(\n\t\t\t\t\t\".subpage-image\",\n\t\t\t\t\t{ scale: 1.2, height: \"0%\" },\n\t\t\t\t\t{ scale: 1, height: \"100%\", stagger: 0.1 },\n\t\t\t\t\t\"<\"\n\t\t\t\t)\n\t\t\t\t.fromTo(\n\t\t\t\t\t\".subpage-divider\",\n\t\t\t\t\t{ scaleX: 0 },\n\t\t\t\t\t{ scaleX: 1, stagger: 0.1 },\n\t\t\t\t\t\"<\"\n\t\t\t\t)\n\t\t\t\t.fromTo(\n\t\t\t\t\tsubpageTitle,\n\t\t\t\t\t{ y: 20, opacity: 0 },\n\t\t\t\t\t{ y: 0, opacity: 1, stagger: 0.1 },\n\t\t\t\t\t\"<\"\n\t\t\t\t);\n\n\t\t\ttl.play();\n\t\t},\n\t\t{ scope: sectionRef }\n\t);\n\treturn (\n\t\t<section\n\t\t\tclassName=\"flex flex-col justify-end gap-y-12 overflow-hidden pb-[8vw] lg:gap-y-20 lg:pb-[2vw]\"\n\t\t\tref={sectionRef}\n\t\t>\n\t\t\t<h1 className=\"page-title mb-[5vw] max-w-6xl overflow-hidden font-roboto text-[clamp(6vw,8vw,80px)] uppercase leading-none opacity-0 lg:mb-[3vw]\">\n\t\t\t\tA creative platform built on depth, motion and precision\n\t\t\t</h1>\n\n\t\t\t<div className=\"grid grid-cols-2 gap-[2vw] lg:grid-cols-4 lg:gap-[1vw]\">\n\t\t\t\t{pages.map((page, index) => {\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<Link\n\t\t\t\t\t\t\thref={`/${page.slug}`}\n\t\t\t\t\t\t\tkey={index + \"hero-home\"}\n\t\t\t\t\t\t\tclassName=\"group\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<div className=\"relative aspect-square overflow-hidden transition-[border-radius] duration-500 group-hover:rounded-[50%]\">\n\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\tsrc={page.image}\n\t\t\t\t\t\t\t\t\talt={page.slug}\n\t\t\t\t\t\t\t\t\tfill\n\t\t\t\t\t\t\t\t\tpriority\n\t\t\t\t\t\t\t\t\tsizes=\"25vw\"\n\t\t\t\t\t\t\t\t\tclassName=\"subpage-image h-0 object-cover opacity-0\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div className=\"subpage-divider my-2 h-px w-full scale-x-0 bg-charleston-green opacity-0 lg:my-3\"></div>\n\t\t\t\t\t\t\t<div className=\"subpage-title font-roboto text-[3vw] uppercase opacity-0 lg:text-[1.2vw]\">\n\t\t\t\t\t\t\t\t{page.slug} Effect\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</Link>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</div>\n\t\t</section>\n\t);\n}\n"
+    },
+    {
+      "path": "components/ui/page-transitions/data.ts",
+      "type": "registry:ui",
+      "target": "components/ui/page-transitions/data.ts",
+      "content": "export const pages = [\r\n    {\r\n        slug: \"layer\",\r\n        image: \"/itjustworks.jpg\",\r\n        title: \"Layer Depth\",\r\n        description:\r\n            \"A clean, stacked design that emphasizes depth and separation between content sections.\",\r\n    },\r\n    {\r\n        slug: \"slide\",\r\n        image: \"/itjustworks.jpg\",\r\n        title: \"Slide Motion\",\r\n        description:\r\n            \"A sleek style focusing on horizontal or vertical sliding transitions for dynamic navigation.\",\r\n    },\r\n    {\r\n        slug: \"pixel\",\r\n        image: \"/itjustworks.jpg\",\r\n        title: \"Pixel Grid\",\r\n        description:\r\n            \"A grid-based layout with sharp edges and precision, giving a modern and structured feel.\",\r\n    },\r\n    {\r\n        slug: \"zoom\",\r\n        image: \"/itjustworks.jpg\",\r\n        title: \"Zoom Focus\",\r\n        description:\r\n            \"A bold, interactive approach with zoom-in effects to highlight focal points and visuals.\",\r\n    },\r\n];"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/page-transitions/component"
+  }
+}

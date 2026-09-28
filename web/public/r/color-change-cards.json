@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "color-change-cards",
+  "type": "registry:ui",
+  "title": "Color Change Cards",
+  "description": "Grid of photo tiles that sit desaturated behind a heading, a caption and a corner arrow.",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/color-change-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/color-change-cards.tsx",
+      "content": "import { motion } from \"motion/react\";\r\nimport { FiArrowRight } from \"react-icons/fi\";\r\n\r\nconst ColorChangeCards = () => {\r\n\treturn (\r\n\t\t<section className=\"p-4 md:p-8 bg-slate-100\">\r\n\t\t\t<div className=\"cont-page\">\r\n\t\t\t\t<h2 className=\"pb-7\">Services</h2>\r\n\t\t\t\t<div className=\"grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8 w-full\">\r\n\t\t\t\t\t<Card\r\n\t\t\t\t\t\theading=\"Plan\"\r\n\t\t\t\t\t\tdescription=\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque, exercitationem.\"\r\n\t\t\t\t\t\timgSrc=\"https://images.unsplash.com/photo-1506157786151-b8491531f063?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<Card\r\n\t\t\t\t\t\theading=\"Play\"\r\n\t\t\t\t\t\tdescription=\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque, exercitationem.\"\r\n\t\t\t\t\t\timgSrc=\"https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<Card\r\n\t\t\t\t\t\theading=\"Connect\"\r\n\t\t\t\t\t\tdescription=\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque, exercitationem.\"\r\n\t\t\t\t\t\timgSrc=\"https://images.unsplash.com/photo-1516450137517-162bfbeb8dba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<Card\r\n\t\t\t\t\t\theading=\"Support\"\r\n\t\t\t\t\t\tdescription=\"Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque, exercitationem.\"\r\n\t\t\t\t\t\timgSrc=\"https://images.unsplash.com/photo-1576328077645-2dd68934d2b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=627&q=80\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nconst Card = ({\r\n\theading,\r\n\tdescription,\r\n\timgSrc,\r\n}: {\r\n\theading: string;\r\n\tdescription: string;\r\n\timgSrc: string;\r\n}) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\ttransition={{\r\n\t\t\t\tstaggerChildren: 0.035,\r\n\t\t\t}}\r\n\t\t\twhileHover=\"hover\"\r\n\t\t\tclassName=\"w-full h-64 bg-slate-300 overflow-hidden cursor-pointer group relative\"\r\n\t\t>\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"absolute inset-0 saturate-100 md:saturate-0 md:group-hover:saturate-100 group-hover:scale-110 transition-[transform,filter] duration-500\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tbackgroundImage: `url(${imgSrc})`,\r\n\t\t\t\t\tbackgroundSize: \"cover\",\r\n\t\t\t\t\tbackgroundPosition: \"center\",\r\n\t\t\t\t}}\r\n\t\t\t/>\r\n\t\t\t<div className=\"p-4 relative z-20 h-full text-slate-300 group-hover:text-foreground transition-colors duration-500 flex flex-col justify-between\">\r\n\t\t\t\t<FiArrowRight className=\"text-3xl group-hover:-rotate-45 transition-transform duration-500 ml-auto\" />\r\n\t\t\t\t<div>\r\n\t\t\t\t\t<h4>\r\n\t\t\t\t\t\t{heading.split(\"\").map((l, i) => (\r\n\t\t\t\t\t\t\t<ShiftLetter letter={l} key={i + \"color-change-card\"} />\r\n\t\t\t\t\t\t))}\r\n\t\t\t\t\t</h4>\r\n\t\t\t\t\t<p>{description}</p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst ShiftLetter = ({ letter }: { letter: string }) => {\r\n\treturn (\r\n\t\t<div className=\"inline-block overflow-hidden h-[36px] font-semibold text-3xl\">\r\n\t\t\t<motion.span\r\n\t\t\t\tclassName=\"flex flex-col min-w-[4px]\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\ty: \"0%\",\r\n\t\t\t\t}}\r\n\t\t\t\tvariants={{\r\n\t\t\t\t\thover: {\r\n\t\t\t\t\t\ty: \"-50%\",\r\n\t\t\t\t\t},\r\n\t\t\t\t}}\r\n\t\t\t\ttransition={{\r\n\t\t\t\t\tduration: 0.5,\r\n\t\t\t\t}}\r\n\t\t\t>\r\n\t\t\t\t<span>{letter}</span>\r\n\t\t\t\t<span>{letter}</span>\r\n\t\t\t</motion.span>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ColorChangeCards;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering a tile brings its photo back to full colour and zooms it in, swings the corner arrow up to a diagonal, and rolls the heading letters upward one after another to a matching copy underneath.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/color-change-cards"
+  }
+}

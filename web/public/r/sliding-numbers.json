@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sliding-numbers",
+  "type": "registry:ui",
+  "title": "Sliding Numbers",
+  "description": "Sliding Numbers",
+  "dependencies": [
+    "motion",
+    "react-use-measure"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sliding-numbers.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sliding-numbers.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useId } from \"react\";\r\n\r\nimport {\r\n\tmotion,\r\n\tMotionValue,\r\n\tmotionValue,\r\n\tuseSpring,\r\n\tuseTransform,\r\n} from \"motion/react\";\r\nimport useMeasure from \"react-use-measure\";\r\n\r\n// Credit:\r\n// https://motion-primitives.com/docs/sliding-number\r\n\r\nconst TRANSITION = {\r\n\ttype: \"spring\",\r\n\tstiffness: 280,\r\n\tdamping: 18,\r\n\tmass: 0.3,\r\n};\r\n\r\nfunction Digit({ value, place }: { value: number; place: number }) {\r\n\tconst valueRoundedToPlace = Math.floor(value / place) % 10;\r\n\tconst initial = motionValue(valueRoundedToPlace);\r\n\tconst animatedValue = useSpring(initial, TRANSITION);\r\n\r\n\tuseEffect(() => {\r\n\t\tanimatedValue.set(valueRoundedToPlace);\r\n\t}, [animatedValue, valueRoundedToPlace]);\r\n\r\n\treturn (\r\n\t\t<div className=\"relative inline-block w-[1ch] overflow-x-visible overflow-y-clip leading-none tabular-nums\">\r\n\t\t\t<div className=\"invisible\">0</div>\r\n\t\t\t{Array.from({ length: 10 }, (_, i) => (\r\n\t\t\t\t<Number key={i + \"sliding-numbers\"} mv={animatedValue} number={i} />\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nfunction Number({ mv, number }: { mv: MotionValue<number>; number: number }) {\r\n\tconst uniqueId = useId();\r\n\tconst [ref, bounds] = useMeasure();\r\n\r\n\tconst y = useTransform(mv, (latest) => {\r\n\t\tif (!bounds.height) return 0;\r\n\t\tconst placeValue = latest % 10;\r\n\t\tconst offset = (10 + number - placeValue) % 10;\r\n\t\tlet memo = offset * bounds.height;\r\n\r\n\t\tif (offset > 5) {\r\n\t\t\tmemo -= 10 * bounds.height;\r\n\t\t}\r\n\r\n\t\treturn memo;\r\n\t});\r\n\r\n\t// don't render the animated number until we know the height\r\n\tif (!bounds.height) {\r\n\t\treturn (\r\n\t\t\t<span ref={ref} className=\"invisible absolute\">\r\n\t\t\t\t{number}\r\n\t\t\t</span>\r\n\t\t);\r\n\t}\r\n\r\n\treturn (\r\n\t\t<motion.span\r\n\t\t\tstyle={{ y }}\r\n\t\t\tlayoutId={`${uniqueId}-${number}`}\r\n\t\t\tclassName=\"absolute inset-0 flex items-center justify-center\"\r\n\t\t\ttransition={TRANSITION}\r\n\t\t\tref={ref}\r\n\t\t>\r\n\t\t\t{number}\r\n\t\t</motion.span>\r\n\t);\r\n}\r\n\r\ntype SlidingNumberProps = {\r\n\tvalue: number;\r\n\tpadStart?: boolean;\r\n\tdecimalSeparator?: string;\r\n};\r\n\r\nexport function SlidingNumber({\r\n\tvalue,\r\n\tpadStart = false,\r\n\tdecimalSeparator = \".\",\r\n}: SlidingNumberProps) {\r\n\tconst absValue = Math.abs(value);\r\n\tconst [integerPart, decimalPart] = absValue.toString().split(\".\");\r\n\tconst integerValue = parseInt(integerPart, 10);\r\n\tconst paddedInteger =\r\n\t\tpadStart && integerValue < 10 ? `0${integerPart}` : integerPart;\r\n\tconst integerDigits = paddedInteger.split(\"\");\r\n\tconst integerPlaces = integerDigits.map((_, i) =>\r\n\t\tMath.pow(10, integerDigits.length - i - 1)\r\n\t);\r\n\r\n\treturn (\r\n\t\t<div className=\"flex items-center\">\r\n\t\t\t{value < 0 && \"-\"}\r\n\t\t\t{integerDigits.map((_, index) => (\r\n\t\t\t\t<Digit\r\n\t\t\t\t\tkey={`pos-${integerPlaces[index]}`}\r\n\t\t\t\t\tvalue={integerValue}\r\n\t\t\t\t\tplace={integerPlaces[index]}\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t\t{decimalPart && (\r\n\t\t\t\t<>\r\n\t\t\t\t\t<span>{decimalSeparator}</span>\r\n\t\t\t\t\t{decimalPart.split(\"\").map((_, index) => (\r\n\t\t\t\t\t\t<Digit\r\n\t\t\t\t\t\t\tkey={`decimal-${index}`}\r\n\t\t\t\t\t\t\tvalue={parseInt(decimalPart, 10)}\r\n\t\t\t\t\t\t\tplace={Math.pow(10, decimalPart.length - index - 1)}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</>\r\n\t\t\t)}\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Motion Primitives",
+      "url": "https://motion-primitives.com/docs/sliding-number",
+      "authorUrl": "https://motion-primitives.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "padStart",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "decimalSeparator",
+        "type": "string",
+        "default": "\".\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sliding-numbers"
+  }
+}

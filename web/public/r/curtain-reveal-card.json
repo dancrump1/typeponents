@@ -1,0 +1,47 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "curtain-reveal-card",
+  "type": "registry:ui",
+  "title": "Curtain Reveal Card",
+  "description": "Curtain Reveal Card",
+  "dependencies": [
+    "clsx",
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/curtain-reveal-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/curtain-reveal-card.tsx",
+      "content": "'use client';\n\nimport * as React from 'react';\n\nimport { cn } from '@/lib/utils';\nimport { ClassValue } from 'clsx';\n\n// Credit:\n// https://systaliko-ui.vercel.app/docs/cards/card-curtain-reveal\n\nconst clipPathVariants: ClassValue =\n    'delay-[0.1] duration-400 ease-out transition-[clip-path] [clip-path:polygon(50%_0,50%_0,50%_100%,50%_100%)] group-hover:[clip-path:polygon(0_0,100%_0,100%_100%,0_100%)]';\n\nexport function CardCurtainReveal({\n    children,\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return (\n        <div\n            className={cn(\n                'group relative flex flex-col gap-2 overflow-hidden  ',\n                className,\n            )}\n            {...props}\n        >\n            {children}\n        </div>\n    );\n}\n\nexport function CardCurtainRevealFooter({\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return <div className={cn(clipPathVariants, className)} {...props} />;\n}\n\nexport function CardCurtainRevealBody({\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return <div className={cn('flex-1 p-6', className)} {...props} />;\n}\n\nexport function CardCurtainRevealTitle({\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return (\n        <h2\n            className={cn(\n                'group-hover:translate-y-0 translate-y-[170px] duration-300 ease-out transition-transform',\n                className,\n            )}\n            {...props}\n        />\n    );\n}\n\nexport function CardCurtain({\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return (\n        <div\n            className={cn(\n                'pointer-events-none absolute inset-0 size-full mix-blend-difference',\n                clipPathVariants,\n                className,\n            )}\n            {...props}\n        />\n    );\n}\n\nexport function CardCurtainRevealDescription({\n    className,\n    ...props\n}: React.ComponentProps<'div'>) {\n    return <div className={cn(clipPathVariants, className)} {...props} />;\n}"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "systaliko-ui.vercel.app",
+      "url": "https://systaliko-ui.vercel.app/docs/cards/card-curtain-reveal",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/curtain-reveal-card"
+  }
+}

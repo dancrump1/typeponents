@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "carousel-stack",
+  "type": "registry:ui",
+  "title": "Carousel Stack",
+  "description": "Carousel that keeps its slides in a stack, the upcoming ones peeking out below the top card, with back and forward arrows.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/carousel-stack.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/carousel-stack.tsx",
+      "content": "import type React from \"react\";\nimport { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { ArrowLeft, ArrowRight } from \"lucide-react\";\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://starui.link/docs/components/stack-card\n\nexport interface StackCard extends React.ComponentPropsWithRef<\"div\"> {\n\tcards: React.ReactNode[];\n}\n\nexport function StackCard({ cards, className, ...props }: StackCard) {\n\tconst [current, setCurrent] = useState(0);\n\n\treturn (\n\t\t<div className={cn(\"flex flex-col\", className)} {...props}>\n\t\t\t<div className=\"relative\">\n\t\t\t\t{cards.map((card, index) => (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tkey={index + \"carousel-stack\"}\n\t\t\t\t\t\tinitial={false}\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\tindex > 0 && \"absolute bottom-0 left-0 w-full\",\n\t\t\t\t\t\t\tcurrent < index && \"pointer-events-none\"\n\t\t\t\t\t\t)}\n\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\topacity: index <= current ? 1 : 0,\n\t\t\t\t\t\t\ty: (index - current) * 28,\n\t\t\t\t\t\t\tscale: 1 + (index - current) * 0.08,\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t{card}\n\t\t\t\t\t</motion.div>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t\t<div className=\"mt-5 flex items-center justify-center gap-5\">\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\tclassName=\"bg-background text-foreground rounded-full p-2 disabled:bg-background disabled:cursor-not-allowed active:scale-90 transition-transform disabled:active:scale-100\"\n\t\t\t\t\tdisabled={current === 0}\n\t\t\t\t\tonClick={() => setCurrent((prev) => prev - 1)}\n\t\t\t\t>\n\t\t\t\t\t<ArrowLeft size={20} />\n\t\t\t\t</button>\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\tclassName=\"bg-background text-foreground rounded-full p-2 disabled:bg-background disabled:cursor-not-allowed active:scale-90 transition-transform disabled:active:scale-100\"\n\t\t\t\t\tdisabled={current === cards.length - 1}\n\t\t\t\t\tonClick={() => setCurrent((prev) => prev + 1)}\n\t\t\t\t>\n\t\t\t\t\t<ArrowRight size={20} />\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [],
+    "interaction": "Clicking forward drops the top card away and lifts the next one up into place while the stack behind shifts up a step; clicking back reverses it, and the arrows grey out at either end.",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/stack-card",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "cards",
+        "type": "React.ReactNode[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/carousel-stack"
+  }
+}

@@ -1,0 +1,72 @@
+---
+description: Conventions for components and metadata under registry/ — folder shape, the defineComponent contract, import aliases, generated files and the intake flow for ported components.
+globs: registry/**/*.ts,registry/**/*.tsx
+alwaysApply: false
+---
+
+# Registry conventions
+
+## Folder shape
+
+One folder per component: `registry/components/<slug>/`, slug kebab-case and
+equal to `meta.ts`'s `slug`.
+
+- `component.tsx` — required entry point; the build walks its imports.
+- `demo.tsx` — required; `export default` a component, import from `./component`.
+- `meta.ts` — required metadata.
+- Anything else colocated (`use-x.ts`, `*.module.css`, `demo-<variant>.tsx`) is
+  imported with `"./…"` and picked up automatically.
+
+## Imports
+
+- `cn` is at `@/lib/utils`. Never re-path it, copy it or redeclare it.
+- Shared hooks → `hooks/use-x.ts` (`@/hooks/use-x`).
+- Shared non-hook helpers → `lib/x.ts` (`@/lib/x`).
+- shadcn primitives → `@/components/ui/<name>`.
+- Single-use helpers stay in the component's own folder.
+- Never import app-level code (`@/components/*` outside `components/ui/`,
+  `@/data/*`): consumers don't have it.
+
+## Metadata
+
+`meta.ts` calling `defineComponent` is the only place metadata lives — no
+separate categories, credits or meta JSON files anywhere.
+
+- Contract: `registry/schema.ts`. It validates at module load, so bad metadata
+  fails the build.
+- `categories` must come from the closed `CATEGORIES` list in that file.
+- `inspiration` is mandatory for anything ported from another library:
+  `source`, `url`, `relationship` (`port` | `adaptation` | `inspired-by` |
+  `original`). Designers depend on this attribution.
+- `dependencies` / `registryDependencies` are declarations; the build also
+  infers them from real imports.
+
+## Generated — never hand-edit
+
+`registry.json`, `public/r/`, `public/docs/`, `public/llms.txt`,
+`registry/__generated__/`. Change `meta.ts` or the component and rebuild.
+
+## Commands
+
+- `npm run registry:intake -- <url-or-file>` — import from another library.
+- `npm run registry:enrich` — fill props and behaviour tags from source; only
+  writes empty fields, safe to re-run.
+- `npm run registry:build` — regenerate all artifacts.
+- `npm run registry:attribute` — fill inspiration from URLs in source comments.
+
+## Porting a component
+
+Use `scripts/v2/intake.mts` (via `registry:intake`) instead of copying files by
+hand: it normalises `cn` and the source library's aliases, promotes hooks/lib
+files without overwriting ours, and pre-fills attribution. Then fill in the
+metadata it lists as TODO.
+
+## Done means
+
+A demo that isn't an intake scaffold, at least one real category
+(`"Uncategorized"` is triage, not an answer), and a `description`. Until then
+`status` stays `"needs-review"` — or `"draft"` while the demo is a scaffold.
+
+## Style
+
+Tabs, double quotes, semicolons. Comments explain *why*, never restate the code.

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-534",
+  "type": "registry:component",
+  "title": "Comp 534",
+  "description": "Comp 534",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-534.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineContent,\r\n\tTimelineDate,\r\n\tTimelineHeader,\r\n\tTimelineIndicator,\r\n\tTimelineItem,\r\n\tTimelineSeparator,\r\n\tTimelineTitle,\r\n} from \"@/components/ui/timeline\";\r\nimport { CheckIcon } from \"lucide-react\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: \"Mar 15, 2024\",\r\n\t\ttitle: \"Project Kickoff\",\r\n\t\tdescription:\r\n\t\t\t\"Initial team meeting and project scope definition. Established key milestones and resource allocation.\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: \"Mar 22, 2024\",\r\n\t\ttitle: \"Design Phase\",\r\n\t\tdescription:\r\n\t\t\t\"Completed wireframes and user interface mockups. Stakeholder review and feedback incorporated.\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: \"Apr 5, 2024\",\r\n\t\ttitle: \"Development Sprint\",\r\n\t\tdescription:\r\n\t\t\t\"Backend API implementation and frontend component development in progress.\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tdate: \"Apr 19, 2024\",\r\n\t\ttitle: \"Testing & Deployment\",\r\n\t\tdescription:\r\n\t\t\t\"Quality assurance testing, performance optimization, and production deployment preparation.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline defaultValue={3}>\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tstep={item.id}\r\n\t\t\t\t\tclassName=\"group-data-[orientation=vertical]/timeline:ms-10\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<TimelineHeader>\r\n\t\t\t\t\t\t<TimelineSeparator className=\"group-data-[orientation=vertical]/timeline:-left-7 group-data-[orientation=vertical]/timeline:h-[calc(100%-1.5rem-0.25rem)] group-data-[orientation=vertical]/timeline:translate-y-6.5\" />\r\n\t\t\t\t\t\t<TimelineDate>{item.date}</TimelineDate>\r\n\t\t\t\t\t\t<TimelineTitle>{item.title}</TimelineTitle>\r\n\t\t\t\t\t\t<TimelineIndicator className=\"group-data-completed/timeline-item:bg-primary group-data-completed/timeline-item:text-primary-foreground flex size-6 items-center justify-center group-data-completed/timeline-item:border-none group-data-[orientation=vertical]/timeline:-left-7\">\r\n\t\t\t\t\t\t\t<CheckIcon\r\n\t\t\t\t\t\t\t\tclassName=\"group-not-data-completed/timeline-item:hidden\"\r\n\t\t\t\t\t\t\t\tsize={16}\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</TimelineIndicator>\r\n\t\t\t\t\t</TimelineHeader>\r\n\t\t\t\t\t<TimelineContent>{item.description}</TimelineContent>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

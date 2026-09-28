@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cms-falling-text",
+  "type": "registry:block",
+  "title": "Falling text (CMS block)",
+  "description": "Craft-ready Falling text block with injectable Editable wrapper.",
+  "registryDependencies": [
+    "@dbs/falling-text"
+  ],
+  "files": [
+    {
+      "path": "registry/cms/_types.ts",
+      "content": "import type { ComponentPropsWithoutRef, ElementType, ReactNode } from \"react\";\r\n\r\n/** Standard Craft Matrix block fields used by Drive CMS wrappers. */\r\nexport interface CmsBlockData {\r\n\tid: string;\r\n\tuid: string;\r\n\ttitle: string;\r\n\theadline?: string | null;\r\n\tcopy?: string | null;\r\n\thero?: Array<{\r\n\t\turl: string;\r\n\t\talt?: string | null;\r\n\t\twidth?: number;\r\n\t\theight?: number;\r\n\t}>;\r\n\tbutton?: Array<{\r\n\t\ttext?: string | null;\r\n\t\tlinkText?: string | null;\r\n\t\turl?: string | null;\r\n\t\tlinkUrl?: string | null;\r\n\t\tnewWindow?: string | boolean | null;\r\n\t}>;\r\n}\r\n\r\n/**\r\n * CmsBlockData aligns with SharedBlockContent in @/lib/component-content:\r\n *   title, headline, copy → copy fields\r\n *   hero[0]               → image\r\n *   button[0]             → button\r\n */\r\n\r\nexport type EditableMode = \"inline\" | \"panel\" | \"focus\";\r\n\r\nexport interface CmsFieldMapping {\r\n\tcmsField: keyof CmsBlockData | \"componentHandle\";\r\n\tprop: string;\r\n\tlabel: string;\r\n\teditable?: EditableMode;\r\n\t/** e.g. \"comma-list\" to split headline into string[] */\r\n\tformat?: \"comma-list\";\r\n}\r\n\r\nexport interface CmsComponentMeta {\r\n\tenabled: boolean;\r\n\tusesBlockStyles?: boolean;\r\n\tfields: CmsFieldMapping[];\r\n}\r\n\r\nexport interface EditableFieldProps {\r\n\tsubfield: string;\r\n\tlabel: string;\r\n\tinline?: boolean;\r\n\tpanelOnly?: boolean;\r\n\tclassName?: string;\r\n\tas?: ElementType;\r\n\tchildren: ReactNode;\r\n}\r\n\r\nexport type EditableComponent = (\r\n\tprops: EditableFieldProps,\r\n) => ReactNode;\r\n\r\nexport interface CmsBlockContext {\r\n\tfieldHandle: string;\r\n\tblockId: string;\r\n\tblockUid: string;\r\n\tentryId?: string;\r\n\tEditable: EditableComponent;\r\n}\r\n\r\nexport type CmsBlockProps<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\tCmsBlockContext & {\r\n\t\tdata: CmsBlockData;\r\n\t} & TProps;\r\n\r\nexport type CmsBlockComponent<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\t(props: CmsBlockProps<TProps>) => ReactNode;\r\n\r\nexport function mapCommaList(value?: string | null): string[] {\r\n\tif (!value?.trim()) {\r\n\t\treturn [];\r\n\t}\r\n\r\n\treturn value\r\n\t\t.split(/[,;]+/)\r\n\t\t.map((part) => part.trim())\r\n\t\t.filter(Boolean);\r\n}\r\n\r\nexport function getBlockButton(data: CmsBlockData) {\r\n\treturn data.button?.[0];\r\n}\r\n\r\nexport function getBlockImage(data: CmsBlockData) {\r\n\treturn data.hero?.[0];\r\n}\r\n",
+      "type": "registry:lib",
+      "target": "~/registry/cms/_types.ts"
+    },
+    {
+      "path": "registry/cms/falling-text.block.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport FallingText from \"@/registry/open-source/falling-text\";\r\n\r\nimport {\r\n\tCmsBlockComponent,\r\n\tmapCommaList,\r\n} from \"./_types\";\r\n\r\n/**\r\n * Library-shaped CMS block — no CraftEditable or project imports.\r\n * Copy to component library: registry/cms/falling-text.block.tsx\r\n */\r\nexport const fallingTextCmsMeta = {\r\n\tenabled: true,\r\n\tusesBlockStyles: true,\r\n\tfields: [\r\n\t\t{\r\n\t\t\tcmsField: \"title\",\r\n\t\t\tprop: \"text\",\r\n\t\t\tlabel: \"Text\",\r\n\t\t\teditable: \"inline\",\r\n\t\t},\r\n\t\t{\r\n\t\t\tcmsField: \"headline\",\r\n\t\t\tprop: \"highlightWords\",\r\n\t\t\tlabel: \"Highlight words\",\r\n\t\t\teditable: \"inline\",\r\n\t\t\tformat: \"comma-list\",\r\n\t\t},\r\n\t],\r\n} as const;\r\n\r\nexport interface FallingTextBlockOptions {\r\n\ttrigger?: \"auto\" | \"scroll\" | \"click\" | \"hover\";\r\n\tbackgroundColor?: string;\r\n\twireframes?: boolean;\r\n\tgravity?: number;\r\n\tfontSize?: string;\r\n\tmouseConstraintStiffness?: number;\r\n}\r\n\r\nexport const FallingTextCmsBlock: CmsBlockComponent<FallingTextBlockOptions> = ({\r\n\tdata,\r\n\tEditable,\r\n\ttrigger = \"hover\",\r\n\tbackgroundColor = \"transparent\",\r\n\twireframes = false,\r\n\tgravity = 0.56,\r\n\tfontSize = \"2rem\",\r\n\tmouseConstraintStiffness = 0.9,\r\n}) => {\r\n\tconst highlightWords = mapCommaList(data.headline);\r\n\r\n\treturn (\r\n\t\t<div className=\"mx-auto flex w-full max-w-4xl flex-col items-center px-6\">\r\n\t\t\t{data.headline ? (\r\n\t\t\t\t<Editable\r\n\t\t\t\t\tsubfield=\"headline\"\r\n\t\t\t\t\tlabel=\"Highlight words\"\r\n\t\t\t\t\tinline\r\n\t\t\t\t\tclassName=\"mb-4 w-full text-center\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<p className=\"text-sm text-neutral-500\">\r\n\t\t\t\t\t\tHighlight: {data.headline}\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t<Editable subfield=\"title\" label=\"Falling text\" className=\"w-full\">\r\n\t\t\t\t<div className=\"h-[400px] w-full\">\r\n\t\t\t\t\t<FallingText\r\n\t\t\t\t\t\ttext={data.title}\r\n\t\t\t\t\t\thighlightWords={highlightWords}\r\n\t\t\t\t\t\ttrigger={trigger}\r\n\t\t\t\t\t\tbackgroundColor={backgroundColor}\r\n\t\t\t\t\t\twireframes={wireframes}\r\n\t\t\t\t\t\tgravity={gravity}\r\n\t\t\t\t\t\tfontSize={fontSize}\r\n\t\t\t\t\t\tmouseConstraintStiffness={mouseConstraintStiffness}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</div>\r\n\t\t\t</Editable>\r\n\t\t</div>\r\n\t);\r\n};\r\n",
+      "type": "registry:block",
+      "target": "~/registry/cms/falling-text.block.tsx"
+    }
+  ],
+  "meta": {
+    "cms": {
+      "handle": "falling-text",
+      "usesBlockStyles": true,
+      "fields": [
+        {
+          "cmsField": "title",
+          "prop": "text",
+          "label": "Text",
+          "editable": "inline"
+        },
+        {
+          "cmsField": "headline",
+          "prop": "highlightWords",
+          "label": "Highlight words",
+          "editable": "inline",
+          "format": "comma-list"
+        }
+      ]
+    }
+  },
+  "categories": [
+    "Text"
+  ]
+}

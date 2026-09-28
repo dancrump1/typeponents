@@ -1,0 +1,56 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bento",
+  "type": "registry:ui",
+  "title": "Bento",
+  "description": "Bento grid of uneven tiles, each with an image, icon, title and short blurb, that link somewhere when clicked.",
+  "dependencies": [
+    "@tabler/icons-react"
+  ],
+  "registryDependencies": [
+    "button",
+    "fuzzy-overlay",
+    "https://components.drivedev.net/r/fuzzy-overlay.json"
+  ],
+  "files": [
+    {
+      "path": "components/ui/bento.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/bento.tsx",
+      "content": "import React, { ReactNode } from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { cn } from \"@/lib/utils\";\n\nimport \"lazysizes\";\n\nimport Link from \"next/link\";\n\nimport FuzzyOverlay from \"@/components/ui/fuzzy-overlay\";\n\n// https://ui.aceternity.com/components/bento-grid\n\nexport const BentoGrid = ({\n\tclassName,\n\tchildren,\n}: {\n\tclassName?: string;\n\tchildren?: React.ReactNode;\n}) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"grid grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto \",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n\nexport const BentoGridItem = ({\n\tclassName,\n\ttitle,\n\tdescription,\n\theader,\n\tsrcset,\n\ticon,\n\thref,\n}: {\n\tclassName?: string;\n\ttitle?: string | React.ReactNode;\n\tdescription?: string | React.ReactNode;\n\theader?: React.ReactNode;\n\tsrcset?: string;\n\ticon?: React.ReactNode;\n}) => {\n\treturn (\n\t\t<Link\n\t\t\tclassName={cn(\n\t\t\t\t\"row-span-1 rounded-xl max-h-[85vh] group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 dark:bg-background dark:border-white/20 bg-background border border-transparent justify-between flex flex-col space-y-4\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\thref={href || \"\"}\n\t\t>\n\t\t\t<img\n\t\t\t\tsrc={\"/itjustworks.jpg\"}\n\t\t\t\tsrcSet={srcset}\n\t\t\t\tclassName=\"lazyload h-full w-full object-cover\"\n\t\t\t\talt=\"image with artdirection\"\n\t\t\t/>\n\n\t\t\t<div className=\"group-hover/bento:translate-x-2 transition duration-200\">\n\t\t\t\t{icon}\n\t\t\t\t<div className=\"font-sans font-bold text-foreground dark:text-foreground mb-2 mt-2\">\n\t\t\t\t\t{title}\n\t\t\t\t</div>\n\t\t\t\t<div className=\"font-sans font-normal text-foreground text-xs dark:text-foreground\">\n\t\t\t\t\t{description}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</Link>\n\t);\n};\n\nconst BentoGridFullBackground = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<div className={cn(\"grid w-full grid-cols-3 gap-4\", className)}>\n\t\t\t{children}\n\t\t</div>\n\t);\n};\n\nconst BentoCard = ({\n\tname,\n\tclassName,\n\tbackground,\n\tIcon,\n\tdescription,\n\thref,\n\tcta,\n\toverlay = false,\n\tuuid,\n\thoverDarken = true,\n}: {\n\tname?: string;\n\tclassName: string;\n\tbackground: ReactNode;\n\tIcon: any;\n\tdescription: string;\n\thref: string;\n\tcta: string;\n\toverlay?: boolean;\n\tuuid?: string;\n\thoverDarken?: boolean;\n}) => (\n\t<div\n\t\tkey={name || uuid}\n\t\tclassName={cn(\n\t\t\t\"group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl\",\n\t\t\t// light styles\n\t\t\t\"bg-background [box-shadow:0_0_0_1px_rgba(0,0,0,.03),0_2px_4px_rgba(0,0,0,.05),0_12px_24px_rgba(0,0,0,.05)]\",\n\t\t\t// dark styles\n\t\t\t\"transform-gpu dark:bg-slate-950 dark:[box-shadow:0_-20px_80px_-20px_#ffffff1f_inset]\",\n\t\t\tclassName\n\t\t)}\n\t>\n\t\t<div className=\"h-full\">{background}</div>\n\t\t{overlay && (\n\t\t\t<FuzzyOverlay className=\"hidden group-hover:block group-hover:opacity-30\" />\n\t\t)}\n\n\t\t{(name || description) && (\n\t\t\t<div className=\"pointer-events-none z-10 flex transform-gpu flex-col gap-1 p-6 transition-transform duration-300 group-hover:-translate-y-10\">\n\t\t\t\t{name && (\n\t\t\t\t\t<h3 className=\"text-xl font-semibold text-foreground dark:text-foreground drop-shadow-[0_1px_2px_rgb(0,0,0,0.8)]\">\n\t\t\t\t\t\t{name}\n\t\t\t\t\t</h3>\n\t\t\t\t)}\n\t\t\t\t{description && (\n\t\t\t\t\t<p className=\"max-w-lg text-foreground drop-shadow-[0_1px_2px_rgb(0,0,0,0.5)]\">\n\t\t\t\t\t\t{description}\n\t\t\t\t\t</p>\n\t\t\t\t)}\n\t\t\t</div>\n\t\t)}\n\n\t\t{href && (\n\t\t\t<div\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"pointer-events-none absolute bottom-0 flex w-full translate-y-10 transform-gpu flex-row items-center p-4 opacity-0 transition-[transform,opacity] duration-300 group-hover:translate-y-0 group-hover:opacity-100\"\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t<Button\n\t\t\t\t\tvariant=\"ghost\"\n\t\t\t\t\tasChild\n\t\t\t\t\tsize=\"sm\"\n\t\t\t\t\tclassName=\"pointer-events-auto group/svg\"\n\t\t\t\t>\n\t\t\t\t\t<a href={href}>\n\t\t\t\t\t\t{cta}\n\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\twidth=\"36\"\n\t\t\t\t\t\t\theight=\"12\"\n\t\t\t\t\t\t\tviewBox=\"0 0 36 12\"\n\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\tclassName=\" ml-3\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\td=\"M0.75 6H11.25 M6 0.75L11.25 6L6 11.25\"\n\t\t\t\t\t\t\t\tstroke=\"teal\"\n\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\t\tclassName=\"opacity-0 group-hover/svg:opacity-100\"\n\t\t\t\t\t\t\t\tstyle={{ transition: \"opacity 1000ms ease 50ms\" }}\n\t\t\t\t\t\t\t></path>\n\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\td=\"M15 10L19.5 5.5L15 1\"\n\t\t\t\t\t\t\t\tstroke=\"teal\"\n\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\t\tclassName=\"opacity-0 group-hover/svg:opacity-100\"\n\t\t\t\t\t\t\t\tstyle={{ transition: \"opacity 1000ms ease 125ms\" }}\n\t\t\t\t\t\t\t></path>\n\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\td=\"M23 10L27.5 5.5L23 1\"\n\t\t\t\t\t\t\t\tstroke=\"teal\"\n\t\t\t\t\t\t\t\tstrokeOpacity=\"0.66\"\n\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\t\tclassName=\" opacity-0 group-hover/svg:opacity-100\"\n\t\t\t\t\t\t\t\tstyle={{ transition: \"opacity 1000ms ease 250ms\" }}\n\t\t\t\t\t\t\t></path>\n\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\td=\"M31 10L35.5 5.5L31 1\"\n\t\t\t\t\t\t\t\tstroke=\"teal\"\n\t\t\t\t\t\t\t\tstrokeOpacity=\"0.35\"\n\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\t\tclassName=\"opacity-0 group-hover/svg:opacity-100\"\n\t\t\t\t\t\t\t\tstyle={{ transition: \"opacity 1000ms ease 375ms\" }}\n\t\t\t\t\t\t\t></path>\n\t\t\t\t\t\t</svg>\n\t\t\t\t\t</a>\n\t\t\t\t</Button>\n\t\t\t</div>\n\t\t)}\n\t\t{hoverDarken && (\n\t\t\t<div className=\"pointer-events-none absolute inset-0 transform-gpu transition-[background-color] duration-300 group-hover:bg-background/3 dark:group-hover:bg-background/10\" />\n\t\t)}\n\t</div>\n);\n\nexport { BentoCard, BentoGridFullBackground };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering a tile deepens its shadow and nudges the text block to the right; on the full-background tiles the caption slides up to make room for a link that fades in along the bottom, with its arrows lighting up in sequence.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/bento-grid",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/bento"
+  }
+}

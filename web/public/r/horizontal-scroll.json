@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "horizontal-scroll",
+  "type": "registry:ui",
+  "title": "Horizontal Scroll",
+  "description": "A scrollable component that displays images in a horizontal carousel layout with 3D rotation effects. As you scroll vertically, the images animate with smooth horizontal movement, perspective transforms, and dynamic blur effects to create an immersive visual experience.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/horizontal-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/horizontal-scroll.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useRef } from 'react';\r\nimport Image from 'next/image';\r\nimport { motion, MotionValue, useScroll, useTransform } from 'framer-motion';\r\n\r\nconst HorizontalScrollItem = ({\r\n  image,\r\n  index,\r\n  isLeft,\r\n  scrollYProgress,\r\n  totalItems\r\n}: {\r\n  image: string;\r\n  index: number;\r\n  isLeft: boolean;\r\n  scrollYProgress: MotionValue<number>;\r\n  totalItems: number;\r\n}) => {\r\n  const direction = isLeft ? -1 : 1;\r\n  const position = index / totalItems;\r\n\r\n  const translateX = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [-index * 500 * direction, 0, (totalItems - index) * 500 * direction]\r\n  );\r\n  const rotateY = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [index * 35 * direction, 0, (totalItems - index) * -35 * direction]\r\n  );\r\n  const blur = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [index * 2, 0, (totalItems - index) * 2]\r\n  );\r\n  const contrast = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [index * 0.5, 1, (totalItems - index) * 0.5]\r\n  );\r\n\r\n  const translateY = useTransform(\r\n    scrollYProgress,\r\n    [0, position, 1],\r\n    [(totalItems - index) * 20, totalItems * 20, index * 20]\r\n  );\r\n\r\n  const filter = useTransform(\r\n    [blur, contrast],\r\n    ([blur, contrast]) => `blur(${blur}px) contrast(${contrast})`\r\n  );\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        translateX,\r\n        filter,\r\n        translateY: useTransform(translateY, (value) => `${value - 400}px`),\r\n        perspective: 1000,\r\n        transformStyle: 'preserve-3d'\r\n      }}\r\n      className=\"h-[300px] max-w-sm w-full absolute rounded-xl overflow-visible text-black\"\r\n    >\r\n      <motion.div style={{ rotateY }}>\r\n        <Image\r\n          src={image}\r\n          alt={image}\r\n          width={1000}\r\n          height={1000}\r\n          className=\"object-cover h-[300px] w-full rounded-xl\"\r\n        />\r\n      </motion.div>\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst HorizontalScroll = ({ items }: { items: { image: string }[] }) => {\r\n  const ref = useRef<HTMLDivElement>(null);\r\n\r\n  const { scrollYProgress } = useScroll({\r\n    container: ref,\r\n    offset: ['start start', 'end end']\r\n  });\r\n\r\n  return (\r\n    <div\r\n      ref={ref}\r\n      className=\"h-full w-full overflow-y-auto relative\"\r\n      style={{ minHeight: '400px' }}\r\n    >\r\n      <div className=\"h-full w-full absolute top-0 left-0\">\r\n        <div\r\n          className=\"w-full\"\r\n          style={{\r\n            height: (items.length - 3) * 300\r\n          }}\r\n        />\r\n      </div>\r\n      <div className=\"grid grid-cols-1 gap-12 h-full w-full sticky top-0 left-0\">\r\n        <div className=\"flex flex-col h-full justify-center w-full items-center relative\">\r\n          {items.map((image, index) => (\r\n            <HorizontalScrollItem\r\n              key={`left-column-image-${index}`}\r\n              image={image.image}\r\n              index={index}\r\n              isLeft={true}\r\n              scrollYProgress={scrollYProgress}\r\n              totalItems={items.length}\r\n            />\r\n          ))}\r\n        </div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default HorizontalScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Vertical scroll drives a 3D horizontal carousel of images.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/horizontalscroll",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; }[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/horizontal-scroll"
+  }
+}

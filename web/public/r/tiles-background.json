@@ -1,0 +1,39 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tiles-background",
+  "type": "registry:ui",
+  "title": "Tiles Background",
+  "description": "Tiles Background",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tiles-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tiles-background.tsx",
+      "content": "\"use client\";\n\nimport React, { Fragment, MouseEvent, useMemo, useRef, useState } from \"react\";\n\nconst numberOfCols = 15;\n\nconst colors = [\"#007BFF\", \"#FFD700\", \"#32CD32\"];\n\nconst imagePositions = [\n\t{\n\t\tdistanceFromLeft: 7,\n\t\tdistanceFromTop: 12,\n\t\theight: 4,\n\t\twidth: 3,\n\t\turl: \"https://ik.imagekit.io/khoaphan/playground/Tiles%20Background/anime%20painting.webp?updatedAt=1727431865607\",\n\t\ttext: \"Beach\",\n\t},\n\t{\n\t\tdistanceFromLeft: 20,\n\t\tdistanceFromTop: 16,\n\t\theight: 4,\n\t\twidth: 3,\n\t\turl: \"https://ik.imagekit.io/khoaphan/playground/Tiles%20Background/minimal.webp?updatedAt=1727431865328\",\n\t\ttext: \"Forest\",\n\t},\n\t{\n\t\tdistanceFromLeft: 14,\n\t\tdistanceFromTop: 20,\n\t\twidth: 4,\n\t\theight: 3,\n\t\turl: \"https://ik.imagekit.io/khoaphan/playground/Tiles%20Background/A%20person%20standing%20inside%20of%20a%20wooden%20structure.webp?updatedAt=1727431865057\",\n\t\ttext: \"Cave\",\n\t},\n\t{\n\t\tdistanceFromLeft: 16,\n\t\tdistanceFromTop: 11,\n\t\twidth: 3,\n\t\theight: 2,\n\t\turl: \"https://ik.imagekit.io/khoaphan/playground/Tiles%20Background/cube%20cutout%20of%20an%20isometric%20oil%20painters%20studio.webp?updatedAt=1727431865089\",\n\t\ttext: \"Home\",\n\t},\n\t{\n\t\tdistanceFromLeft: 9,\n\t\tdistanceFromTop: 7,\n\t\twidth: 4,\n\t\theight: 3,\n\t\turl: \"https://ik.imagekit.io/khoaphan/playground/Tiles%20Background/Drawing%20rice%20field%20terrasses%20on%20mountains%20in%20the%20p.webp?updatedAt=1727433283382\",\n\t\ttext: \"Terrace\",\n\t},\n];\n\nconst TilesBackground = () => {\n\tconst left = useRef(0);\n\tconst top = useRef(0);\n\tconst indicator = useRef<HTMLDivElement>(null);\n\tconst [imageText, setImageText] = useState<string>(imagePositions[0].text);\n\n\t// To create the image size (unit is tile)\n\tconst createSize = ({\n\t\tdistanceFromLeft,\n\t\tdistanceFromTop,\n\t\twidth,\n\t\theight,\n\t}: {\n\t\tdistanceFromLeft: number;\n\t\tdistanceFromTop: number;\n\t\twidth: number;\n\t\theight: number;\n\t}) => {\n\t\tconst totalCols = numberOfCols * 2;\n\n\t\tconst left = (distanceFromLeft / totalCols) * 100;\n\t\tconst top = (distanceFromTop / totalCols) * 100;\n\t\tconst tileWidth = (width / totalCols) * 100;\n\t\tconst aspectRatio = width / height;\n\n\t\treturn {\n\t\t\tleft: `${left}%`,\n\t\t\ttop: `${top}%`,\n\t\t\twidth: `${tileWidth}%`,\n\t\t\taspectRatio,\n\t\t};\n\t};\n\n\t// Mouse events on tiles\n\tconst onMouseTileEnter = (event: MouseEvent<HTMLDivElement>) => {\n\t\t(event.target as HTMLDivElement).style.backgroundColor =\n\t\t\tcolors[Math.floor(Math.random() * colors.length)];\n\t};\n\n\tconst onMouseTileLeave = (event: MouseEvent<HTMLDivElement>) => {\n\t\t(event.target as HTMLDivElement).style.backgroundColor = \"transparent\";\n\t};\n\n\t// Mouse events on image\n\tconst onMouseImageMove = (\n\t\tevent: MouseEvent<HTMLDivElement>,\n\t\ttext: string\n\t) => {\n\t\tif (text !== imageText) setImageText(text);\n\n\t\tleft.current = event.clientX;\n\t\ttop.current = event.clientY;\n\n\t\tindicator.current?.animate(\n\t\t\t{\n\t\t\t\ttransform: `translate(${left.current}px, calc(-100% + ${top.current}px) )`,\n\t\t\t\topacity: 1,\n\t\t\t},\n\t\t\t{ duration: 1000, fill: \"forwards\" }\n\t\t);\n\t};\n\tconst onMouseImageLeave = () => {\n\t\tindicator.current?.animate(\n\t\t\t{\n\t\t\t\topacity: 0,\n\t\t\t},\n\t\t\t{ duration: 300, fill: \"forwards\" }\n\t\t);\n\t};\n\n\tconst staticTiles = useMemo(\n\t\t() =>\n\t\t\tArray.from({ length: Math.pow(numberOfCols, 2) }).map((_, index) => {\n\t\t\t\treturn (\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"relative grid grid-cols-2 text-foreground/70\"\n\t\t\t\t\t\tkey={index + \"static-tiles\"}\n\t\t\t\t\t>\n\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\tviewBox=\"0 0 114 113\"\n\t\t\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2 size-[15%] -translate-x-1/2 -translate-y-1/2\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\td=\"M57.5 0L57.5 113M0.5 56H113.5\"\n\t\t\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\t\t\tstrokeWidth={3}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</svg>\n\n\t\t\t\t\t\t{Array.from({ length: 4 }).map((_, childIndex) => {\n\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\t\tonMouseLeave={onMouseTileLeave}\n\t\t\t\t\t\t\t\t\tonMouseEnter={onMouseTileEnter}\n\t\t\t\t\t\t\t\t\tkey={childIndex}\n\t\t\t\t\t\t\t\t\tclassName=\"aspect-square bg-transparent outline-solid outline-1 outline-white/5 transition duration-1000 ease-linear hover:duration-0\"\n\t\t\t\t\t\t\t\t></div>\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t})}\n\t\t\t\t\t</div>\n\t\t\t\t);\n\t\t\t}),\n\t\t[]\n\t);\n\n\treturn (\n\t\t<Fragment>\n\t\t\t<article className=\"aspect-square overflow-hidden bg-background/5\">\n\t\t\t\t<div\n\t\t\t\t\t// to center to grid container\n\t\t\t\t\tclassName=\"relative -ml-[10%] -mt-[10%] grid w-[120%]\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tgridTemplateColumns: `repeat(${numberOfCols},1fr)`,\n\t\t\t\t\t\ttransform: \"skewX(-48deg) skewY(14deg) scaleX(2)\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t{staticTiles}\n\t\t\t\t\t{imagePositions.map((image, index) => {\n\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tkey={index + \"tiles-images\"}\n\t\t\t\t\t\t\t\tonMouseMove={(e) => onMouseImageMove(e, image.text)}\n\t\t\t\t\t\t\t\tonMouseLeave={onMouseImageLeave}\n\t\t\t\t\t\t\t\tstyle={createSize(image)}\n\t\t\t\t\t\t\t\tclassName=\"group absolute z-10 bg-background/5 shadow-[12px_20px_50px] shadow-white/20\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\t\tsrc={image.url}\n\t\t\t\t\t\t\t\t\tclassName=\"h-full w-full object-cover grayscale transition-[filter] duration-200 group-hover:grayscale-0\"\n\t\t\t\t\t\t\t\t\talt=\"tile image\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t);\n\t\t\t\t\t})}\n\n\t\t\t\t\t<div className=\"pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none text-center font-poppins text-[3vw] font-semibold text-foreground\">\n\t\t\t\t\t\tExplore\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</article>\n\t\t\t<div\n\t\t\t\tref={indicator}\n\t\t\t\tclassName=\"pointer-events-none fixed left-0 top-0 z-10 opacity-0 mix-blend-difference will-change-transform\"\n\t\t\t>\n\t\t\t\t<p className=\"-translate-x-1/2 text-foreground\">{imageText}</p>\n\t\t\t\t<div className=\"h-20 w-px bg-background\"></div>\n\t\t\t</div>\n\t\t</Fragment>\n\t);\n};\n\nexport default TilesBackground;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tiles-background"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "carousel-logo",
+  "type": "registry:component",
+  "title": "Carousel Logo",
+  "description": "Carousel Logo",
+  "files": [
+    {
+      "path": "registry/ui-basic/CarouselLogo.tsx",
+      "content": "import React, { useEffect } from \"react\";\r\n\r\nimport Glide from \"@glidejs/glide\";\r\n\r\nexport default function CarouselLogo() {\r\n\tuseEffect(() => {\r\n\t\tconst slider = new Glide(\".glide-09\", {\r\n\t\t\ttype: \"carousel\",\r\n\t\t\tautoplay: 1,\r\n\t\t\tanimationDuration: 4500,\r\n\t\t\tanimationTimingFunc: \"linear\",\r\n\t\t\tperView: 3,\r\n\t\t\tclasses: {\r\n\t\t\t\tnav: {\r\n\t\t\t\t\tactive: \"[&>*]:bg-wuiSlate-700\",\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t\tbreakpoints: {\r\n\t\t\t\t1024: {\r\n\t\t\t\t\tperView: 2,\r\n\t\t\t\t},\r\n\t\t\t\t640: {\r\n\t\t\t\t\tperView: 1,\r\n\t\t\t\t\tgap: 36,\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t}).mount();\r\n\r\n\t\treturn () => {\r\n\t\t\tslider.destroy();\r\n\t\t};\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/*<!-- Component: Testimonial carousel --> */}\r\n\t\t\t<div className=\"glide-09 relative w-full\">\r\n\t\t\t\t{/* <!-- Slides --> */}\r\n\t\t\t\t<div data-glide-el=\"track\">\r\n\t\t\t\t\t<ul className=\"whitespace-no-wrap flex-no-wrap [backface-visibility: hidden] [transform-style: preserve-3d] [touch-action: pan-Y] [will-change: transform] relative flex w-full overflow-hidden p-0\">\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-1.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-2.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-3.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-4.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-5.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t<li>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tsrc=\"https://Tailwindmix.b-cdn.net/carousel/logos/carousel-logo-image-6.svg\"\r\n\t\t\t\t\t\t\t\tclassName=\"m-auto h-20 max-h-full w-auto max-w-full\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t{/*<!-- End Testimonial carousel --> */}\r\n\t\t</>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

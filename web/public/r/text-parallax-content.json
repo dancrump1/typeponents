@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-parallax-content",
+  "type": "registry:ui",
+  "title": "Text Parallax Content",
+  "description": "Text Parallax Content",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-parallax-content.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-parallax-content.tsx",
+      "content": "import { ReactNode, useRef } from \"react\";\r\n\r\nimport { motion, useScroll, useTransform } from \"motion/react\";\r\nimport { FiArrowUpRight } from \"react-icons/fi\";\r\n\r\nconst IMG_PADDING = 12;\r\n\r\nconst StickyImage = ({ imgUrl }: { imgUrl: string }) => {\r\n\tconst targetRef = useRef(null);\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: targetRef,\r\n\t\toffset: [\"end end\", \"end start\"],\r\n\t});\r\n\r\n\tconst scale = useTransform(scrollYProgress, [0, 1], [1, 0.85]);\r\n\tconst opacity = useTransform(scrollYProgress, [0, 1], [1, 0]);\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tstyle={{\r\n\t\t\t\tbackgroundImage: `url(${imgUrl})`,\r\n\t\t\t\tbackgroundSize: \"cover\",\r\n\t\t\t\tbackgroundPosition: \"center\",\r\n\t\t\t\theight: `calc(100vh - ${IMG_PADDING * 2}px)`,\r\n\t\t\t\ttop: IMG_PADDING,\r\n\t\t\t\tscale,\r\n\t\t\t}}\r\n\t\t\tref={targetRef}\r\n\t\t\tclassName=\"sticky z-0 overflow-hidden rounded-3xl\"\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"absolute inset-0 bg-background/70\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\topacity,\r\n\t\t\t\t}}\r\n\t\t\t/>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst OverlayCopy = ({\r\n\tsubheading,\r\n\theading,\r\n}: {\r\n\tsubheading: string;\r\n\theading: string;\r\n}) => {\r\n\tconst targetRef = useRef(null);\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: targetRef,\r\n\t\toffset: [\"start end\", \"end start\"],\r\n\t});\r\n\r\n\tconst y = useTransform(scrollYProgress, [0, 1], [250, -250]);\r\n\tconst opacity = useTransform(scrollYProgress, [0.25, 0.5, 0.75], [0, 1, 0]);\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tstyle={{\r\n\t\t\t\ty,\r\n\t\t\t\topacity,\r\n\t\t\t}}\r\n\t\t\tref={targetRef}\r\n\t\t\tclassName=\"absolute left-0 top-0 flex h-screen w-full flex-col items-center justify-center text-foreground\"\r\n\t\t>\r\n\t\t\t<p className=\"mb-2 text-center text-xl md:mb-4 md:text-3xl\">\r\n\t\t\t\t{subheading}\r\n\t\t\t</p>\r\n\t\t\t<p className=\"text-center text-4xl font-bold md:text-7xl\">{heading}</p>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nconst ExampleContent = () => (\r\n\t<div className=\"mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 pb-24 pt-12 md:grid-cols-12\">\r\n\t\t<h2 className=\"col-span-1 text-3xl font-bold md:col-span-4\">\r\n\t\t\tAdditional content explaining the above card here\r\n\t\t</h2>\r\n\t\t<div className=\"col-span-1 md:col-span-8\">\r\n\t\t\t<p className=\"mb-4 text-xl text-foreground md:text-2xl\">\r\n\t\t\t\tLorem ipsum dolor sit amet consectetur adipisicing elit. Quasi,\r\n\t\t\t\tblanditiis soluta eius quam modi aliquam quaerat odit deleniti\r\n\t\t\t\tminima maiores voluptate est ut saepe accusantium maxime doloremque\r\n\t\t\t\tnulla consectetur possimus.\r\n\t\t\t</p>\r\n\t\t\t<p className=\"mb-8 text-xl text-foreground md:text-2xl\">\r\n\t\t\t\tLorem ipsum dolor sit amet consectetur adipisicing elit. Accusantium\r\n\t\t\t\treiciendis blanditiis aliquam aut fugit sint.\r\n\t\t\t</p>\r\n\t\t\t<button className=\"w-full rounded bg-background px-9 py-4 text-xl text-foreground transition-colors hover:bg-background md:w-fit\">\r\n\t\t\t\tLearn more <FiArrowUpRight className=\"inline\" />\r\n\t\t\t</button>\r\n\t\t</div>\r\n\t</div>\r\n);\r\n\r\nexport const TextParallaxContentExample = () => {\r\n\treturn (\r\n\t\t<div className=\"bg-background\">\r\n\t\t\t<TextParallaxContent\r\n\t\t\t\timgUrl={\r\n\t\t\t\t\t\"https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\r\n\t\t\t\t}\r\n\t\t\t\tsubheading=\"Efficient\"\r\n\t\t\t\theading=\"Be the best\"\r\n\t\t\t>\r\n\t\t\t\t<ExampleContent />\r\n\t\t\t</TextParallaxContent>\r\n\t\t\t<TextParallaxContent\r\n\t\t\t\timgUrl=\"https://images.unsplash.com/photo-1530893609608-32a9af3aa95c?q=80&w=2564&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\r\n\t\t\t\tsubheading=\"Quality\"\r\n\t\t\t\theading=\"Never compromise.\"\r\n\t\t\t>\r\n\t\t\t\t<ExampleContent />\r\n\t\t\t</TextParallaxContent>\r\n\t\t\t<TextParallaxContent\r\n\t\t\t\timgUrl=\"https://images.unsplash.com/photo-1504610926078-a1611febcad3?q=80&w=2416&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D\"\r\n\t\t\t\tsubheading=\"Modern\"\r\n\t\t\t\theading=\"Dress for the best.\"\r\n\t\t\t>\r\n\t\t\t\t<ExampleContent />\r\n\t\t\t</TextParallaxContent>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst TextParallaxContent = ({\r\n\timgUrl,\r\n\tsubheading,\r\n\theading,\r\n\tchildren,\r\n}: {\r\n\timgUrl: string;\r\n\tsubheading: string;\r\n\theading: string;\r\n\tchildren: ReactNode;\r\n}) => {\r\n\treturn (\r\n\t\t<div\r\n\t\t\tstyle={{\r\n\t\t\t\tpaddingLeft: IMG_PADDING,\r\n\t\t\t\tpaddingRight: IMG_PADDING,\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<div className=\"relative h-[150vh]\">\r\n\t\t\t\t<StickyImage imgUrl={imgUrl} />\r\n\t\t\t\t<OverlayCopy heading={heading} subheading={subheading} />\r\n\t\t\t</div>\r\n\t\t\t{children}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default TextParallaxContent;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "imgUrl",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "subheading",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "heading",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-parallax-content"
+  }
+}

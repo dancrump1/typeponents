@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "horizontal-scroll-gallery",
+  "type": "registry:ui",
+  "title": "Horizontal Scroll Gallery",
+  "description": "Horizontal Scroll Gallery",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/horizontal-scroll-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/horizontal-scroll-gallery.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\r\n\r\n//optional hook for smooth scrolling\r\n// import useLenis from \"@/hooks/useLenis\";\r\nimport { motion, useScroll, useTransform } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.edilozi.pro/docs/components/horizontal-scroll\r\nconst Example = ({ containerRef }) => {\r\n\treturn (\r\n\t\t<div className=\"bg-background\">\r\n\t\t\t<div className=\"flex h-48 items-center justify-center\">\r\n\t\t\t\t<span className=\"font-semibold uppercase text-foreground\">\r\n\t\t\t\t\tScroll down\r\n\t\t\t\t</span>\r\n\t\t\t</div>\r\n\t\t\t<HorizontalScrollCarousel containerRef={containerRef} />\r\n\t\t\t<div className=\"flex h-48 items-center justify-center\">\r\n\t\t\t\t<span className=\"font-semibold uppercase text-foreground\">\r\n\t\t\t\t\tScroll up\r\n\t\t\t\t</span>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport const HorizontalScrollCarousel = ({ containerRef }) => {\r\n\tconst targetRef = useRef<HTMLDivElement | null>(null);\r\n\tconst [componentContainerRef, setComponentContainerRef] = useState(null);\r\n\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: targetRef,\r\n\t\t// container: componentContainerRef,\r\n\t});\r\n\r\n\tconst x = useTransform(scrollYProgress, [0, 1], [\"1%\", \"-95%\"]);\r\n\r\n\t// useLenis();\r\n\r\n\tuseEffect(() => {\r\n\t\tsetComponentContainerRef(containerRef);\r\n\t}, [containerRef]);\r\n\r\n\tif (!!componentContainerRef && componentContainerRef?.current === undefined)\r\n\t\treturn null;\r\n\r\n\treturn (\r\n\t\t<section ref={targetRef} className=\"relative h-[300vh] bg-background\">\r\n\t\t\t<div className=\"sticky top-0 flex h-screen items-center overflow-hidden\">\r\n\t\t\t\t<motion.div style={{ x }} className=\"flex gap-4\">\r\n\t\t\t\t\t{cards.map((card) => {\r\n\t\t\t\t\t\treturn <Card card={card} key={card.id} />;\r\n\t\t\t\t\t})}\r\n\t\t\t\t</motion.div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nconst Card = ({ card }: { card: CardType }) => {\r\n\treturn (\r\n\t\t<div\r\n\t\t\tkey={card.id}\r\n\t\t\tclassName=\"group relative h-[450px] w-[450px] overflow-hidden bg-background\"\r\n\t\t>\r\n\t\t\t<div\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tbackgroundImage: `url(${card.url})`,\r\n\t\t\t\t\tbackgroundSize: \"cover\",\r\n\t\t\t\t\tbackgroundPosition: \"center\",\r\n\t\t\t\t}}\r\n\t\t\t\tclassName=\"absolute inset-0 z-0 transition-transform duration-300 group-hover:scale-110\"\r\n\t\t\t></div>\r\n\t\t\t<div className=\"absolute inset-0 z-10 grid place-content-center\">\r\n\t\t\t\t<p className=\"bg-linear-to-br from-background/20 to-background/0 p-8 text-6xl font-black uppercase text-foreground backdrop-blur-lg\">\r\n\t\t\t\t\t{card.title}\r\n\t\t\t\t</p>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default Example;\r\n\r\ntype CardType = {\r\n\turl: string;\r\n\ttitle: string;\r\n\tid: number;\r\n};\r\n\r\nconst cards: CardType[] = [\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 1\",\r\n\t\tid: 1,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 2\",\r\n\t\tid: 2,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 3\",\r\n\t\tid: 3,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 4\",\r\n\t\tid: 4,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 5\",\r\n\t\tid: 5,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 6\",\r\n\t\tid: 6,\r\n\t},\r\n\t{\r\n\t\turl: \"/itjustworks.jpg\",\r\n\t\ttitle: \"Title 7\",\r\n\t\tid: 7,\r\n\t},\r\n];\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "edilozi.pro",
+      "url": "https://www.edilozi.pro/docs/components/horizontal-scroll",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/horizontal-scroll-gallery"
+  }
+}

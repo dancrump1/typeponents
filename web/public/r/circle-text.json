@@ -1,0 +1,74 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "circle-text",
+  "type": "registry:ui",
+  "title": "Circle Text",
+  "description": "Circle Text",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/circle-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/circle-text.tsx",
+      "content": "import React, { useEffect, useState } from \"react\";\n\nimport { motion, useAnimation } from \"motion/react\";\n\n// Credit:\n// https://www.reactbits.dev/text-animations/circular-text\n\ninterface CircularTextProps {\n\ttext: string;\n\tspinDuration?: number;\n\tonHover?: \"slowDown\" | \"speedUp\" | \"pause\" | \"goBonkers\";\n\tclassName?: string;\n}\n\nconst getRotationTransition = (\n\tduration: number,\n\tfrom: number,\n\tloop: boolean = true\n) => ({\n\tfrom: from,\n\tto: from + 360,\n\tease: \"linear\",\n\tduration: duration,\n\ttype: \"tween\",\n\trepeat: loop ? Infinity : 0,\n});\n\nconst getTransition = (duration: number, from: number) => ({\n\trotate: getRotationTransition(duration, from),\n\tscale: {\n\t\ttype: \"spring\",\n\t\tdamping: 20,\n\t\tstiffness: 300,\n\t},\n});\n\nconst CircularText: React.FC<CircularTextProps> = ({\n\ttext,\n\tspinDuration = 20,\n\tonHover = \"speedUp\",\n\tclassName = \"\",\n}) => {\n\tconst letters = Array.from(text);\n\tconst controls = useAnimation();\n\tconst [currentRotation, setCurrentRotation] = useState(0);\n\n\tuseEffect(() => {\n\t\tcontrols.start({\n\t\t\trotate: currentRotation + 360,\n\t\t\tscale: 1,\n\t\t\ttransition: getTransition(spinDuration, currentRotation),\n\t\t});\n\t}, [spinDuration, controls, onHover, text]);\n\n\tconst handleHoverStart = () => {\n\t\tif (!onHover) return;\n\t\tswitch (onHover) {\n\t\t\tcase \"slowDown\":\n\t\t\t\tcontrols.start({\n\t\t\t\t\trotate: currentRotation + 360,\n\t\t\t\t\tscale: 1,\n\t\t\t\t\ttransition: getTransition(spinDuration * 2, currentRotation),\n\t\t\t\t});\n\t\t\t\tbreak;\n\t\t\tcase \"speedUp\":\n\t\t\t\tcontrols.start({\n\t\t\t\t\trotate: currentRotation + 360,\n\t\t\t\t\tscale: 1,\n\t\t\t\t\ttransition: getTransition(spinDuration / 4, currentRotation),\n\t\t\t\t});\n\t\t\t\tbreak;\n\t\t\tcase \"pause\":\n\t\t\t\tcontrols.start({\n\t\t\t\t\trotate: currentRotation,\n\t\t\t\t\tscale: 1,\n\t\t\t\t\ttransition: {\n\t\t\t\t\t\trotate: { type: \"spring\", damping: 20, stiffness: 300 },\n\t\t\t\t\t\tscale: { type: \"spring\", damping: 20, stiffness: 300 },\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t\tbreak;\n\t\t\tcase \"goBonkers\":\n\t\t\t\tcontrols.start({\n\t\t\t\t\trotate: currentRotation + 360,\n\t\t\t\t\tscale: 0.8,\n\t\t\t\t\ttransition: getTransition(spinDuration / 20, currentRotation),\n\t\t\t\t});\n\t\t\t\tbreak;\n\t\t\tdefault:\n\t\t\t\tbreak;\n\t\t}\n\t};\n\n\tconst handleHoverEnd = () => {\n\t\tcontrols.start({\n\t\t\trotate: currentRotation + 360,\n\t\t\tscale: 1,\n\t\t\ttransition: getTransition(spinDuration, currentRotation),\n\t\t});\n\t};\n\n\treturn (\n\t\t<motion.div\n\t\t\tinitial={{ rotate: 0 }}\n\t\t\tclassName={`mx-auto rounded-full w-[200px] h-[200px] text-foreground font-black text-center cursor-pointer ${className}`}\n\t\t\tanimate={controls}\n\t\t\tonUpdate={(latest) => setCurrentRotation(Number(latest.rotate))}\n\t\t\tonMouseEnter={handleHoverStart}\n\t\t\tonMouseLeave={handleHoverEnd}\n\t\t>\n\t\t\t{letters.map((letter, i) => {\n\t\t\t\tconst rotation = (360 / letters.length) * i;\n\t\t\t\tconst factor = Number((Math.PI / letters.length).toFixed(0));\n\t\t\t\tconst x = factor * i;\n\t\t\t\tconst y = factor * i;\n\t\t\t\tconst transform = `rotateZ(${rotation}deg) translate3d(${x}px, ${y}px, 0)`;\n\n\t\t\t\treturn (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={i + \"circle-text\"}\n\t\t\t\t\t\tclassName=\"absolute inline-block inset-0 text-2xl transition-translate duration-500 ease-[cubic-bezier(0,0,0,1)]\"\n\t\t\t\t\t\tstyle={{ transform, WebkitTransform: transform }}\n\t\t\t\t\t>\n\t\t\t\t\t\t{letter}\n\t\t\t\t\t</span>\n\t\t\t\t);\n\t\t\t})}\n\t\t</motion.div>\n\t);\n};\n\nexport default CircularText;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/text-animations/circular-text",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "spinDuration",
+        "type": "number",
+        "default": "20",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onHover",
+        "type": "\"slowDown\" | \"speedUp\" | \"pause\" | \"goBonkers\"",
+        "default": "\"speedUp\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/circle-text"
+  }
+}

@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "great-ui-text-reveal",
+	title: "Text Reveal",
+	description: "A scroll-driven text mask reveal component that animates words and characters letter-by-letter as the viewport scrolls.",
+	interaction: "Scroll-driven character color shifts, character blur transitions, and watermark opacity fades.",
+	categories: ["Text Animations"],
+	tags: ["scroll-driven"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/text-reveal",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "paragraphs", type: "string[]", default: "[]" },
+		{ name: "className", type: "string", default: "\"\"" },
+		{ name: "paragraphClassName", type: "string", default: "\"\"" },
+		{ name: "containerRef", type: "React.RefObject<HTMLElement | null>" },
+		{ name: "highlightColor", type: "string", default: "\"rgb(255, 0, 255)\"" },
+		{ name: "lightWatermarkColor", type: "string", default: "\"rgb(200, 200, 200)\"" },
+		{ name: "darkWatermarkColor", type: "string", default: "\"rgb(64, 64, 64)\"" },
+		{ name: "lightTextColor", type: "string", default: "\"rgb(0, 0, 0)\"" },
+		{ name: "darkTextColor", type: "string", default: "\"rgb(255, 255, 255)\"" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

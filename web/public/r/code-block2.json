@@ -1,0 +1,69 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "code-block2",
+  "type": "registry:ui",
+  "title": "Code Block2",
+  "description": "Tabbed code block with a sliding underline on the active tab and a copy button that flips to a tick.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/code-block2.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/code-block2.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useLayoutEffect, useMemo, useRef, useState } from \"react\";\r\n\r\nimport { Check, Copy } from \"lucide-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\ninterface CodeTab {\r\n\tlabel: string;\r\n\tcode: string;\r\n\tlanguage?: string;\r\n}\r\n\r\ninterface CodeBlockProps {\r\n\ttabs?: CodeTab[];\r\n\tcode?: string;\r\n\tlanguage?: string;\r\n\tclassName?: string;\r\n}\r\n\r\nexport default function CodeBlock2({\r\n\ttabs,\r\n\tcode,\r\n\tlanguage = \"bash\",\r\n\tclassName,\r\n}: CodeBlockProps) {\r\n\tconst [activeTab, setActiveTab] = useState(0);\r\n\tconst [copied, setCopied] = useState(false);\r\n\tconst [direction, setDirection] = useState(0);\r\n\tconst preRef = useRef<HTMLPreElement>(null);\r\n\tconst [hasOverflow, setHasOverflow] = useState(false);\r\n\r\n\tconst codeContent = useMemo(() => {\r\n\t\tif (tabs && tabs.length > 0) {\r\n\t\t\treturn tabs;\r\n\t\t}\r\n\t\tif (code) {\r\n\t\t\treturn [{ label: language, code, language }];\r\n\t\t}\r\n\t\treturn [];\r\n\t}, [tabs, code, language]);\r\n\r\n\tconst currentCode = codeContent[activeTab]?.code || \"\";\r\n\r\n\t// Check overflow when tab changes or content updates\r\n\t// biome-ignore lint/correctness/useExhaustiveDependencies: activeTab is needed to recheck overflow when content changes\r\n\tuseLayoutEffect(() => {\r\n\t\tconst checkOverflow = () => {\r\n\t\t\tif (preRef.current) {\r\n\t\t\t\tconst hasHorizontalOverflow =\r\n\t\t\t\t\tpreRef.current.scrollWidth > preRef.current.clientWidth;\r\n\t\t\t\tsetHasOverflow(hasHorizontalOverflow);\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tcheckOverflow();\r\n\t\tconst resizeObserver = new ResizeObserver(checkOverflow);\r\n\t\tif (preRef.current) {\r\n\t\t\tresizeObserver.observe(preRef.current);\r\n\t\t}\r\n\r\n\t\treturn () => {\r\n\t\t\tresizeObserver.disconnect();\r\n\t\t};\r\n\t}, [activeTab]);\r\n\r\n\tconst handleCopy = async () => {\r\n\t\tawait navigator.clipboard.writeText(currentCode);\r\n\t\tsetCopied(true);\r\n\t\tsetTimeout(() => setCopied(false), 2000);\r\n\t};\r\n\r\n\tconst handleTabChange = (index: number) => {\r\n\t\tsetDirection(index > activeTab ? 1 : -1);\r\n\t\tsetActiveTab(index);\r\n\t};\r\n\r\n\tif (codeContent.length === 0) return null;\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"group relative overflow-hidden rounded-2xl border p-0.5\",\r\n\t\t\t\t\"border-zinc-950/10 dark:border-white/10\",\r\n\t\t\t\t\"bg-zinc-50 dark:bg-white/5\",\r\n\t\t\t\t\"text-zinc-950 dark:text-zinc-50\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t{/* Tab Bar */}\r\n\t\t\t{codeContent.length > 1 && (\r\n\t\t\t\t<div className=\"flex items-center relative pr-2.5\">\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\trole=\"tablist\"\r\n\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\"flex-1 min-w-0 text-xs leading-6 rounded-tl-xl gap-1 flex\",\r\n\t\t\t\t\t\t\t\"overflow-x-auto overflow-y-hidden\",\r\n\t\t\t\t\t\t\t\"scrollbar-thin scrollbar-thumb-rounded\",\r\n\t\t\t\t\t\t\t\"scrollbar-thumb-black/15 hover:scrollbar-thumb-black/20\",\r\n\t\t\t\t\t\t\t\"dark:scrollbar-thumb-white/20 dark:hover:scrollbar-thumb-white/25\"\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div className=\"relative flex gap-1\">\r\n\t\t\t\t\t\t\t{codeContent.map((tab, index) => (\r\n\t\t\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\t\t\tkey={`${tab.label}-${index}`}\r\n\t\t\t\t\t\t\t\t\ttype=\"button\"\r\n\t\t\t\t\t\t\t\t\trole=\"tab\"\r\n\t\t\t\t\t\t\t\t\taria-selected={activeTab === index}\r\n\t\t\t\t\t\t\t\t\tonClick={() => handleTabChange(index)}\r\n\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\"flex items-center relative gap-1.5 my-1 mb-1.5 outline-0\",\r\n\t\t\t\t\t\t\t\t\t\t\"whitespace-nowrap font-medium transition-colors duration-150\",\r\n\t\t\t\t\t\t\t\t\t\t\"px-1.5 rounded-lg\",\r\n\t\t\t\t\t\t\t\t\t\t\"first:ml-2.5\",\r\n\t\t\t\t\t\t\t\t\t\t\"hover:bg-zinc-200/50 dark:hover:bg-zinc-700/70\",\r\n\t\t\t\t\t\t\t\t\t\tactiveTab === index\r\n\t\t\t\t\t\t\t\t\t\t\t? \"text-zinc-950 dark:text-zinc-50\"\r\n\t\t\t\t\t\t\t\t\t\t\t: \"text-zinc-500 dark:text-zinc-400\"\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{tab.label}\r\n\t\t\t\t\t\t\t\t\t{activeTab === index && (\r\n\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\tlayoutId=\"activeTabIndicator\"\r\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-950 dark:bg-zinc-50 rounded-full\"\r\n\t\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\t\t\t\tstiffness: 500,\r\n\t\t\t\t\t\t\t\t\t\t\t\tdamping: 35,\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t</button>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t)}\r\n\r\n\t\t\t{/* Code Content */}\r\n\t\t\t<div className=\"relative overflow-hidden\">\r\n\t\t\t\t{/* Copy Button */}\r\n\t\t\t\t<motion.button\r\n\t\t\t\t\tonClick={handleCopy}\r\n\t\t\t\t\twhileTap={{ scale: 0.95 }}\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"absolute top-2 right-2 z-10\",\r\n\t\t\t\t\t\t\"flex items-center gap-1.5 px-2 py-1.5 text-xs font-medium rounded-lg\",\r\n\t\t\t\t\t\t\"text-zinc-500 dark:text-zinc-400\",\r\n\t\t\t\t\t\t\"bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xs\",\r\n\t\t\t\t\t\t\"border border-zinc-200/50 dark:border-zinc-800/50\",\r\n\t\t\t\t\t\t\"opacity-70 group-hover:opacity-100\",\r\n\t\t\t\t\t\t\"hover:bg-zinc-200/50 dark:hover:bg-zinc-700/70\",\r\n\t\t\t\t\t\t\"hover:text-zinc-950 dark:hover:text-zinc-50\",\r\n\t\t\t\t\t\t\"transition-all duration-150\",\r\n\t\t\t\t\t\t\"focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/50\"\r\n\t\t\t\t\t)}\r\n\t\t\t\t\taria-label=\"Copy code\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<span className=\"relative size-3.5\">\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\tscale: copied ? 0 : 1,\r\n\t\t\t\t\t\t\t\topacity: copied ? 0 : 1,\r\n\t\t\t\t\t\t\t\trotate: copied ? 90 : 0,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\t\t\tclassName=\"absolute inset-0\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<Copy className=\"size-full\" />\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tinitial={false}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\tscale: copied ? 1 : 0,\r\n\t\t\t\t\t\t\t\topacity: copied ? 1 : 0,\r\n\t\t\t\t\t\t\t\trotate: copied ? 0 : -90,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\t\t\tclassName=\"absolute inset-0\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<Check className=\"size-full\" />\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t</span>\r\n\t\t\t\t\t<span>{copied ? \"Copied\" : \"Copy\"}</span>\r\n\t\t\t\t</motion.button>\r\n\t\t\t\t<pre\r\n\t\t\t\t\tref={preRef}\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"p-4 text-sm leading-relaxed m-0\",\r\n\t\t\t\t\t\t\"bg-white dark:bg-zinc-950/50\",\r\n\t\t\t\t\t\tcodeContent.length > 1 ? \"rounded-b-2xl\" : \"rounded-2xl\",\r\n\t\t\t\t\t\thasOverflow ? \"overflow-x-auto\" : \"overflow-x-hidden\",\r\n\t\t\t\t\t\thasOverflow && \"scrollbar-thin scrollbar-thumb-rounded\",\r\n\t\t\t\t\t\thasOverflow &&\r\n\t\t\t\t\t\t\t\"scrollbar-thumb-black/15 hover:scrollbar-thumb-black/20\",\r\n\t\t\t\t\t\thasOverflow &&\r\n\t\t\t\t\t\t\t\"dark:scrollbar-thumb-white/20 dark:hover:scrollbar-thumb-white/25\",\r\n\t\t\t\t\t\thasOverflow && \"[&::-webkit-scrollbar]:h-2\",\r\n\t\t\t\t\t\thasOverflow && \"[&::-webkit-scrollbar-thumb]:rounded-full\",\r\n\t\t\t\t\t\thasOverflow && \"[&::-webkit-scrollbar-thumb]:bg-black/15\",\r\n\t\t\t\t\t\thasOverflow &&\r\n\t\t\t\t\t\t\t\"dark:[&::-webkit-scrollbar-thumb]:bg-white/20\",\r\n\t\t\t\t\t\thasOverflow &&\r\n\t\t\t\t\t\t\t\"[&::-webkit-scrollbar-thumb:hover]:bg-black/20\",\r\n\t\t\t\t\t\thasOverflow &&\r\n\t\t\t\t\t\t\t\"dark:[&::-webkit-scrollbar-thumb:hover]:bg-white/25\",\r\n\t\t\t\t\t\thasOverflow && \"[&::-webkit-scrollbar-track]:bg-transparent\"\r\n\t\t\t\t\t)}\r\n\t\t\t\t>\r\n\t\t\t\t\t<AnimatePresence mode=\"wait\" initial={false} custom={direction}>\r\n\t\t\t\t\t\t<motion.code\r\n\t\t\t\t\t\t\tkey={activeTab}\r\n\t\t\t\t\t\t\tcustom={direction}\r\n\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\tx: direction > 0 ? 20 : -20,\r\n\t\t\t\t\t\t\t\tfilter: \"blur(4px)\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\tx: 0,\r\n\t\t\t\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\texit={{\r\n\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\tx: direction > 0 ? -20 : 20,\r\n\t\t\t\t\t\t\t\tfilter: \"blur(4px)\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\tduration: 0.15,\r\n\t\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tclassName=\"font-mono text-zinc-950 dark:text-zinc-50 block whitespace-pre\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{currentCode}\r\n\t\t\t\t\t\t</motion.code>\r\n\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t</pre>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "responsive"
+    ],
+    "interaction": "Clicking a tab slides the underline across to it while the old snippet blurs and slides out sideways and the new one blurs in from the opposite edge; the copy icon rotates into a checkmark for two seconds after you click it.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "tabs",
+        "type": "CodeTab[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "code",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "default": "\"bash\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/code-block2"
+  }
+}

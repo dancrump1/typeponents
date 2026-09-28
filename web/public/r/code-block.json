@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "code-block",
+  "type": "registry:ui",
+  "title": "Code Block",
+  "description": "Code Block",
+  "dependencies": [
+    "@tabler/icons-react",
+    "react-syntax-highlighter"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/code-block.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/code-block.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { IconCheck, IconCopy } from \"@tabler/icons-react\";\r\nimport { Prism as SyntaxHighlighter } from \"react-syntax-highlighter\";\r\nimport { atomDark } from \"react-syntax-highlighter/dist/cjs/styles/prism\";\r\n\r\ntype CodeBlockProps = {\r\n\tlanguage: string;\r\n\tfilename: string;\r\n\thighlightLines?: number[];\r\n} & (\r\n\t\t| {\r\n\t\t\tcode: string;\r\n\t\t\ttabs?: never;\r\n\t\t}\r\n\t\t| {\r\n\t\t\tcode?: never;\r\n\t\t\ttabs: Array<{\r\n\t\t\t\tname: string;\r\n\t\t\t\tcode: string;\r\n\t\t\t\tlanguage?: string;\r\n\t\t\t\thighlightLines?: number[];\r\n\t\t\t}>;\r\n\t\t}\r\n\t);\r\n\r\nconst CodeBlock = ({\r\n\tlanguage = \"typescript\",\r\n\tfilename,\r\n\tcode,\r\n\thighlightLines = [],\r\n\ttabs = [],\r\n}: CodeBlockProps) => {\r\n\tconst [copied, setCopied] = React.useState(false);\r\n\tconst [activeTab, setActiveTab] = React.useState(0);\r\n\r\n\tconst tabsExist = tabs.length > 0;\r\n\r\n\tconst copyToClipboard = async () => {\r\n\t\tconst textToCopy = tabsExist ? tabs[activeTab].code : code;\r\n\t\tif (textToCopy) {\r\n\t\t\tawait navigator.clipboard.writeText(textToCopy);\r\n\t\t\tsetCopied(true);\r\n\t\t\tsetTimeout(() => setCopied(false), 2000);\r\n\t\t}\r\n\t};\r\n\r\n\tconst activeCode = tabsExist ? tabs[activeTab].code : code;\r\n\tconst activeLanguage = tabsExist\r\n\t\t? tabs[activeTab].language || language\r\n\t\t: language;\r\n\tconst activeHighlightLines = tabsExist\r\n\t\t? tabs[activeTab].highlightLines || []\r\n\t\t: highlightLines;\r\n\r\n\treturn (\r\n\t\t<div className=\"relative w-full rounded-lg bg-slate-900 p-4 font-mono text-sm\">\r\n\t\t\t<div className=\"flex flex-col gap-2\">\r\n\t\t\t\t<div className=\"flex items-center justify-between gap-2\">\r\n\t\t\t\t\t{tabsExist ? (\r\n\t\t\t\t\t\t<div className=\"flex overflow-x-auto\">\r\n\t\t\t\t\t\t\t{tabs.map((tab, index) => (\r\n\t\t\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\t\t\tkey={index + \"code-block\"}\r\n\t\t\t\t\t\t\t\t\tonClick={() => setActiveTab(index)}\r\n\t\t\t\t\t\t\t\t\tclassName={`px-3 py-2! text-xs transition-colors font-sans rounded-sm ${activeTab === index\r\n\t\t\t\t\t\t\t\t\t\t\t? \"bg-slate-800 text-white\"\r\n\t\t\t\t\t\t\t\t\t\t\t: \"text-slate-400 hover:text-white\"\r\n\t\t\t\t\t\t\t\t\t\t}`}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{tab.name}\r\n\t\t\t\t\t\t\t\t</button>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t) : (\r\n\t\t\t\t\t\tfilename && (\r\n\t\t\t\t\t\t\t<div className=\"text-xs text-foreground\">{filename}</div>\r\n\t\t\t\t\t\t)\r\n\t\t\t\t\t)}\r\n\t\t\t\t\t<button\r\n\t\t\t\t\t\tonClick={copyToClipboard}\r\n\t\t\t\t\t\tclassName=\"flex shrink-0 items-center gap-1 text-xs text-slate-400 hover:text-white transition-colors font-sans\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{copied ? <IconCheck size={14} /> : <IconCopy size={14} />}\r\n\t\t\t\t\t</button>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<SyntaxHighlighter\r\n\t\t\t\tlanguage={activeLanguage}\r\n\t\t\t\tstyle={atomDark}\r\n\t\t\t\tcustomStyle={{\r\n\t\t\t\t\tmargin: 0,\r\n\t\t\t\t\tpadding: 0,\r\n\t\t\t\t\tbackground: \"transparent\",\r\n\t\t\t\t\tfontSize: \"0.875rem\", // text-sm equivalent\r\n\t\t\t\t}}\r\n\t\t\t\twrapLines={true}\r\n\t\t\t\tshowLineNumbers={true}\r\n\t\t\t\tlineProps={(lineNumber) => ({\r\n\t\t\t\t\tstyle: {\r\n\t\t\t\t\t\tbackgroundColor: activeHighlightLines.includes(lineNumber)\r\n\t\t\t\t\t\t\t? \"rgba(255,255,255,0.1)\"\r\n\t\t\t\t\t\t\t: \"transparent\",\r\n\t\t\t\t\t\tdisplay: \"block\",\r\n\t\t\t\t\t\twidth: \"100%\",\r\n\t\t\t\t\t},\r\n\t\t\t\t})}\r\n\t\t\t\tPreTag=\"div\"\r\n\t\t\t>\r\n\t\t\t\t{String(activeCode)}\r\n\t\t\t</SyntaxHighlighter>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default CodeBlock;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "filename",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "code",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "language",
+        "type": "string",
+        "default": "\"typescript\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "highlightLines",
+        "type": "number[]",
+        "default": "[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "tabs",
+        "type": "{ name: string; code: string; language?: string; highligh…",
+        "default": "[]",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/code-block"
+  }
+}

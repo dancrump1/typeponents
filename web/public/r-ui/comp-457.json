@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-457",
+  "type": "registry:component",
+  "title": "Comp 457",
+  "description": "Comp 457",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-457.tsx",
+      "content": "import {\r\n\tPagination,\r\n\tPaginationContent,\r\n\tPaginationItem,\r\n\tPaginationLink,\r\n} from \"@/components/ui/pagination\";\r\nimport { ChevronLeftIcon, ChevronRightIcon } from \"lucide-react\";\r\n\r\ntype PaginationProps = {\r\n\tcurrentPage: number;\r\n\ttotalPages: number;\r\n};\r\n\r\nexport default function Component({\r\n\tcurrentPage,\r\n\ttotalPages,\r\n}: PaginationProps) {\r\n\treturn (\r\n\t\t<Pagination>\r\n\t\t\t<PaginationContent className=\"gap-3\">\r\n\t\t\t\t<PaginationItem>\r\n\t\t\t\t\t<PaginationLink\r\n\t\t\t\t\t\tclassName=\"aria-disabled:pointer-events-none aria-disabled:opacity-50\"\r\n\t\t\t\t\t\thref={\r\n\t\t\t\t\t\t\tcurrentPage === 1 ? undefined : `#/page/${currentPage - 1}`\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\taria-label=\"Go to previous page\"\r\n\t\t\t\t\t\taria-disabled={currentPage === 1 ? true : undefined}\r\n\t\t\t\t\t\trole={currentPage === 1 ? \"link\" : undefined}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<ChevronLeftIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t</PaginationLink>\r\n\t\t\t\t</PaginationItem>\r\n\t\t\t\t<PaginationItem>\r\n\t\t\t\t\t<p className=\"text-muted-foreground text-sm\" aria-live=\"polite\">\r\n\t\t\t\t\t\tPage <span className=\"text-foreground\">{currentPage}</span> of{\" \"}\r\n\t\t\t\t\t\t<span className=\"text-foreground\">{totalPages}</span>\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</PaginationItem>\r\n\t\t\t\t<PaginationItem>\r\n\t\t\t\t\t<PaginationLink\r\n\t\t\t\t\t\tclassName=\"aria-disabled:pointer-events-none aria-disabled:opacity-50\"\r\n\t\t\t\t\t\thref={\r\n\t\t\t\t\t\t\tcurrentPage === totalPages\r\n\t\t\t\t\t\t\t\t? undefined\r\n\t\t\t\t\t\t\t\t: `#/page/${currentPage + 1}`\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\taria-label=\"Go to next page\"\r\n\t\t\t\t\t\taria-disabled={currentPage === totalPages ? true : undefined}\r\n\t\t\t\t\t\trole={currentPage === totalPages ? \"link\" : undefined}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<ChevronRightIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t\t</PaginationLink>\r\n\t\t\t\t</PaginationItem>\r\n\t\t\t</PaginationContent>\r\n\t\t</Pagination>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

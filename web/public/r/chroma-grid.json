@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "chroma-grid",
+  "type": "registry:ui",
+  "title": "Chroma Grid",
+  "description": "Grid of profile cards held in greyscale, with a circular window of full colour that follows the pointer.",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/chroma-grid.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/chroma-grid.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\nimport { gsap } from \"gsap\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/components/chroma-grid\r\n\r\nexport interface ChromaItem {\r\n\timage: string;\r\n\ttitle: string;\r\n\tsubtitle: string;\r\n\thandle?: string;\r\n\tlocation?: string;\r\n\tborderColor?: string;\r\n\tgradient?: string;\r\n\turl?: string;\r\n}\r\n\r\nexport interface ChromaGridProps {\r\n\titems?: ChromaItem[];\r\n\tclassName?: string;\r\n\tradius?: number;\r\n\tdamping?: number;\r\n\tfadeOut?: number;\r\n\tease?: string;\r\n}\r\n\r\ntype SetterFn = (v: number | string) => void;\r\n\r\nconst ChromaGrid: React.FC<ChromaGridProps> = ({\r\n\titems,\r\n\tclassName = \"\",\r\n\tradius = 300,\r\n\tdamping = 0.45,\r\n\tfadeOut = 0.6,\r\n\tease = \"power3.out\",\r\n}) => {\r\n\tconst rootRef = useRef<HTMLDivElement>(null);\r\n\tconst fadeRef = useRef<HTMLDivElement>(null);\r\n\tconst setX = useRef<SetterFn | null>(null);\r\n\tconst setY = useRef<SetterFn | null>(null);\r\n\tconst pos = useRef({ x: 0, y: 0 });\r\n\r\n\tconst demo: ChromaItem[] = [\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=8\",\r\n\t\t\ttitle: \"Alex Rivera\",\r\n\t\t\tsubtitle: \"Full Stack Developer\",\r\n\t\t\thandle: \"@alexrivera\",\r\n\t\t\tborderColor: \"#4F46E5\",\r\n\t\t\tgradient: \"linear-gradient(145deg,#4F46E5,#000)\",\r\n\t\t\turl: \"https://github.com/\",\r\n\t\t},\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=11\",\r\n\t\t\ttitle: \"Jordan Chen\",\r\n\t\t\tsubtitle: \"DevOps Engineer\",\r\n\t\t\thandle: \"@jordanchen\",\r\n\t\t\tborderColor: \"#10B981\",\r\n\t\t\tgradient: \"linear-gradient(210deg,#10B981,#000)\",\r\n\t\t\turl: \"https://linkedin.com/in/\",\r\n\t\t},\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=3\",\r\n\t\t\ttitle: \"Morgan Blake\",\r\n\t\t\tsubtitle: \"UI/UX Designer\",\r\n\t\t\thandle: \"@morganblake\",\r\n\t\t\tborderColor: \"#F59E0B\",\r\n\t\t\tgradient: \"linear-gradient(165deg,#F59E0B,#000)\",\r\n\t\t\turl: \"https://dribbble.com/\",\r\n\t\t},\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=16\",\r\n\t\t\ttitle: \"Casey Park\",\r\n\t\t\tsubtitle: \"Data Scientist\",\r\n\t\t\thandle: \"@caseypark\",\r\n\t\t\tborderColor: \"#EF4444\",\r\n\t\t\tgradient: \"linear-gradient(195deg,#EF4444,#000)\",\r\n\t\t\turl: \"https://kaggle.com/\",\r\n\t\t},\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=25\",\r\n\t\t\ttitle: \"Sam Kim\",\r\n\t\t\tsubtitle: \"Mobile Developer\",\r\n\t\t\thandle: \"@thesamkim\",\r\n\t\t\tborderColor: \"#8B5CF6\",\r\n\t\t\tgradient: \"linear-gradient(225deg,#8B5CF6,#000)\",\r\n\t\t\turl: \"https://github.com/\",\r\n\t\t},\r\n\t\t{\r\n\t\t\timage: \"https://i.pravatar.cc/300?img=60\",\r\n\t\t\ttitle: \"Tyler Rodriguez\",\r\n\t\t\tsubtitle: \"Cloud Architect\",\r\n\t\t\thandle: \"@tylerrod\",\r\n\t\t\tborderColor: \"#06B6D4\",\r\n\t\t\tgradient: \"linear-gradient(135deg,#06B6D4,#000)\",\r\n\t\t\turl: \"https://aws.amazon.com/\",\r\n\t\t},\r\n\t];\r\n\r\n\tconst data = items?.length ? items : demo;\r\n\r\n\tuseEffect(() => {\r\n\t\tconst el = rootRef.current;\r\n\t\tif (!el) return;\r\n\t\tsetX.current = gsap.quickSetter(el, \"--x\", \"px\") as SetterFn;\r\n\t\tsetY.current = gsap.quickSetter(el, \"--y\", \"px\") as SetterFn;\r\n\t\tconst { width, height } = el.getBoundingClientRect();\r\n\t\tpos.current = { x: width / 2, y: height / 2 };\r\n\t\tsetX.current(pos.current.x);\r\n\t\tsetY.current(pos.current.y);\r\n\t}, []);\r\n\r\n\tconst moveTo = (x: number, y: number) => {\r\n\t\tgsap.to(pos.current, {\r\n\t\t\tx,\r\n\t\t\ty,\r\n\t\t\tduration: damping,\r\n\t\t\tease,\r\n\t\t\tonUpdate: () => {\r\n\t\t\t\tsetX.current?.(pos.current.x);\r\n\t\t\t\tsetY.current?.(pos.current.y);\r\n\t\t\t},\r\n\t\t\toverwrite: true,\r\n\t\t});\r\n\t};\r\n\r\n\tconst handleMove = (e: React.PointerEvent) => {\r\n\t\tconst r = rootRef.current!.getBoundingClientRect();\r\n\t\tmoveTo(e.clientX - r.left, e.clientY - r.top);\r\n\t\tgsap.to(fadeRef.current, { opacity: 0, duration: 0.25, overwrite: true });\r\n\t};\r\n\r\n\tconst handleLeave = () => {\r\n\t\tgsap.to(fadeRef.current, {\r\n\t\t\topacity: 1,\r\n\t\t\tduration: fadeOut,\r\n\t\t\toverwrite: true,\r\n\t\t});\r\n\t};\r\n\r\n\tconst handleCardClick = (url?: string) => {\r\n\t\tif (url) window.open(url, \"_blank\", \"noopener,noreferrer\");\r\n\t};\r\n\r\n\tconst handleCardMove: React.MouseEventHandler<HTMLElement> = (e) => {\r\n\t\tconst c = e.currentTarget as HTMLElement;\r\n\t\tconst rect = c.getBoundingClientRect();\r\n\t\tc.style.setProperty(\"--mouse-x\", `${e.clientX - rect.left}px`);\r\n\t\tc.style.setProperty(\"--mouse-y\", `${e.clientY - rect.top}px`);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={rootRef}\r\n\t\t\tonPointerMove={handleMove}\r\n\t\t\tonPointerLeave={handleLeave}\r\n\t\t\tclassName={`relative w-full h-full flex flex-wrap justify-center items-start gap-3 ${className}`}\r\n\t\t\tstyle={\r\n\t\t\t\t{\r\n\t\t\t\t\t\"--r\": `${radius}px`,\r\n\t\t\t\t\t\"--x\": \"50%\",\r\n\t\t\t\t\t\"--y\": \"50%\",\r\n\t\t\t\t} as React.CSSProperties\r\n\t\t\t}\r\n\t\t>\r\n\t\t\t{data.map((c, i) => (\r\n\t\t\t\t<article\r\n\t\t\t\t\tkey={i + \"chroma-grid\"}\r\n\t\t\t\t\tonMouseMove={handleCardMove}\r\n\t\t\t\t\tonClick={() => handleCardClick(c.url)}\r\n\t\t\t\t\tclassName=\"group relative flex flex-col w-[300px] rounded-[20px] overflow-hidden border-2 border-transparent transition-colors duration-300 cursor-pointer bg-background\"\r\n\t\t\t\t\tstyle={\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\t\"--card-border\": c.borderColor || \"transparent\",\r\n\t\t\t\t\t\t\tbackground: c.gradient,\r\n\t\t\t\t\t\t\t\"--spotlight-color\": \"rgba(255,255,255,0.3)\",\r\n\t\t\t\t\t\t} as React.CSSProperties\r\n\t\t\t\t\t}\r\n\t\t\t\t>\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName=\"absolute inset-0 pointer-events-none transition-opacity duration-500 z-20 opacity-0 group-hover:opacity-100\"\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackground:\r\n\t\t\t\t\t\t\t\t\"radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 70%)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<div className=\"relative z-10 flex-1 p-[10px] box-border\">\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tsrc={c.image}\r\n\t\t\t\t\t\t\talt={c.title}\r\n\t\t\t\t\t\t\tloading=\"lazy\"\r\n\t\t\t\t\t\t\tclassName=\"w-full h-full object-cover rounded-[10px]\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<footer className=\"relative z-10 p-3 text-foreground font-sans grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 bg-background\">\r\n\t\t\t\t\t\t<h3 className=\"m-0 text-[1.05rem] font-semibold text-foreground\">\r\n\t\t\t\t\t\t\t{c.title}\r\n\t\t\t\t\t\t</h3>\r\n\t\t\t\t\t\t{c.handle && (\r\n\t\t\t\t\t\t\t<span className=\"text-[0.95rem] opacity-80 text-right text-foreground\">\r\n\t\t\t\t\t\t\t\t{c.handle}\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t<p className=\"m-0 text-[0.85rem] opacity-85 text-foreground\">\r\n\t\t\t\t\t\t\t{c.subtitle}\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t{c.location && (\r\n\t\t\t\t\t\t\t<span className=\"text-[0.85rem] opacity-85 text-right text-foreground\">\r\n\t\t\t\t\t\t\t\t{c.location}\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</footer>\r\n\t\t\t\t</article>\r\n\t\t\t))}\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"absolute inset-0 pointer-events-none z-30\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tbackdropFilter: \"grayscale(1) brightness(0.78)\",\r\n\t\t\t\t\tWebkitBackdropFilter: \"grayscale(1) brightness(0.78)\",\r\n\t\t\t\t\tbackground: \"rgba(0,0,0,0.001)\",\r\n\t\t\t\t\tmaskImage:\r\n\t\t\t\t\t\t\"radial-gradient(circle var(--r) at var(--x) var(--y),transparent 0%,transparent 15%,rgba(0,0,0,0.10) 30%,rgba(0,0,0,0.22)45%,rgba(0,0,0,0.35)60%,rgba(0,0,0,0.50)75%,rgba(0,0,0,0.68)88%,white 100%)\",\r\n\t\t\t\t\tWebkitMaskImage:\r\n\t\t\t\t\t\t\"radial-gradient(circle var(--r) at var(--x) var,--y),transparent 0%,transparent 15%,rgba(0,0,0,0.10) 30%,rgba(0,0,0,0.22)45%,rgba(0,0,0,0.35)60%,rgba(0,0,0,0.50)75%,rgba(0,0,0,0.68)88%,white 100%)\",\r\n\t\t\t\t}}\r\n\t\t\t/>\r\n\t\t\t<div\r\n\t\t\t\tref={fadeRef}\r\n\t\t\t\tclassName=\"absolute inset-0 pointer-events-none transition-opacity duration-250 z-40\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tbackdropFilter: \"grayscale(1) brightness(0.78)\",\r\n\t\t\t\t\tWebkitBackdropFilter: \"grayscale(1) brightness(0.78)\",\r\n\t\t\t\t\tbackground: \"rgba(0,0,0,0.001)\",\r\n\t\t\t\t\tmaskImage:\r\n\t\t\t\t\t\t\"radial-gradient(circle var(--r) at var(--x) var(--y),white 0%,white 15%,rgba(255,255,255,0.90)30%,rgba(255,255,255,0.78)45%,rgba(255,255,255,0.65)60%,rgba(255,255,255,0.50)75%,rgba(255,255,255,0.32)88%,transparent 100%)\",\r\n\t\t\t\t\tWebkitMaskImage:\r\n\t\t\t\t\t\t\"radial-gradient(circle var(--r) at var(--x) var,--y),white 0%,white 15%,rgba(255,255,255,0.90)30%,rgba(255,255,255,0.78)45%,rgba(255,255,255,0.65)60%,rgba(255,255,255,0.50)75%,rgba(255,255,255,0.32)88%,transparent 100%)\",\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t}}\r\n\t\t\t/>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ChromaGrid;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "Moving across the grid drags a soft round patch of colour and brightness with it, lagging slightly behind the pointer; the card underneath also picks up a glow where the pointer sits, and the whole grid drains back to grey when you leave.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/components/chroma-grid",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "ChromaItem[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "default": "300",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "damping",
+        "type": "number",
+        "default": "0.45",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fadeOut",
+        "type": "number",
+        "default": "0.6",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "ease",
+        "type": "string",
+        "default": "\"power3.out\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/chroma-grid"
+  }
+}

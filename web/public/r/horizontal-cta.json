@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "horizontal-cta",
+  "type": "registry:ui",
+  "title": "Horizontal CTA",
+  "description": "Horizontal CTA",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/horizontal-cta.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/horizontal-cta.tsx",
+      "content": "import React from \"react\";\n\nexport default function CardCTA() {\n\treturn (\n\t\t<>\n\t\t\t{/*<!-- Component: Horizontal card--> */}\n\t\t\t<div className=\"flex flex-col overflow-hidden bg-background rounded shadow-md text-slate-500 shadow-slate-200 sm:flex-row\">\n\t\t\t\t{/*  <!-- Image --> */}\n\t\t\t\t<figure className=\"flex-1\">\n\t\t\t\t\t<img\n\t\t\t\t\t\tsrc=\"https://picsum.photos/id/118/800/600\"\n\t\t\t\t\t\talt=\"card image\"\n\t\t\t\t\t\tclassName=\"object-cover min-h-full aspect-auto\"\n\t\t\t\t\t/>\n\t\t\t\t</figure>\n\t\t\t\t{/*  <!-- Body--> */}\n\t\t\t\t<div className=\"flex-1 p-6 sm:mx-6 sm:px-0\">\n\t\t\t\t\t<header className=\"flex gap-4 mb-4\">\n\t\t\t\t\t\t<a\n\t\t\t\t\t\t\thref=\"#\"\n\t\t\t\t\t\t\tclassName=\"relative inline-flex items-center justify-center w-12 h-12 text-foreground rounded-full\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc=\"https://i.pravatar.cc/48?img=24\"\n\t\t\t\t\t\t\t\talt=\"user name\"\n\t\t\t\t\t\t\t\ttitle=\"user name\"\n\t\t\t\t\t\t\t\twidth=\"48\"\n\t\t\t\t\t\t\t\theight=\"48\"\n\t\t\t\t\t\t\t\tclassName=\"max-w-full rounded-full\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</a>\n\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t<h3 className=\"text-xl font-medium text-slate-700\">\n\t\t\t\t\t\t\t\tA day in the sun\n\t\t\t\t\t\t\t</h3>\n\t\t\t\t\t\t\t<p className=\"text-sm text-slate-400\">\n\t\t\t\t\t\t\t\t{\" \"}\n\t\t\t\t\t\t\t\tBy Sue, jun 3 2023\n\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</header>\n\t\t\t\t\t<p>\n\t\t\t\t\t\tAfter a walk through history, there is nothing left to do but\n\t\t\t\t\t\tadmire the hypnotizing landscapes that exist in every\n\t\t\t\t\t\tdirection. From vast deserts to rainbow mountains, and\n\t\t\t\t\t\teverything in between.\n\t\t\t\t\t</p>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t{/*<!-- End Horizontal card--> */}\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/horizontal-cta"
+  }
+}

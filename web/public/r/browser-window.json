@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "browser-window",
+  "type": "registry:ui",
+  "title": "Browser Window",
+  "description": "Browser chrome frame with traffic-light buttons, an optional address bar and sidebar, wrapping any content as a screenshot-style mockup.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/browser-window.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/browser-window.tsx",
+      "content": "import type React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\n\ninterface SidebarItem {\n\ticon?: React.ReactNode;\n\tlabel: string;\n\tactive?: boolean;\n\tbadge?: string | number;\n}\n\ninterface WindowControlsProps {\n\tvariant?: \"macos\" | \"windows\" | \"chrome\" | \"safari\";\n\theaderStyle?: \"minimal\" | \"full\";\n}\n\ninterface AddressBarProps {\n\turl?: string;\n\tsecure?: boolean;\n\tvariant?: \"chrome\" | \"safari\";\n\tclassName?: string;\n}\n\ninterface SidebarContentProps {\n\titems?: SidebarItem[];\n\tvariant?: \"navigation\" | \"bookmarks\" | \"history\" | \"extensions\";\n\tclassName?: string;\n}\n\ninterface BrowserWindowProps {\n\tchildren?: React.ReactNode;\n\tclassName?: string;\n\tsize?: \"sm\" | \"md\" | \"lg\" | \"xl\";\n\tshowSidebar?: boolean;\n\tsidebarPosition?: \"left\" | \"right\" | \"top\" | \"bottom\";\n\theaderStyle?: \"minimal\" | \"full\";\n\tvariant?: \"chrome\" | \"safari\" | \"generic\";\n\ttheme?: \"light\" | \"dark\" | \"auto\";\n\turl?: string;\n\tsidebarItems?: Array<{\n\t\ticon?: React.ReactNode;\n\t\tlabel: string;\n\t\tactive?: boolean;\n\t\tbadge?: string | number;\n\t}>;\n}\n\nfunction WindowControls({\n\tvariant = \"macos\",\n\theaderStyle = \"full\",\n}: WindowControlsProps) {\n\tconst sizeClasses = \"size-2\";\n\n\tif (variant === \"macos\" || variant === \"safari\") {\n\t\tconst dotColors =\n\t\t\theaderStyle === \"minimal\"\n\t\t\t\t? {\n\t\t\t\t\tred: \"bg-muted border  border-foreground/20\",\n\t\t\t\t\tyellow: \"bg-muted border border-foreground/20\",\n\t\t\t\t\tgreen: \"bg-muted border border-foreground/20\",\n\t\t\t\t}\n\t\t\t\t: {\n\t\t\t\t\tred: \"bg-red-500 hover:bg-red-600 border border-foreground/20\",\n\t\t\t\t\tyellow:\n\t\t\t\t\t\t\"bg-yellow-500 hover:bg-yellow-600 border border-foreground/20\",\n\t\t\t\t\tgreen: \"bg-green-500 hover:bg-green-600 border border-foreground/20 \",\n\t\t\t\t};\n\n\t\treturn (\n\t\t\t<div className=\"flex gap-2\">\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full\",\n\t\t\t\t\t\tdotColors.red,\n\t\t\t\t\t\t\"transition-colors cursor-pointer flex items-center justify-center group\"\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t{headerStyle !== \"minimal\" && (\n\t\t\t\t\t\t<div className=\"w-1.5 h-0.5 bg-red-900/60 opacity-0 group-hover:opacity-100 transition-opacity\"></div>\n\t\t\t\t\t)}\n\t\t\t\t</div>\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full\",\n\t\t\t\t\t\tdotColors.yellow,\n\t\t\t\t\t\t\"transition-colors cursor-pointer flex items-center justify-center group\"\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t{headerStyle !== \"minimal\" && (\n\t\t\t\t\t\t<div className=\"w-1.5 h-0.5 bg-yellow-900/60 opacity-0 group-hover:opacity-100 transition-opacity\"></div>\n\t\t\t\t\t)}\n\t\t\t\t</div>\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full\",\n\t\t\t\t\t\tdotColors.green,\n\t\t\t\t\t\t\"transition-colors cursor-pointer flex items-center justify-center group\"\n\t\t\t\t\t)}\n\t\t\t\t>\n\t\t\t\t\t{headerStyle !== \"minimal\" && (\n\t\t\t\t\t\t<div className=\"w-1 h-1 border border-green-900/60 opacity-0 group-hover:opacity-100 transition-opacity\"></div>\n\t\t\t\t\t)}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t);\n\t}\n\n\tif (variant === \"windows\") {\n\t\treturn (\n\t\t\t<div className=\"flex gap-1\">\n\t\t\t\t<div className=\"w-6 h-4 bg-muted/50 hover:bg-muted transition-colors cursor-pointer flex items-center justify-center\">\n\t\t\t\t\t<div className=\"w-2 h-0.5 bg-foreground/60\"></div>\n\t\t\t\t</div>\n\t\t\t\t<div className=\"w-6 h-4 bg-muted/50 hover:bg-muted transition-colors cursor-pointer flex items-center justify-center\">\n\t\t\t\t\t<div className=\"w-2 h-2 border border-foreground/60\"></div>\n\t\t\t\t</div>\n\t\t\t\t<div className=\"w-6 h-4 bg-red-500/80 hover:bg-red-500 transition-colors cursor-pointer flex items-center justify-center\">\n\t\t\t\t\t<div className=\"w-2 h-0.5 bg-white rotate-45\"></div>\n\t\t\t\t\t<div className=\"w-2 h-0.5 bg-white -rotate-45 absolute\"></div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t);\n\t}\n\n\tif (variant === \"chrome\") {\n\t\treturn (\n\t\t\t<div className=\"flex gap-1.5\">\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full bg-red-500 hover:bg-red-600 transition-colors cursor-pointer\"\n\t\t\t\t\t)}\n\t\t\t\t></div>\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full bg-yellow-500 hover:bg-yellow-600 transition-colors cursor-pointer\"\n\t\t\t\t\t)}\n\t\t\t\t></div>\n\t\t\t\t<div\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\tsizeClasses,\n\t\t\t\t\t\t\"rounded-full bg-green-500 hover:bg-green-600 transition-colors cursor-pointer\"\n\t\t\t\t\t)}\n\t\t\t\t></div>\n\t\t\t</div>\n\t\t);\n\t}\n\n\treturn (\n\t\t<div className=\"flex gap-1.5\">\n\t\t\t<div\n\t\t\t\tclassName={`${sizeClasses} rounded-full border border-foreground/20 bg-foreground/10`}\n\t\t\t></div>\n\t\t\t<div\n\t\t\t\tclassName={`${sizeClasses} rounded-full border border-foreground/20 bg-foreground/10`}\n\t\t\t></div>\n\t\t\t<div\n\t\t\t\tclassName={`${sizeClasses} rounded-full border border-foreground/20 bg-foreground/10`}\n\t\t\t></div>\n\t\t</div>\n\t);\n}\n\nfunction AddressBar({\n\turl = \"https://example.com\",\n\tsecure = true,\n\tvariant = \"chrome\",\n\tclassName = \"\",\n}: AddressBarProps) {\n\tconst variantStyles = {\n\t\tchrome:\n\t\t\t\"bg-muted/30 rounded-full border border-foreground/5 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.03)_inset] backdrop-blur-xs\",\n\t\tsafari:\n\t\t\t\"bg-muted/20 rounded-lg border border-foreground/5 shadow-[0px_1px_2px_0px_rgba(0,0,0,0.03)_inset] backdrop-blur-xs\",\n\t};\n\n\tconst iconColors = {\n\t\tchrome: \"text-muted-foreground/60\",\n\t\tsafari: \"text-muted-foreground/60\",\n\t};\n\n\treturn (\n\t\t<div className={`flex-1 flex justify-center ${className}`}>\n\t\t\t<div\n\t\t\t\tclassName={`${variantStyles[variant]} px-4 py-2 text-xs text-muted-foreground/70 min-w-[200px] max-w-md flex items-center gap-2 transition-colors`}\n\t\t\t>\n\t\t\t\t{secure && (\n\t\t\t\t\t<div className={`w-3 h-3 ${iconColors[variant]}`}>\n\t\t\t\t\t\t<svg viewBox=\"0 0 12 12\" fill=\"currentColor\">\n\t\t\t\t\t\t\t<title>Secure</title>\n\t\t\t\t\t\t\t<path d=\"M6 1a2.5 2.5 0 0 1 2.5 2.5V5h.5a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h.5V3.5A2.5 2.5 0 0 1 6 1z\" />\n\t\t\t\t\t\t</svg>\n\t\t\t\t\t</div>\n\t\t\t\t)}\n\t\t\t\t<span className=\"truncate\">{url}</span>\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n\nfunction SidebarContent({\n\titems = [\n\t\t{ label: \"Dashboard\", active: true },\n\t\t{ label: \"Analytics\", badge: \"3\" },\n\t\t{ label: \"Settings\" },\n\t\t{ label: \"Profile\" },\n\t],\n\tclassName = \"\",\n}: SidebarContentProps) {\n\treturn (\n\t\t<div className={`p-3 space-y-1 ${className}`}>\n\t\t\t{items.map((item, index) => (\n\t\t\t\t<div\n\t\t\t\t\tkey={`${item.label}-${index}`}\n\t\t\t\t\tclassName={`\n            flex items-center gap-2 px-2 py-1.5 rounded text-sm transition-colors cursor-pointer\n            ${item.active\n\t\t\t\t\t\t\t? \"bg-primary/5 text-primary border border-primary/5\"\n\t\t\t\t\t\t\t: \"text-muted-foreground hover:text-foreground hover:bg-muted/20\"\n\t\t\t\t\t\t}\n          `}\n\t\t\t\t>\n\t\t\t\t\t{item.icon && (\n\t\t\t\t\t\t<div className=\"w-4 h-4 shrink-0\">{item.icon}</div>\n\t\t\t\t\t)}\n\t\t\t\t\t<span className=\"flex-1 truncate\">{item.label}</span>\n\t\t\t\t\t{item.badge && (\n\t\t\t\t\t\t<div className=\"bg-primary/5 text-primary text-xs px-1.5 py-0.5 rounded-full min-w-[16px] text-center\">\n\t\t\t\t\t\t\t{item.badge}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t)}\n\t\t\t\t</div>\n\t\t\t))}\n\t\t</div>\n\t);\n}\n\nexport function BrowserWindow({\n\tchildren,\n\tclassName = \"\",\n\tsize = \"md\",\n\tshowSidebar = false,\n\tsidebarPosition = \"left\",\n\theaderStyle = \"minimal\",\n\tvariant = \"generic\",\n\ttheme = \"auto\",\n\turl,\n\tsidebarItems,\n}: BrowserWindowProps) {\n\tconst sizeClasses = {\n\t\tsm: \"h-64 max-w-sm\",\n\t\tmd: \"h-80 max-w-2xl\",\n\t\tlg: \"h-96 max-w-4xl\",\n\t\txl: \"h-128 max-w-6xl\",\n\t};\n\n\tconst sidebarSizes = {\n\t\tsm: \"w-32\",\n\t\tmd: \"w-48\",\n\t\tlg: \"w-56\",\n\t\txl: \"w-64\",\n\t};\n\n\tconst themeClasses =\n\t\ttheme === \"dark\"\n\t\t\t? \"bg-background border-border\"\n\t\t\t: theme === \"light\"\n\t\t\t\t? \"bg-background border-border\"\n\t\t\t\t: \"bg-background border-border\";\n\n\tconst getHeaderStyles = () => {\n\t\tconst baseStyles =\n\t\t\t\"h-11 border-b border-foreground/5 flex items-center px-4\";\n\n\t\tif (variant === \"chrome\") {\n\t\t\treturn `${baseStyles} bg-muted/10 overflow-hidden`;\n\t\t}\n\n\t\tif (variant === \"safari\") {\n\t\t\treturn `${baseStyles} bg-muted/10 overflow-hidden border-b border-border/30`;\n\t\t}\n\n\t\treturn `${baseStyles} bg-muted/20`;\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName={`\n        relative mask-b-from-50% rounded-2xl border shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)] dark:shadow-[0px_1px_1px_0px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.3)_inset,0px_0px_0px_1px_hsla(0,0%,0%,0.2)_inset,0px_0px_1px_0px_rgba(255,255,255,0.1)]\n        ${sizeClasses[size]} ${themeClasses} ${className} flex flex-col\n      `}\n\t\t>\n\t\t\t<div className={getHeaderStyles()}>\n\t\t\t\t<WindowControls\n\t\t\t\t\tvariant={variant === \"generic\" ? \"macos\" : variant}\n\t\t\t\t\theaderStyle={headerStyle}\n\t\t\t\t/>\n\n\t\t\t\t{headerStyle === \"full\" && (\n\t\t\t\t\t<AddressBar\n\t\t\t\t\t\turl={url}\n\t\t\t\t\t\tvariant={variant === \"generic\" ? \"chrome\" : variant}\n\t\t\t\t\t\tclassName=\"ml-4\"\n\t\t\t\t\t/>\n\t\t\t\t)}\n\t\t\t</div>\n\n\t\t\t{showSidebar && sidebarPosition === \"top\" && (\n\t\t\t\t<div className=\"border-b border-foreground/5 bg-muted/20 h-16\">\n\t\t\t\t\t<SidebarContent\n\t\t\t\t\t\titems={sidebarItems}\n\t\t\t\t\t\tvariant=\"navigation\"\n\t\t\t\t\t\tclassName=\"flex-row\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t)}\n\n\t\t\t<div className=\"flex flex-1 h-0\">\n\t\t\t\t{/* Left Sidebar */}\n\t\t\t\t{showSidebar && sidebarPosition === \"left\" && (\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName={`border-r border-foreground/5 bg-muted/20 ${sidebarSizes[size]} shrink-0 h-full`}\n\t\t\t\t\t>\n\t\t\t\t\t\t<SidebarContent items={sidebarItems} />\n\t\t\t\t\t</div>\n\t\t\t\t)}\n\n\t\t\t\t{/* Main Content Area */}\n\t\t\t\t<div className=\"flex-1 relative min-w-0 h-full\">\n\t\t\t\t\t{children || <div className=\"absolute inset-0\">{children}</div>}\n\t\t\t\t</div>\n\n\t\t\t\t{/* Right Sidebar */}\n\t\t\t\t{showSidebar && sidebarPosition === \"right\" && (\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName={`border-l border-foreground/5 bg-muted/20 ${sidebarSizes[size]} shrink-0 h-full`}\n\t\t\t\t\t>\n\t\t\t\t\t\t<SidebarContent items={sidebarItems} />\n\t\t\t\t\t</div>\n\t\t\t\t)}\n\t\t\t</div>\n\n\t\t\t{/* Bottom Sidebar */}\n\t\t\t{showSidebar && sidebarPosition === \"bottom\" && (\n\t\t\t\t<div className=\"border-t border-foreground/5 bg-muted/20 h-16\">\n\t\t\t\t\t<SidebarContent\n\t\t\t\t\t\titems={sidebarItems}\n\t\t\t\t\t\tvariant=\"navigation\"\n\t\t\t\t\t\tclassName=\"flex-row\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t)}\n\t\t</div>\n\t);\n}\n\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Static frame — it renders as-is on load; the only motion is the window buttons and sidebar rows tinting under the pointer.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "size",
+        "type": "\"sm\" | \"md\" | \"lg\" | \"xl\"",
+        "default": "\"md\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showSidebar",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "sidebarPosition",
+        "type": "\"left\" | \"right\" | \"top\" | \"bottom\"",
+        "default": "\"left\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "headerStyle",
+        "type": "\"minimal\" | \"full\"",
+        "default": "\"minimal\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variant",
+        "type": "\"chrome\" | \"safari\" | \"generic\"",
+        "default": "\"generic\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "theme",
+        "type": "\"light\" | \"dark\" | \"auto\"",
+        "default": "\"auto\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "url",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "sidebarItems",
+        "type": "{ icon?: React.ReactNode; label: string; active?: boolean…",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/browser-window"
+  }
+}

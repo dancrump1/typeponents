@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "following-headers",
+  "type": "registry:ui",
+  "title": "Following Headers",
+  "description": "Following Headers",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/following-headers.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/following-headers.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useRef, useState, type HTMLProps } from \"react\";\n\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport { ChevronRight } from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://cuicui.day/application-ui/table-of-contents\n\ntype Heading = {\n\tid: string;\n\ttext: string;\n\tlevel: number;\n\tindex: number;\n};\n\nconst TableOfContent = ({\n\tclassName,\n\tidOfParentContainer,\n\t...props\n}: {\n\treadonly props?: HTMLProps<HTMLDivElement>;\n\treadonly className?: string;\n\treadonly idOfParentContainer: string;\n}) => {\n\tconst [headings, setHeadings] = useState<Heading[]>([]);\n\tconst [activeIds, setActiveIds] = useState<string[]>([]);\n\tconst [activeTableOfContentIds, setActiveTableOfContentIds] = useState<\n\t\tstring[]\n\t>([]);\n\tconst [firstActiveHeading2, setFirstActiveHeading2] = useState<\n\t\tstring | null\n\t>(null);\n\tconst [lastActiveHeading2, setLastActiveHeading2] = useState<string | null>(\n\t\tnull\n\t);\n\tconst [bottomCoordinate, setBottomCoordinate] = useState<number>(0);\n\tconst [topCoordinate, setTopCoordinate] = useState<number>(0);\n\tconst refTableOfContentList = useRef<HTMLOListElement>(null);\n\tuseEffect(() => {\n\t\tif (activeTableOfContentIds.length > 0) {\n\t\t\tsetFirstActiveHeading2(activeTableOfContentIds[0]);\n\t\t\tsetLastActiveHeading2(\n\t\t\t\tactiveTableOfContentIds[activeTableOfContentIds.length - 1]\n\t\t\t);\n\t\t} else {\n\t\t\tsetFirstActiveHeading2(null);\n\t\t\tsetLastActiveHeading2(null);\n\t\t}\n\t}, [activeTableOfContentIds]);\n\n\tuseEffect(() => {\n\t\t// Get coordinates of the bottom of the last active heading and the top of the first active heading\n\t\tconst lastChildId =\n\t\t\tactiveTableOfContentIds[activeTableOfContentIds.length - 1];\n\t\tconst firstChildId = activeTableOfContentIds[0];\n\t\tconst lastChild = document.getElementById(\n\t\t\t`${lastChildId}-table-of-content-item`\n\t\t);\n\t\tconst firstChild = document.getElementById(\n\t\t\t`${firstChildId}-table-of-content-item`\n\t\t);\n\n\t\tif (lastChild && firstChild) {\n\t\t\tconst lastChildRect = lastChild.getBoundingClientRect();\n\t\t\tconst firstChildRect = firstChild.getBoundingClientRect();\n\n\t\t\t// Calculate relative coordinates from the ol element\n\t\t\tif (!refTableOfContentList.current) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t\tsetBottomCoordinate(\n\t\t\t\tlastChildRect.bottom -\n\t\t\t\t\trefTableOfContentList.current.getBoundingClientRect().top\n\t\t\t);\n\t\t\tsetTopCoordinate(\n\t\t\t\tfirstChildRect.top -\n\t\t\t\t\trefTableOfContentList.current.getBoundingClientRect().top\n\t\t\t);\n\t\t}\n\t}, [activeTableOfContentIds]);\n\n\tuseEffect(() => {\n\t\tif (!headings) {\n\t\t\treturn;\n\t\t}\n\t\tif (activeIds.length > 0) {\n\t\t\tconst previousHeading = getPreviousHeading(activeIds[0], headings);\n\t\t\tif (previousHeading) {\n\t\t\t\tconst activeIdsWithPreviousHeading = [\n\t\t\t\t\tpreviousHeading,\n\t\t\t\t\t...activeIds,\n\t\t\t\t];\n\t\t\t\tsetActiveTableOfContentIds(activeIdsWithPreviousHeading);\n\t\t\t} else {\n\t\t\t\tsetActiveTableOfContentIds(activeIds);\n\t\t\t}\n\t\t} else {\n\t\t\t// Keep the previous active ids if there are no active ids but without the first one\n\t\t\tsetActiveTableOfContentIds((prevIds) => {\n\t\t\t\tif (prevIds.length > 0) {\n\t\t\t\t\treturn prevIds.slice(1);\n\t\t\t\t}\n\t\t\t\treturn [];\n\t\t\t});\n\t\t}\n\t}, [activeIds, headings]);\n\n\tuseEffect(() => {\n\t\tif (typeof document === \"undefined\") {\n\t\t\treturn;\n\t\t}\n\n\t\tconst content = document.getElementById(idOfParentContainer);\n\t\tif (!content) {\n\t\t\treturn;\n\t\t}\n\n\t\tconst headingElements = Array.from(\n\t\t\tcontent.querySelectorAll(\"h1, h2, h3, h4, h5, h6\")\n\t\t);\n\n\t\tconst newHeadings: Heading[] = headingElements.map((elem, index) => {\n\t\t\tlet id = elem.id;\n\t\t\tif (!id) {\n\t\t\t\tid =\n\t\t\t\t\telem.textContent\n\t\t\t\t\t\t?.toLowerCase()\n\t\t\t\t\t\t.replace(/\\s+/g, \"-\")\n\t\t\t\t\t\t.replace(/[!@#$%^&*(),.?\":{}|<>]/g, \"\") ?? \"\";\n\t\t\t\telem.id = id;\n\t\t\t}\n\t\t\tconst level = Number.parseInt(elem.tagName.substring(1), 10);\n\t\t\treturn { id, text: elem.textContent ?? \"\", level, index };\n\t\t});\n\n\t\tsetHeadings(newHeadings);\n\n\t\tconst handleIntersection: IntersectionObserverCallback = (entries) => {\n\t\t\tconst updateActiveIds = (\n\t\t\t\tprevIds: string[],\n\t\t\t\tentries: IntersectionObserverEntry[]\n\t\t\t) => {\n\t\t\t\tconst updatedIds = [...prevIds];\n\t\t\t\tfor (const entry of entries) {\n\t\t\t\t\tconst index = updatedIds.indexOf(entry.target.id);\n\n\t\t\t\t\tif (entry.isIntersecting) {\n\t\t\t\t\t\tif (index === -1) {\n\t\t\t\t\t\t\tupdatedIds.push(entry.target.id);\n\t\t\t\t\t\t\tupdatedIds.sort(\n\t\t\t\t\t\t\t\t(a, b) =>\n\t\t\t\t\t\t\t\t\theadingElements.findIndex((el) => el.id === a) -\n\t\t\t\t\t\t\t\t\theadingElements.findIndex((el) => el.id === b)\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t}\n\t\t\t\t\t} else if (index !== -1) {\n\t\t\t\t\t\tupdatedIds.splice(index, 1);\n\t\t\t\t\t}\n\t\t\t\t}\n\n\t\t\t\treturn updatedIds;\n\t\t\t};\n\n\t\t\tsetActiveIds((prevIds) => updateActiveIds(prevIds, entries));\n\t\t};\n\n\t\tconst observerOptions: IntersectionObserverInit = {\n\t\t\troot: null,\n\t\t\trootMargin: \"-10px\",\n\t\t\t// threshold: [0.5, 1],\n\t\t\tthreshold: [1],\n\t\t};\n\n\t\tconst observer = new IntersectionObserver(\n\t\t\thandleIntersection,\n\t\t\tobserverOptions\n\t\t);\n\n\t\tfor (const elem of headingElements) {\n\t\t\tobserver.observe(elem);\n\t\t}\n\n\t\treturn () => {\n\t\t\tobserver.disconnect();\n\t\t};\n\t}, [idOfParentContainer]);\n\n\tfunction getPreviousHeading(id: string, headings: Heading[]) {\n\t\tconst index = headings.findIndex((heading) => heading.id === id);\n\t\tif (index === 0) {\n\t\t\treturn null;\n\t\t}\n\t\treturn headings[index - 1]?.id;\n\t}\n\n\tif (headings.length === 0) {\n\t\treturn <div>loading</div>;\n\t}\n\n\treturn (\n\t\t<nav className={cn(\"bg-background dark:bg-background\", className)} {...props}>\n\t\t\t<ol className=\"relative overflow-hidden \" ref={refTableOfContentList}>\n\t\t\t\t{headings.map((heading, _index) => {\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<li\n\t\t\t\t\t\t\tclassName=\"group relative px-1 text-foreground hover:text-foreground dark:hover:text-foreground\"\n\t\t\t\t\t\t\tid={`${heading.id}-table-of-content-item`}\n\t\t\t\t\t\t\tkey={heading.id}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\n\t\t\t\t\t\t\t\tclassName=\"pointer-events-none absolute top-px left-0 z-20 h-full select-none bg-background dark:bg-background\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\twidth: `${(heading.level - 1) * 8 - 1}px`,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\n\t\t\t\t\t\t\t\tclassName=\"pointer-events-none absolute z-20 h-full w-full select-none bg-background dark:bg-background\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tleft: `${(heading.level - 1) * 8}px`,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<Link\n\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\"relative z-30 block transform-gpu py-1.5 pr-5 pl-2 text-sm leading-4 tracking-tight transition-translated hover:translate-x-0.5\",\n\t\t\t\t\t\t\t\t\t// Before element : positionning\n\t\t\t\t\t\t\t\t\t\"before:absolute before:top-0.5 before:right-0 before:bottom-0.5 before:left-0 \",\n\t\t\t\t\t\t\t\t\t// Before element : animation\n\t\t\t\t\t\t\t\t\t\"before:scale-x-75 before:scale-y-50 before:transform-gpu before:rounded-lg before:bg-background/10 before:opacity-0 before:transition-[transform,opacity] before:duration-300 group-hover:before:scale-100 group-hover:before:opacity-100\",\n\t\t\t\t\t\t\t\t\t(heading.level === 1 || heading.level === 2) &&\n\t\t\t\t\t\t\t\t\t\t\"font-semibold\",\n\t\t\t\t\t\t\t\t\theading.level === 3 && \"font-normal\"\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t\thref={`#${heading.id}`}\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tmarginLeft: `${(heading.level - 1) * 8}px`,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{heading.text}\n\t\t\t\t\t\t\t</Link>\n\t\t\t\t\t\t\t<ChevronRight className=\"-translate-y-1/2 absolute top-1/2 right-1 ml-1 size-4 translate-x-1 transform-gpu opacity-0 transition-[transform,opacity] group-hover:translate-x-0 group-hover:opacity-100\" />\n\t\t\t\t\t\t</li>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{firstActiveHeading2 && lastActiveHeading2 && (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tanimate={{ opacity: 1, y: 0 }}\n\t\t\t\t\t\t\tclassName=\"pointer-events-none absolute z-10 w-full select-none bg-blue-500\"\n\t\t\t\t\t\t\texit={{ opacity: 0, y: -100 }}\n\t\t\t\t\t\t\tinitial={{ opacity: 0, y: -100 }}\n\t\t\t\t\t\t\tlayout={true}\n\t\t\t\t\t\t\tlayoutId=\"active-bar\"\n\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\ttop: topCoordinate,\n\t\t\t\t\t\t\t\tbottom: `calc(100% - ${bottomCoordinate}px)`,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{ duration: 0.3, ease: \"easeOut\" }}\n\t\t\t\t\t\t/>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t</ol>\n\t\t</nav>\n\t);\n};\n\nexport default TableOfContent;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "cuicui.day",
+      "url": "https://cuicui.day/application-ui/table-of-contents",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "idOfParentContainer",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "props",
+        "type": "HTMLProps<HTMLDivElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/following-headers"
+  }
+}

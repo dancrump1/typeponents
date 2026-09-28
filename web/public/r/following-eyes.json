@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "following-eyes",
+  "type": "registry:ui",
+  "title": "Following Eyes",
+  "description": "Following Eyes",
+  "dependencies": [
+    "lucide-react",
+    "next-themes",
+    "react-inlinesvg"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/theme-changer.json",
+    "theme-changer",
+    "toggle"
+  ],
+  "files": [
+    {
+      "path": "components/ui/following-eyes.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/following-eyes.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useRef } from \"react\";\n\nimport Link from \"next/link\";\n\nimport ThemeToggle from \"@/components/ui/navbar-components/theme-toggle\";\nimport SVG from \"react-inlinesvg\";\n\nimport { ThemeToggleButton } from \"@/components/ui/theme-changer\";\n\n// Credit:\n// https://nurui.vercel.app/docs/following-eye\n\nconst MouseFollowingEyes: React.FC = () => {\n\tconst eye1Ref = useRef<HTMLDivElement>(null);\n\tconst eye2Ref = useRef<HTMLDivElement>(null);\n\tconst mousePos = useRef({ x: 0, y: 0 });\n\n\tuseEffect(() => {\n\t\tconst handleMouseMove = (e: MouseEvent) => {\n\t\t\tmousePos.current = { x: e.clientX, y: e.clientY };\n\t\t};\n\n\t\twindow.addEventListener(\"mousemove\", handleMouseMove);\n\n\t\treturn () => window.removeEventListener(\"mousemove\", handleMouseMove);\n\t}, []);\n\n\treturn (\n\t\t<div className=\"flex justify-center items-center\">\n\t\t\t<div className=\"flex space-x-2\">\n\t\t\t\t<div className=\"group\">\n\t\t\t\t\t<div className=\"group-hover:block hidden\">\n\t\t\t\t\t\t<ThemeToggleButton\n\t\t\t\t\t\t\tshowLabel\n\t\t\t\t\t\t\tvariant=\"gif\"\n\t\t\t\t\t\t\turl=\"https://media.giphy.com/media/KBbr4hHl9DSahKvInO/giphy.gif?cid=790b76112m5eeeydoe7et0cr3j3ekb1erunxozyshuhxx2vl&ep=v1_stickers_search&rid=giphy.gif&ct=s\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t\t<div className=\"group-hover:hidden block\">\n\t\t\t\t\t\t<Eye\n\t\t\t\t\t\t\tselfRef={eye1Ref}\n\t\t\t\t\t\t\totherRef={eye2Ref}\n\t\t\t\t\t\t\tmousePos={mousePos}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t\t<div className=\"group\">\n\t\t\t\t\t<Link href=\"/drive25\">\n\t\t\t\t\t\t<SVG\n\t\t\t\t\t\t\tsrc={\"/dbsbottom.svg\"}\n\t\t\t\t\t\t\ttitle={\"half of our logo\"}\n\t\t\t\t\t\t\theight={80}\n\t\t\t\t\t\t\twidth={233}\n\t\t\t\t\t\t\tclassName=\"stroke-white group-hover:block hidden\"\n\t\t\t\t\t\t\trole=\"img\"\n\t\t\t\t\t\t\taria-label={\"half of our logo\"}\n\t\t\t\t\t\t\tloader={<span>Loading...</span>}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</Link>\n\t\t\t\t\t<div className=\"group-hover:hidden block\">\n\t\t\t\t\t\t<Eye\n\t\t\t\t\t\t\tselfRef={eye2Ref}\n\t\t\t\t\t\t\totherRef={eye1Ref}\n\t\t\t\t\t\t\tmousePos={mousePos}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\ninterface EyeProps {\n\tselfRef: React.RefObject<HTMLDivElement>;\n\totherRef: React.RefObject<HTMLDivElement>;\n\tmousePos: React.MutableRefObject<{ x: number; y: number }>;\n}\n\nconst Eye: React.FC<EyeProps> = ({\n\tselfRef,\n\totherRef,\n\tmousePos,\n\tshowWhat,\n\tsetShowWhat,\n}) => {\n\tconst pupilRef = useRef<HTMLDivElement>(null);\n\tconst center = useRef({ x: 0, y: 0 });\n\n\tconst updateCenter = () => {\n\t\tif (!selfRef.current) return;\n\t\tconst rect = selfRef.current.getBoundingClientRect();\n\t\tcenter.current = {\n\t\t\tx: rect.left + rect.width / 2,\n\t\t\ty: rect.top + rect.height / 2,\n\t\t};\n\t};\n\n\tuseEffect(() => {\n\t\tupdateCenter();\n\t\twindow.addEventListener(\"resize\", updateCenter);\n\n\t\tlet frameId: number;\n\n\t\tconst animate = () => {\n\t\t\tconst { x, y } = mousePos.current;\n\n\t\t\tconst isInside = (ref: React.RefObject<HTMLDivElement>) => {\n\t\t\t\tconst rect = ref.current?.getBoundingClientRect();\n\t\t\t\tif (!rect) return false;\n\t\t\t\treturn (\n\t\t\t\t\tx >= rect.left &&\n\t\t\t\t\tx <= rect.right &&\n\t\t\t\t\ty >= rect.top &&\n\t\t\t\t\ty <= rect.bottom\n\t\t\t\t);\n\t\t\t};\n\n\t\t\tif (!(isInside(selfRef) || isInside(otherRef))) {\n\t\t\t\tconst dx = x - center.current.x;\n\t\t\t\tconst dy = y - center.current.y;\n\t\t\t\tconst angle = Math.atan2(dy, dx);\n\n\t\t\t\tconst maxMove = 10;\n\t\t\t\tconst pupilX = Math.cos(angle) * maxMove;\n\t\t\t\tconst pupilY = Math.sin(angle) * maxMove;\n\n\t\t\t\tif (pupilRef.current) {\n\t\t\t\t\tpupilRef.current.style.transform = `translate(${pupilX}px, ${pupilY}px)`;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tframeId = requestAnimationFrame(animate);\n\t\t};\n\n\t\tframeId = requestAnimationFrame(animate);\n\n\t\treturn () => {\n\t\t\tcancelAnimationFrame(frameId);\n\t\t\twindow.removeEventListener(\"resize\", updateCenter);\n\t\t};\n\t}, [selfRef, otherRef, mousePos]);\n\n\treturn (\n\t\t<div\n\t\t\tref={selfRef}\n\t\t\tclassName=\"relative bg-white border-4 border-black rounded-full h-12 w-12 flex items-center justify-center\"\n\t\t>\n\t\t\t<div ref={pupilRef} className=\"absolute bg-black rounded-full h-4 w-4\">\n\t\t\t\t<div className=\"w-1 h-1 bg-white rounded-full absolute bottom-1 right-1\"></div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport { MouseFollowingEyes };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "nurui.vercel.app",
+      "url": "https://nurui.vercel.app/docs/following-eye",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/following-eyes"
+  }
+}

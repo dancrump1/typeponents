@@ -1,0 +1,85 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "screen-saver",
+  "type": "registry:ui",
+  "title": "Screen Saver",
+  "description": "Screen Saver",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/screen-saver.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/screen-saver.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { useDimensions } from \"@/hooks/use-dimensions\";\r\nimport { motion, useAnimationFrame, useMotionValue } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.fancycomponents.dev/docs/components/blocks/screensaver\r\n\r\ntype ScreensaverProps = {\r\n\tchildren: React.ReactNode;\r\n\tcontainerRef: React.RefObject<HTMLElement>;\r\n\tspeed?: number;\r\n\tstartPosition?: { x: number; y: number }; // x,y as percentages (0-100)\r\n\tstartAngle?: number; // in degrees\r\n\tclassName?: string;\r\n};\r\n\r\nconst Screensaver: React.FC<ScreensaverProps> = ({\r\n\tchildren,\r\n\tspeed = 3,\r\n\tstartPosition = { x: 0, y: 0 },\r\n\tstartAngle = 45,\r\n\tcontainerRef,\r\n\tclassName,\r\n}) => {\r\n\tconst elementRef = useRef<HTMLDivElement>(null);\r\n\tconst x = useMotionValue(0);\r\n\tconst y = useMotionValue(0);\r\n\tconst angle = useRef((startAngle * Math.PI) / 180);\r\n\r\n\tconst containerDimensions = useDimensions(containerRef);\r\n\tconst elementDimensions = useDimensions(elementRef);\r\n\r\n\t// Set initial position based on container dimensions and percentage\r\n\tuseEffect(() => {\r\n\t\tif (containerDimensions.width && containerDimensions.height) {\r\n\t\t\tconst initialX =\r\n\t\t\t\t(startPosition.x / 100) *\r\n\t\t\t\t(containerDimensions.width - (elementDimensions.width || 0));\r\n\t\t\tconst initialY =\r\n\t\t\t\t(startPosition.y / 100) *\r\n\t\t\t\t(containerDimensions.height - (elementDimensions.height || 0));\r\n\t\t\tx.set(initialX);\r\n\t\t\ty.set(initialY);\r\n\t\t}\r\n\t}, [containerDimensions, elementDimensions, startPosition]);\r\n\r\n\tuseAnimationFrame(() => {\r\n\t\tconst velocity = speed;\r\n\t\tconst dx = Math.cos(angle.current) * velocity;\r\n\t\tconst dy = Math.sin(angle.current) * velocity;\r\n\r\n\t\tlet newX = x.get() + dx;\r\n\t\tlet newY = y.get() + dy;\r\n\r\n\t\t// Check for collisions with container boundaries\r\n\t\tif (\r\n\t\t\tnewX <= 0 ||\r\n\t\t\tnewX + elementDimensions.width >= containerDimensions.width\r\n\t\t) {\r\n\t\t\tangle.current = Math.PI - angle.current;\r\n\t\t\tnewX = Math.max(\r\n\t\t\t\t0,\r\n\t\t\t\tMath.min(newX, containerDimensions.width - elementDimensions.width)\r\n\t\t\t);\r\n\t\t}\r\n\t\tif (\r\n\t\t\tnewY <= 0 ||\r\n\t\t\tnewY + elementDimensions.height >= containerDimensions.height\r\n\t\t) {\r\n\t\t\tangle.current = -angle.current;\r\n\t\t\tnewY = Math.max(\r\n\t\t\t\t0,\r\n\t\t\t\tMath.min(\r\n\t\t\t\t\tnewY,\r\n\t\t\t\t\tcontainerDimensions.height - elementDimensions.height\r\n\t\t\t\t)\r\n\t\t\t);\r\n\t\t}\r\n\r\n\t\tx.set(newX);\r\n\t\ty.set(newY);\r\n\t});\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tref={elementRef}\r\n\t\t\tstyle={{\r\n\t\t\t\tposition: \"absolute\",\r\n\t\t\t\ttop: 0,\r\n\t\t\t\tleft: 0,\r\n\t\t\t\tx,\r\n\t\t\t\ty,\r\n\t\t\t}}\r\n\t\t\tclassName={cn(\"transform will-change-transform\", className)}\r\n\t\t>\r\n\t\t\t{children}\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport default Screensaver;\r\n"
+    },
+    {
+      "path": "hooks/use-dimensions.ts",
+      "type": "registry:hook",
+      "target": "hooks/use-dimensions.ts",
+      "content": "import { RefObject, useEffect, useState } from \"react\";\n\ninterface Dimensions {\n\twidth: number;\n\theight: number;\n}\n\nexport function useDimensions(\n\tref: RefObject<HTMLElement | SVGElement>\n): Dimensions {\n\tconst [dimensions, setDimensions] = useState<Dimensions>({\n\t\twidth: 0,\n\t\theight: 0,\n\t});\n\n\tuseEffect(() => {\n\t\tconst updateDimensions = () => {\n\t\t\tif (ref?.current) {\n\t\t\t\tconst { width, height } = ref.current.getBoundingClientRect();\n\t\t\t\tsetDimensions({ width, height });\n\t\t\t}\n\t\t};\n\n\t\tupdateDimensions();\n\t\twindow.addEventListener(\"resize\", updateDimensions);\n\n\t\treturn () => window.removeEventListener(\"resize\", updateDimensions);\n\t}, [ref]);\n\n\treturn dimensions;\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/blocks/screensaver",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "containerRef",
+        "type": "React.RefObject<HTMLElement>",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "startPosition",
+        "type": "{ x: number; y: number; }",
+        "default": "{ x: 0, y: 0 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "startAngle",
+        "type": "number",
+        "default": "45",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/screen-saver"
+  }
+}

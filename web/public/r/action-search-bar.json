@@ -1,0 +1,63 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "action-search-bar",
+  "type": "registry:ui",
+  "title": "Action Search Bar",
+  "description": "Command-palette search field that lists matching actions with icons, shortcuts and type labels.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "input"
+  ],
+  "files": [
+    {
+      "path": "components/ui/action-search-bar.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/action-search-bar.tsx",
+      "content": "\"use client\";\n\nimport { useEffect, useState } from \"react\";\n\nimport { Input } from \"@/components/ui/input\";\nimport {\n\tAudioLines,\n\tBarChart2,\n\tGlobe,\n\tLayout,\n\tLayoutGrid,\n\tPlaneTakeoff,\n\tSearch,\n\tSend,\n\tVideo,\n} from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://kokonutui.com/docs/components/action-search-bar\n\ninterface Action {\n\tid: string;\n\tlabel: string;\n\ticon: React.ReactNode;\n\tdescription?: string;\n\tshort?: string;\n\tend?: string;\n}\n\ninterface SearchResult {\n\tactions: Action[];\n}\n\nconst allActionsSample = [\n\t{\n\t\tid: \"1\",\n\t\tlabel: \"Book tickets\",\n\t\ticon: <PlaneTakeoff className=\"h-4 w-4 text-blue-500\" />,\n\t\tdescription: \"Operator\",\n\t\tshort: \"⌘K\",\n\t\tend: \"Agent\",\n\t},\n\t{\n\t\tid: \"2\",\n\t\tlabel: \"Summarize\",\n\t\ticon: <BarChart2 className=\"h-4 w-4 text-orange-500\" />,\n\t\tdescription: \"gpt-4o\",\n\t\tshort: \"⌘cmd+p\",\n\t\tend: \"Command\",\n\t},\n\t{\n\t\tid: \"3\",\n\t\tlabel: \"Screen Studio\",\n\t\ticon: <Video className=\"h-4 w-4 text-purple-500\" />,\n\t\tdescription: \"gpt-4o\",\n\t\tshort: \"\",\n\t\tend: \"Application\",\n\t},\n\t{\n\t\tid: \"4\",\n\t\tlabel: \"Talk to Jarvis\",\n\t\ticon: <AudioLines className=\"h-4 w-4 text-green-500\" />,\n\t\tdescription: \"gpt-4o voice\",\n\t\tshort: \"\",\n\t\tend: \"Active\",\n\t},\n\t{\n\t\tid: \"5\",\n\t\tlabel: \"Kokonut UI - Pro\",\n\t\ticon: <LayoutGrid className=\"h-4 w-4 text-blue-500\" />,\n\t\tdescription: \"Components\",\n\t\tshort: \"\",\n\t\tend: \"Link\",\n\t},\n];\n\nfunction ActionSearchBar({\n\tactions = allActionsSample,\n\tdefaultOpen = false,\n}: {\n\tactions?: Action[];\n\tdefaultOpen?: boolean;\n}) {\n\tconst [query, setQuery] = useState(\"\");\n\tconst [result, setResult] = useState<SearchResult | null>(null);\n\tconst [isFocused, setIsFocused] = useState(defaultOpen);\n\tconst [isTyping, setIsTyping] = useState(false);\n\tconst [selectedAction, setSelectedAction] = useState<Action | null>(null);\n\tconst debouncedQuery = query;\n\n\tuseEffect(() => {\n\t\tif (!isFocused) {\n\t\t\tsetResult(null);\n\t\t\treturn;\n\t\t}\n\n\t\tif (!debouncedQuery) {\n\t\t\tsetResult({ actions: actions });\n\t\t\treturn;\n\t\t}\n\n\t\tconst normalizedQuery = debouncedQuery.toLowerCase().trim();\n\t\tconst filteredActions = actions.filter((action) => {\n\t\t\tconst searchableText = action.label.toLowerCase();\n\t\t\treturn searchableText.includes(normalizedQuery);\n\t\t});\n\n\t\tsetResult({ actions: filteredActions });\n\t}, [debouncedQuery, isFocused, actions]);\n\n\tconst handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {\n\t\tsetQuery(e.target.value);\n\t\tsetIsTyping(true);\n\t};\n\n\tconst container = {\n\t\thidden: { opacity: 0, height: 0 },\n\t\tshow: {\n\t\t\topacity: 1,\n\t\t\theight: \"auto\",\n\t\t\ttransition: {\n\t\t\t\theight: {\n\t\t\t\t\tduration: 0.4,\n\t\t\t\t},\n\t\t\t\tstaggerChildren: 0.1,\n\t\t\t},\n\t\t},\n\t\texit: {\n\t\t\topacity: 0,\n\t\t\theight: 0,\n\t\t\ttransition: {\n\t\t\t\theight: {\n\t\t\t\t\tduration: 0.3,\n\t\t\t\t},\n\t\t\t\topacity: {\n\t\t\t\t\tduration: 0.2,\n\t\t\t\t},\n\t\t\t},\n\t\t},\n\t};\n\n\tconst item = {\n\t\thidden: { opacity: 0, y: 20 },\n\t\tshow: {\n\t\t\topacity: 1,\n\t\t\ty: 0,\n\t\t\ttransition: {\n\t\t\t\tduration: 0.3,\n\t\t\t},\n\t\t},\n\t\texit: {\n\t\t\topacity: 0,\n\t\t\ty: -10,\n\t\t\ttransition: {\n\t\t\t\tduration: 0.2,\n\t\t\t},\n\t\t},\n\t};\n\n\tconst handleFocus = () => {\n\t\tsetSelectedAction(null);\n\t\tsetIsFocused(true);\n\t};\n\n\treturn (\n\t\t<div className=\"w-full max-w-xl mx-auto\">\n\t\t\t<div className=\"relative flex flex-col justify-start items-center min-h-[300px]\">\n\t\t\t\t<div className=\"w-full max-w-sm sticky top-0 bg-background z-10 pt-4 pb-1\">\n\t\t\t\t\t<label\n\t\t\t\t\t\tclassName=\"text-xs font-medium text-foreground dark:text-foreground mb-1 block\"\n\t\t\t\t\t\thtmlFor=\"search\"\n\t\t\t\t\t>\n\t\t\t\t\t\tSearch Commands\n\t\t\t\t\t</label>\n\t\t\t\t\t<div className=\"relative\">\n\t\t\t\t\t\t<Input\n\t\t\t\t\t\t\ttype=\"text\"\n\t\t\t\t\t\t\tplaceholder=\"What's up?\"\n\t\t\t\t\t\t\tvalue={query}\n\t\t\t\t\t\t\tonChange={handleInputChange}\n\t\t\t\t\t\t\tonFocus={handleFocus}\n\t\t\t\t\t\t\tonBlur={() => setTimeout(() => setIsFocused(false), 200)}\n\t\t\t\t\t\t\tclassName=\"pl-3 pr-9 py-1.5 h-9 text-sm rounded-lg focus-visible:ring-offset-0\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t\t<div className=\"absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4\">\n\t\t\t\t\t\t\t<AnimatePresence mode=\"popLayout\">\n\t\t\t\t\t\t\t\t{query.length > 0 ? (\n\t\t\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\t\t\tkey=\"send\"\n\t\t\t\t\t\t\t\t\t\tinitial={{ y: -20, opacity: 0 }}\n\t\t\t\t\t\t\t\t\t\tanimate={{ y: 0, opacity: 1 }}\n\t\t\t\t\t\t\t\t\t\texit={{ y: 20, opacity: 0 }}\n\t\t\t\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t<Send className=\"w-4 h-4 text-foreground dark:text-foreground\" />\n\t\t\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t\t\t) : (\n\t\t\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\t\t\tkey=\"search\"\n\t\t\t\t\t\t\t\t\t\tinitial={{ y: -20, opacity: 0 }}\n\t\t\t\t\t\t\t\t\t\tanimate={{ y: 0, opacity: 1 }}\n\t\t\t\t\t\t\t\t\t\texit={{ y: 20, opacity: 0 }}\n\t\t\t\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t<Search className=\"w-4 h-4 text-foreground dark:text-foreground\" />\n\t\t\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t</AnimatePresence>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t<div className=\"w-full max-w-sm\">\n\t\t\t\t\t<AnimatePresence>\n\t\t\t\t\t\t{isFocused && result && !selectedAction && (\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tclassName=\"w-full border rounded-md shadow-2xs overflow-hidden dark:border-gray-800 bg-background dark:bg-background mt-1\"\n\t\t\t\t\t\t\t\tvariants={container}\n\t\t\t\t\t\t\t\tinitial=\"hidden\"\n\t\t\t\t\t\t\t\tanimate=\"show\"\n\t\t\t\t\t\t\t\texit=\"exit\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<motion.ul>\n\t\t\t\t\t\t\t\t\t{result.actions.map((action) => (\n\t\t\t\t\t\t\t\t\t\t<motion.li\n\t\t\t\t\t\t\t\t\t\t\tkey={action.id}\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"px-3 py-2 flex items-center justify-between hover:bg-background dark:hover:bg-background  cursor-pointer rounded-md\"\n\t\t\t\t\t\t\t\t\t\t\tvariants={item}\n\t\t\t\t\t\t\t\t\t\t\tlayout\n\t\t\t\t\t\t\t\t\t\t\tonClick={() => setSelectedAction(action)}\n\t\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t\t<div className=\"flex items-center gap-2 justify-between\">\n\t\t\t\t\t\t\t\t\t\t\t\t<div className=\"flex items-center gap-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span className=\"text-foreground\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{action.icon}\n\t\t\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span className=\"text-sm font-medium text-foreground dark:text-foreground\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{action.label}\n\t\t\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t\t\t\t<span className=\"text-xs text-foreground\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{action.description}\n\t\t\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t\t<div className=\"flex items-center gap-2\">\n\t\t\t\t\t\t\t\t\t\t\t\t<span className=\"text-xs text-foreground\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t{action.short}\n\t\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t\t\t<span className=\"text-xs text-foreground text-right\">\n\t\t\t\t\t\t\t\t\t\t\t\t\t{action.end}\n\t\t\t\t\t\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t\t\t</motion.li>\n\t\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t\t</motion.ul>\n\t\t\t\t\t\t\t\t<div className=\"mt-2 px-3 py-2 border-t border-gray-100 dark:border-gray-800\">\n\t\t\t\t\t\t\t\t\t<div className=\"flex items-center justify-between text-xs text-foreground\">\n\t\t\t\t\t\t\t\t\t\t<span>Press ⌘K to open commands</span>\n\t\t\t\t\t\t\t\t\t\t<span>ESC to cancel</span>\n\t\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t)}\n\t\t\t\t\t</AnimatePresence>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n}\n\nexport default ActionSearchBar;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Focusing the field drops the action list open and the rows stagger in one after another; typing filters the list as you go, and the magnifier at the end of the field flips up to a send arrow once there is text.",
+    "inspiration": {
+      "source": "Kokonut UI",
+      "url": "https://kokonutui.com/docs/components/action-search-bar",
+      "authorUrl": "https://kokonutui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "actions",
+        "type": "Action[]",
+        "default": "allActionsSample",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/action-search-bar"
+  }
+}

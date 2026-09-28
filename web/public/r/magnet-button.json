@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magnet-button",
+  "type": "registry:ui",
+  "title": "Magnet Button",
+  "description": "Magnet Button",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/magnet-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/magnet-button.tsx",
+      "content": "import {\r\n    motion,\r\n    useMotionTemplate,\r\n    useMotionValue,\r\n    useSpring,\r\n} from \"motion/react\";\r\nimport { useRef } from \"react\";\r\nimport { MdOutlineArrowUpward } from \"react-icons/md\";\r\n\r\n\r\n\r\nconst MagnetButton = () => {\r\n    const ref = useRef<HTMLButtonElement | null>(null);\r\n\r\n    const x = useMotionValue(0);\r\n    const y = useMotionValue(0);\r\n\r\n    const xSpring = useSpring(x, {\r\n        mass: 3,\r\n        stiffness: 400,\r\n        damping: 50,\r\n    });\r\n    const ySpring = useSpring(y, {\r\n        mass: 3,\r\n        stiffness: 400,\r\n        damping: 50,\r\n    });\r\n\r\n    const transform = useMotionTemplate`translateX(${xSpring}px) translateY(${ySpring}px)`;\r\n\r\n    const handleMouseMove = (\r\n        e: React.MouseEvent<HTMLButtonElement, MouseEvent>\r\n    ) => {\r\n        if (!ref.current) return;\r\n\r\n        const { height, width, left, top } = ref.current.getBoundingClientRect();\r\n\r\n        x.set(e.clientX - (left + width / 2));\r\n        y.set(e.clientY - (top + height / 2));\r\n    };\r\n\r\n    const handleMouseLeave = () => {\r\n        x.set(0);\r\n        y.set(0);\r\n    };\r\n\r\n    return (\r\n        <motion.button\r\n            ref={ref}\r\n            onMouseMove={handleMouseMove}\r\n            onMouseLeave={handleMouseLeave}\r\n            style={{ transform }}\r\n            transition={{ type: \"spring\", stiffness: 200, damping: 20 }}\r\n            className=\"group relative grid h-[220px] w-[220px] place-content-center rounded-full border-2 border-black transition-colors duration-700 ease-out\"\r\n        >\r\n            <MdOutlineArrowUpward className=\"pointer-events-none relative z-10 rotate-45 text-7xl text-black transition-all duration-700 ease-out group-hover:rotate-90\" />\r\n\r\n            <div className=\"pointer-events-none absolute inset-0 z-0 scale-0 rounded-full bg-white transition-transform duration-700 ease-out group-hover:scale-100\" />\r\n\r\n            <motion.svg\r\n                initial={{ rotate: 0 }}\r\n                animate={{ rotate: 360 }}\r\n                transition={{\r\n                    duration: 25,\r\n                    repeat: Infinity,\r\n                    repeatType: \"loop\",\r\n                    ease: \"linear\",\r\n                }}\r\n                style={{\r\n                    top: \"50%\",\r\n                    left: \"50%\",\r\n                    x: \"-50%\",\r\n                    y: \"-50%\",\r\n                }}\r\n                width=\"200\"\r\n                height=\"200\"\r\n                className=\"pointer-events-none absolute z-10\"\r\n            >\r\n                <path\r\n                    id=\"circlePath\"\r\n                    d=\"M100,100 m-100,0 a100,100 0 1,0 200,0 a100,100 0 1,0 -200,0\"\r\n                    fill=\"none\"\r\n                />\r\n                <text>\r\n                    <textPath\r\n                        href=\"#circlePath\"\r\n                        fill=\"black\"\r\n                        className=\"fill-black text-xl font-light uppercase opacity-0 transition-opacity duration-700 ease-out group-hover:opacity-100\"\r\n                    >\r\n                        You can write whatever text you want around this circle\r\n                    </textPath>\r\n                </text>\r\n            </motion.svg>\r\n        </motion.button>\r\n    );\r\n};\r\n\r\nexport default MagnetButton;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/magnet-button"
+  }
+}

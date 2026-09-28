@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-538",
+  "type": "registry:component",
+  "title": "Comp 538",
+  "description": "Comp 538",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-538.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineContent,\r\n\tTimelineDate,\r\n\tTimelineItem,\r\n} from \"@/components/ui/timeline\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: new Date(\"2024-01-09T10:55:00\"),\r\n\t\tdescription: \"System backup completed successfully.\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: new Date(\"2024-01-09T10:50:00\"),\r\n\t\tdescription:\r\n\t\t\t\"User authentication service restarted due to configuration update.\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: new Date(\"2024-01-09T10:45:00\"),\r\n\t\tdescription: \"Warning: High CPU usage detected on worker node-03.\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tdate: new Date(\"2024-01-09T10:40:00\"),\r\n\t\tdescription: \"New deployment initiated for api-service v2.1.0.\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline className=\"divide-y rounded-lg border\">\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tstep={item.id}\r\n\t\t\t\t\tclassName=\"m-0! px-4! py-3!\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<TimelineContent className=\"text-foreground\">\r\n\t\t\t\t\t\t{item.description}\r\n\t\t\t\t\t\t<TimelineDate className=\"mt-1\">\r\n\t\t\t\t\t\t\t{item.date.toLocaleDateString(\"en-US\", {\r\n\t\t\t\t\t\t\t\tyear: \"numeric\",\r\n\t\t\t\t\t\t\t\tmonth: \"long\",\r\n\t\t\t\t\t\t\t\tday: \"numeric\",\r\n\t\t\t\t\t\t\t})}{\" \"}\r\n\t\t\t\t\t\t\tat{\" \"}\r\n\t\t\t\t\t\t\t{item.date.toLocaleTimeString(\"en-US\", {\r\n\t\t\t\t\t\t\t\thour: \"numeric\",\r\n\t\t\t\t\t\t\t\tminute: \"2-digit\",\r\n\t\t\t\t\t\t\t\thour12: true,\r\n\t\t\t\t\t\t\t})}\r\n\t\t\t\t\t\t</TimelineDate>\r\n\t\t\t\t\t</TimelineContent>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

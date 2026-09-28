@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-150",
+  "type": "registry:component",
+  "title": "Comp 150",
+  "description": "Comp 150",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-150.tsx",
+      "content": "\"use client\"\r\n\r\nimport { useId, useState } from \"react\"\r\nimport { MoonIcon, SunIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  const id = useId()\r\n  const [theme, setTheme] = useState<string>(\"light\")\r\n\r\n  return (\r\n    <div className=\"space-y-4\">\r\n      <legend className=\"text-foreground text-sm leading-none font-medium\">\r\n        Dark mode toggle checkbox\r\n      </legend>\r\n      <div className=\"flex flex-col justify-center\">\r\n        <input\r\n          type=\"checkbox\"\r\n          name={id}\r\n          id={id}\r\n          className=\"peer sr-only\"\r\n          checked={theme === \"dark\"}\r\n          onChange={() =>\r\n            setTheme((prev) => (prev === \"dark\" ? \"light\" : \"dark\"))\r\n          }\r\n        />\r\n        <label\r\n          className=\"group border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground peer-focus-visible:border-ring peer-focus-visible:ring-ring/50 relative inline-flex size-9 items-center justify-center rounded-md border shadow-2xs transition-[color,box-shadow] outline-hidden peer-focus-visible:ring-[3px]\"\r\n          htmlFor={id}\r\n          aria-label={`Switch to ${theme === \"dark\" ? \"light\" : \"dark\"} mode`}\r\n        >\r\n          {/* Note: After dark mode implementation, rely on dark: prefix rather than group-peer-checked: */}\r\n          <MoonIcon\r\n            size={16}\r\n            className=\"shrink-0 scale-0 opacity-0 transition-all group-peer-checked:scale-100 group-peer-checked:opacity-100\"\r\n            aria-hidden=\"true\"\r\n          />\r\n          <SunIcon\r\n            size={16}\r\n            className=\"absolute shrink-0 scale-100 opacity-100 transition-all group-peer-checked:scale-0 group-peer-checked:opacity-0\"\r\n            aria-hidden=\"true\"\r\n          />\r\n        </label>\r\n      </div>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

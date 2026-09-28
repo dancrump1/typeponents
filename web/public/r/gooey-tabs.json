@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gooey-tabs",
+  "type": "registry:ui",
+  "title": "Gooey Tabs",
+  "description": "Gooey Tabs",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/gooey-tabs.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/gooey-tabs.tsx",
+      "content": "import { useState } from \"react\";\r\n\r\nimport dynamic from \"next/dynamic\";\r\n\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.fancycomponents.dev/docs/components/filter/gooey-svg-filter\r\n\r\nconst TAB_CONTENT = [\r\n\t{\r\n\t\ttitle: \"2024\",\r\n\t\tfiles: [\r\n\t\t\t\"learning-to-meditate.md\",\r\n\t\t\t\"spring-garden-plans.md\",\r\n\t\t\t\"travel-wishlist.md\",\r\n\t\t\t\"new-coding-projects.md\",\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\ttitle: \"2023\",\r\n\t\tfiles: [\r\n\t\t\t\"year-in-review.md\",\r\n\t\t\t\"marathon-training-log.md\",\r\n\t\t\t\"recipe-collection.md\",\r\n\t\t\t\"book-reflections.md\",\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\ttitle: \"2022\",\r\n\t\tfiles: [\r\n\t\t\t\"moving-to-a-new-city.md\",\r\n\t\t\t\"starting-a-blog.md\",\r\n\t\t\t\"photography-basics.md\",\r\n\t\t\t\"first-coding-project.md\",\r\n\t\t],\r\n\t},\r\n\t{\r\n\t\ttitle: \"2021\",\r\n\t\tfiles: [\r\n\t\t\t\"goals-and-aspirations.md\",\r\n\t\t\t\"daily-gratitude.md\",\r\n\t\t\t\"learning-to-cook.md\",\r\n\t\t\t\"remote-work-journal.md\",\r\n\t\t],\r\n\t},\r\n];\r\n\r\nexport function GooeyDemo() {\r\n\tconst [activeTab, setActiveTab] = useState(0);\r\n\tconst [isGooeyEnabled, setIsGooeyEnabled] = useState(true);\r\n\r\n\treturn (\r\n\t\t<div className=\"relative w-full h-full flex justify-center p-8 font-calendas md:text-base text-xs sm:text-sm bg-background dark:bg-background\">\r\n\t\t\t<GooeyFilter id=\"gooey-filter\" strength={15} />\r\n\r\n\t\t\t<Button\r\n\t\t\t\tvariant=\"outline\"\r\n\t\t\t\tonClick={() => setIsGooeyEnabled(!isGooeyEnabled)}\r\n\t\t\t\tclassName=\"absolute top-4 left-4 font-overusedGrotesk\"\r\n\t\t\t>\r\n\t\t\t\t{isGooeyEnabled ? \"Disable filter\" : \"Enable filter\"}\r\n\t\t\t</Button>\r\n\r\n\t\t\t<div className=\"w-11/12 md:w-4/5 relative mt-24\">\r\n\t\t\t\t<div\r\n\t\t\t\t\tclassName=\"absolute inset-0\"\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\tfilter: isGooeyEnabled ? \"url(#gooey-filter)\" : \"none\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t<div className=\"flex w-full \">\r\n\t\t\t\t\t\t{TAB_CONTENT.map((_, index) => (\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tkey={index + \"gooey-tabs\"}\r\n\t\t\t\t\t\t\t\tclassName=\"relative flex-1 h-8 md:h-12\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{activeTab === index && (\r\n\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\tlayoutId=\"active-tab\"\r\n\t\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 bg-background\"\r\n\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\t\t\tbounce: 0.0,\r\n\t\t\t\t\t\t\t\t\t\t\tduration: 0.4,\r\n\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t))}\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t{/* Content panel */}\r\n\t\t\t\t\t<div className=\"w-full h-[200px] sm:h-[250px] md:h-[300px] bg-background overflow-hidden text-muted-foreground\">\r\n\t\t\t\t\t\t<AnimatePresence mode=\"popLayout\">\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tkey={activeTab}\r\n\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\ty: 50,\r\n\t\t\t\t\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\texit={{\r\n\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\ty: -50,\r\n\t\t\t\t\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t\t\t\tease: \"easeOut\",\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\tclassName=\"p-8 md:p-12\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<div className=\"space-y-2 mt-4 sm:mt-8 md:mt-8\">\r\n\t\t\t\t\t\t\t\t\t<ul className=\"\">\r\n\t\t\t\t\t\t\t\t\t\t{TAB_CONTENT[activeTab].files.map(\r\n\t\t\t\t\t\t\t\t\t\t\t(file, index) => (\r\n\t\t\t\t\t\t\t\t\t\t\t\t<li\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tkey={file}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"border-b border-muted-foreground/50 pt-2 pb-1 text-foreground\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t{file}\r\n\t\t\t\t\t\t\t\t\t\t\t\t</li>\r\n\t\t\t\t\t\t\t\t\t\t\t)\r\n\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t</ul>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t{/* Interactive text overlay, no filter */}\r\n\t\t\t\t<div className=\"relative flex w-full \">\r\n\t\t\t\t\t{TAB_CONTENT.map((tab, index) => (\r\n\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\tkey={index + \"gooey-content\"}\r\n\t\t\t\t\t\t\tonClick={() => setActiveTab(index)}\r\n\t\t\t\t\t\t\tclassName=\"flex-1 h-8 md:h-12\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\tclassName={`\r\n                w-full h-full flex items-center justify-center\r\n                ${activeTab === index ? \"text-foreground\" : \"text-muted-foreground\"}\r\n              `}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{tab.title}\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nconst GooeyFilter = ({\r\n\tid = \"goo-filter\",\r\n\tstrength = 10,\r\n}: {\r\n\tid?: string;\r\n\tstrength?: number;\r\n}) => {\r\n\treturn (\r\n\t\t<svg className=\"hidden absolute\">\r\n\t\t\t<defs>\r\n\t\t\t\t<filter id={id}>\r\n\t\t\t\t\t<feGaussianBlur\r\n\t\t\t\t\t\tin=\"SourceGraphic\"\r\n\t\t\t\t\t\tstdDeviation={strength}\r\n\t\t\t\t\t\tresult=\"blur\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<feColorMatrix\r\n\t\t\t\t\t\tin=\"blur\"\r\n\t\t\t\t\t\ttype=\"matrix\"\r\n\t\t\t\t\t\tvalues=\"1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 19 -9\"\r\n\t\t\t\t\t\tresult=\"goo\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<feComposite in=\"SourceGraphic\" in2=\"goo\" operator=\"atop\" />\r\n\t\t\t\t</filter>\r\n\t\t\t</defs>\r\n\t\t</svg>\r\n\t);\r\n};\r\n\r\nexport default GooeyFilter;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Fancy Components",
+      "url": "https://www.fancycomponents.dev/docs/components/filter/gooey-svg-filter",
+      "authorUrl": "https://www.fancycomponents.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "id",
+        "type": "string",
+        "default": "\"goo-filter\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "strength",
+        "type": "number",
+        "default": "10",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/gooey-tabs"
+  }
+}

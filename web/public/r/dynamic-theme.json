@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dynamic-theme",
+  "type": "registry:ui",
+  "title": "Dynamic Theme",
+  "description": "Sticky top navigation that recolours itself to stay legible over alternating light and dark page sections.",
+  "dependencies": [
+    "@gsap/react",
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dynamic-theme.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dynamic-theme.tsx",
+      "content": "import { useRef } from \"react\";\n\nimport { useGSAP } from \"@gsap/react\";\nimport gsap from \"gsap\";\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\n\n// optional hook for smooth scrolling\n// import useLenis from '@/hooks/useLenis';\n\n// Credit:\n// https://www.edil-ozi.pro/docs/components/dynamic-theme\n\ngsap.registerPlugin(ScrollTrigger);\n\nexport const NAV_LINKS = [\n\t{ id: \"home\", linkIdx: 0, isDarkBg: false, start: \"\", end: \"\" },\n\t{ id: \"services\", linkIdx: 1, isDarkBg: true, start: \"\", end: \"\" },\n\t{ id: \"works\", linkIdx: 2, isDarkBg: false, start: \"\", end: \"\" },\n\t{ id: \"about\", linkIdx: 3, isDarkBg: true, start: \"\", end: \"\" },\n\t{ id: \"contact\", linkIdx: 4, isDarkBg: false, start: \"\", end: \"\" },\n];\n\nconst DynamicTheme = ({ containerRef }) => {\n\tconst navRef = useRef<HTMLDivElement | null>(null);\n\tconst mainRef = useRef<HTMLElement | null>(null);\n\n\t// for smooth scrolling when link were pressed\n\tconst smoothScroll = (id: string) => {\n\t\tconst el = document.getElementById(id);\n\t\tel?.scrollIntoView({ behavior: \"smooth\" });\n\t};\n\n\tuseGSAP(\n\t\t() => {\n\t\t\tconsole.log(mainRef?.current);\n\n\t\t\tif (!mainRef?.current) return;\n\n\t\t\tconst navItems = mainRef?.current?.querySelectorAll(\".nav_link\");\n\n\t\t\tconst setActiveLink = (linkIdx: number, isDark: boolean) => {\n\t\t\t\tnavItems.forEach((item, i) => {\n\t\t\t\t\tif (i === linkIdx) {\n\t\t\t\t\t\tgsap.to(item, {\n\t\t\t\t\t\t\tcolor: isDark ? \"#fff\" : \"#000\",\n\t\t\t\t\t\t\tfontWeight: 500,\n\t\t\t\t\t\t\tduration: 0.08,\n\t\t\t\t\t\t});\n\t\t\t\t\t} else {\n\t\t\t\t\t\tgsap.to(item, {\n\t\t\t\t\t\t\tcolor: isDark ? \"#fff5\" : \"#0007\",\n\t\t\t\t\t\t\tfontWeight: 400,\n\t\t\t\t\t\t\tduration: 0.08,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t};\n\n\t\t\t// Create ScrollTrigger for each section\n\t\t\tNAV_LINKS.forEach(({ id, linkIdx, isDarkBg, start, end }) => {\n\t\t\t\tScrollTrigger.create({\n\t\t\t\t\t// scroller: \".scroll-container\",\n\t\t\t\t\ttrigger: \"#\" + id + \"link-for-changing-theme\",\n\t\t\t\t\tstart: start || \"top top\",\n\t\t\t\t\tend: end || \"bottom top\",\n\t\t\t\t\tonEnter: () => setActiveLink(linkIdx, isDarkBg),\n\t\t\t\t\tonEnterBack: () => setActiveLink(linkIdx, isDarkBg),\n\t\t\t\t});\n\t\t\t});\n\n\t\t\t// Function to update active link style\n\n\t\t\t// Cleanup\n\t\t\treturn () => {\n\t\t\t\tScrollTrigger.getAll().forEach((trigger) => trigger.kill());\n\t\t\t};\n\t\t},\n\t\t{ scope: mainRef.current!, dependencies: [] }\n\t);\n\n\t//Optional for smooth scrolling\n\t//   useLenis()\n\n\treturn (\n\t\t<section className=\"w-full relative bg-background\" ref={mainRef}>\n\t\t\t<span className=\"absolute top-0 left-0 text-foreground w-full h-12 flex items-center mx-auto text-center z-10100\">\n\t\t\t\t<p className=\"w-[70%] mx-auto text-balance text-sm font-medium tracking-wide opacity-60\">\n\t\t\t\t\tThis is demo area , please remove the additional styles from NAV\n\t\t\t\t\telement.\n\t\t\t\t</p>\n\t\t\t</span>\n\t\t\t<nav\n\t\t\t\tref={navRef}\n\t\t\t\tclassName=\"flex h-16  items-center text-sm lg:text-lg top-0 w-full z-1000 shadow-xs sticky\"\n\t\t\t>\n\t\t\t\t<ul className=\"flex flex-1 justify-end items-center h-full text-foreground space-x-4 px-6\">\n\t\t\t\t\t{NAV_LINKS.map(({ id }) => (\n\t\t\t\t\t\t<li\n\t\t\t\t\t\t\tclassName=\"nav_link capitalize cursor-pointer transition inline-block\"\n\t\t\t\t\t\t\taria-label=\"link-button\"\n\t\t\t\t\t\t\trole=\"button\"\n\t\t\t\t\t\t\ttabIndex={0}\n\t\t\t\t\t\t\tonClick={() => smoothScroll(id)}\n\t\t\t\t\t\t\tkey={id + \"link-for-changing-theme\"}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<p>{id}</p>\n\t\t\t\t\t\t</li>\n\t\t\t\t\t))}\n\t\t\t\t</ul>\n\t\t\t</nav>\n\n\t\t\t<section\n\t\t\t\tid=\"homelink-for-changing-theme\"\n\t\t\t\tclassName=\"w-full h-[480px] flex flex-col items-center justify-center text-4xl uppercase text-opacity-80 bg-slate-100 text-foreground\"\n\t\t\t>\n\t\t\t\thome section <br />\n\t\t\t\t<span className=\"text-xs font-bold tracking-wider opacity-40 mt-2 lowercase\">\n\t\t\t\t\t(scroll down to see effect)\n\t\t\t\t</span>\n\t\t\t</section>\n\n\t\t\t<section\n\t\t\t\tid=\"serviceslink-for-changing-theme\"\n\t\t\t\tclassName=\"w-full h-[480px] flex items-center justify-center text-4xl uppercase text-opacity-80 text-slate-bg-slate-100 bg-slate-950\"\n\t\t\t>\n\t\t\t\tservices section\n\t\t\t</section>\n\n\t\t\t<section\n\t\t\t\tid=\"workslink-for-changing-theme\"\n\t\t\t\tclassName=\"w-full h-[480px] flex items-center justify-center text-4xl uppercase text-opacity-80 bg-slate-100 text-foreground\"\n\t\t\t>\n\t\t\t\tworks section\n\t\t\t</section>\n\n\t\t\t<section\n\t\t\t\tid=\"aboutlink-for-changing-theme\"\n\t\t\t\tclassName=\"w-full h-[480px] flex items-center justify-center text-4xl uppercase text-opacity-80 text-slate-bg-slate-100 bg-slate-950\"\n\t\t\t>\n\t\t\t\tabout section\n\t\t\t</section>\n\n\t\t\t<section\n\t\t\t\tid=\"contactlink-for-changing-theme\"\n\t\t\t\tclassName=\"w-full h-[480px] flex items-center justify-center text-4xl uppercase text-opacity-80 bg-slate-100 text-foreground\"\n\t\t\t>\n\t\t\t\tcontact section\n\t\t\t</section>\n\t\t</section>\n\t);\n};\n\nexport default DynamicTheme;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "As you scroll from one section to the next, every nav link fades between dark and light text to suit the background behind it, and the link for the section you are in brightens to full strength. Clicking a link scrolls smoothly to that section.",
+    "inspiration": {
+      "source": "edil-ozi.pro",
+      "url": "https://www.edil-ozi.pro/docs/components/dynamic-theme",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dynamic-theme"
+  }
+}

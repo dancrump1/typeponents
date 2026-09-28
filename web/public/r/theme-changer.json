@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "theme-changer",
+  "type": "registry:ui",
+  "title": "Theme Changer",
+  "description": "Theme Changer",
+  "dependencies": [
+    "lucide-react",
+    "next-themes"
+  ],
+  "registryDependencies": [
+    "button",
+    "https://components.drivedev.net/r/theme-animations.json",
+    "theme-animations"
+  ],
+  "files": [
+    {
+      "path": "components/ui/theme-changer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/theme-changer.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { Button } from \"@/components/ui/button\";\nimport { MoonIcon, SunIcon } from \"lucide-react\";\nimport { useTheme } from \"next-themes\";\n\nimport {\n\tAnimationStart,\n\tAnimationVariant,\n\tcreateAnimation,\n} from \"@/components/ui/theme-animations\";\n\n// Credit:\n// https://skiper-ui.com/docs/components/theme-toggle-animations\n\n// CSS to Add to global\n\n/*\n.page-transition {\n  opacity: 0;\n  transition: opacity 0.7s ease;\n}\n\n.page-transition.active {\n  opacity: 1;\n}\n\n@supports (view-transition-name: none) {\n  .page-transition {\n    transition: none;\n  }\n\n  ::view-transition-group(root) {\n    animation-duration: 0.7s;\n    animation-timing-function: linear(\n      0 0%, 0.2342 12.49%, 0.4374 24.99%,\n      0.6093 37.49%, 0.6835 43.74%,\n      0.7499 49.99%, 0.8086 56.25%,\n      0.8593 62.5%, 0.9023 68.75%, 0.9375 75%,\n      0.9648 81.25%, 0.9844 87.5%,\n      0.9961 93.75%, 1 100%\n    );\n  }\n\n  ::view-transition-new(root) {\n    mask: url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 40 40\"><defs><filter id=\"blur\"><feGaussianBlur stdDeviation=\"2\"/></filter></defs><circle cx=\"0\" cy=\"0\" r=\"18\" fill=\"white\" filter=\"url(%23blur)\"/></svg>') top left / 0 no-repeat;\n    mask-origin: content-box;\n    animation: scale 1s;\n    transform-origin: top left;\n  }\n\n  ::view-transition-old(root),\n  .dark::view-transition-old(root) {\n    animation: scale 1s;\n    transform-origin: top left;\n    z-index: -1;\n  }\n\n  @keyframes scale {\n    to {\n      mask-size: 350vmax;\n    }\n  }\n}\n*/\n\ninterface ThemeToggleAnimationProps {\n\tvariant?: AnimationVariant;\n\tstart?: AnimationStart;\n\tshowLabel?: boolean;\n\turl?: string;\n}\n\nexport function ThemeToggleButton({\n\tvariant = \"circle-blur\",\n\tstart = \"top-left\",\n\tshowLabel = false,\n\turl = \"\",\n}: ThemeToggleAnimationProps) {\n\tconst { theme, setTheme } = useTheme();\n\n\tconst styleId = \"theme-transition-styles\";\n\n\tconst updateStyles = React.useCallback((css: string, name: string) => {\n\t\tif (typeof window === \"undefined\") return;\n\n\t\tlet styleElement = document.getElementById(styleId) as HTMLStyleElement;\n\n\t\tif (!styleElement) {\n\t\t\tstyleElement = document.createElement(\"style\");\n\t\t\tstyleElement.id = styleId;\n\t\t\tdocument.head.appendChild(styleElement);\n\t\t}\n\n\t\tstyleElement.textContent = css;\n\t}, []);\n\n\tconst toggleTheme = React.useCallback(() => {\n\t\tconst animation = createAnimation(variant, start, url);\n\n\t\tupdateStyles(animation.css, animation.name);\n\n\t\tif (typeof window === \"undefined\") return;\n\n\t\tconst switchTheme = () => {\n\t\t\tsetTheme(theme === \"light\" ? \"dark\" : \"light\");\n\t\t};\n\n\t\tif (!document.startViewTransition) {\n\t\t\tswitchTheme();\n\t\t\treturn;\n\t\t}\n\n\t\tdocument.startViewTransition(switchTheme);\n\t}, [theme, setTheme]);\n\n\treturn (\n\t\t<Button\n\t\t\tonClick={toggleTheme}\n\t\t\tvariant=\"ghost\"\n\t\t\tsize=\"icon\"\n\t\t\tclassName=\"w-9 p-0 h-9 relative group\"\n\t\t\tname=\"Theme Toggle Button\"\n\t\t>\n\t\t\t<SunIcon className=\"size-[1.2rem] rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0\" />\n\t\t\t<MoonIcon className=\"absolute size-[1.2rem] rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100\" />\n\t\t\t<span className=\"sr-only\">Theme Toggle </span>\n\t\t\t{showLabel && (\n\t\t\t\t<>\n\t\t\t\t\t<span className=\"hidden group-hover:block border rounded-full px-2 absolute -top-10\">\n\t\t\t\t\t\tvariant = {variant}\n\t\t\t\t\t</span>\n\t\t\t\t\t<span className=\"hidden group-hover:block border rounded-full px-2 absolute -bottom-10\">\n\t\t\t\t\t\tstart = {start}\n\t\t\t\t\t</span>\n\t\t\t\t</>\n\t\t\t)}\n\t\t</Button>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [
+      "internal",
+      "hover",
+      "theme-aware"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "skiper-ui.com",
+      "url": "https://skiper-ui.com/docs/components/theme-toggle-animations",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "variant",
+        "type": "AnimationVariant",
+        "default": "\"circle-blur\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "start",
+        "type": "AnimationStart",
+        "default": "\"top-left\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showLabel",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "url",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": true,
+    "gated": false,
+    "importPath": "@/components/ui/theme-changer"
+  }
+}

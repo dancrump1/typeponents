@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "three-bounce-loader",
+  "type": "registry:ui",
+  "title": "Three Bounce Loader",
+  "description": "Three Bounce Loader",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/three-bounce-loader.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/three-bounce-loader.tsx",
+      "content": "const ThreeDotSimpleLoader = () => {\r\n\treturn (\r\n\t\t<div className=\"flex items-center justify-center space-x-2 dark:invert\">\r\n\t\t\t<span className=\"sr-only\">Loading...</span>\r\n\t\t\t<div className=\"size-7 animate-bounce rounded-full bg-background [animation-delay:-0.3s]\" />\r\n\t\t\t<div className=\"size-7 animate-bounce rounded-full bg-background [animation-delay:-0.15s]\" />\r\n\t\t\t<div className=\"size-7 animate-bounce rounded-full bg-background\" />\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ThreeDotSimpleLoader;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Loaders"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/three-bounce-loader"
+  }
+}

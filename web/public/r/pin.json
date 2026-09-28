@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pin",
+  "type": "registry:ui",
+  "title": "Pin",
+  "description": "Pin",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/pin.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/pin.tsx",
+      "content": "\"use client\";\n\nimport React, { useState } from \"react\";\n\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// https://ui.aceternity.com/components/3d-pin\n\nexport const PinContainer = ({\n\tchildren,\n\ttitle,\n\thref,\n\tclassName,\n\tcontainerClassName,\n}: {\n\tchildren: React.ReactNode;\n\ttitle?: string;\n\thref?: string;\n\tclassName?: string;\n\tcontainerClassName?: string;\n}) => {\n\tconst [transform, setTransform] = useState(\n\t\t\"translate(-50%,-50%) rotateX(0deg)\"\n\t);\n\n\tconst onMouseEnter = () => {\n\t\tsetTransform(\"translate(-50%,-50%) rotateX(40deg) scale(0.8)\");\n\t};\n\tconst onMouseLeave = () => {\n\t\tsetTransform(\"translate(-50%,-50%) rotateX(0deg) scale(1)\");\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"relative group/pin z-40  cursor-pointer text-foreground\",\n\t\t\t\tcontainerClassName\n\t\t\t)}\n\t\t\tonMouseEnter={onMouseEnter}\n\t\t\tonMouseLeave={onMouseLeave}\n\t\t>\n\t\t\t<div\n\t\t\t\tstyle={{\n\t\t\t\t\tperspective: \"1000px\",\n\t\t\t\t\ttransform: \"rotateX(70deg) translateZ(0deg)\",\n\t\t\t\t}}\n\t\t\t\tclassName=\"absolute left-1/2 top-1/2 ml-[0.09375rem] mt-4 -translate-x-1/2 -translate-y-1/2\"\n\t\t\t>\n\t\t\t\t<div\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttransform: transform,\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute left-1/2 p-4 top-1/2  flex justify-start items-start  rounded-2xl  shadow-[0_8px_16px_rgb(0_0_0/0.4)] bg-background border border-white/10 group-hover/pin:border-white/20 transition duration-700 overflow-hidden\"\n\t\t\t\t>\n\t\t\t\t\t<div className={cn(\" relative z-40 \", className)}>\n\t\t\t\t\t\t{children}\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t\t<PinPerspective title={title} href={href} />\n\t\t</div>\n\t);\n};\n\nexport const PinPerspective = ({\n\ttitle,\n\thref,\n}: {\n\ttitle?: string;\n\thref: string;\n}) => {\n\treturn (\n\t\t<motion.div className=\"w-96 h-80 flex items-center justify-center opacity-0 group-hover/pin:opacity-100 z-60 transition duration-500\">\n\t\t\t<div className=\" w-full h-full -mt-7 flex-none  inset-0\">\n\t\t\t\t<div className=\"absolute top-0 inset-x-0  flex justify-center\">\n\t\t\t\t\t<Link\n\t\t\t\t\t\thref={href || \"\"}\n\t\t\t\t\t\ttarget={\"_blank\"}\n\t\t\t\t\t\tclassName=\"relative flex space-x-2 items-center z-10 rounded-full bg-background py-0.5 px-4 ring-1 ring-white/10 \"\n\t\t\t\t\t>\n\t\t\t\t\t\t<span className=\"relative z-20 text-foreground text-xs font-bold inline-block py-0.5\">\n\t\t\t\t\t\t\t{title}\n\t\t\t\t\t\t</span>\n\n\t\t\t\t\t\t<span className=\"absolute bottom-0 left-4.5 h-px w-[calc(100%-2.25rem)] bg-linear-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover/btn:opacity-40\"></span>\n\t\t\t\t\t</Link>\n\t\t\t\t</div>\n\n\t\t\t\t<div\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tperspective: \"1000px\",\n\t\t\t\t\t\ttransform: \"rotateX(70deg) translateZ(0)\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2 ml-[0.09375rem] mt-4 -translate-x-1/2 -translate-y-1/2\"\n\t\t\t\t>\n\t\t\t\t\t<>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\tscale: 0,\n\t\t\t\t\t\t\t\tx: \"-50%\",\n\t\t\t\t\t\t\t\ty: \"-50%\",\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\topacity: [0, 1, 0.5, 0],\n\t\t\t\t\t\t\t\tscale: 1,\n\n\t\t\t\t\t\t\t\tz: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\tduration: 6,\n\t\t\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\t\t\tdelay: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2  h-45 w-45 rounded-[50%] bg-sky-500/8 shadow-[0_8px_16px_rgb(0_0_0/0.4)]\"\n\t\t\t\t\t\t></motion.div>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\tscale: 0,\n\t\t\t\t\t\t\t\tx: \"-50%\",\n\t\t\t\t\t\t\t\ty: \"-50%\",\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\topacity: [0, 1, 0.5, 0],\n\t\t\t\t\t\t\t\tscale: 1,\n\n\t\t\t\t\t\t\t\tz: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\tduration: 6,\n\t\t\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\t\t\tdelay: 2,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2  h-45 w-45 rounded-[50%] bg-sky-500/8 shadow-[0_8px_16px_rgb(0_0_0/0.4)]\"\n\t\t\t\t\t\t></motion.div>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\tscale: 0,\n\t\t\t\t\t\t\t\tx: \"-50%\",\n\t\t\t\t\t\t\t\ty: \"-50%\",\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\topacity: [0, 1, 0.5, 0],\n\t\t\t\t\t\t\t\tscale: 1,\n\n\t\t\t\t\t\t\t\tz: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\tduration: 6,\n\t\t\t\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\t\t\t\tdelay: 4,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tclassName=\"absolute left-1/2 top-1/2  h-45 w-45 rounded-[50%] bg-sky-500/8 shadow-[0_8px_16px_rgb(0_0_0/0.4)]\"\n\t\t\t\t\t\t></motion.div>\n\t\t\t\t\t</>\n\t\t\t\t</div>\n\n\t\t\t\t<>\n\t\t\t\t\t<motion.div className=\"absolute right-1/2 bottom-1/2 bg-linear-to-b from-transparent to-cyan-500 translate-y-[14px] w-px h-20 group-hover/pin:h-40 blur-[2px]\" />\n\t\t\t\t\t<motion.div className=\"absolute right-1/2 bottom-1/2 bg-linear-to-b from-transparent to-cyan-500 translate-y-[14px] w-px h-20 group-hover/pin:h-40  \" />\n\t\t\t\t\t<motion.div className=\"absolute right-1/2 translate-x-[1.5px] bottom-1/2 bg-cyan-600 translate-y-[14px] w-[4px] h-[4px] rounded-full z-40 blur-[3px]\" />\n\t\t\t\t\t<motion.div className=\"absolute right-1/2 translate-x-[0.5px] bottom-1/2 bg-cyan-300 translate-y-[14px] w-[2px] h-[2px] rounded-full z-40 \" />\n\t\t\t\t</>\n\t\t\t</div>\n\t\t</motion.div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/3d-pin",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "href",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/pin"
+  }
+}

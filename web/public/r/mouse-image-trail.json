@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mouse-image-trail",
+  "type": "registry:ui",
+  "title": "Mouse Image Trail",
+  "description": "Mouse Image Trail",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/mouse-image-trail.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/mouse-image-trail.tsx",
+      "content": "import React, { MouseEventHandler, ReactNode, useRef } from \"react\";\r\n\r\nimport { useAnimate } from \"motion/react\";\r\n\r\n// www.hover.dev/components/other#mouse-image-trail\r\n\r\nexport const MouseImageTrail = ({\r\n\tchildren,\r\n\t// List of image sources\r\n\timages,\r\n\t// Will render a new image every X pixels between mouse moves\r\n\trenderImageBuffer,\r\n\t// images will be rotated at a random number between zero and rotationRange,\r\n\t// alternating between a positive and negative rotation\r\n\trotationRange,\r\n}: {\r\n\tchildren: ReactNode;\r\n\timages: string[];\r\n\trenderImageBuffer: number;\r\n\trotationRange: number;\r\n}) => {\r\n\tconst [scope, animate] = useAnimate();\r\n\r\n\tconst lastRenderPosition = useRef({ x: 0, y: 0 });\r\n\tconst imageRenderCount = useRef(0);\r\n\r\n\tconst handleMouseMove: MouseEventHandler<HTMLDivElement> = (e) => {\r\n\t\tconst { clientX, clientY } = e;\r\n\r\n\t\tconst distance = calculateDistance(\r\n\t\t\tclientX,\r\n\t\t\tclientY,\r\n\t\t\tlastRenderPosition.current.x,\r\n\t\t\tlastRenderPosition.current.y\r\n\t\t);\r\n\r\n\t\tif (distance >= renderImageBuffer) {\r\n\t\t\tlastRenderPosition.current.x = clientX;\r\n\t\t\tlastRenderPosition.current.y = clientY;\r\n\r\n\t\t\trenderNextImage();\r\n\t\t}\r\n\t};\r\n\r\n\tconst calculateDistance = (\r\n\t\tx1: number,\r\n\t\ty1: number,\r\n\t\tx2: number,\r\n\t\ty2: number\r\n\t) => {\r\n\t\tconst deltaX = x2 - x1;\r\n\t\tconst deltaY = y2 - y1;\r\n\r\n\t\t// Using the Pythagorean theorem to calculate the distance\r\n\t\tconst distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);\r\n\r\n\t\treturn distance;\r\n\t};\r\n\r\n\tconst renderNextImage = () => {\r\n\t\tconst imageIndex = imageRenderCount.current % images?.length;\r\n\t\tconst selector = `[data-mouse-move-index=\"${imageIndex}\"]`;\r\n\r\n\t\tconst el = document.querySelector(selector) as HTMLElement;\r\n\r\n\t\tel.style.top = `${lastRenderPosition.current.y}px`;\r\n\t\tel.style.left = `${lastRenderPosition.current.x}px`;\r\n\t\tel.style.zIndex = imageRenderCount.current.toString();\r\n\r\n\t\tconst rotation = Math.random() * rotationRange;\r\n\r\n\t\tanimate(\r\n\t\t\tselector,\r\n\t\t\t{\r\n\t\t\t\topacity: [0, 1],\r\n\t\t\t\ttransform: [\r\n\t\t\t\t\t`translate(-50%, -25%) scale(0.5) ${\r\n\t\t\t\t\t\timageIndex % 2\r\n\t\t\t\t\t\t\t? `rotate(${rotation}deg)`\r\n\t\t\t\t\t\t\t: `rotate(-${rotation}deg)`\r\n\t\t\t\t\t}`,\r\n\t\t\t\t\t`translate(-50%, -50%) scale(1) ${\r\n\t\t\t\t\t\timageIndex % 2\r\n\t\t\t\t\t\t\t? `rotate(-${rotation}deg)`\r\n\t\t\t\t\t\t\t: `rotate(${rotation}deg)`\r\n\t\t\t\t\t}`,\r\n\t\t\t\t],\r\n\t\t\t},\r\n\t\t\t{ type: \"spring\", damping: 15, stiffness: 200 }\r\n\t\t);\r\n\r\n\t\tanimate(\r\n\t\t\tselector,\r\n\t\t\t{\r\n\t\t\t\topacity: [1, 0],\r\n\t\t\t},\r\n\t\t\t{ ease: \"linear\", duration: 0.5, delay: 5 }\r\n\t\t);\r\n\r\n\t\timageRenderCount.current = imageRenderCount.current + 1;\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={scope}\r\n\t\t\tclassName=\"relative overflow-hidden h-screen z-502\"\r\n\t\t\tonMouseMove={handleMouseMove}\r\n\t\t>\r\n\t\t\t{children}\r\n\r\n\t\t\t{images?.map((img, index) => (\r\n\t\t\t\t<img\r\n\t\t\t\t\tclassName=\"pointer-events-none absolute left-0 top-0 h-48 w-auto rounded-xl border-2 border-black bg-background object-cover opacity-0\"\r\n\t\t\t\t\tsrc={img}\r\n\t\t\t\t\talt={`Mouse move image ${index}`}\r\n\t\t\t\t\tkey={index + \"mouse-image-trail\"}\r\n\t\t\t\t\tdata-mouse-move-index={index}\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cursor & Pointer Effects"
+    ],
+    "tags": [
+      "spring",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "renderImageBuffer",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "rotationRange",
+        "type": "number",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/mouse-image-trail"
+  }
+}

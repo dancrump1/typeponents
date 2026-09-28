@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-537",
+  "type": "registry:component",
+  "title": "Comp 537",
+  "description": "Comp 537",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-537.tsx",
+      "content": "import {\r\n\tTimeline,\r\n\tTimelineDate,\r\n\tTimelineHeader,\r\n\tTimelineIndicator,\r\n\tTimelineItem,\r\n\tTimelineSeparator,\r\n\tTimelineTitle,\r\n} from \"@/components/ui/timeline\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: 1,\r\n\t\tdate: \"Mar 15, 2024\",\r\n\t\ttitle: \"Project Kickoff\",\r\n\t},\r\n\t{\r\n\t\tid: 2,\r\n\t\tdate: \"Mar 22, 2024\",\r\n\t\ttitle: \"Design Phase\",\r\n\t},\r\n\t{\r\n\t\tid: 3,\r\n\t\tdate: \"Apr 5, 2024\",\r\n\t\ttitle: \"Development Sprint\",\r\n\t},\r\n\t{\r\n\t\tid: 4,\r\n\t\tdate: \"Apr 19, 2024\",\r\n\t\ttitle: \"Testing & Deployment\",\r\n\t},\r\n\t{\r\n\t\tid: 5,\r\n\t\tdate: \"May 3, 2024\",\r\n\t\ttitle: \"User Training\",\r\n\t},\r\n\t{\r\n\t\tid: 6,\r\n\t\tdate: \"May 17, 2024\",\r\n\t\ttitle: \"Project Handover\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<Timeline defaultValue={3}>\r\n\t\t\t{items.map((item) => (\r\n\t\t\t\t<TimelineItem\r\n\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\tstep={item.id}\r\n\t\t\t\t\tclassName=\"w-[calc(50%-1.5rem)] odd:ms-auto even:text-right group-data-[orientation=vertical]/timeline:even:ms-0 group-data-[orientation=vertical]/timeline:even:me-8 **:data-[slot=timeline-indicator]:group-data-[orientation=vertical]/timeline:even:-right-6 **:data-[slot=timeline-indicator]:group-data-[orientation=vertical]/timeline:even:left-auto **:data-[slot=timeline-indicator]:group-data-[orientation=vertical]/timeline:even:translate-x-1/2 **:data-[slot=timeline-separator]:group-data-[orientation=vertical]/timeline:even:-right-6 **:data-[slot=timeline-separator]:group-data-[orientation=vertical]/timeline:even:left-auto **:data-[slot=timeline-separator]:group-data-[orientation=vertical]/timeline:even:translate-x-1/2\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<TimelineHeader>\r\n\t\t\t\t\t\t<TimelineSeparator />\r\n\t\t\t\t\t\t<TimelineDate>{item.date}</TimelineDate>\r\n\t\t\t\t\t\t<TimelineTitle>{item.title}</TimelineTitle>\r\n\t\t\t\t\t\t<TimelineIndicator />\r\n\t\t\t\t\t</TimelineHeader>\r\n\t\t\t\t</TimelineItem>\r\n\t\t\t))}\r\n\t\t</Timeline>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-364",
+  "type": "registry:component",
+  "title": "Comp 364",
+  "description": "Comp 364",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-364.tsx",
+      "content": "import {\r\n\tHoverCard,\r\n\tHoverCardContent,\r\n\tHoverCardTrigger,\r\n} from \"@/components/ui/hover-card\";\r\n\r\nexport default function HoverCardDemo() {\r\n\treturn (\r\n\t\t<HoverCard>\r\n\t\t\t<div className=\"flex items-center gap-3\">\r\n\t\t\t\t<img\r\n\t\t\t\t\tclassName=\"shrink-0 rounded-full\"\r\n\t\t\t\t\tsrc=\"avatar-40-05.jpg\"\r\n\t\t\t\t\twidth={40}\r\n\t\t\t\t\theight={40}\r\n\t\t\t\t\talt=\"Avatar\"\r\n\t\t\t\t/>\r\n\t\t\t\t<div className=\"space-y-0.5\">\r\n\t\t\t\t\t<HoverCardTrigger asChild>\r\n\t\t\t\t\t\t<p>\r\n\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\tclassName=\"text-sm font-medium hover:underline\"\r\n\t\t\t\t\t\t\t\thref=\"#\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\tKeith Kennedy\r\n\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</HoverCardTrigger>\r\n\t\t\t\t\t<p className=\"text-muted-foreground text-xs\">@k.kennedy</p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t<HoverCardContent>\r\n\t\t\t\t<div className=\"space-y-3\">\r\n\t\t\t\t\t<div className=\"flex items-center gap-3\">\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tclassName=\"shrink-0 rounded-full\"\r\n\t\t\t\t\t\t\tsrc=\"avatar-40-05.jpg\"\r\n\t\t\t\t\t\t\twidth={40}\r\n\t\t\t\t\t\t\theight={40}\r\n\t\t\t\t\t\t\talt=\"Avatar\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<div className=\"space-y-0.5\">\r\n\t\t\t\t\t\t\t<p className=\"text-sm font-medium\">Keith Kennedy</p>\r\n\t\t\t\t\t\t\t<p className=\"text-muted-foreground text-xs\">@k.kennedy</p>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<p className=\"text-muted-foreground text-sm\">\r\n\t\t\t\t\t\tDesigner at{\" \"}\r\n\t\t\t\t\t\t<strong className=\"text-foreground font-medium\">\r\n\t\t\t\t\t\t\t@Origin UI\r\n\t\t\t\t\t\t</strong>\r\n\t\t\t\t\t\t. Crafting web experiences with Tailwind CSS.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t\t<div className=\"flex items-center gap-2\">\r\n\t\t\t\t\t\t<div className=\"flex -space-x-1.5\">\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"ring-background rounded-full ring-1\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-04.jpg\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t\talt=\"Friend 01\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"ring-background rounded-full ring-1\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-05.jpg\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t\talt=\"Friend 02\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\tclassName=\"ring-background rounded-full ring-1\"\r\n\t\t\t\t\t\t\t\tsrc=\"/avatar-20-06.jpg\"\r\n\t\t\t\t\t\t\t\twidth={20}\r\n\t\t\t\t\t\t\t\theight={20}\r\n\t\t\t\t\t\t\t\talt=\"Friend 03\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div className=\"text-muted-foreground text-xs\">\r\n\t\t\t\t\t\t\t3 mutual friends\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</HoverCardContent>\r\n\t\t</HoverCard>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

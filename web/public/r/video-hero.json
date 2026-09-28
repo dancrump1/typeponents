@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "video-hero",
+  "type": "registry:ui",
+  "title": "Video Hero",
+  "description": "Video Hero",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/video-hero.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/video-hero.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nconst VideoHero = () => {\r\n\treturn (\r\n\t\t<section\r\n\t\t\tclassName=\"aspect-square md:aspect-video relative md:rounded-lg\r\n\t\t\tflex flex-col items-center \r\n\t\t\tjustify-center text-center md:mt-[.5em] md:mx-[7%] mb-[3em]\r\n\t\t\ttext-foreground overflow-hidden\"\r\n\t\t>\r\n\t\t\t<div className=\"video-docker absolute inset-0 -mx-[40%]\">\r\n\t\t\t\t<iframe\r\n\t\t\t\t\tclassName=\"w-full h-full\"\r\n\t\t\t\t\tsrc=\"https://www.youtube.com/embed/jJN3amHlaKQ?feature=oembed&loop=1&playsinline=1&autoplay=1&mute=1&controls=0&enablejsapi=0&iv_load_policy=3\"\r\n\t\t\t\t\tallow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\r\n\t\t\t\t\treferrerPolicy=\"strict-origin-when-cross-origin\"\r\n\t\t\t\t\tallowFullScreen\r\n\t\t\t\t></iframe>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"video-content space-y-2 z-10\">\r\n\t\t\t\t<h1 className=\"font-light text-6xl\">full Hero Video</h1>\r\n\t\t\t\t<h3 className=\"font-light text-3xl\">with TailwindCSS</h3>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nexport default VideoHero;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Videos"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/video-hero"
+  }
+}

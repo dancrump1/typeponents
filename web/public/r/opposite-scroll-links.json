@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "opposite-scroll-links",
+  "type": "registry:ui",
+  "title": "Opposite Scroll Links",
+  "description": "Split index of full-height image links, with the left and right columns scrolling past each other in opposite directions.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/opposite-scroll-links.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/opposite-scroll-links.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\n\nimport Image from \"next/image\";\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion, MotionValue, useScroll, useTransform } from \"motion/react\";\n\n// Inspiration:\n// www.hover.dev/components/other#opposite-scroll-content\n\nconst OppositeScroll = ({ works, className, containerRef, ...props }) => {\n\tconst targetRef = useRef<HTMLDivElement | null>(null);\n\tconst [componentContainerRef, setComponentContainerRef] = useState(null);\n\n\tuseEffect(() => {\n\t\tsetComponentContainerRef(containerRef);\n\t}, [containerRef]);\n\n\tconst { scrollYProgress } = useScroll({\n\t\ttarget: targetRef,\n\t\t// container: componentContainerRef || null,\n\t});\n\n\tconst leftWorks = works?.slice(0, works.length / 2);\n\tconst rightWorks = works?.slice(works.length / 2, works.length);\n\tif (!!componentContainerRef && componentContainerRef?.current === undefined)\n\t\treturn null;\n\n\treturn (\n\t\t<section className={cn(\"flex\", className)} ref={targetRef} {...props}>\n\t\t\t<LeftContent content={leftWorks} />\n\t\t\t<RightContent content={rightWorks} scrollYProgress={scrollYProgress} />\n\t\t</section>\n\t);\n};\n\nconst LeftContent = ({ content }: { content: any }) => {\n\treturn (\n\t\t<div className=\"w-full\">\n\t\t\t{content?.map(({ id, title, image, uri }, idx) => (\n\t\t\t\t<Link\n\t\t\t\t\thref={`/work/${uri}`}\n\t\t\t\t\tkey={title + \"opposite\" + id}\n\t\t\t\t\tclassName={`p-8 h-screen relative flex flex-col justify-between group`}\n\t\t\t\t>\n\t\t\t\t\t<div className=\"invisible group-hover:visible group-hover:bg-background/40 absolute inset-0 text-center content-center text-4xl\">\n\t\t\t\t\t\t{title}\n\t\t\t\t\t</div>\n\t\t\t\t\t<Image\n\t\t\t\t\t\theight={1200}\n\t\t\t\t\t\twidth={1200}\n\t\t\t\t\t\tkey={title + \"oppo-link-img\"}\n\t\t\t\t\t\talt={title}\n\t\t\t\t\t\tclassName=\"h-screen w-full object-cover\"\n\t\t\t\t\t\tsrc={image[0].url || \"/itjustworks.jpg\"}\n\t\t\t\t\t/>\n\t\t\t\t</Link>\n\t\t\t))}\n\t\t</div>\n\t);\n};\n\nconst RightContent = ({\n\tcontent,\n\tscrollYProgress,\n}: {\n\tcontent: any;\n\tscrollYProgress: MotionValue<number>;\n}) => {\n\tconst top = useTransform(\n\t\tscrollYProgress,\n\t\t[0, 1],\n\t\t[`-${(content?.length - 1) * 100}vh`, \"0vh\"]\n\t);\n\n\treturn (\n\t\t<div className=\"h-screen overflow-hidden sticky top-0 w-24 md:w-full\">\n\t\t\t<motion.div style={{ top }} className=\"absolute left-0 right-0\">\n\t\t\t\t{[...content || []]?.reverse().map(({ image, id, title, uri }) => (\n\t\t\t\t\t<Link\n\t\t\t\t\t\thref={`/work/${uri}`}\n\t\t\t\t\t\tkey={title + \"opposite\" + id}\n\t\t\t\t\t\tclassName={`p-8 h-screen relative flex flex-col justify-between group`}\n\t\t\t\t\t>\n\t\t\t\t\t\t<div className=\"invisible group-hover:visible group-hover:bg-background/40 absolute inset-0 text-center content-center text-4xl\">\n\t\t\t\t\t\t\t{title}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\theight={1200}\n\t\t\t\t\t\t\twidth={1200}\n\t\t\t\t\t\t\tkey={id + \"oppo-img\"}\n\t\t\t\t\t\t\talt={title}\n\t\t\t\t\t\t\tclassName=\"h-screen w-full object-cover\"\n\t\t\t\t\t\t\tsrc={image.src || \"/itjustworks.jpg\"}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</Link>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\nexport default OppositeScroll;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "Scrolling drives the left column one way and the right column the other, so the two halves slide past each other. Hovering an image washes it over and fades the project title in on top; clicking opens that project.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/opposite-scroll-links"
+  }
+}

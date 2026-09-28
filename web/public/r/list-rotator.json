@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "list-rotator",
+  "type": "registry:ui",
+  "title": "List Rotator",
+  "description": "List Rotator",
+  "dependencies": [
+    "gsap",
+    "lenis",
+    "styled-components"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/list-rotator.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/list-rotator.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\n\nimport gsap from \"gsap\";\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\nimport { ReactLenis } from \"lenis/react\";\nimport styled from \"styled-components\";\n\n// Credit:\n// https://github.com/PhanDangKhoa96/ui-collections\n\nconst listItems = [\n\t{ text: \"Web\", emphasizedText: \"Design\" },\n\t{ text: \"Mobile\", emphasizedText: \"App Development\" },\n\t{ text: \"E-Commerce\", emphasizedText: \"Solutions\" },\n\t{ text: \"Digital\", emphasizedText: \"Marketing\" },\n\t{ text: \"UI/UX\", emphasizedText: \"Design\" },\n\t{ text: \"Brand\", emphasizedText: \"Strategy\" },\n\t{ text: \"SEO\", emphasizedText: \"Optimization\" },\n\t{ text: \"Social\", emphasizedText: \"Media Management\" },\n\t{ text: \"Content\", emphasizedText: \"Creation\" },\n\t{ text: \"Data\", emphasizedText: \"Analytics\" },\n];\ngsap.registerPlugin(ScrollTrigger);\n\nconst RotatorWrapper = styled.div`\n\t-webkit-mask-image: -webkit-linear-gradient(\n\t\ttransparent 25%,\n\t\tblack 40%,\n\t\tblack 60%,\n\t\ttransparent 75%\n\t);\n`;\n\nconst ListRotator = ({}) => {\n\tconst $wrapper = useRef<HTMLDivElement>(null);\n\tconst $triggerPoint = useRef<HTMLDivElement>(null);\n\tconst $listRotator = useRef<HTMLUListElement>(null);\n\n\tuseEffect(() => {\n\t\tconst ctx = gsap.context(() => {\n\t\t\tconst items = $wrapper.current?.querySelectorAll(\"li\");\n\t\t\tconst totalItems = listItems.length - 1;\n\t\t\tconst angleIncrement = 180 / totalItems;\n\n\t\t\titems?.forEach((item, index) => {\n\t\t\t\tconst rotationAngle = index * angleIncrement;\n\t\t\t\tconst fontSize = gsap.getProperty(item, \"fontSize\") as string;\n\t\t\t\tconst lineHeight = gsap.getProperty(item, \"lineHeight\") as string;\n\t\t\t\tconst translateZ =\n\t\t\t\t\t(parseFloat(fontSize) + parseFloat(lineHeight)) * 1.8;\n\n\t\t\t\tgsap.set(item, {\n\t\t\t\t\trotationX: -rotationAngle,\n\t\t\t\t\ttransformOrigin: `center center 0`,\n\t\t\t\t\ttransform: `rotateX(${-rotationAngle}deg) translateZ(${translateZ}px)`,\n\t\t\t\t\tzIndex: totalItems - index,\n\t\t\t\t});\n\t\t\t});\n\n\t\t\tgsap.set($listRotator.current, { rotationX: -90 });\n\n\t\t\tgsap.to($listRotator.current, {\n\t\t\t\trotationX: 270,\n\t\t\t\tscrollTrigger: {\n\t\t\t\t\ttrigger: $triggerPoint.current,\n\t\t\t\t\t// scroller: \".scroll-container\",\n\t\t\t\t\tstart: \"top top\",\n\t\t\t\t\t// markers: true,\n\t\t\t\t\tscrub: true,\n\t\t\t\t},\n\t\t\t});\n\t\t}, $wrapper);\n\t\treturn () => {\n\t\t\tctx.revert();\n\t\t};\n\t}, []);\n\n\treturn (\n\t\t<div className=\"h-screen overflow-auto\">\n\t\t\t<div ref={$wrapper}>\n\t\t\t\t<RotatorWrapper\n\t\t\t\t\tclassName=\"sticky h-screen top-0 grid place-items-center bg-background\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tperspective: \"10000px\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<ul\n\t\t\t\t\t\tclassName=\"relative flex h-full w-full flex-col gap-y-5\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttransformStyle: \"preserve-3d\",\n\t\t\t\t\t\t\tbackfaceVisibility: \"hidden\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tref={$listRotator}\n\t\t\t\t\t>\n\t\t\t\t\t\t{listItems.map((item, index) => {\n\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t<li\n\t\t\t\t\t\t\t\t\tkey={index + \"list-rotator\"}\n\t\t\t\t\t\t\t\t\tclassName=\"absolute top-1/2 w-full whitespace-nowrap text-center text-[calc(1rem+3vw)] leading-[calc(1rem+3.5vw)]\"\n\t\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\t\tbackfaceVisibility: \"hidden\",\n\t\t\t\t\t\t\t\t\t\ttransformStyle: \"preserve-3d\",\n\t\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<span className=\"font-light\">{item.text}</span>{\" \"}\n\t\t\t\t\t\t\t\t\t<strong className=\"text-indigo-700\">\n\t\t\t\t\t\t\t\t\t\t{item.emphasizedText}\n\t\t\t\t\t\t\t\t\t</strong>\n\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t})}\n\t\t\t\t\t</ul>\n\t\t\t\t</RotatorWrapper>\n\n\t\t\t\t<div className=\"h-[300vh]\" ref={$triggerPoint}></div>\n\t\t\t\t{/* <div className=\"h-screen\"></div> */}\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default ListRotator;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Data & Tables"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "GitHub",
+      "url": "https://github.com/PhanDangKhoa96/ui-collections",
+      "author": "PhanDangKhoa96",
+      "authorUrl": "https://github.com/PhanDangKhoa96",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/list-rotator"
+  }
+}

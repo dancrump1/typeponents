@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "terminal-loader",
+	title: "Terminal Loader",
+	description: "A retro, terminal-inspired monospace loading indicator that animates character blocks and trailing density particles in real-time.",
+	interaction: "Continuous procedural loop animation with customizable speed, matrix dimensions, character glyph trails, and colors.",
+	categories: ["Loaders"],
+	tags: ["autoplay"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/terminal-loader",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: [],
+	registryDependencies: [],
+	props: [
+		{ name: "rows", type: "number", default: "5" },
+		{ name: "cols", type: "number", default: "60" },
+		{ name: "blockWidth", type: "number", default: "3" },
+		{ name: "speed", type: "number", default: "50" },
+		{ name: "color", type: "string", default: "\"text-rose-500\"" },
+		{ name: "bgColor", type: "string", default: "\"bg-rose-500\"" },
+		{ name: "charEmpty", type: "string", default: "\".\"" },
+		{ name: "charTrail", type: "string[]", default: "[\"▓\", \"▒\", \"░\"]" },
+		{ name: "className", type: "string" },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gradient-testimonials",
+  "type": "registry:ui",
+  "title": "Gradient Testimonials",
+  "description": "Gradient Testimonials",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/gradient-testimonials.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/gradient-testimonials.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nconst Testimonials = ({ data }) => {\r\n\treturn (\r\n\t\t<section className=\"h-fit w-full bg-background\">\r\n\t\t\t<div className=\"mx-auto flex flex-wrap justify-center gradient-background cont-page\">\r\n\t\t\t\t{data.map(({ title, comment }) => {\r\n\t\t\t\t\treturn (\r\n\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\tclassName=\"relative gradient-card basis-1/3 grow\"\r\n\t\t\t\t\t\t\tkey={title}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tclassName=\"absolute -inset-1 bg-background\"\r\n\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\tmask: \"url(./TextBox_frame.svg)\",\r\n\t\t\t\t\t\t\t\t\tmaskSize: \"contain\",\r\n\t\t\t\t\t\t\t\t\tmaskRepeat: \"no-repeat\",\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t></div>\r\n\t\t\t\t\t\t\t<div className=\"z-10 relative p-20 text-foreground mix-blend-difference\">\r\n\t\t\t\t\t\t\t\t{title}\r\n\t\t\t\t\t\t\t\t{comment}\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t);\r\n\t\t\t\t})}\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nexport default Testimonials;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Testimonials"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/gradient-testimonials"
+  }
+}

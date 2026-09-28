@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "trading-card",
+  "type": "registry:ui",
+  "title": "Trading Card",
+  "description": "A card that moves in 3D when you hover over it. Perfect for showcasing profiles, characters, or products with engaging effects.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/trading-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/trading-card.tsx",
+      "content": "'use client';\n\nimport { motion, useAnimationControls } from 'framer-motion';\r\nimport Image from 'next/image';\r\nimport React, { useRef } from 'react';\r\n\r\ninterface TradingCardProps {\r\n  imageUrl: string;\r\n  rank: number;\r\n  name: string;\r\n  description: string;\r\n}\r\n\r\nconst TradingCard: React.FC<TradingCardProps> = ({ imageUrl, rank, name, description }) => {\r\n  const cardRef = useRef<HTMLDivElement>(null);\r\n\r\n  const backgroundControls = useAnimationControls();\r\n  const contentControls = useAnimationControls();\r\n  const cardControls = useAnimationControls();\r\n\r\n  const onMouseEnter: React.MouseEventHandler<HTMLDivElement> = () => {\r\n    contentControls.start({ x: -300 });\r\n    backgroundControls.start({ scale: 1.05, opacity: 1 });\r\n  };\r\n\r\n  const onMouseLeave = () => {\r\n    contentControls.start({ x: 0, transition: { delay: 0.5 } });\r\n    backgroundControls.start({ scale: 0.95, opacity: 0.4 });\r\n    cardControls.start({ transform: `rotateY(0deg) rotateX(0deg)` });\r\n  };\r\n\r\n  const onMouseMove: React.MouseEventHandler<HTMLDivElement> = (e) => {\r\n    if (!cardRef.current) return;\r\n\r\n    const rect = cardRef.current?.getBoundingClientRect();\r\n    if (!rect) return;\r\n\r\n    const mx = e.clientX - rect.left;\r\n    const my = e.clientY - rect.top;\r\n\r\n    const width = rect.right - rect.left;\r\n    const height = rect.bottom - rect.top;\r\n\r\n    const xd = (mx - width / 2) / 10;\r\n    const yd = (height / 2 - my) / 10;\r\n\r\n    cardRef.current.style.transform = `perspective(1000px) rotateY(${xd}deg) rotateX(${yd}deg)`;\r\n  };\r\n\r\n  return (\r\n    <motion.div\r\n      ref={cardRef}\r\n      onMouseMove={onMouseMove}\r\n      onMouseEnter={onMouseEnter}\r\n      onMouseLeave={onMouseLeave}\r\n      initial={{\r\n        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg)'\r\n      }}\r\n      style={{\r\n        transformStyle: 'preserve-3d'\r\n      }}\r\n      animate={cardControls}\r\n      className=\"flex flex-col hover:scale-105 transition-all duration-200 ease-linear items-start justify-end rounded-lg relative shadow-xl overflow-hidden h-[400px] w-[300px] cursor-pointer border-[1px] border-neutral-800\"\r\n    >\r\n      <motion.div\r\n        className=\"h-full w-full absolute z-0\"\r\n        initial={{\r\n          opacity: 0.4,\r\n          scale: 0.95\r\n        }}\r\n        animate={backgroundControls}\r\n        transition={{ duration: 0.7, ease: 'backOut' }}\r\n      >\r\n        <div className=\"h-full w-full inset-0 bg-cover bg-center\">\r\n          <Image src={imageUrl} alt={name} fill className=\"object-cover\" />\r\n        </div>\r\n      </motion.div>\r\n      <div className=\"font-semibold absolute top-5 right-5 z-10 text-white/70\">#{rank}</div>\r\n      <motion.div\r\n        animate={contentControls}\r\n        transition={{ duration: 0.5, ease: 'backOut' }}\r\n        className=\"p-5 h-full w-full flex flex-col justify-end bg-transparent z-10 opacity-90\"\r\n      >\r\n        <div className=\"font-medium\">\r\n          {name.split(' ').map((word) => {\r\n            return (\r\n              <div\r\n                key={word}\r\n                className=\"flex flex-col items-start justify-start text-4xl font-bold\"\r\n              >\r\n                {word} <br />\r\n              </div>\r\n            );\r\n          })}\r\n        </div>\r\n        <p className=\"text-sm text-white/90\">{description}</p>\r\n      </motion.div>\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nexport default TradingCard;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "The card tilts in 3D to follow the pointer, catching a specular highlight.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/tradingCard",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "imageUrl",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "rank",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "name",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/trading-card"
+  }
+}

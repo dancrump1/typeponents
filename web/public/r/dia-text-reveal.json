@@ -1,0 +1,121 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dia-text-reveal",
+  "type": "registry:ui",
+  "title": "Dia Text Reveal",
+  "description": "Dia Text Reveal",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dia-text-reveal.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dia-text-reveal.tsx",
+      "content": "\"use client\"\r\n\r\nimport { useEffect, useRef, useState } from \"react\"\r\nimport {\r\n    animate,\r\n    motion,\r\n    useInView,\r\n    useMotionValue,\r\n    useReducedMotion,\r\n    useTransform,\r\n    type HTMLMotionProps,\r\n} from \"motion/react\"\r\nimport { cn } from \"@/lib/utils\"\r\n\r\n// Credit:\r\n// https://magicui.design/docs/components/dia-text-reveal\r\n\r\nconst DEFAULT_COLORS = [\"#c679c4\", \"#fa3d1d\", \"#ffb005\", \"#e1e1fe\", \"#0358f7\"]\r\nconst BAND_HALF = 17\r\nconst SWEEP_START = -BAND_HALF\r\nconst SWEEP_END = 100 + BAND_HALF\r\n\r\nconst sweepEase = (t: number) =>\r\n    t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2\r\n\r\nfunction buildGradient(pos: number, colors: string[], textColor: string) {\r\n    const bandStart = pos - BAND_HALF\r\n    const bandEnd = pos + BAND_HALF\r\n\r\n    if (bandStart >= 100) {\r\n        return `linear-gradient(90deg, ${textColor}, ${textColor})`\r\n    }\r\n    const n = colors.length\r\n    const parts: string[] = []\r\n\r\n    if (bandStart > 0)\r\n        parts.push(`${textColor} 0%`, `${textColor} ${bandStart.toFixed(2)}%`)\r\n\r\n    colors.forEach((c, i) => {\r\n        const pct = n === 1 ? pos : bandStart + (i / (n - 1)) * BAND_HALF * 2\r\n        parts.push(`${c} ${pct.toFixed(2)}%`)\r\n    })\r\n\r\n    if (bandEnd < 100)\r\n        parts.push(`transparent ${bandEnd.toFixed(2)}%`, `transparent 100%`)\r\n\r\n    return `linear-gradient(90deg, ${parts.join(\", \")})`\r\n}\r\n\r\nfunction measureWidths(el: HTMLElement, texts: string[]) {\r\n    const ghost = el.cloneNode() as HTMLElement\r\n    Object.assign(ghost.style, {\r\n        position: \"absolute\",\r\n        visibility: \"hidden\",\r\n        pointerEvents: \"none\",\r\n        width: \"auto\",\r\n        whiteSpace: \"nowrap\",\r\n    })\r\n    el.parentElement!.appendChild(ghost)\r\n    const widths = texts.map((t) => {\r\n        ghost.textContent = t\r\n        return ghost.getBoundingClientRect().width\r\n    })\r\n    ghost.remove()\r\n    return widths\r\n}\r\n\r\n/**\r\n * Props for {@link DiaTextReveal}.\r\n */\r\nexport interface DiaTextRevealProps extends Omit<\r\n    HTMLMotionProps<\"span\">,\r\n    \"ref\" | \"children\" | \"style\" | \"animate\" | \"transition\" | \"color\"\r\n> {\r\n    /**\r\n     * Text to reveal. Pass multiple strings to rotate when {@link DiaTextRevealProps.repeat} is `true`.\r\n     */\r\n    text: string | string[]\r\n    /**\r\n     * Colors sampled across the moving gradient band. Defaults to a built-in palette.\r\n     */\r\n    colors?: string[]\r\n    /**\r\n     * CSS color for revealed text after the sweep and for leading/trailing regions during the animation.\r\n     * @defaultValue `\"var(--foreground)\"`\r\n     */\r\n    textColor?: string\r\n    /**\r\n     * Duration of one sweep pass, in seconds.\r\n     * @defaultValue `1.5`\r\n     */\r\n    duration?: number\r\n    /**\r\n     * Delay before the sweep starts, in seconds.\r\n     * @defaultValue `0`\r\n     */\r\n    delay?: number\r\n    /**\r\n     * When `text` is an array, replay the sweep and advance to the next string after each completion.\r\n     * @defaultValue `false`\r\n     */\r\n    repeat?: boolean\r\n    /**\r\n     * Pause between cycles when {@link DiaTextRevealProps.repeat} is `true`, in seconds.\r\n     * @defaultValue `0.5`\r\n     */\r\n    repeatDelay?: number\r\n    /**\r\n     * If `true`, the animation starts only after the element enters the viewport.\r\n     * @defaultValue `true`\r\n     */\r\n    startOnView?: boolean\r\n    /**\r\n     * Passed to `useInView`: if `true`, in-view detection fires at most once (no replay on scroll-back).\r\n     * @defaultValue `true`\r\n     */\r\n    once?: boolean\r\n    /**\r\n     * Additional class names for the animated `span` (e.g. typography utilities).\r\n     */\r\n    className?: string\r\n    /**\r\n     * When `text` has multiple entries, use the widest string’s width for layout instead of animating width per line.\r\n     * @defaultValue `false`\r\n     */\r\n    fixedWidth?: boolean\r\n}\r\n\r\nexport function DiaTextReveal({\r\n    text,\r\n    colors = DEFAULT_COLORS,\r\n    textColor = \"var(--foreground)\",\r\n    duration = 1.5,\r\n    delay = 0,\r\n    repeat = false,\r\n    repeatDelay = 0.5,\r\n    startOnView = true,\r\n    once = true,\r\n    className,\r\n    fixedWidth = false,\r\n    ...props\r\n}: DiaTextRevealProps) {\r\n    const texts = Array.isArray(text) ? text : [text]\r\n    const isMulti = texts.length > 1\r\n    const prefersReducedMotion = useReducedMotion()\r\n\r\n    const spanRef = useRef<HTMLSpanElement>(null)\r\n    const optsRef = useRef({\r\n        colors,\r\n        textColor,\r\n        duration,\r\n        delay,\r\n        repeat,\r\n        repeatDelay,\r\n        texts,\r\n    })\r\n    optsRef.current = {\r\n        colors,\r\n        textColor,\r\n        duration,\r\n        delay,\r\n        repeat,\r\n        repeatDelay,\r\n        texts,\r\n    }\r\n\r\n    const indexRef = useRef(0)\r\n    const hasPlayedRef = useRef(false)\r\n    const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined)\r\n    const playRef = useRef<() => void>(null!)\r\n    const stopRef = useRef<(() => void) | null>(null)\r\n\r\n    const [activeIndex, setActiveIndex] = useState(0)\r\n    const [measuredWidths, setMeasuredWidths] = useState<number[]>([])\r\n\r\n    const sweepPos = useMotionValue(SWEEP_START)\r\n\r\n    const backgroundImage = useTransform(sweepPos, (pos) =>\r\n        buildGradient(pos, optsRef.current.colors, optsRef.current.textColor)\r\n    )\r\n\r\n    const isInView = useInView(spanRef, { once, amount: 0.1 })\r\n\r\n    useEffect(() => {\r\n        const el = spanRef.current\r\n        if (!el || !isMulti) return\r\n        setMeasuredWidths(measureWidths(el, texts))\r\n    }, [Array.isArray(text) ? text.join(\"\\0\") : text])\r\n\r\n    playRef.current = () => {\r\n        const { duration, delay, repeat, repeatDelay, texts } = optsRef.current\r\n\r\n        sweepPos.set(SWEEP_START)\r\n\r\n        const controls = animate(sweepPos, SWEEP_END, {\r\n            duration,\r\n            delay,\r\n            ease: sweepEase,\r\n            onComplete() {\r\n                if (!repeat) return\r\n                timerRef.current = setTimeout(() => {\r\n                    const next = (indexRef.current + 1) % texts.length\r\n                    indexRef.current = next\r\n                    setActiveIndex(next)\r\n                    playRef.current()\r\n                }, repeatDelay * 1000)\r\n            },\r\n        })\r\n\r\n        stopRef.current = () => controls.stop()\r\n    }\r\n\r\n    useEffect(() => {\r\n        if (prefersReducedMotion) {\r\n            sweepPos.set(SWEEP_END)\r\n            return\r\n        }\r\n        if (startOnView && !isInView) return\r\n        if (once && hasPlayedRef.current) return\r\n        hasPlayedRef.current = true\r\n        playRef.current()\r\n\r\n        return () => {\r\n            stopRef.current?.()\r\n            clearTimeout(timerRef.current)\r\n        }\r\n    }, [isInView, startOnView, once, prefersReducedMotion, sweepPos])\r\n\r\n    const fixedW =\r\n        isMulti && fixedWidth && measuredWidths.length > 0\r\n            ? Math.max(...measuredWidths)\r\n            : undefined\r\n\r\n    const animatedW =\r\n        isMulti && !fixedWidth && measuredWidths[activeIndex] != null\r\n            ? measuredWidths[activeIndex]\r\n            : undefined\r\n\r\n    return (\r\n        <motion.span\r\n            ref={spanRef}\r\n            className={cn(\"align-bottom leading-[100%] text-inherit\", className)}\r\n            style={{\r\n                transform: \"translateY(-2px)\",\r\n                color: \"transparent\",\r\n                backgroundClip: \"text\",\r\n                WebkitBackgroundClip: \"text\",\r\n                backgroundSize: \"100% 100%\",\r\n                backgroundImage,\r\n                ...(isMulti && {\r\n                    display: \"inline-block\",\r\n                    overflow: \"hidden\",\r\n                    whiteSpace: \"nowrap\",\r\n                    verticalAlign: \"text-center\",\r\n                    ...(fixedW != null && { width: fixedW }),\r\n                }),\r\n            }}\r\n            animate={animatedW != null ? { width: animatedW } : undefined}\r\n            transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}\r\n            {...props}\r\n        >\r\n            {texts[activeIndex]}\r\n        </motion.span>\r\n    )\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Magic UI",
+      "url": "https://magicui.design/docs/components/dia-text-reveal",
+      "authorUrl": "https://magicui.design",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string | string[]",
+        "description": "Text to reveal. Pass multiple strings to rotate when {@link DiaTextRevealProps.repeat} is `true`.",
+        "required": true
+      },
+      {
+        "name": "colors",
+        "type": "string[]",
+        "default": "DEFAULT_COLORS",
+        "description": "Colors sampled across the moving gradient band. Defaults to a built-in palette.",
+        "required": false
+      },
+      {
+        "name": "textColor",
+        "type": "string",
+        "default": "\"var(--foreground)\"",
+        "description": "CSS color for revealed text after the sweep and for leading/trailing regions during the animation.",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "1.5",
+        "description": "Duration of one sweep pass, in seconds.",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "0",
+        "description": "Delay before the sweep starts, in seconds.",
+        "required": false
+      },
+      {
+        "name": "repeat",
+        "type": "boolean",
+        "default": "false",
+        "description": "When `text` is an array, replay the sweep and advance to the next string after each completion.",
+        "required": false
+      },
+      {
+        "name": "repeatDelay",
+        "type": "number",
+        "default": "0.5",
+        "description": "Pause between cycles when {@link DiaTextRevealProps.repeat} is `true`, in seconds.",
+        "required": false
+      },
+      {
+        "name": "startOnView",
+        "type": "boolean",
+        "default": "true",
+        "description": "If `true`, the animation starts only after the element enters the viewport.",
+        "required": false
+      },
+      {
+        "name": "once",
+        "type": "boolean",
+        "default": "true",
+        "description": "Passed to `useInView`: if `true`, in-view detection fires at most once (no replay on scroll-back).",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "Additional class names for the animated `span` (e.g. typography utilities).",
+        "required": false
+      },
+      {
+        "name": "fixedWidth",
+        "type": "boolean",
+        "default": "false",
+        "description": "When `text` has multiple entries, use the widest string’s width for layout instead of animating width per line.",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dia-text-reveal"
+  }
+}

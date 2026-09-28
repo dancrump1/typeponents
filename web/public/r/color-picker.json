@@ -1,0 +1,67 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "color-picker",
+  "type": "registry:ui",
+  "title": "Color Picker",
+  "description": "Swatch button that opens a picker panel with a saturation field, a rainbow hue slider, a hex input and preset chips.",
+  "dependencies": [
+    "lucide-react",
+    "motion",
+    "poline"
+  ],
+  "registryDependencies": [
+    "button",
+    "cards",
+    "input",
+    "label",
+    "popover"
+  ],
+  "files": [
+    {
+      "path": "components/ui/color-picker.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/color-picker.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useState } from \"react\";\r\n\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { Input } from \"@/components/ui/input\";\r\nimport { Label } from \"@/components/ui/label\";\r\nimport {\r\n\tPopover,\r\n\tPopoverContent,\r\n\tPopoverTrigger,\r\n} from \"@/components/ui/popover\";\r\nimport { Check, ChevronDown } from \"lucide-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// Credit:\r\n// https://www.cult-ui.com/docs/components/color-picker\r\n\r\n// Helper functions for color conversion\r\nconst hslToHex = (h: number, s: number, l: number) => {\r\n\tl /= 100;\r\n\tconst a = (s * Math.min(l, 1 - l)) / 100;\r\n\tconst f = (n: number) => {\r\n\t\tconst k = (n + h / 30) % 12;\r\n\t\tconst color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);\r\n\t\treturn Math.round(255 * color)\r\n\t\t\t.toString(16)\r\n\t\t\t.padStart(2, \"0\");\r\n\t};\r\n\treturn `#${f(0)}${f(8)}${f(4)}`;\r\n};\r\n\r\nconst hexToHsl = (hex: string): [number, number, number] => {\r\n\tconst result = /^#?([a-f\\d]{2})([a-f\\d]{2})([a-f\\d]{2})$/i.exec(hex);\r\n\tif (!result) return [0, 0, 0];\r\n\r\n\tlet r = parseInt(result[1], 16) / 255;\r\n\tlet g = parseInt(result[2], 16) / 255;\r\n\tlet b = parseInt(result[3], 16) / 255;\r\n\r\n\tconst max = Math.max(r, g, b);\r\n\tconst min = Math.min(r, g, b);\r\n\tlet h = 0;\r\n\tlet s = 0;\r\n\tlet l = (max + min) / 2;\r\n\r\n\tif (max !== min) {\r\n\t\tconst d = max - min;\r\n\t\ts = l > 0.5 ? d / (2 - max - min) : d / (max + min);\r\n\t\tswitch (max) {\r\n\t\t\tcase r:\r\n\t\t\t\th = (g - b) / d + (g < b ? 6 : 0);\r\n\t\t\t\tbreak;\r\n\t\t\tcase g:\r\n\t\t\t\th = (b - r) / d + 2;\r\n\t\t\t\tbreak;\r\n\t\t\tcase b:\r\n\t\t\t\th = (r - g) / d + 4;\r\n\t\t\t\tbreak;\r\n\t\t}\r\n\t\th /= 6;\r\n\t}\r\n\r\n\treturn [Math.round(h * 360), Math.round(s * 100), Math.round(l * 100)];\r\n};\r\n\r\nconst normalizeColor = (color: string): string => {\r\n\tif (color.startsWith(\"#\")) {\r\n\t\treturn color.toUpperCase();\r\n\t} else if (color.startsWith(\"hsl\")) {\r\n\t\tconst [h, s, l] = color.match(/\\d+(\\.\\d+)?/g)?.map(Number) || [0, 0, 0];\r\n\t\treturn `hsl(${Math.round(h)}, ${Math.round(s)}%, ${Math.round(l)}%)`;\r\n\t}\r\n\treturn color;\r\n};\r\n\r\nconst trimColorString = (color: string, maxLength: number = 20): string => {\r\n\tif (color.length <= maxLength) return color;\r\n\treturn `${color.slice(0, maxLength - 3)}...`;\r\n};\r\n\r\nconst ColorPicker = ({\r\n\tcolor,\r\n\tonChange,\r\n}: {\r\n\tcolor: string;\r\n\tonChange: (color: string) => void;\r\n}) => {\r\n\tconst [hsl, setHsl] = useState<[number, number, number]>([0, 0, 0]);\r\n\tconst [colorInput, setColorInput] = useState(color);\r\n\tconst [isOpen, setIsOpen] = useState(false);\r\n\r\n\tuseEffect(() => {\r\n\t\thandleColorChange(color);\r\n\t}, [color]);\r\n\r\n\tconst handleColorChange = (newColor: string) => {\r\n\t\tconst normalizedColor = normalizeColor(newColor);\r\n\t\tsetColorInput(normalizedColor);\r\n\r\n\t\tlet h, s, l;\r\n\t\tif (normalizedColor.startsWith(\"#\")) {\r\n\t\t\t[h, s, l] = hexToHsl(normalizedColor);\r\n\t\t} else {\r\n\t\t\t[h, s, l] = normalizedColor.match(/\\d+(\\.\\d+)?/g)?.map(Number) || [\r\n\t\t\t\t0, 0, 0,\r\n\t\t\t];\r\n\t\t}\r\n\r\n\t\tsetHsl([h, s, l]);\r\n\t\tonChange(`hsl(${h.toFixed(1)}, ${s?.toFixed(1) || 0}%, ${l?.toFixed(1) || 0}%)`);\r\n\t};\r\n\r\n\tconst handleHueChange = (hue: number) => {\r\n\t\tconst newHsl: [number, number, number] = [hue, hsl[1], hsl[2]];\r\n\t\tsetHsl(newHsl);\r\n\t\thandleColorChange(`hsl(${newHsl[0]}, ${newHsl[1]}%, ${newHsl[2]}%)`);\r\n\t};\r\n\r\n\tconst handleSaturationLightnessChange = (\r\n\t\tevent: React.MouseEvent<HTMLDivElement>\r\n\t) => {\r\n\t\tconst rect = event.currentTarget.getBoundingClientRect();\r\n\t\tconst x = event.clientX - rect.left;\r\n\t\tconst y = event.clientY - rect.top;\r\n\t\tconst s = Math.round((x / rect.width) * 100);\r\n\t\tconst l = Math.round(100 - (y / rect.height) * 100);\r\n\t\tconst newHsl: [number, number, number] = [hsl[0], s, l];\r\n\t\tsetHsl(newHsl);\r\n\t\thandleColorChange(`hsl(${newHsl[0]}, ${newHsl[1]}%, ${newHsl[2]}%)`);\r\n\t};\r\n\r\n\tconst handleColorInputChange = (\r\n\t\tevent: React.ChangeEvent<HTMLInputElement>\r\n\t) => {\r\n\t\tconst newColor = event.target.value;\r\n\t\tsetColorInput(newColor);\r\n\t\tif (\r\n\t\t\t/^#[0-9A-Fa-f]{6}$/.test(newColor) ||\r\n\t\t\t/^hsl$$\\d+,\\s*\\d+%,\\s*\\d+%$$$/.test(newColor)\r\n\t\t) {\r\n\t\t\thandleColorChange(newColor);\r\n\t\t}\r\n\t};\r\n\r\n\tconst colorPresets = [\r\n\t\t\"#FF3B30\",\r\n\t\t\"#FF9500\",\r\n\t\t\"#FFCC00\",\r\n\t\t\"#4CD964\",\r\n\t\t\"#5AC8FA\",\r\n\t\t\"#007AFF\",\r\n\t\t\"#5856D6\",\r\n\t\t\"#FF2D55\",\r\n\t\t\"#8E8E93\",\r\n\t\t\"#EFEFF4\",\r\n\t\t\"#E5E5EA\",\r\n\t\t\"#D1D1D6\",\r\n\t];\r\n\r\n\treturn (\r\n\t\t<Popover open={isOpen} onOpenChange={setIsOpen}>\r\n\t\t\t<PopoverTrigger asChild>\r\n\t\t\t\t<Button\r\n\t\t\t\t\tvariant=\"outline\"\r\n\t\t\t\t\tclassName=\"w-[200px] justify-start text-left font-normal\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tclassName=\"w-4 h-4 rounded-full mr-2 shadow-xs\"\r\n\t\t\t\t\t\tstyle={{ backgroundColor: colorInput }}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<span className=\"grow\">{trimColorString(colorInput)}</span>\r\n\t\t\t\t\t<ChevronDown className=\"h-4 w-4 opacity-50\" />\r\n\t\t\t\t</Button>\r\n\t\t\t</PopoverTrigger>\r\n\t\t\t<PopoverContent className=\"w-[240px] p-3\">\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tinitial={{ opacity: 0, scale: 0.95 }}\r\n\t\t\t\t\tanimate={{ opacity: 1, scale: 1 }}\r\n\t\t\t\t\texit={{ opacity: 0, scale: 0.95 }}\r\n\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\tclassName=\"space-y-3\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tclassName=\"w-full h-40 rounded-lg cursor-crosshair relative overflow-hidden\"\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackground: `\r\n                linear-gradient(to top, rgba(0, 0, 0, 1), transparent),\r\n                linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 0, 0, 0)),\r\n                hsl(${hsl[0]}, 100%, 50%)\r\n              `,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\tonClick={handleSaturationLightnessChange}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tclassName=\"w-4 h-4 rounded-full border-2 border-white absolute shadow-md\"\r\n\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\tleft: `${hsl[1]}%`,\r\n\t\t\t\t\t\t\t\ttop: `${100 - hsl[2]}%`,\r\n\t\t\t\t\t\t\t\tbackgroundColor: `hsl(${hsl[0]}, ${hsl[1]}%, ${hsl[2]}%)`,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\twhileHover={{ scale: 1.2 }}\r\n\t\t\t\t\t\t\twhileTap={{ scale: 0.9 }}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t<motion.input\r\n\t\t\t\t\t\ttype=\"range\"\r\n\t\t\t\t\t\tmin=\"0\"\r\n\t\t\t\t\t\tmax=\"360\"\r\n\t\t\t\t\t\tvalue={hsl[0]}\r\n\t\t\t\t\t\tonChange={(e) => handleHueChange(Number(e.target.value))}\r\n\t\t\t\t\t\tclassName=\"w-full h-3 rounded-full appearance-none cursor-pointer\"\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackground: `linear-gradient(to right, \r\n                hsl(0, 100%, 50%), hsl(60, 100%, 50%), hsl(120, 100%, 50%), \r\n                hsl(180, 100%, 50%), hsl(240, 100%, 50%), hsl(300, 100%, 50%), hsl(360, 100%, 50%)\r\n              )`,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\twhileHover={{ scale: 1.05 }}\r\n\t\t\t\t\t\twhileTap={{ scale: 0.95 }}\r\n\t\t\t\t\t/>\r\n\t\t\t\t\t<div className=\"flex items-center space-x-2\">\r\n\t\t\t\t\t\t<Label htmlFor=\"color-input\" className=\"sr-only\">\r\n\t\t\t\t\t\t\tColor\r\n\t\t\t\t\t\t</Label>\r\n\t\t\t\t\t\t<Input\r\n\t\t\t\t\t\t\tid=\"color-input\"\r\n\t\t\t\t\t\t\ttype=\"text\"\r\n\t\t\t\t\t\t\tvalue={colorInput}\r\n\t\t\t\t\t\t\tonChange={handleColorInputChange}\r\n\t\t\t\t\t\t\tclassName=\"grow bg-background border border-gray-300 rounded-md text-sm h-8 px-2\"\r\n\t\t\t\t\t\t\tplaceholder=\"#RRGGBB or hsl(h, s%, l%)\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tclassName=\"w-8 h-8 rounded-md shadow-xs\"\r\n\t\t\t\t\t\t\tstyle={{ backgroundColor: colorInput }}\r\n\t\t\t\t\t\t\twhileHover={{ scale: 1.1 }}\r\n\t\t\t\t\t\t\twhileTap={{ scale: 0.9 }}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t\t<div className=\"grid grid-cols-6 gap-2\">\r\n\t\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t\t{colorPresets.map((preset) => (\r\n\t\t\t\t\t\t\t\t<motion.button\r\n\t\t\t\t\t\t\t\t\tkey={preset}\r\n\t\t\t\t\t\t\t\t\tclassName=\"w-8 h-8 rounded-full relative\"\r\n\t\t\t\t\t\t\t\t\tstyle={{ backgroundColor: preset }}\r\n\t\t\t\t\t\t\t\t\tonClick={() => handleColorChange(preset)}\r\n\t\t\t\t\t\t\t\t\twhileHover={{ scale: 1.2, zIndex: 1 }}\r\n\t\t\t\t\t\t\t\t\twhileTap={{ scale: 0.9 }}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{colorInput === preset && (\r\n\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\tinitial={{ scale: 0 }}\r\n\t\t\t\t\t\t\t\t\t\t\tanimate={{ scale: 1 }}\r\n\t\t\t\t\t\t\t\t\t\t\texit={{ scale: 0 }}\r\n\t\t\t\t\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t<Check className=\"w-4 h-4 text-foreground absolute inset-0 m-auto\" />\r\n\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t</motion.button>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</PopoverContent>\r\n\t\t</Popover>\r\n\t);\r\n};\r\n\r\nexport default ColorPicker;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "Clicking the swatch scales the panel open; clicking in the colour field moves the ring marker and drags on the hue slider recolour everything live, and tapping a preset chip springs it larger and marks it with a tick.",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/color-picker",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "color",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "onChange",
+        "type": "(color: string) => void",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/color-picker"
+  }
+}

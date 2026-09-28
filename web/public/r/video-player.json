@@ -1,0 +1,55 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "video-player",
+  "type": "registry:ui",
+  "title": "Video Player",
+  "description": "Video Player",
+  "dependencies": [
+    "video.js"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/video-player.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/video-player.tsx",
+      "content": "import React, { useEffect } from \"react\";\n\nimport videojs from \"video.js\";\n\n// https://tailwindflex.com/@samuel33/hero-with-video-background\n\nconst VideoPlayer = ({\n\tfirstLine,\n\tsecondLine,\n}: {\n\tfirstLine: string;\n\tsecondLine: string;\n}) => {\n\tuseEffect(() => {\n\t\t!!document.getElementById(\"home-video\") && videojs(\"#home-video\");\n\t}, []);\n\n\treturn (\n\t\t<>\n\t\t\t<video\n\t\t\t\tid=\"home-video\"\n\t\t\t\tclassName=\"home-video video-js vjs-big-play-centered object-cover object-top-left rounded-lg inset-0 h-full w-full\"\n\t\t\t\tcontrols=\"controls\"\n\t\t\t\tpreload=\"auto\"\n\t\t\t\tposter=\"public/BuildSomethingMeaningful.png\"\n\t\t\t\tdata-setup=\"{}\"\n\t\t\t>\n\t\t\t\t<source src=\"/public/DriveReel_compressed.mp4\" type=\"video/mp4\" />\n\t\t\t\t<source src=\"/public/DriveReel_compressed.webm\" type=\"video/webm\" />\n\t\t\t\t<p className=\"vjs-no-js\">\n\t\t\t\t\tTo view this video please enable JavaScript, and consider\n\t\t\t\t\tupgrading to a web browser that\n\t\t\t\t\t<a\n\t\t\t\t\t\thref=\"https://videojs.com/html5-video-support/\"\n\t\t\t\t\t\ttarget=\"_blank\"\n\t\t\t\t\t>\n\t\t\t\t\t\tsupports HTML5 video\n\t\t\t\t\t</a>\n\t\t\t\t</p>\n\t\t\t</video>\n\t\t\t<span className=\"line first\">{firstLine}</span>\n\t\t\t<span className=\"line second\">{secondLine}</span>\n\t\t</>\n\t);\n};\n\nexport default VideoPlayer;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Videos"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "tailwindflex.com",
+      "url": "https://tailwindflex.com/@samuel33/hero-with-video-background",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "firstLine",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "secondLine",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/video-player"
+  }
+}

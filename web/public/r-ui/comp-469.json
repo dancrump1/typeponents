@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-469",
+  "type": "registry:component",
+  "title": "Comp 469",
+  "description": "Comp 469",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-469.tsx",
+      "content": "import {\r\n\tTable,\r\n\tTableBody,\r\n\tTableCell,\r\n\tTableFooter,\r\n\tTableHead,\r\n\tTableHeader,\r\n\tTableRow,\r\n} from \"@/components/ui/table\";\r\n\r\nconst items = [\r\n\t{\r\n\t\tid: \"1\",\r\n\t\tname: \"Alex Thompson\",\r\n\t\temail: \"alex.t@company.com\",\r\n\t\tlocation: \"San Francisco, US\",\r\n\t\tstatus: \"Active\",\r\n\t\tbalance: \"$1,250.00\",\r\n\t},\r\n\t{\r\n\t\tid: \"2\",\r\n\t\tname: \"Sarah Chen\",\r\n\t\temail: \"sarah.c@company.com\",\r\n\t\tlocation: \"Singapore\",\r\n\t\tstatus: \"Active\",\r\n\t\tbalance: \"$600.00\",\r\n\t},\r\n\t{\r\n\t\tid: \"3\",\r\n\t\tname: \"James Wilson\",\r\n\t\temail: \"j.wilson@company.com\",\r\n\t\tlocation: \"London, UK\",\r\n\t\tstatus: \"Inactive\",\r\n\t\tbalance: \"$650.00\",\r\n\t},\r\n\t{\r\n\t\tid: \"4\",\r\n\t\tname: \"Maria Garcia\",\r\n\t\temail: \"m.garcia@company.com\",\r\n\t\tlocation: \"Madrid, Spain\",\r\n\t\tstatus: \"Active\",\r\n\t\tbalance: \"$0.00\",\r\n\t},\r\n\t{\r\n\t\tid: \"5\",\r\n\t\tname: \"David Kim\",\r\n\t\temail: \"d.kim@company.com\",\r\n\t\tlocation: \"Seoul, KR\",\r\n\t\tstatus: \"Active\",\r\n\t\tbalance: \"-$1,000.00\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div>\r\n\t\t\t<Table>\r\n\t\t\t\t<TableHeader className=\"bg-transparent\">\r\n\t\t\t\t\t<TableRow className=\"hover:bg-transparent\">\r\n\t\t\t\t\t\t<TableHead>Name</TableHead>\r\n\t\t\t\t\t\t<TableHead>Email</TableHead>\r\n\t\t\t\t\t\t<TableHead>Location</TableHead>\r\n\t\t\t\t\t\t<TableHead>Status</TableHead>\r\n\t\t\t\t\t\t<TableHead className=\"text-right\">Balance</TableHead>\r\n\t\t\t\t\t</TableRow>\r\n\t\t\t\t</TableHeader>\r\n\t\t\t\t<tbody aria-hidden=\"true\" className=\"table-row h-2\"></tbody>\r\n\t\t\t\t<TableBody className=\"[&_td:first-child]:rounded-l-lg [&_td:last-child]:rounded-r-lg\">\r\n\t\t\t\t\t{items.map((item) => (\r\n\t\t\t\t\t\t<TableRow\r\n\t\t\t\t\t\t\tkey={item.id}\r\n\t\t\t\t\t\t\tclassName=\"odd:bg-muted/50 odd:hover:bg-muted/50 border-none hover:bg-transparent\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<TableCell className=\"py-2.5 font-medium\">\r\n\t\t\t\t\t\t\t\t{item.name}\r\n\t\t\t\t\t\t\t</TableCell>\r\n\t\t\t\t\t\t\t<TableCell className=\"py-2.5\">{item.email}</TableCell>\r\n\t\t\t\t\t\t\t<TableCell className=\"py-2.5\">{item.location}</TableCell>\r\n\t\t\t\t\t\t\t<TableCell className=\"py-2.5\">{item.status}</TableCell>\r\n\t\t\t\t\t\t\t<TableCell className=\"py-2.5 text-right\">\r\n\t\t\t\t\t\t\t\t{item.balance}\r\n\t\t\t\t\t\t\t</TableCell>\r\n\t\t\t\t\t\t</TableRow>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</TableBody>\r\n\t\t\t\t<tbody aria-hidden=\"true\" className=\"table-row h-2\"></tbody>\r\n\t\t\t\t<TableFooter className=\"bg-transparent\">\r\n\t\t\t\t\t<TableRow className=\"hover:bg-transparent\">\r\n\t\t\t\t\t\t<TableCell colSpan={4}>Total</TableCell>\r\n\t\t\t\t\t\t<TableCell className=\"text-right\">$2,500.00</TableCell>\r\n\t\t\t\t\t</TableRow>\r\n\t\t\t\t</TableFooter>\r\n\t\t\t</Table>\r\n\t\t\t<p className=\"text-muted-foreground mt-4 text-center text-sm\">\r\n\t\t\t\tStriped table\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

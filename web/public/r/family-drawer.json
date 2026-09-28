@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "family-drawer",
+  "type": "registry:ui",
+  "title": "Family Drawer",
+  "description": "Family Drawer",
+  "dependencies": [
+    "@radix-ui/react-slot",
+    "lucide-react",
+    "motion",
+    "react-use-measure",
+    "vaul"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/family-drawer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/family-drawer.tsx",
+      "content": "\"use client\";\n\nimport {\n\tcreateContext,\n\tuseContext,\n\tuseMemo,\n\tuseRef,\n\tuseState,\n\ttype ReactNode,\n} from \"react\";\n\nimport { Slot } from \"@radix-ui/react-slot\";\nimport { AnimatePresence, motion } from \"motion/react\";\nimport useMeasure from \"react-use-measure\";\nimport { Drawer } from \"vaul\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Credit:\n// https://www.cult-ui.com/docs/components/family-drawer\n\n// ============================================================================\n// Types\n// ============================================================================\n\ntype ViewComponent = React.ComponentType<Record<string, unknown>>;\n\ninterface ViewsRegistry {\n\t[viewName: string]: ViewComponent;\n}\n\n// ============================================================================\n// Context\n// ============================================================================\n\ninterface FamilyDrawerContextValue {\n\tisOpen: boolean;\n\tview: string;\n\tsetView: (view: string) => void;\n\topacityDuration: number;\n\telementRef: ReturnType<typeof useMeasure>[0];\n\tbounds: ReturnType<typeof useMeasure>[1];\n\tviews: ViewsRegistry | undefined;\n}\n\nconst FamilyDrawerContext = createContext<FamilyDrawerContextValue | undefined>(\n\tundefined\n);\n\nfunction useFamilyDrawer() {\n\tconst context = useContext(FamilyDrawerContext);\n\tif (!context) {\n\t\tthrow new Error(\n\t\t\t\"FamilyDrawer components must be used within FamilyDrawerRoot\"\n\t\t);\n\t}\n\treturn context;\n}\n\n// ============================================================================\n// Root Component\n// ============================================================================\n\ninterface FamilyDrawerRootProps {\n\tchildren: ReactNode;\n\topen?: boolean;\n\tdefaultOpen?: boolean;\n\tonOpenChange?: (open: boolean) => void;\n\tdefaultView?: string;\n\tonViewChange?: (view: string) => void;\n\tviews?: ViewsRegistry;\n}\n\nfunction FamilyDrawerRoot({\n\tchildren,\n\topen: controlledOpen,\n\tdefaultOpen = false,\n\tonOpenChange,\n\tdefaultView = \"default\",\n\tonViewChange,\n\tviews: customViews,\n}: FamilyDrawerRootProps) {\n\tconst [internalOpen, setInternalOpen] = useState(defaultOpen);\n\tconst [view, setView] = useState(defaultView);\n\tconst [elementRef, bounds] = useMeasure();\n\tconst previousHeightRef = useRef<number>(0);\n\n\tconst isOpen = controlledOpen !== undefined ? controlledOpen : internalOpen;\n\tconst setIsOpen = onOpenChange || setInternalOpen;\n\n\tconst opacityDuration = useMemo(() => {\n\t\tconst currentHeight = bounds.height;\n\t\tconst previousHeight = previousHeightRef.current;\n\n\t\tconst MIN_DURATION = 0.15;\n\t\tconst MAX_DURATION = 0.27;\n\n\t\tif (!previousHeightRef.current) {\n\t\t\tpreviousHeightRef.current = currentHeight;\n\t\t\treturn MIN_DURATION;\n\t\t}\n\n\t\tconst heightDifference = Math.abs(currentHeight - previousHeight);\n\t\tpreviousHeightRef.current = currentHeight;\n\n\t\tconst duration = Math.min(\n\t\t\tMath.max(heightDifference / 500, MIN_DURATION),\n\t\t\tMAX_DURATION\n\t\t);\n\n\t\treturn duration;\n\t}, [bounds.height]);\n\n\tconst handleViewChange = (newView: string) => {\n\t\tsetView(newView);\n\t\tonViewChange?.(newView);\n\t};\n\n\t// Use custom views if provided, otherwise pass undefined\n\tconst views =\n\t\tcustomViews && Object.keys(customViews).length > 0\n\t\t\t? customViews\n\t\t\t: undefined;\n\n\tconst contextValue: FamilyDrawerContextValue = {\n\t\tisOpen,\n\t\tview,\n\t\tsetView: handleViewChange,\n\t\topacityDuration,\n\t\telementRef,\n\t\tbounds,\n\t\tviews,\n\t};\n\n\treturn (\n\t\t<FamilyDrawerContext.Provider value={contextValue}>\n\t\t\t<Drawer.Root open={isOpen} onOpenChange={setIsOpen}>\n\t\t\t\t{children}\n\t\t\t</Drawer.Root>\n\t\t</FamilyDrawerContext.Provider>\n\t);\n}\n\n// ============================================================================\n// Trigger Component\n// ============================================================================\n\ninterface FamilyDrawerTriggerProps {\n\tchildren: ReactNode;\n\tasChild?: boolean;\n\tclassName?: string;\n}\n\nfunction FamilyDrawerTrigger({\n\tchildren,\n\tasChild = false,\n\tclassName,\n}: FamilyDrawerTriggerProps) {\n\tif (asChild) {\n\t\treturn (\n\t\t\t<Drawer.Trigger asChild>\n\t\t\t\t<Slot>{children}</Slot>\n\t\t\t</Drawer.Trigger>\n\t\t);\n\t}\n\n\treturn (\n\t\t<Drawer.Trigger asChild>\n\t\t\t<button\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"fixed top-1/2 left-1/2 antialiased -translate-y-1/2 -translate-x-1/2 h-[44px] rounded-full border bg-background px-4 py-2 font-medium text-foreground transition-colors hover:bg-accent focus-visible:shadow-focus-ring-button md:font-medium cursor-pointer\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t\ttype=\"button\"\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</button>\n\t\t</Drawer.Trigger>\n\t);\n}\n\n// ============================================================================\n// Portal Component\n// ============================================================================\n\nfunction FamilyDrawerPortal({ children }: { children: ReactNode }) {\n\treturn <Drawer.Portal>{children}</Drawer.Portal>;\n}\n\n// ============================================================================\n// Overlay Component\n// ============================================================================\n\ninterface FamilyDrawerOverlayProps {\n\tclassName?: string;\n\tonClick?: () => void;\n}\n\nfunction FamilyDrawerOverlay({ className, onClick }: FamilyDrawerOverlayProps) {\n\tconst { setView } = useFamilyDrawer();\n\n\treturn (\n\t\t<Drawer.Overlay\n\t\t\tclassName={cn(\"fixed inset-0 z-10 bg-black/30\", className)}\n\t\t\tonClick={onClick || (() => setView(\"default\"))}\n\t\t/>\n\t);\n}\n\n// ============================================================================\n// Content Component\n// ============================================================================\n\ninterface FamilyDrawerContentProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n\tasChild?: boolean;\n}\n\nfunction FamilyDrawerContent({\n\tchildren,\n\tclassName,\n\tasChild = false,\n}: FamilyDrawerContentProps) {\n\tconst { bounds } = useFamilyDrawer();\n\n\tconst content = (\n\t\t<motion.div\n\t\t\tanimate={{\n\t\t\t\theight: bounds.height,\n\t\t\t\ttransition: {\n\t\t\t\t\tduration: 0.27,\n\t\t\t\t\tease: [0.25, 1, 0.5, 1],\n\t\t\t\t},\n\t\t\t}}\n\t\t>\n\t\t\t{children}\n\t\t</motion.div>\n\t);\n\n\tif (asChild) {\n\t\treturn (\n\t\t\t<Drawer.Content\n\t\t\t\tasChild\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"fixed inset-x-4 bottom-4 z-10 mx-auto max-w-[361px] overflow-hidden rounded-[36px] bg-background outline-hidden md:mx-auto md:w-full\",\n\t\t\t\t\tclassName\n\t\t\t\t)}\n\t\t\t>\n\t\t\t\t<Slot>{content}</Slot>\n\t\t\t</Drawer.Content>\n\t\t);\n\t}\n\n\treturn (\n\t\t<Drawer.Content\n\t\t\tasChild\n\t\t\tclassName={cn(\n\t\t\t\t\"fixed inset-x-4 bottom-4 z-10 mx-auto max-w-[361px] overflow-hidden rounded-[36px] bg-background outline-hidden md:mx-auto md:w-full\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{content}\n\t\t</Drawer.Content>\n\t);\n}\n\n// ============================================================================\n// Animated Wrapper Component\n// ============================================================================\n\ninterface FamilyDrawerAnimatedWrapperProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n}\n\nfunction FamilyDrawerAnimatedWrapper({\n\tchildren,\n\tclassName,\n}: FamilyDrawerAnimatedWrapperProps) {\n\tconst { elementRef } = useFamilyDrawer();\n\n\treturn (\n\t\t<div\n\t\t\tref={elementRef}\n\t\t\tclassName={cn(\"px-6 pb-6 pt-2.5 antialiased\", className)}\n\t\t>\n\t\t\t{children}\n\t\t</div>\n\t);\n}\n\n// ============================================================================\n// Animated Content Component\n// ============================================================================\n\ninterface FamilyDrawerAnimatedContentProps {\n\tchildren: ReactNode;\n}\n\nfunction FamilyDrawerAnimatedContent({\n\tchildren,\n}: FamilyDrawerAnimatedContentProps) {\n\tconst { view, opacityDuration } = useFamilyDrawer();\n\n\treturn (\n\t\t<AnimatePresence initial={false} mode=\"popLayout\" custom={view}>\n\t\t\t<motion.div\n\t\t\t\tinitial={{ opacity: 0, scale: 0.96 }}\n\t\t\t\tanimate={{ opacity: 1, scale: 1, y: 0 }}\n\t\t\t\texit={{ opacity: 0, scale: 0.96 }}\n\t\t\t\tkey={view}\n\t\t\t\ttransition={{\n\t\t\t\t\tduration: opacityDuration,\n\t\t\t\t\tease: [0.26, 0.08, 0.25, 1],\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t{children}\n\t\t\t</motion.div>\n\t\t</AnimatePresence>\n\t);\n}\n\n// ============================================================================\n// Close Component\n// ============================================================================\n\ninterface FamilyDrawerCloseProps {\n\tchildren?: ReactNode;\n\tasChild?: boolean;\n\tclassName?: string;\n}\n\nfunction FamilyDrawerClose({\n\tchildren,\n\tasChild = false,\n\tclassName,\n}: FamilyDrawerCloseProps) {\n\tconst defaultClose = (\n\t\t<button\n\t\t\tdata-vaul-no-drag=\"\"\n\t\t\tclassName={cn(\n\t\t\t\t\"absolute right-8 top-7 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-transform focus:scale-95 focus-visible:shadow-focus-ring-button active:scale-75 cursor-pointer\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\ttype=\"button\"\n\t\t>\n\t\t\t{children || <CloseIcon />}\n\t\t</button>\n\t);\n\n\tif (asChild) {\n\t\treturn (\n\t\t\t<Drawer.Close asChild>\n\t\t\t\t<Slot>{defaultClose}</Slot>\n\t\t\t</Drawer.Close>\n\t\t);\n\t}\n\n\treturn <Drawer.Close asChild>{defaultClose}</Drawer.Close>;\n}\n\n// ============================================================================\n// Helper Components\n// ============================================================================\n\ninterface FamilyDrawerHeaderProps {\n\ticon: ReactNode;\n\ttitle: string;\n\tdescription: string;\n\tclassName?: string;\n}\n\nfunction FamilyDrawerHeader({\n\ticon,\n\ttitle,\n\tdescription,\n\tclassName,\n}: FamilyDrawerHeaderProps) {\n\treturn (\n\t\t<header className={cn(\"mt-[21px]\", className)}>\n\t\t\t{icon}\n\t\t\t<h2 className=\"mt-2.5 text-[22px] font-semibold text-foreground md:font-medium\">\n\t\t\t\t{title}\n\t\t\t</h2>\n\t\t\t<p className=\"mt-3 text-[17px] font-medium leading-[24px] text-muted-foreground md:font-normal\">\n\t\t\t\t{description}\n\t\t\t</p>\n\t\t</header>\n\t);\n}\n\ninterface FamilyDrawerButtonProps {\n\tchildren: ReactNode;\n\tonClick: () => void;\n\tclassName?: string;\n\tasChild?: boolean;\n}\n\nfunction FamilyDrawerButton({\n\tchildren,\n\tonClick,\n\tclassName,\n\tasChild = false,\n}: FamilyDrawerButtonProps) {\n\tconst button = (\n\t\t<button\n\t\t\tdata-vaul-no-drag=\"\"\n\t\t\tclassName={cn(\n\t\t\t\t\"flex h-12 w-full items-center gap-[15px] rounded-[16px] bg-muted px-4 text-[17px] font-semibold text-foreground transition-transform focus:scale-95 focus-visible:shadow-focus-ring-button active:scale-95 md:font-medium cursor-pointer\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tonClick={onClick}\n\t\t\ttype=\"button\"\n\t\t>\n\t\t\t{children}\n\t\t</button>\n\t);\n\n\tif (asChild) {\n\t\treturn <Slot>{button}</Slot>;\n\t}\n\n\treturn button;\n}\n\ninterface FamilyDrawerSecondaryButtonProps {\n\tchildren: ReactNode;\n\tonClick: () => void;\n\tclassName: string;\n\tasChild?: boolean;\n}\n\nfunction FamilyDrawerSecondaryButton({\n\tchildren,\n\tonClick,\n\tclassName,\n\tasChild = false,\n}: FamilyDrawerSecondaryButtonProps) {\n\tconst button = (\n\t\t<button\n\t\t\tdata-vaul-no-drag=\"\"\n\t\t\ttype=\"button\"\n\t\t\tclassName={cn(\n\t\t\t\t\"flex h-12 w-full items-center justify-center gap-[15px] rounded-full text-center text-[19px] font-semibold transition-transform focus:scale-95 focus-visible:shadow-focus-ring-button active:scale-95 md:font-medium cursor-pointer\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tonClick={onClick}\n\t\t>\n\t\t\t{children}\n\t\t</button>\n\t);\n\n\tif (asChild) {\n\t\treturn <Slot>{button}</Slot>;\n\t}\n\n\treturn button;\n}\n\n// ============================================================================\n// View Content Renderer\n// ============================================================================\n\ninterface FamilyDrawerViewContentProps {\n\tviews?: ViewsRegistry;\n}\n\nfunction FamilyDrawerViewContent(\n\t{\n\t\tviews: propViews,\n\t}: FamilyDrawerViewContentProps = {} as FamilyDrawerViewContentProps\n) {\n\tconst { view, views: contextViews } = useFamilyDrawer();\n\n\t// Use prop views first, then context views\n\tconst views = propViews || contextViews;\n\n\tif (!views) {\n\t\tthrow new Error(\n\t\t\t\"FamilyDrawerViewContent requires views to be provided via props or FamilyDrawerRoot\"\n\t\t);\n\t}\n\n\tconst ViewComponent = views[view];\n\n\tif (!ViewComponent) {\n\t\t// Fallback to default view if view not found\n\t\tconst DefaultComponent = views.default;\n\t\treturn DefaultComponent ? <DefaultComponent /> : null;\n\t}\n\n\treturn <ViewComponent />;\n}\n\n// ============================================================================\n// Icons\n// ============================================================================\n\nfunction CloseIcon() {\n\treturn (\n\t\t<svg\n\t\t\twidth=\"12\"\n\t\t\theight=\"12\"\n\t\t\tviewBox=\"0 0 12 12\"\n\t\t\tfill=\"none\"\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t>\n\t\t\t<title>Close Icon</title>\n\t\t\t<path\n\t\t\t\td=\"M10.4854 1.99998L2.00007 10.4853\"\n\t\t\t\tstroke=\"#999999\"\n\t\t\t\tstrokeWidth=\"3\"\n\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t/>\n\t\t\t<path\n\t\t\t\td=\"M10.4854 10.4844L2.00007 1.99908\"\n\t\t\t\tstroke=\"#999999\"\n\t\t\t\tstrokeWidth=\"3\"\n\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t/>\n\t\t</svg>\n\t);\n}\n\n// ============================================================================\n// Exports\n// ============================================================================\n\nexport {\n\tFamilyDrawerRoot,\n\tFamilyDrawerTrigger,\n\tFamilyDrawerPortal,\n\tFamilyDrawerOverlay,\n\tFamilyDrawerContent,\n\tFamilyDrawerAnimatedWrapper,\n\tFamilyDrawerAnimatedContent,\n\tFamilyDrawerClose,\n\tFamilyDrawerHeader,\n\tFamilyDrawerButton,\n\tFamilyDrawerSecondaryButton,\n\tFamilyDrawerViewContent,\n\tuseFamilyDrawer,\n\ttype ViewsRegistry,\n\ttype ViewComponent,\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/family-drawer",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "open",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultOpen",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onOpenChange",
+        "type": "((open: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultView",
+        "type": "string",
+        "default": "\"default\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onViewChange",
+        "type": "((view: string) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "views",
+        "type": "ViewsRegistry",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/family-drawer"
+  }
+}

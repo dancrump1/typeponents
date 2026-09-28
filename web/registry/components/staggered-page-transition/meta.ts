@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "staggered-page-transition",
+	title: "Staggered Page Transition",
+	description: "A gorgeous staggered layout transition built with Framer Motion.",
+	interaction: "Triggered on route change or programmatically. Covers the viewport in staggered animated panels, seamlessly revealing the next view underneath.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/staggered-page-transition",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "trigger", type: "number", required: true },
+		{ name: "onViewSwap", type: "(() => void)" },
+		{ name: "className", type: "string" },
+		{ name: "panelClassName", type: "string" },
+		{ name: "columns", type: "number", default: "5" },
+		{ name: "duration", type: "number", default: "0.75" },
+		{ name: "staggerDelay", type: "number", default: "0.075" },
+		{ name: "ease", type: "Easing | Easing[]", default: "[0.85, 0, 0.15, 1]" },
+		{ name: "direction", type: "\"bottom\" | \"left\" | \"right\" | \"top\"", default: "\"top\"" },
+		{ name: "exitOpposite", type: "boolean", default: "true" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

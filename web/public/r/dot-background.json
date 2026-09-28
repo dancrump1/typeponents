@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dot-background",
+  "type": "registry:ui",
+  "title": "Dot Background",
+  "description": "Full-width canvas grid of purple and pink dots joined by faint lines, like a soft particle mesh.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dot-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dot-background.tsx",
+      "content": "\"use client\"\r\n\r\nimport { useEffect, useRef } from \"react\"\r\nimport { motion } from \"framer-motion\"\r\n\r\nexport function GradientGridHero() {\r\n    const canvasRef = useRef<HTMLCanvasElement>(null)\r\n\r\n    useEffect(() => {\r\n        const canvas = canvasRef.current\r\n        if (!canvas) return\r\n\r\n        const ctx = canvas.getContext(\"2d\")\r\n        if (!ctx) return\r\n\r\n        let devicePixelRatio: number\r\n\r\n        // Set canvas dimensions\r\n        const setCanvasDimensions = () => {\r\n            devicePixelRatio = window.devicePixelRatio || 1\r\n            const rect = canvas.getBoundingClientRect()\r\n\r\n            canvas.width = rect.width * devicePixelRatio\r\n            canvas.height = rect.height * devicePixelRatio\r\n\r\n            ctx.scale(devicePixelRatio, devicePixelRatio)\r\n        }\r\n\r\n        setCanvasDimensions()\r\n        window.addEventListener(\"resize\", setCanvasDimensions)\r\n\r\n        // Mouse position\r\n        let mouseX = 0\r\n        let mouseY = 0\r\n        let targetX = 0\r\n        let targetY = 0\r\n\r\n        window.addEventListener(\"mousemove\", (e) => {\r\n            const rect = canvas.getBoundingClientRect()\r\n            targetX = e.clientX - rect.left\r\n            targetY = e.clientY - rect.top\r\n        })\r\n\r\n        // Particle class\r\n        class Particle {\r\n            x: number\r\n            y: number\r\n            size: number\r\n            baseX: number\r\n            baseY: number\r\n            density: number\r\n            color: string\r\n            distance: number\r\n\r\n            constructor(x: number, y: number) {\r\n                this.x = x\r\n                this.y = y\r\n                this.baseX = x\r\n                this.baseY = y\r\n                this.size = Math.random() * 5 + 2\r\n                this.density = Math.random() * 30 + 1\r\n                this.distance = 0\r\n\r\n                // Create a gradient from purple to pink\r\n                const hue = Math.random() * 60 + 270 // 270-330 range for purples and pinks\r\n                this.color = `hsl(${hue}, 70%, 60%)`\r\n            }\r\n\r\n            update() {\r\n                // Calculate distance between mouse and particle\r\n                const dx = mouseX - this.x\r\n                const dy = mouseY - this.y\r\n                this.distance = Math.sqrt(dx * dx + dy * dy)\r\n\r\n                const forceDirectionX = dx / this.distance\r\n                const forceDirectionY = dy / this.distance\r\n\r\n                const maxDistance = 100\r\n                const force = (maxDistance - this.distance) / maxDistance\r\n\r\n                if (this.distance < maxDistance) {\r\n                    const directionX = forceDirectionX * force * this.density\r\n                    const directionY = forceDirectionY * force * this.density\r\n\r\n                    this.x -= directionX\r\n                    this.y -= directionY\r\n                } else {\r\n                    if (this.x !== this.baseX) {\r\n                        const dx = this.x - this.baseX\r\n                        this.x -= dx / 10\r\n                    }\r\n                    if (this.y !== this.baseY) {\r\n                        const dy = this.y - this.baseY\r\n                        this.y -= dy / 10\r\n                    }\r\n                }\r\n            }\r\n\r\n            draw(ctx: CanvasRenderingContext2D | null) {\r\n                if (!ctx) return\r\n                ctx.fillStyle = this.color\r\n                ctx.beginPath()\r\n                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)\r\n                ctx.closePath()\r\n                ctx.fill()\r\n            }\r\n        }\r\n\r\n        // Create particle grid\r\n        const particlesArray: Particle[] = []\r\n        const gridSize = 30\r\n\r\n        function init() {\r\n            particlesArray.length = 0\r\n\r\n            if (!canvas) return;\r\n\r\n            const canvasWidth = canvas.width / devicePixelRatio\r\n            const canvasHeight = canvas.height / devicePixelRatio\r\n\r\n            const numX = Math.floor(canvasWidth / gridSize)\r\n            const numY = Math.floor(canvasHeight / gridSize)\r\n\r\n            for (let y = 0; y < numY; y++) {\r\n                for (let x = 0; x < numX; x++) {\r\n                    const posX = x * gridSize + gridSize / 2\r\n                    const posY = y * gridSize + gridSize / 2\r\n                    particlesArray.push(new Particle(posX, posY))\r\n                }\r\n            }\r\n        }\r\n\r\n        init()\r\n\r\n        // Animation loop\r\n        const animate = () => {\r\n            ctx.clearRect(0, 0, canvas.width, canvas.height)\r\n\r\n            // Smooth mouse following\r\n            mouseX += (targetX - mouseX) * 0.1\r\n            mouseY += (targetY - mouseY) * 0.1\r\n\r\n            // Draw connections\r\n            for (let i = 0; i < particlesArray.length; i++) {\r\n                particlesArray[i].update()\r\n                particlesArray[i].draw(ctx)\r\n\r\n                // Draw connections\r\n                for (let j = i; j < particlesArray.length; j++) {\r\n                    const dx = particlesArray[i].x - particlesArray[j].x\r\n                    const dy = particlesArray[i].y - particlesArray[j].y\r\n                    const distance = Math.sqrt(dx * dx + dy * dy)\r\n\r\n                    if (distance < 30) {\r\n                        ctx.beginPath()\r\n                        ctx.strokeStyle = `rgba(180, 120, 255, ${0.2 - distance / 150})`\r\n                        ctx.lineWidth = 0.5\r\n                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y)\r\n                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y)\r\n                        ctx.stroke()\r\n                    }\r\n                }\r\n            }\r\n\r\n            requestAnimationFrame(animate)\r\n        }\r\n\r\n        animate()\r\n\r\n        // Handle window resize\r\n        window.addEventListener(\"resize\", init)\r\n\r\n        return () => {\r\n            window.removeEventListener(\"resize\", setCanvasDimensions)\r\n            window.removeEventListener(\"resize\", init)\r\n        }\r\n    }, [])\r\n\r\n    return (\r\n        <motion.div\r\n            className=\"w-full h-[400px] md:h-[500px] relative\"\r\n            initial={{ opacity: 0 }}\r\n            animate={{ opacity: 1 }}\r\n            transition={{ duration: 1 }}\r\n        >\r\n            <canvas ref={canvasRef} className=\"w-full h-full\" style={{ display: \"block\" }} />\r\n        </motion.div>\r\n    )\r\n}"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "The mesh fades in on load, then dots scatter away from the pointer as it passes and drift back to their grid positions once it moves on.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dot-background"
+  }
+}

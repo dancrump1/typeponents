@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-182",
+  "type": "registry:component",
+  "title": "Comp 182",
+  "description": "Comp 182",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-182.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useId, useState } from \"react\";\r\n\r\nimport { Switch } from \"@/components/ui/switch\";\r\nimport { MoonIcon, SunIcon } from \"lucide-react\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\tconst [checked, setChecked] = useState(false);\r\n\r\n\tconst toggleSwitch = () => setChecked((prev) => !prev);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"group inline-flex items-center gap-2\"\r\n\t\t\tdata-state={checked ? \"checked\" : \"unchecked\"}\r\n\t\t>\r\n\t\t\t<span\r\n\t\t\t\tid={`${id}-off`}\r\n\t\t\t\tclassName=\"group-data-[state=checked]:text-muted-foreground/70 flex-1 cursor-pointer text-right text-sm font-medium\"\r\n\t\t\t\taria-controls={id}\r\n\t\t\t\tonClick={() => setChecked(false)}\r\n\t\t\t>\r\n\t\t\t\t<MoonIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t</span>\r\n\t\t\t<Switch\r\n\t\t\t\tid={id}\r\n\t\t\t\tchecked={checked}\r\n\t\t\t\tonCheckedChange={toggleSwitch}\r\n\t\t\t\taria-labelledby={`${id}-off ${id}-on`}\r\n\t\t\t\taria-label=\"Toggle between dark and light mode\"\r\n\t\t\t/>\r\n\t\t\t<span\r\n\t\t\t\tid={`${id}-on`}\r\n\t\t\t\tclassName=\"group-data-[state=unchecked]:text-muted-foreground/70 flex-1 cursor-pointer text-left text-sm font-medium\"\r\n\t\t\t\taria-controls={id}\r\n\t\t\t\tonClick={() => setChecked(true)}\r\n\t\t\t>\r\n\t\t\t\t<SunIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t</span>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/switch.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as SwitchPrimitives from \"@radix-ui/react-switch\";\r\n\r\nconst Switch = React.forwardRef<\r\n\tReact.ElementRef<typeof SwitchPrimitives.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<SwitchPrimitives.Root\r\n\t\tclassName={cn(\r\n\t\t\t\"peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=unchecked]:bg-input\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t\tref={ref}\r\n\t>\r\n\t\t<SwitchPrimitives.Thumb\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0\"\r\n\t\t\t)}\r\n\t\t/>\r\n\t</SwitchPrimitives.Root>\r\n));\r\nSwitch.displayName = SwitchPrimitives.Root.displayName;\r\n\r\nexport { Switch };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

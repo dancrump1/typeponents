@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "particle-background",
+  "type": "registry:ui",
+  "title": "Particle Background",
+  "description": "Particle Background",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/particle-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/particle-background.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useRef } from \"react\";\r\nimport { motion } from \"framer-motion\";\r\n\r\nconst ParticleBackground = () => {\r\n    const canvasRef = useRef<HTMLCanvasElement>(null);\r\n\r\n    useEffect(() => {\r\n        const canvas = canvasRef.current;\r\n        if (!canvas) return;\r\n\r\n        const ctx = canvas.getContext(\"2d\");\r\n        if (!ctx) return;\r\n\r\n        // Set canvas dimensions\r\n        const setCanvasDimensions = () => {\r\n            canvas.width = window.innerWidth;\r\n            canvas.height = window.innerHeight;\r\n        };\r\n\r\n        setCanvasDimensions();\r\n        window.addEventListener(\"resize\", setCanvasDimensions);\r\n\r\n        // Particle class\r\n        class Particle {\r\n            x: number;\r\n            y: number;\r\n            size: number;\r\n            speedX: number;\r\n            speedY: number;\r\n            color: string;\r\n\r\n            constructor() {\r\n                this.x = Math.random() * (canvas?.width ?? window.innerWidth);\r\n                this.y = Math.random() * (canvas?.height ?? window.innerHeight);\r\n                this.size = Math.random() * 3 + 0.5;\r\n                this.speedX = Math.random() * 0.5 - 0.25;\r\n                this.speedY = Math.random() * 0.5 - 0.25;\r\n                this.color = `rgba(245, 158, 11, ${Math.random() * 0.5})`;\r\n            }\r\n\r\n            update() {\r\n                this.x += this.speedX;\r\n                this.y += this.speedY;\r\n\r\n                if (canvas) {\r\n                    if (this.x > canvas.width) this.x = 0;\r\n                    else if (this.x < 0) this.x = canvas.width;\r\n\r\n                    if (this.y > canvas.height) this.y = 0;\r\n                    else if (this.y < 0) this.y = canvas.height;\r\n                }\r\n            }\r\n\r\n            draw() {\r\n                if (!ctx) return;\r\n                ctx.fillStyle = this.color;\r\n                ctx.beginPath();\r\n                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);\r\n                ctx.fill();\r\n            }\r\n        }\r\n\r\n        // Create particles\r\n        const particleCount = Math.min(\r\n            100,\r\n            Math.floor((window.innerWidth * window.innerHeight) / 10000),\r\n        );\r\n        const particles: Particle[] = [];\r\n\r\n        for (let i = 0; i < particleCount; i++) {\r\n            particles.push(new Particle());\r\n        }\r\n\r\n        // Animation loop\r\n        const animate = () => {\r\n            if (!ctx) return;\r\n            ctx.clearRect(0, 0, canvas.width, canvas.height);\r\n\r\n            // Draw connections\r\n            ctx.strokeStyle = \"rgba(245, 158, 11, 0.05)\";\r\n            ctx.lineWidth = 0.5;\r\n\r\n            for (let i = 0; i < particles.length; i++) {\r\n                for (let j = i; j < particles.length; j++) {\r\n                    const dx = particles[i].x - particles[j].x;\r\n                    const dy = particles[i].y - particles[j].y;\r\n                    const distance = Math.sqrt(dx * dx + dy * dy);\r\n\r\n                    if (distance < 100) {\r\n                        ctx.beginPath();\r\n                        ctx.moveTo(particles[i].x, particles[i].y);\r\n                        ctx.lineTo(particles[j].x, particles[j].y);\r\n                        ctx.stroke();\r\n                    }\r\n                }\r\n            }\r\n\r\n            // Update and draw particles\r\n            particles.forEach((particle) => {\r\n                particle.update();\r\n                particle.draw();\r\n            });\r\n\r\n            requestAnimationFrame(animate);\r\n        };\r\n\r\n        animate();\r\n\r\n        return () => {\r\n            window.removeEventListener(\"resize\", setCanvasDimensions);\r\n        };\r\n    }, []);\r\n\r\n    return (\r\n        <motion.canvas\r\n            ref={canvasRef}\r\n            className=\"absolute inset-0 z-0\"\r\n            initial={{ opacity: 0 }}\r\n            animate={{ opacity: 1 }}\r\n            transition={{ duration: 1 }}\r\n        />\r\n    );\r\n};\r\n\r\nexport default ParticleBackground;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "canvas",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/particle-background"
+  }
+}

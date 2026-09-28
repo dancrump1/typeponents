@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "navigation",
+  "type": "registry:ui",
+  "title": "Navigation",
+  "description": "Sticky site header with a logo, inline page links, a call-to-action button, and a hamburger menu on narrow screens.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/navigation.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/navigation.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\nimport Link from \"next/link\";\r\nimport { useRouter } from \"next/router\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport const lightBg = \"#a3c2e7\";\r\nexport const baseBg = \"#859cb7\";\r\nexport const hoverBg = \"#647991\";\r\n\r\nexport default function NavbarActionButton({ header }) {\r\n\tconst [isToggleOpen, setIsToggleOpen] = useState(false);\r\n\tconst router = useRouter();\r\n\r\n\treturn (\r\n\t\t<header className=\"fixed top-0 z-20 w-full border-b shadow-lg border-slate-200 bg-background/90 shadow-slate-700/5 after:absolute after:left-0 after:top-full after:z-10 after:block after:h-px after:w-full after:bg-slate-200 lg:border-slate-200 lg:backdrop-blur-xs lg:after:hidden\">\r\n\t\t\t<div className=\"relative mx-auto max-w-full px-6 lg:max-w-5xl xl:max-w-7xl 2xl:max-w-384\">\r\n\t\t\t\t<nav\r\n\t\t\t\t\taria-label=\"main navigation\"\r\n\t\t\t\t\tclassName=\"flex h-22 items-stretch justify-between font-medium text-slate-700\"\r\n\t\t\t\t\trole=\"navigation\"\r\n\t\t\t\t>\r\n\t\t\t\t\t{/*      <!-- Brand logo --> */}\r\n\t\t\t\t\t<Link\r\n\t\t\t\t\t\tid=\"WindUI\"\r\n\t\t\t\t\t\taria-label=\"WindUI logo\"\r\n\t\t\t\t\t\taria-current=\"page\"\r\n\t\t\t\t\t\tclassName=\"flex items-center gap-2 py-3 text-lg whitespace-nowrap focus:outline-hidden lg:flex-1\"\r\n\t\t\t\t\t\thref=\"/\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{!!header.globalSet?.logo.length && (\r\n\t\t\t\t\t\t\t<Image\r\n\t\t\t\t\t\t\t\tsrc={header.globalSet.logo?.[0].url}\r\n\t\t\t\t\t\t\t\twidth={260}\r\n\t\t\t\t\t\t\t\theight={60}\r\n\t\t\t\t\t\t\t\talt=\"Logo\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</Link>\r\n\t\t\t\t\t{/*      <!-- Mobile trigger --> */}\r\n\t\t\t\t\t<button\r\n\t\t\t\t\t\tclassName={`relative order-10 block h-10 w-10 self-center lg:hidden\r\n              ${\r\n\t\t\t\t\t\tisToggleOpen\r\n\t\t\t\t\t\t\t? \"visible opacity-100 [&_span:nth-child(1)]:w-6 [&_span:nth-child(1)]:translate-y-0 [&_span:nth-child(1)]:rotate-45 [&_span:nth-child(2)]:-rotate-45 [&_span:nth-child(3)]:w-0 \"\r\n\t\t\t\t\t\t\t: \"\"\r\n\t\t\t\t\t}\r\n            `}\r\n\t\t\t\t\t\tonClick={() => setIsToggleOpen(!isToggleOpen)}\r\n\t\t\t\t\t\taria-expanded={isToggleOpen ? \"true\" : \"false\"}\r\n\t\t\t\t\t\taria-label=\"Toggle navigation\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div className=\"absolute w-6 transform -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2\">\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\tclassName=\"absolute block h-0.5 w-9/12 -translate-y-2 transform rounded-full bg-slate-900 transition-all duration-300\"\r\n\t\t\t\t\t\t\t></span>\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\tclassName=\"absolute block h-0.5 w-6 transform rounded-full bg-slate-900 transition duration-300\"\r\n\t\t\t\t\t\t\t></span>\r\n\t\t\t\t\t\t\t<span\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\tclassName=\"absolute block h-0.5 w-1/2 origin-top-left translate-y-2 transform rounded-full bg-slate-900 transition-all duration-300\"\r\n\t\t\t\t\t\t\t></span>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</button>\r\n\t\t\t\t\t{/*      <!-- Navigation links --> */}\r\n\t\t\t\t\t<ul\r\n\t\t\t\t\t\trole=\"menubar\"\r\n\t\t\t\t\t\taria-label=\"Select page\"\r\n\t\t\t\t\t\tclassName={`absolute left-0 top-0 z-[-1] h-114 w-full justify-center overflow-hidden  overflow-y-auto overscroll-contain bg-background/90 px-8 pb-12 pt-24 font-medium transition-[opacity,visibility] duration-300 lg:visible lg:relative lg:top-0  lg:z-0 lg:flex lg:h-full lg:w-auto lg:items-stretch lg:overflow-visible lg:bg-background/0 lg:px-0 lg:py-0  lg:pt-0 lg:opacity-100 ${\r\n\t\t\t\t\t\t\tisToggleOpen\r\n\t\t\t\t\t\t\t\t? \"visible opacity-100 backdrop-blur-xs\"\r\n\t\t\t\t\t\t\t\t: \"invisible opacity-0\"\r\n\t\t\t\t\t\t}`}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<li role=\"none\" className=\"flex items-stretch\">\r\n\t\t\t\t\t\t\t<Link\r\n\t\t\t\t\t\t\t\trole=\"menuitem\"\r\n\t\t\t\t\t\t\t\taria-haspopup=\"false\"\r\n\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t`flex items-center gap-2 py-4 transition-colors duration-300 hover:text-foreground focus:text-foreground focus:outline-hidden focus-visible:outline-hidden lg:px-8`,\r\n\t\t\t\t\t\t\t\t\trouter.asPath.includes(\"services\") &&\r\n\t\t\t\t\t\t\t\t\t\t`text-foreground`\r\n\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\thref=\"/about\"\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<span>About</span>\r\n\t\t\t\t\t\t\t</Link>\r\n\t\t\t\t\t\t</li>\r\n\t\t\t\t\t</ul>\r\n\t\t\t\t\t{!!header.globalSet.button?.length && (\r\n\t\t\t\t\t\t<div className=\"flex items-center px-6 ml-auto lg:ml-0 lg:p-0\">\r\n\t\t\t\t\t\t\t<Link\r\n\t\t\t\t\t\t\t\tclassName={`inline-flex items-center justify-center h-10 gap-2 px-5 text-sm font-medium tracking-wide text-foreground transition duration-300 rounded shadow-md whitespace-nowrap bg-background shadow-[#b0cef0] hover:bg-background hover:shadow-xs hover:shadow-[#a3c2e7] focus:bg-background focus:shadow-xs focus:shadow-[#647991] focus-visible:outline-hidden`}\r\n\t\t\t\t\t\t\t\thref={header.globalSet.button?.[0].linkUrl}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{header.globalSet.button?.[0].linkText}\r\n\t\t\t\t\t\t\t</Link>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t)}\r\n\t\t\t\t</nav>\r\n\t\t\t</div>\r\n\t\t</header>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "On small screens, tapping the hamburger folds its three bars into an X and a frosted panel of links drops down over the page; tapping again folds it away. Links and the button shift colour on hover.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/navigation"
+  }
+}

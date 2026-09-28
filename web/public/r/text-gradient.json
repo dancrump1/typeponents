@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-gradient",
+  "type": "registry:ui",
+  "title": "Text Gradient",
+  "description": "Hero block whose three headline words take turns lighting up in their own colour gradient, matched by a glowing call-to-action button.",
+  "dependencies": [
+    "styled-components"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-gradient.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-gradient.tsx",
+      "content": "import React from \"react\";\n\nimport Link from \"next/link\";\n\nimport styled, { keyframes } from \"styled-components\";\n\n// Credit:\n// https://github.com/PhanDangKhoa96/ui-collections/blob/main/src/pages/ui-collection/text-gradient-transition.tsx\n\n// Mock data\nconst titleWords = [\n\t{ text: \"Develop.\", startColor: \"#0071f2\", endColor: \"#01dfd8\" },\n\t{ text: \"Preview.\", startColor: \"#7d00d9\", endColor: \"#ff0080\" },\n\t{ text: \"Ship.\", startColor: \"#ff4d4d\", endColor: \"#fbca00\" },\n];\n\n// Keyframes\nconst fadeOut1 = keyframes`\n    0%,16.667%,to {\n        opacity: 1\n    }\n\n    33.333%,83.333% {\n        opacity: 0\n    }\n`;\n\nconst fadeOut2 = keyframes`\n    0%,to {\n        opacity: 0\n    }\n\n    33.333%,50% {\n        opacity: 1\n    }\n\n    16.667%,66.667% {\n        opacity: 0\n    }\n`;\n\nconst fadeOut3 = keyframes`\n    0%,50%,to {\n        opacity: 0\n    }\n\n    66.667%,83.333% {\n        opacity: 1\n    }\n`;\n\nconst keyframesArray = [fadeOut1, fadeOut2, fadeOut3];\n\n// Title styles\nconst WordGradient = styled.span<{\n\t$startColor: string;\n\t$endColor: string;\n\t$index: number;\n}>`\n\tbackground-clip: text;\n\t-webkit-background-clip: text;\n\t-webkit-text-fill-color: transparent;\n\tbackground-image: linear-gradient(\n\t\t90deg,\n\t\t${(props) => props.$startColor},\n\t\t${(props) => props.$endColor}\n\t);\n\tposition: relative;\n\tz-index: 1;\n\tanimation: ${(props) => keyframesArray[props.$index]} 8s infinite;\n`;\n\nconst WordGrey = styled.span`\n\tbackground-clip: text;\n\t-webkit-background-clip: text;\n\t-webkit-text-fill-color: transparent;\n\tbackground-image: linear-gradient(180deg, #fff, hsla(0, 0%, 100%, 0.75));\n\tz-index: 1;\n`;\n\n// Button styles\nconst ButtonBg = styled.span<{\n\t$startColor: string;\n\t$endColor: string;\n\t$index: number;\n}>`\n\tbackground-image: linear-gradient(\n\t\t165deg,\n\t\t${(props) => props.$startColor},\n\t\t${(props) => props.$endColor}\n\t);\n\tposition: absolute;\n\tinset: 0;\n\tanimation: ${(props) => keyframesArray[props.$index]} 8s infinite;\n\tz-index: -2;\n`;\n\nconst ButtonBgInner = styled.span<{\n\t$startColor: string;\n\t$endColor: string;\n\t$index: number;\n}>`\n\tbackground-image: linear-gradient(\n\t\t165deg,\n\t\t${(props) => props.$startColor},\n\t\t${(props) => props.$endColor}\n\t);\n\tposition: absolute;\n\tinset: 0;\n\tanimation: ${(props) => keyframesArray[props.$index]} 8s infinite;\n\tz-index: -1;\n\tborder: 16px solid transparent;\n\tbackground-clip: padding-box;\n\tfilter: blur(36px);\n`;\n\nconst TextGradientTransition = () => {\n\treturn (\n\t\t<div className=\"container text-center\">\n\t\t\t<h1 className=\"mb-10 flex select-none flex-col items-center text-center text-7xl font-bold tracking-tight md:text-8xl lg:flex-row lg:justify-center lg:tracking-tighter xl:tracking-tight\">\n\t\t\t\t{titleWords.map((word, index) => {\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<span className=\"relative\" key={index + \"text-gradient\"}>\n\t\t\t\t\t\t\t{/* Grey text */}\n\t\t\t\t\t\t\t<WordGrey className=\"absolute inset-0\">\n\t\t\t\t\t\t\t\t{word.text}\n\t\t\t\t\t\t\t</WordGrey>\n\n\t\t\t\t\t\t\t{/* Gradient text */}\n\t\t\t\t\t\t\t<WordGradient\n\t\t\t\t\t\t\t\t$startColor={word.startColor}\n\t\t\t\t\t\t\t\t$endColor={word.endColor}\n\t\t\t\t\t\t\t\t$index={index}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{word.text}\n\t\t\t\t\t\t\t</WordGradient>\n\t\t\t\t\t\t</span>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</h1>\n\n\t\t\t<p className=\"mx-auto mb-5 max-w-3xl text-foreground\">\n\t\t\t\tLorem, ipsum dolor sit amet consectetur adipisicing elit. Alias,\n\t\t\t\tmodi error aspernatur saepe eveniet non tempore, ipsam, id\n\t\t\t\trepudiandae atque obcaecati sit ab debitis corporis vitae dolor\n\t\t\t\tvoluptatibus nam? Reprehenderit?\n\t\t\t</p>\n\n\t\t\t<div className=\"mx-auto mt-10 flex max-w-sm flex-col items-stretch gap-y-5 sm:max-w-md sm:flex-row sm:gap-x-5\">\n\t\t\t\t<Link\n\t\t\t\t\tclassName=\"inline-flex flex-1 items-center justify-center gap-x-3 rounded-lg bg-seasalt px-4 pb-2 pt-3 text-base font-bold text-vampire-black transition duration-300 hover:bg-seasalt/90\"\n\t\t\t\t\thref={\"/ui-collection\"}\n\t\t\t\t>\n\t\t\t\t\t<svg\n\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\tstrokeWidth=\"1.5\"\n\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\tclassName=\"mb-1 h-4 w-4\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<path\n\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\td=\"M18.75 19.5l-7.5-7.5 7.5-7.5m-6 15L5.25 12l7.5-7.5\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</svg>\n\t\t\t\t\tBack to UI Collections\n\t\t\t\t</Link>\n\n\t\t\t\t<div className=\"group relative flex-1 text-center\">\n\t\t\t\t\t{titleWords.map((word, index) => {\n\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t<>\n\t\t\t\t\t\t\t\t<ButtonBg\n\t\t\t\t\t\t\t\t\tkey={index + \"button-bg\"}\n\t\t\t\t\t\t\t\t\t$startColor={word.startColor}\n\t\t\t\t\t\t\t\t\t$endColor={word.endColor}\n\t\t\t\t\t\t\t\t\t$index={index}\n\t\t\t\t\t\t\t\t\tclassName=\"rounded-lg\"\n\t\t\t\t\t\t\t\t/>\n\n\t\t\t\t\t\t\t\t<ButtonBgInner\n\t\t\t\t\t\t\t\t\t$startColor={word.startColor}\n\t\t\t\t\t\t\t\t\t$endColor={word.endColor}\n\t\t\t\t\t\t\t\t\t$index={index}\n\t\t\t\t\t\t\t\t\tclassName=\"rounded-lg\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</>\n\t\t\t\t\t\t);\n\t\t\t\t\t})}\n\n\t\t\t\t\t<Link\n\t\t\t\t\t\tclassName=\"inline-block w-full rounded-lg border border-solid border-transparent bg-vampire-black bg-clip-padding px-4 pb-2 pt-3 text-base font-bold text-seasalt transition-all duration-300 group-hover:bg-transparent group-hover:text-vampire-black\"\n\t\t\t\t\t\thref={\"/ui-collection\"}\n\t\t\t\t\t>\n\t\t\t\t\t\tGet A Demo\n\t\t\t\t\t</Link>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default TextGradientTransition;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Runs on its own — each word fades from plain white into its gradient and back in turn, and the button behind the call to action glows in the same colour as the word currently lit.",
+    "inspiration": {
+      "source": "GitHub",
+      "url": "https://github.com/PhanDangKhoa96/ui-collections/blob/main/src/pages/ui-collection/text-gradient-transition.tsx",
+      "author": "PhanDangKhoa96",
+      "authorUrl": "https://github.com/PhanDangKhoa96",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-gradient"
+  }
+}

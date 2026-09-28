@@ -1,0 +1,102 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "link-preview",
+  "type": "registry:ui",
+  "title": "Link Preview",
+  "description": "Link Preview",
+  "dependencies": [
+    "@radix-ui/react-hover-card",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/link-preview.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/link-preview.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport Image from \"next/image\";\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as HoverCardPrimitive from \"@radix-ui/react-hover-card\";\nimport {\n\tAnimatePresence,\n\tmotion,\n\tuseMotionValue,\n\tuseSpring,\n} from \"motion/react\";\n\n// https://ui.aceternity.com/components/link-preview\n\ntype LinkPreviewProps = {\n\tchildren: React.ReactNode;\n\turl: string;\n\tclassName?: string;\n\twidth?: number;\n\theight?: number;\n\tquality?: number;\n\tlayout?: string;\n} & (\n\t| { isStatic: true; imageSrc: string }\n\t| { isStatic?: false; imageSrc?: never }\n);\n\nexport const LinkPreview = ({\n\tchildren,\n\turl,\n\tclassName,\n\twidth = 200,\n\theight = 125,\n\tquality = 50,\n\tlayout = \"fixed\",\n\timageSrc = \"\",\n}: LinkPreviewProps) => {\n\tconst [isOpen, setOpen] = React.useState(false);\n\n\tconst [isMounted, setIsMounted] = React.useState(false);\n\n\tReact.useEffect(() => {\n\t\tsetIsMounted(true);\n\t}, []);\n\n\tconst springConfig = { stiffness: 100, damping: 15 };\n\tconst x = useMotionValue(0);\n\n\tconst translateX = useSpring(x, springConfig);\n\n\tconst handleMouseMove = (event: any) => {\n\t\tconst targetRect = event.target.getBoundingClientRect();\n\t\tconst eventOffsetX = event.clientX - targetRect.left;\n\t\tconst offsetFromCenter = (eventOffsetX - targetRect.width / 2) / 2; // Reduce the effect to make it subtle\n\t\tx.set(offsetFromCenter);\n\t};\n\n\treturn (\n\t\t<>\n\t\t\t{isMounted ? (\n\t\t\t\t<div className=\"hidden\">\n\t\t\t\t\t<Image\n\t\t\t\t\t\tsrc={imageSrc || \"\"}\n\t\t\t\t\t\twidth={width}\n\t\t\t\t\t\theight={height}\n\t\t\t\t\t\tquality={quality}\n\t\t\t\t\t\tlayout={layout}\n\t\t\t\t\t\tpriority={true}\n\t\t\t\t\t\talt=\"hidden image\"\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t) : null}\n\n\t\t\t<HoverCardPrimitive.Root\n\t\t\t\topenDelay={50}\n\t\t\t\tcloseDelay={100}\n\t\t\t\tonOpenChange={(open) => {\n\t\t\t\t\tsetOpen(open);\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<HoverCardPrimitive.Trigger\n\t\t\t\t\tonMouseMove={handleMouseMove}\n\t\t\t\t\tclassName={cn(\"text-foreground dark:text-foreground\", className)}\n\t\t\t\t\thref={url}\n\t\t\t\t>\n\t\t\t\t\t{children}\n\t\t\t\t</HoverCardPrimitive.Trigger>\n\n\t\t\t\t<HoverCardPrimitive.Content\n\t\t\t\t\tclassName=\"origin-(--radix-hover-card-content-transform-origin)\"\n\t\t\t\t\tside=\"top\"\n\t\t\t\t\talign=\"center\"\n\t\t\t\t\tsideOffset={10}\n\t\t\t\t>\n\t\t\t\t\t<AnimatePresence>\n\t\t\t\t\t\t{isOpen && (\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0, y: 20, scale: 0.6 }}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t\t\t\ty: 0,\n\t\t\t\t\t\t\t\t\tscale: 1,\n\t\t\t\t\t\t\t\t\ttransition: {\n\t\t\t\t\t\t\t\t\t\ttype: \"spring\",\n\t\t\t\t\t\t\t\t\t\tstiffness: 260,\n\t\t\t\t\t\t\t\t\t\tdamping: 20,\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\texit={{ opacity: 0, y: 20, scale: 0.6 }}\n\t\t\t\t\t\t\t\tclassName=\"shadow-xl rounded-xl\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tx: translateX,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<Link\n\t\t\t\t\t\t\t\t\thref={url}\n\t\t\t\t\t\t\t\t\tclassName=\"block p-1 bg-background border-2 border-transparent shadow-sm rounded-xl hover:border-neutral-200 dark:hover:border-neutral-800\"\n\t\t\t\t\t\t\t\t\tstyle={{ fontSize: 0 }}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\t\tsrc={imageSrc || \"\"}\n\t\t\t\t\t\t\t\t\t\twidth={width}\n\t\t\t\t\t\t\t\t\t\theight={height}\n\t\t\t\t\t\t\t\t\t\tquality={quality}\n\t\t\t\t\t\t\t\t\t\tlayout={layout}\n\t\t\t\t\t\t\t\t\t\tpriority={true}\n\t\t\t\t\t\t\t\t\t\tclassName=\"rounded-lg\"\n\t\t\t\t\t\t\t\t\t\talt=\"preview image\"\n\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t</Link>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t)}\n\t\t\t\t\t</AnimatePresence>\n\t\t\t\t</HoverCardPrimitive.Content>\n\t\t\t</HoverCardPrimitive.Root>\n\t\t</>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/link-preview",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "url",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "isStatic",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "default": "200",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "default": "125",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "quality",
+        "type": "number",
+        "default": "50",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "layout",
+        "type": "string",
+        "default": "\"fixed\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "imageSrc",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/link-preview"
+  }
+}

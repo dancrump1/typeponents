@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "shift-card",
+  "type": "registry:ui",
+  "title": "Shift Card",
+  "description": "Shift Card",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/shift-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/shift-card.tsx",
+      "content": "\"use client\";\r\n\r\nimport * as React from \"react\";\r\n\r\nimport { AnimatePresence, motion, MotionProps } from \"motion/react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// Credit:\r\n// https://www.cult-ui.com/docs/components/shift-card\r\n\r\ninterface ShiftCardProps\r\n\textends Omit<MotionProps, \"onAnimationStart\" | \"onAnimationComplete\"> {\r\n\tclassName?: string;\r\n\ttopContent?: React.ReactNode;\r\n\tmiddleContent?: React.ReactNode;\r\n\ttopAnimateContent?: React.ReactNode;\r\n\tbottomContent?: React.ReactNode;\r\n}\r\n\r\nconst ShiftCardHeader = React.forwardRef<\r\n\tHTMLDivElement,\r\n\tReact.HTMLAttributes<HTMLDivElement>\r\n>(({ children, ...props }, ref) => (\r\n\t<div ref={ref} {...props}>\r\n\t\t{children}\r\n\t</div>\r\n));\r\nShiftCardHeader.displayName = \"ShiftCardHeader\";\r\n\r\ninterface ShiftCardContentProps extends React.HTMLAttributes<HTMLDivElement> {\r\n\tisHovered: boolean;\r\n}\r\nconst ShiftCardContent = React.forwardRef<\r\n\tHTMLDivElement,\r\n\tShiftCardContentProps\r\n>(({ isHovered, children, ...divProps }, ref) => {\r\n\t// Explicitly define motion props to avoid passing incompatible HTML attributes\r\n\tconst motionProps: MotionProps = {\r\n\t\tinitial: { opacity: 0, height: 0 },\r\n\t\tanimate: isHovered\r\n\t\t\t? { opacity: 1, height: 194 }\r\n\t\t\t: { opacity: 1, height: 38 },\r\n\t\ttransition: { duration: 0.3, delay: 0.1, ease: \"circIn\" },\r\n\t};\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tkey=\"shift-card-content\"\r\n\t\t\tref={ref}\r\n\t\t\t{...motionProps}\r\n\t\t\tclassName={divProps.className}\r\n\t\t>\r\n\t\t\t{children}\r\n\t\t</motion.div>\r\n\t);\r\n});\r\nShiftCardContent.displayName = \"ShiftCardContent\";\r\n\r\nconst ShiftCard = React.forwardRef<HTMLDivElement, ShiftCardProps>(\r\n\t(\r\n\t\t{\r\n\t\t\tclassName,\r\n\t\t\ttopContent,\r\n\t\t\ttopAnimateContent,\r\n\t\t\tmiddleContent,\r\n\t\t\tbottomContent,\r\n\t\t\t...props\r\n\t\t},\r\n\t\tref\r\n\t) => {\r\n\t\tconst [isHovered, setHovered] = React.useState(false);\r\n\t\tconst handleMouseEnter = () => setHovered(true);\r\n\t\tconst handleMouseLeave = () => setHovered(false);\r\n\t\tconst handleTapStart = () => setHovered(true);\r\n\t\tconst handleTapCancel = () => setHovered(false);\r\n\t\tconst handleTap = () => setHovered(false);\r\n\r\n\t\treturn (\r\n\t\t\t<motion.div\r\n\t\t\t\tref={ref}\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"min-h-[240px] w-[280px] md:min-h-[300px] md:w-[300px]\",\r\n\t\t\t\t\t\" group relative flex flex-col items-center justify-between overflow-hidden rounded-xl  p-3 text-sm \",\r\n\t\t\t\t\t\" hover:cursor-pointer bg-card  \",\r\n\t\t\t\t\t\"shadow-[0px_1px_1px_0px_rgba(0,0,0,0.05),0px_1px_1px_0px_rgba(255,252,240,0.5)_inset,0px_0px_0px_1px_hsla(0,0%,100%,0.1)_inset,0px_0px_1px_0px_rgba(28,27,26,0.5)]\",\r\n\t\t\t\t\t/* \r\n\t\t  Applies a multi-layer shadow effect in dark mode:\r\n\t\t  1. Two subtle white inset shadows: one horizontal at 1px height, and one around the entire border at 1px width, both with a very light opacity of 0.03, creating a slight inner glow.\r\n\t\t  2. A series of black shadows:\r\n\t\t\t  - A basic 1px black border shadow with 10% opacity to subtly outline the element.\r\n\t\t\t  - Three progressively larger diffuse shadows at 2px, 4px, and 8px, each with 10% opacity, creating a depth effect that enhances the element's visual separation from the background.\r\n\t\t  */\r\n\t\t\t\t\t\"dark:shadow-[0_1px_0_0_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(255,255,255,0.03)_inset,0_0_0_1px_rgba(0,0,0,0.1),0_2px_2px_0_rgba(0,0,0,0.1),0_4px_4px_0_rgba(0,0,0,0.1),0_8px_8px_0_rgba(0,0,0,0.1)]\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\tinitial={{ y: 20, opacity: 0 }}\r\n\t\t\t\tanimate={{ y: 0, opacity: 1 }}\r\n\t\t\t\twhileHover={{ scale: 1.02 }}\r\n\t\t\t\tonMouseEnter={handleMouseEnter}\r\n\t\t\t\tonMouseLeave={handleMouseLeave}\r\n\t\t\t\tonTapStart={handleTapStart}\r\n\t\t\t\tonTapCancel={handleTapCancel}\r\n\t\t\t\tonTap={handleTap}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<ShiftCardHeader className=\"flex h-[46px] w-full flex-col relative text-primary-foreground \">\r\n\t\t\t\t\t<div className=\" w-full\">\r\n\t\t\t\t\t\t{topContent}\r\n\r\n\t\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t\t{isHovered ? <>{topAnimateContent}</> : null}\r\n\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</ShiftCardHeader>\r\n\r\n\t\t\t\t<div className=\"pb-12 \">\r\n\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t{!isHovered ? <>{middleContent}</> : null}\r\n\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<ShiftCardContent\r\n\t\t\t\t\tisHovered={isHovered}\r\n\t\t\t\t\tclassName=\"absolute bottom-0 left-0 right-0 flex  flex-col gap-4  rounded-xl  \"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div className=\"flex w-full flex-col gap-1  \">\r\n\t\t\t\t\t\t{bottomContent}\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</ShiftCardContent>\r\n\t\t\t</motion.div>\r\n\t\t);\r\n\t}\r\n);\r\n\r\nShiftCard.displayName = \"ShiftCard\";\r\n\r\nexport { ShiftCard, ShiftCardHeader, ShiftCardContent };\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards",
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/shift-card",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/shift-card"
+  }
+}

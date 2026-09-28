@@ -1,0 +1,62 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "glowing-scroll-indicator",
+  "type": "registry:ui",
+  "title": "Glowing Scroll Indicator",
+  "description": "A visual scroll indicator that shows animated glowing bars that light up and grow as you scroll down the page. Features a smooth red marker that moves across the bars to show your exact scroll position, creating an eye-catching glowing wave effect.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/glowing-scroll-indicator.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/glowing-scroll-indicator.tsx",
+      "content": "'use client';\r\n\r\nimport { motion, MotionValue, useScroll, useTransform } from 'framer-motion';\r\nimport { usePathname } from 'next/navigation';\r\nimport React, { useEffect } from 'react';\r\n\r\nconst BARS = 40;\r\n\r\nconst ScrollBar = ({\r\n  index,\r\n  scrollProgress\r\n}: {\r\n  index: number;\r\n  scrollProgress: MotionValue<number>;\r\n}) => {\r\n  const thisBarPosition = index / BARS;\r\n  const preStep = Math.max(0, (index - 3) / BARS);\r\n  const postStep = Math.min(1, (index + 3) / BARS);\r\n\r\n  const height = useTransform(\r\n    scrollProgress,\r\n    [0, preStep, thisBarPosition, postStep, 1],\r\n    [5, 15, 35, 15, 5]\r\n  );\r\n  const opacity = useTransform(\r\n    scrollProgress,\r\n    [0, preStep, thisBarPosition, postStep, 1],\r\n    [0.1, 0.4, 1, 0.4, 0.1]\r\n  );\r\n  const width = useTransform(scrollProgress, [0, thisBarPosition, 1], [1.5, 5, 1.5]);\r\n\r\n  return (\r\n    <motion.div\r\n      className=\"bg-white\"\r\n      style={{\r\n        height: height,\r\n        opacity: useTransform(opacity, (value) => `${value}`),\r\n        width: useTransform(width, (value) => `${value}px`)\r\n      }}\r\n    />\r\n  );\r\n};\r\n\r\nconst ScrollIndicatorBars = ({\r\n  container,\r\n  direction\r\n}: {\r\n  container: HTMLElement;\r\n  direction: 'vertical' | 'horizontal';\r\n}) => {\r\n  const ref = React.useRef<HTMLElement>(container);\r\n\r\n  // Update ref if container changes\r\n  React.useEffect(() => {\r\n    ref.current = container;\r\n  }, [container]);\r\n\r\n  const { scrollXProgress, scrollYProgress } = useScroll({\r\n    container: ref\r\n  });\r\n\r\n  const scrollProgress = direction === 'vertical' ? scrollYProgress : scrollXProgress;\r\n\r\n  const left = useTransform(scrollProgress, [0, 1], [0, 100]);\r\n\r\n  return (\r\n    <div className=\"flex items-end justify-center gap-1 md:gap-2 relative w-fit\">\r\n      {Array.from({ length: BARS }).map((_, index) => {\r\n        return (\r\n          <ScrollBar\r\n            key={`scroll-bar-${index}`}\r\n            index={index}\r\n            scrollProgress={direction === 'vertical' ? scrollYProgress : scrollXProgress}\r\n          />\r\n        );\r\n      })}\r\n      <motion.div\r\n        className=\"h-20 bg-red-700 w-1 absolute bottom-0 left-1/2 -translate-x-1/2\"\r\n        style={{ left: useTransform(left, (value) => `${value}%`) }}\r\n      >\r\n        <div className=\"w-3.5 h-3.5 rounded-full shadow-sm bg-red-500 from-50% to-50% absolute top-0 left-1/2 -translate-x-1/2\"></div>\r\n      </motion.div>\r\n    </div>\r\n  );\r\n};\r\n\r\nconst ScrollIndicator = ({\r\n  scrollContainerId,\r\n  direction\r\n}: {\r\n  scrollContainerId: string;\r\n  direction: 'vertical' | 'horizontal';\r\n}) => {\r\n  const [container, setContainer] = React.useState<HTMLElement | null>(null);\r\n\r\n  useEffect(() => {\r\n    const scrollContainer = document.getElementById(scrollContainerId);\r\n    if (scrollContainer) {\r\n      setContainer(scrollContainer);\r\n    }\r\n  }, [scrollContainerId]);\r\n\r\n  if (!container) {\r\n    return null;\r\n  }\r\n\r\n  return <ScrollIndicatorBars container={container} direction={direction} />;\r\n};\r\n\r\nconst GlowingScrollIndicator = ({\r\n  scrollContainerId = 'scroll-target',\r\n  direction = 'vertical'\r\n}: {\r\n  scrollContainerId?: string;\r\n  direction?: 'vertical' | 'horizontal';\r\n}) => {\r\n  const pathname = usePathname();\r\n\r\n  return (\r\n    <ScrollIndicator key={pathname} scrollContainerId={scrollContainerId} direction={direction} />\r\n  );\r\n};\r\n\r\nexport default GlowingScrollIndicator;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Glowing bars grow as you scroll, with a marker tracking exact position.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/glowingscrollindicator",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "scrollContainerId",
+        "type": "string",
+        "default": "'scroll-target'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "direction",
+        "type": "\"vertical\" | \"horizontal\"",
+        "default": "'vertical'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/glowing-scroll-indicator"
+  }
+}

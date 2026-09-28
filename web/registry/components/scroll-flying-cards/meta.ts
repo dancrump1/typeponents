@@ -1,0 +1,38 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "scroll-flying-cards",
+	title: "Scroll Flying Cards",
+	description: "A scroll-driven flying cards component featuring dynamic entry/exit transforms, rotation, scale depth, blur filters, and sticky background text.",
+	interaction: "Cards float into and out of view on scroll with dynamic translation, tilt, scaling, and blur filters.",
+	categories: ["Scroll"],
+	tags: ["scroll-driven"],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/scroll-flying-cards",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "cards", type: "FlyingCard[]", required: true },
+		{ name: "backgroundText", type: "string", default: "\"GREAT UI\"" },
+		{ name: "className", type: "string" },
+		{ name: "cardClassName", type: "string" },
+		{ name: "titleClassName", type: "string" },
+		{ name: "descriptionClassName", type: "string" },
+		{ name: "backgroundTextClassName", type: "string" },
+		{ name: "scrollContainerRef", type: "React.RefObject<HTMLElement | null>" },
+		{ name: "animationOffset", type: "number", default: "300" },
+		{ name: "animationRotation", type: "number", default: "10" },
+		{ name: "animationScale", type: "number", default: "0.85" },
+		{ name: "animationBlur", type: "number", default: "20" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

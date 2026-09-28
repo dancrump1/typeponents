@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-167",
+  "type": "registry:component",
+  "title": "Comp 167",
+  "description": "Comp 167",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-167.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { RadioGroup, RadioGroupItem } from \"@/components/ui/radio-group\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\r\n\tconst items = [\r\n\t\t{ value: \"1\", label: \"Angry\", icon: \"😠\" },\r\n\t\t{ value: \"2\", label: \"Sad\", icon: \"🙁\" },\r\n\t\t{ value: \"3\", label: \"Neutral\", icon: \"😐\" },\r\n\t\t{ value: \"4\", label: \"Happy\", icon: \"🙂\" },\r\n\t\t{ value: \"5\", label: \"Laughing\", icon: \"😀\" },\r\n\t];\r\n\r\n\treturn (\r\n\t\t<fieldset className=\"space-y-4\">\r\n\t\t\t<legend className=\"text-foreground text-sm leading-none font-medium\">\r\n\t\t\t\tHow did it go?\r\n\t\t\t</legend>\r\n\t\t\t<RadioGroup className=\"flex gap-1.5\" defaultValue=\"3\">\r\n\t\t\t\t{items.map((item) => (\r\n\t\t\t\t\t<label\r\n\t\t\t\t\t\tkey={`${id}-${item.value}`}\r\n\t\t\t\t\t\tclassName=\"border-input has-data-[state=checked]:border-primary/50 has-focus-visible:border-ring has-focus-visible:ring-ring/50 relative flex size-9 cursor-pointer flex-col items-center justify-center rounded-full border text-center text-xl shadow-2xs transition-[color,box-shadow] outline-hidden has-focus-visible:ring-[3px] has-data-disabled:cursor-not-allowed has-data-disabled:opacity-50\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<RadioGroupItem\r\n\t\t\t\t\t\t\tid={`${id}-${item.value}`}\r\n\t\t\t\t\t\t\tvalue={item.value}\r\n\t\t\t\t\t\t\tclassName=\"sr-only after:absolute after:inset-0\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t{item.icon}\r\n\t\t\t\t\t</label>\r\n\t\t\t\t))}\r\n\t\t\t</RadioGroup>\r\n\t\t</fieldset>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/radio-group.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as RadioGroupPrimitive from \"@radix-ui/react-radio-group\";\r\nimport { Circle } from \"lucide-react\";\r\n\r\nconst RadioGroup = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Root\r\n\t\t\tclassName={cn(\"grid gap-2\", className)}\r\n\t\t\t{...props}\r\n\t\t\tref={ref}\r\n\t\t/>\r\n\t);\r\n});\r\nRadioGroup.displayName = RadioGroupPrimitive.Root.displayName;\r\n\r\nconst RadioGroupItem = React.forwardRef<\r\n\tReact.ElementRef<typeof RadioGroupPrimitive.Item>,\r\n\tReact.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>\r\n>(({ className, ...props }, ref) => {\r\n\treturn (\r\n\t\t<RadioGroupPrimitive.Item\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t\t{...props}\r\n\t\t>\r\n\t\t\t<RadioGroupPrimitive.Indicator className=\"flex items-center justify-center\">\r\n\t\t\t\t<Circle className=\"h-2.5 w-2.5 fill-current text-current\" />\r\n\t\t\t</RadioGroupPrimitive.Indicator>\r\n\t\t</RadioGroupPrimitive.Item>\r\n\t);\r\n});\r\nRadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;\r\n\r\nexport { RadioGroup, RadioGroupItem };\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

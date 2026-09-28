@@ -1,0 +1,44 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "word-tornado",
+  "type": "registry:ui",
+  "title": "Word Tornado",
+  "description": "Word Tornado",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/word-tornado.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/word-tornado.tsx",
+      "content": "import type React from \"react\";\nimport { useEffect, useRef } from \"react\";\n\n// Credit:\n// https://starui.link/docs/components/word-galaxy\n\nconst str =\n\t'Tailwind CSS is an open-source CSS framework. Unlike other frameworks, like Bootstrap, it does not provide a series of predefined classes for elements such as buttons or tables. Instead, it creates a list of \"utility\" CSS classes that can be used to style each element by mixing and matching.';\n\nconst words = str.split(\" \");\n\nexport default function WordTornadoDemo() {\n\treturn (\n\t\t<div className=\"p-5\">\n\t\t\t<WordTornado>\n\t\t\t\t{words.map((word, index) => (\n\t\t\t\t\t<span\n\t\t\t\t\t\tkey={index + \"tornato\"}\n\t\t\t\t\t\tclassName=\"inline-block ease-spring duration-500\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{word}\n\t\t\t\t\t\t{index < words.length && \"\\u00A0\"}\n\t\t\t\t\t</span>\n\t\t\t\t))}\n\t\t\t</WordTornado>\n\n\t\t\t<div className=\"text-center text-3xl mt-10\">Hover ↑</div>\n\t\t</div>\n\t);\n}\n\nexport function WordTornado({\n\tdistanceScale,\n\tmaxMovement,\n\t...props\n}: {\n\tdistanceScale?: number;\n\tmaxMovement?: number;\n} & React.ComponentPropsWithoutRef<\"div\">) {\n\tconst container = useRef<HTMLDivElement | null>(null);\n\n\tuseEffect(() => {\n\t\tlet instance: WordTornadoFactory;\n\t\tif (container.current) {\n\t\t\tinstance = new WordTornadoFactory(\n\t\t\t\tcontainer.current,\n\t\t\t\tdistanceScale,\n\t\t\t\tmaxMovement\n\t\t\t);\n\t\t}\n\t\treturn () => instance.destroy();\n\t}, []);\n\n\treturn <div ref={container} {...props} />;\n}\n\ntype Position = { x: number; y: number };\n\nexport class WordTornadoFactory {\n\tprivate container: HTMLElement;\n\tprivate elements: HTMLElement[] = [];\n\tprivate elementsPosition: Position[] = [];\n\tprivate pointerPosition: Position | null = null;\n\tprivate resizeObserver?: ResizeObserver;\n\tprivate rafId?: ReturnType<typeof requestAnimationFrame>;\n\tprivate distanceScale = 200;\n\tprivate maxMovement = 100;\n\n\tconstructor(\n\t\tcontainer: HTMLElement | string,\n\t\tdistanceScale = 200,\n\t\tmaxMovement = 100\n\t) {\n\t\tif (!container) throw new Error(\"container is required\");\n\t\tif (typeof container === \"string\") {\n\t\t\tconst target = document.querySelector(container);\n\t\t\tif (!(target instanceof HTMLElement))\n\t\t\t\tthrow new Error(\"container is not HTMLElement\");\n\t\t\tthis.container = target;\n\t\t} else {\n\t\t\tthis.container = container;\n\t\t}\n\t\tthis.distanceScale = distanceScale ?? 200;\n\t\tthis.maxMovement = maxMovement ?? 100;\n\t\tthis.container.style.touchAction = \"none\";\n\t\tthis.getElements();\n\t\tthis.addListeners();\n\t\tthis.rafId = requestAnimationFrame(this.animate);\n\t}\n\n\tprivate getElements = () => {\n\t\tthis.elements = Array.from(this.container.children).filter(\n\t\t\t(item) => item instanceof HTMLElement\n\t\t);\n\t};\n\n\tprivate updateElementsPosition = () => {\n\t\tconst containerRect = this.container.getBoundingClientRect();\n\t\tthis.elementsPosition = this.elements.map((element) => {\n\t\t\tconst { x, y, width, height } = element.getBoundingClientRect();\n\t\t\treturn {\n\t\t\t\tx: x - containerRect.x + width * 0.5,\n\t\t\t\ty: y - containerRect.y + height * 0.5,\n\t\t\t};\n\t\t});\n\t};\n\n\tprivate observeContainer = () => {\n\t\tthis.resizeObserver =\n\t\t\tthis.resizeObserver || new ResizeObserver(this.updateElementsPosition);\n\t\tthis.resizeObserver.observe(this.container);\n\t};\n\n\tprivate updatePointerPosition = (event: PointerEvent) => {\n\t\tthis.pointerPosition = this.pointerPosition || { x: 0, y: 0 };\n\t\tconst { x, y } = this.container.getBoundingClientRect();\n\t\tthis.pointerPosition.x = event.x - x;\n\t\tthis.pointerPosition.y = event.y - y;\n\t};\n\n\tprivate resetPointerPosition = () => {\n\t\tthis.pointerPosition = null;\n\t};\n\n\tprivate addListeners = () => {\n\t\tthis.observeContainer();\n\t\tthis.container.addEventListener(\n\t\t\t\"pointermove\",\n\t\t\tthis.updatePointerPosition\n\t\t);\n\t\tthis.container.addEventListener(\n\t\t\t\"pointerleave\",\n\t\t\tthis.resetPointerPosition\n\t\t);\n\t};\n\n\tprivate removeListeners = () => {\n\t\tthis.resizeObserver?.disconnect();\n\t\tthis.container.removeEventListener(\n\t\t\t\"pointermove\",\n\t\t\tthis.updatePointerPosition\n\t\t);\n\t\tthis.container.removeEventListener(\n\t\t\t\"pointerleave\",\n\t\t\tthis.resetPointerPosition\n\t\t);\n\t\tthis.rafId && cancelAnimationFrame(this.rafId);\n\t};\n\n\tprivate animate = () => {\n\t\tif (!this.pointerPosition) {\n\t\t\tfor (let i = 0; i < this.elements.length; i++) {\n\t\t\t\tthis.elements[i].style.transform = \"\";\n\t\t\t}\n\t\t} else {\n\t\t\tfor (let i = 0; i < this.elements.length; i++) {\n\t\t\t\tconst { x, y } = this.elementsPosition[i];\n\t\t\t\tconst { x: px, y: py } = this.pointerPosition;\n\t\t\t\tconst dx = px - x;\n\t\t\t\tconst dy = py - y;\n\t\t\t\tconst distance = Math.sqrt(dx ** 2 + dy ** 2);\n\t\t\t\tconst scale = Math.max(0, 1 - distance / this.distanceScale);\n\n\t\t\t\tconst moveX = (-dx / distance) * scale * this.maxMovement;\n\t\t\t\tconst moveY = (-dy / distance) * scale * this.maxMovement;\n\n\t\t\t\tthis.elements[i].style.transform =\n\t\t\t\t\t`translate(${moveX}px, ${moveY}px)`;\n\t\t\t}\n\t\t}\n\n\t\tthis.rafId = requestAnimationFrame(this.animate);\n\t};\n\n\tdestroy = () => this.removeListeners();\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/word-galaxy",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/word-tornado"
+  }
+}

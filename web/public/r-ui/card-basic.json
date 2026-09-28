@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-basic",
+  "type": "registry:component",
+  "title": "Card Basic",
+  "description": "Card Basic",
+  "files": [
+    {
+      "path": "registry/ui-basic/CardBasic.tsx",
+      "content": "import React from \"react\";\r\n\r\nexport default function CardBasic() {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/*<!-- Component: Basic card --> */}\r\n\t\t\t<div className=\"overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200\">\r\n\t\t\t\t<div className=\"p-6\">\r\n\t\t\t\t\t<h3 className=\"mb-4 text-xl font-medium text-slate-700\">\r\n\t\t\t\t\t\tSomething to remember\r\n\t\t\t\t\t</h3>\r\n\t\t\t\t\t<p>\r\n\t\t\t\t\t\tAll components can be copied and pasted and easily implemented\r\n\t\t\t\t\t\tin your tailwind css projects. You can choose which language\r\n\t\t\t\t\t\tyou want to copy the desired component and just hover and\r\n\t\t\t\t\t\tclick on the component you need and paste it on your project.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t{/*<!-- End Basic card --> */}\r\n\t\t</>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

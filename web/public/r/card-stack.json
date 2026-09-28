@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-stack",
+  "type": "registry:ui",
+  "title": "Card Stack",
+  "description": "Stack of testimonial cards with the ones behind peeking out above, slightly smaller each step back.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/card-stack.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/card-stack.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\nlet interval: any;\n\ntype Card = {\n\tid: number;\n\tname: string;\n\tdesignation: string;\n\tcontent: React.ReactNode;\n};\n\n// https://ui.aceternity.com/components/card-stack\n\n// Small utility to highlight the content of specific section of a testimonial content\nexport const Highlight = ({\n\tchildren,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tclassName?: string;\n}) => {\n\treturn (\n\t\t<span\n\t\t\tclassName={cn(\n\t\t\t\t\"font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-700/20 dark:text-emerald-500 px-1 py-0.5\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</span>\n\t);\n};\n\nconst CARDS = [\n\t{\n\t\tid: 0,\n\t\tname: \"Manu Arora\",\n\t\tdesignation: \"Senior Software Engineer\",\n\t\tcontent: (\n\t\t\t<p>\n\t\t\t\tThese cards are amazing, <Highlight>I want to use them</Highlight>{\" \"}\n\t\t\t\tin my project. Framer motion is a godsend ngl tbh fam 🙏\n\t\t\t</p>\n\t\t),\n\t},\n\t{\n\t\tid: 1,\n\t\tname: \"Elon Musk\",\n\t\tdesignation: \"Senior Shitposter\",\n\t\tcontent: (\n\t\t\t<p>\n\t\t\t\tI dont like this Twitter thing,{\" \"}\n\t\t\t\t<Highlight>deleting it right away</Highlight> because yolo. Instead,\n\t\t\t\tI would like to call it <Highlight>X.com</Highlight> so that it can\n\t\t\t\teasily be confused with adult sites.\n\t\t\t</p>\n\t\t),\n\t},\n\t{\n\t\tid: 2,\n\t\tname: \"Tyler Durden\",\n\t\tdesignation: \"Manager Project Mayhem\",\n\t\tcontent: (\n\t\t\t<p>\n\t\t\t\tThe first rule of\n\t\t\t\t<Highlight>Fight Club</Highlight> is that you do not talk about\n\t\t\t\tfight club. The second rule of\n\t\t\t\t<Highlight>Fight club</Highlight> is that you DO NOT TALK about\n\t\t\t\tfight club.\n\t\t\t</p>\n\t\t),\n\t},\n];\n\nexport const CardStack = ({\n\titems = CARDS,\n\toffset,\n\tscaleFactor,\n}: {\n\titems?: Card[];\n\toffset?: number;\n\tscaleFactor?: number;\n}) => {\n\tconst CARD_OFFSET = offset || 10;\n\tconst SCALE_FACTOR = scaleFactor || 0.06;\n\tconst [cards, setCards] = useState<Card[]>(items);\n\n\tuseEffect(() => {\n\t\tstartFlipping();\n\n\t\treturn () => clearInterval(interval);\n\t}, []);\n\tconst startFlipping = () => {\n\t\tinterval = setInterval(() => {\n\t\t\tsetCards((prevCards: Card[]) => {\n\t\t\t\tconst newArray = [...prevCards]; // create a copy of the array\n\t\t\t\tnewArray.unshift(newArray.pop()!); // move the last element to the front\n\t\t\t\treturn newArray;\n\t\t\t});\n\t\t}, 5000);\n\t};\n\n\treturn (\n\t\t<div className=\"relative  h-60 w-60 md:h-60 md:w-96\">\n\t\t\t{cards.map((card, index) => {\n\t\t\t\treturn (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tkey={card.id}\n\t\t\t\t\t\tclassName=\"absolute dark:bg-background bg-background h-60 w-60 md:h-60 md:w-96 rounded-3xl p-4 shadow-xl border border-neutral-200 dark:border-white/10  shadow-black/10 dark:shadow-white/5 flex flex-col justify-between\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttransformOrigin: \"top center\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\ttop: index * -CARD_OFFSET,\n\t\t\t\t\t\t\tscale: 1 - index * SCALE_FACTOR, // decrease scale for cards that are behind\n\t\t\t\t\t\t\tzIndex: cards.length - index, //  decrease z-index for the cards that are behind\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<div className=\"font-normal text-foreground dark:text-foreground\">\n\t\t\t\t\t\t\t{card.content}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t<p className=\"text-foreground font-medium dark:text-foreground\">\n\t\t\t\t\t\t\t\t{card.name}\n\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t\t<p className=\"text-foreground font-normal dark:text-foreground\">\n\t\t\t\t\t\t\t\t{card.designation}\n\t\t\t\t\t\t\t</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</motion.div>\n\t\t\t\t);\n\t\t\t})}\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "Runs on its own — every few seconds the back card slides up to the front and the rest shuffle down a place, cycling through the quotes without any input.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/card-stack",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/card-stack"
+  }
+}

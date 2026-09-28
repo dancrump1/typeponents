@@ -1,0 +1,314 @@
+# Sidebar
+
+Collapsible sidebar navigation.
+
+**Interaction.** Open and close the sidebar; nested items expand in place.
+
+- Categories: Navigation
+- Tags: hover
+- Import: `@/components/ui/sidebar`
+
+## Install
+
+```bash
+npx shadcn@latest add https://components.drivedev.net/r/sidebar.json
+```
+
+This rewrites imports to match the target project's `components.json` aliases, so `cn` and any hooks land in the right place automatically.
+
+## Dependencies
+
+- `@tabler/icons-react`
+- `lucide-react`
+- `motion`
+
+## Usage
+
+```tsx
+"use client";
+
+import { Sidebar, SidebarBody, SidebarLink } from "./component";
+import { Home, Settings, User } from "lucide-react";
+
+const links = [
+	{ label: "Home", href: "#", icon: <Home className="h-5 w-5" /> },
+	{ label: "Profile", href: "#", icon: <User className="h-5 w-5" /> },
+	{ label: "Settings", href: "#", icon: <Settings className="h-5 w-5" /> },
+];
+
+export default function Usage() {
+	return (
+		<div className="flex h-[400px] w-full rounded-xl border">
+			<Sidebar>
+				<SidebarBody className="justify-between gap-10">
+					<div className="flex flex-col gap-2">
+						{links.map((link) => (
+							<SidebarLink key={link.label} link={link} />
+						))}
+					</div>
+				</SidebarBody>
+			</Sidebar>
+		</div>
+	);
+}
+```
+
+## Source
+
+### `components/ui/sidebar.tsx`
+
+```tsx
+"use client";
+
+import React, { createContext, useContext, useState } from "react";
+
+import Image from "next/image";
+import Link, { LinkProps } from "next/link";
+
+import { cn } from "@/lib/utils";
+import { IconMenu2, IconX } from "@tabler/icons-react";
+import { AnimatePresence, motion } from "motion/react";
+
+interface Links {
+	label: string;
+	href: string;
+	icon: React.JSX.Element | React.ReactNode;
+}
+
+interface SidebarContextProps {
+	open: boolean;
+	setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+	animate: boolean;
+}
+
+const SidebarContext = createContext<SidebarContextProps | undefined>(
+	undefined
+);
+
+export const useSidebar = () => {
+	const context = useContext(SidebarContext);
+	if (!context) {
+		throw new Error("useSidebar must be used within a SidebarProvider");
+	}
+	return context;
+};
+
+export const SidebarProvider = ({
+	children,
+	open: openProp,
+	setOpen: setOpenProp,
+	animate = true,
+}: {
+	children: React.ReactNode;
+	open?: boolean;
+	setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	animate?: boolean;
+}) => {
+	const [openState, setOpenState] = useState(false);
+
+	const open = openProp !== undefined ? openProp : openState;
+	const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+
+	return (
+		<SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+			{children}
+		</SidebarContext.Provider>
+	);
+};
+
+export const Sidebar = ({
+	children,
+	open,
+	setOpen,
+	animate,
+}: {
+	children: React.ReactNode;
+	open?: boolean;
+	setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+	animate?: boolean;
+}) => {
+	return (
+		<SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+			{children}
+		</SidebarProvider>
+	);
+};
+
+export const SidebarBody = (props: React.ComponentProps<typeof motion.div>) => {
+	return (
+		<>
+			<DesktopSidebar {...props} />
+			<MobileSidebar {...(props as React.ComponentProps<"div">)} />
+		</>
+	);
+};
+
+export const DesktopSidebar = ({
+	className,
+	children,
+	...props
+}: React.ComponentProps<typeof motion.div>) => {
+	const { open, setOpen, animate } = useSidebar();
+	return (
+		<>
+			<motion.div
+				className={cn(
+					"h-full fixed top-0 left-0 px-4 z-50 cursor-pointer py-4 hidden  md:flex md:flex-col bg-background dark:bg-background w-[300px] shrink-0",
+					className
+				)}
+				animate={{
+					width: animate ? (open ? "300px" : "60px") : "300px",
+				}}
+				// onMouseEnter={() => setOpen(true)}
+				// onMouseLeave={() => setOpen(false)}
+				{...props}
+			>
+				<div onClick={() => setOpen(!open)}>{open ? "<" : ">"}</div>
+				{children}
+			</motion.div>
+		</>
+	);
+};
+
+export const MobileSidebar = ({
+	className,
+	children,
+	...props
+}: React.ComponentProps<"div">) => {
+	const { open, setOpen } = useSidebar();
+	return (
+		<>
+			<div
+				className={cn(
+					"h-10 px-4 py-4 flex flex-row md:hidden  items-center justify-between bg-background dark:bg-background",
+					!open && "absolute top-0"
+				)}
+				{...props}
+			>
+				<div className="flex justify-end z-20 w-full">
+					<IconMenu2
+						className="text-foreground dark:text-foreground"
+						onClick={() => setOpen(!open)}
+					/>
+				</div>
+				<AnimatePresence>
+					{open && (
+						<motion.div
+							initial={{ x: "-100%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							exit={{ x: "-100%", opacity: 0 }}
+							transition={{
+								duration: 0.3,
+								ease: "easeInOut",
+							}}
+							className={cn(
+								"fixed h-full w-full inset-0 bg-background dark:bg-background p-10 z-100 flex flex-col justify-between",
+								className
+							)}
+						>
+							<div
+								className="absolute left-5 top-2 z-50 text-foreground dark:text-foreground"
+								onClick={() => setOpen(!open)}
+							>
+								<IconX />
+							</div>
+							{children}
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</div>
+		</>
+	);
+};
+
+export const SidebarLink = ({
+	link,
+	label,
+	icon,
+	className,
+	toggle,
+	all,
+	...props
+}: {
+	link: Links;
+	className?: string;
+	props?: LinkProps;
+}) => {
+	const { open, animate } = useSidebar();
+	if (toggle) {
+		return !all ? (
+			<Link
+				className={cn(
+					"flex items-center cursor-pointer justify-start gap-2  group/sidebar py-2",
+					className
+				)}
+				href={"/"}
+				{...props}
+			>
+				<Image src={icon} alt={""} height={20} width={20} />
+				<motion.span
+					animate={{
+						display: animate
+							? open
+								? "inline-block"
+								: "none"
+							: "inline-block",
+						opacity: animate ? (open ? 1 : 0) : 1,
+					}}
+					className="text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
+				>
+					{label}{" "}
+				</motion.span>
+			</Link>
+		) : (
+			<div
+				className={cn(
+					"flex items-center cursor-pointer justify-start gap-2  group/sidebar py-2",
+					className
+				)}
+				{...props}
+			>
+				<Image src={icon} alt={""} height={20} width={20} />
+				<motion.span
+					animate={{
+						display: animate
+							? open
+								? "inline-block"
+								: "none"
+							: "inline-block",
+						opacity: animate ? (open ? 1 : 0) : 1,
+					}}
+					className="text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
+				>
+					{label}{" "}
+				</motion.span>
+			</div>
+		);
+	}
+	return (
+		<Link
+			href={all ? "#" + link || "" : link || ""}
+			className={cn(
+				"flex items-center justify-start gap-2  group/sidebar py-2",
+				className
+			)}
+			{...props}
+		>
+			<Image src={icon} alt={""} height={20} width={20} />
+			<motion.span
+				animate={{
+					display: animate
+						? open
+							? "inline-block"
+							: "none"
+						: "inline-block",
+					opacity: animate ? (open ? 1 : 0) : 1,
+				}}
+				className="text-foreground dark:text-foreground text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0!"
+			>
+				{all && !toggle ? "#" + label : label}
+			</motion.span>
+		</Link>
+	);
+};
+```

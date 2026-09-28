@@ -1,0 +1,37 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "venetian-blinds-page-transition",
+	title: "Venetian Blinds Page Transition",
+	description: "A clean full-screen venetian blinds page transition where horizontal or vertical slats scale/rotate open and closed staggered in configurable layouts.",
+	interaction: "Programmatically triggered on route change or view swaps, showing a staggered 3D venetian blinds scale-reveal across the viewport.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/venetian-blinds-page-transition",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "trigger", type: "number", required: true },
+		{ name: "onViewSwap", type: "(() => void)" },
+		{ name: "className", type: "string" },
+		{ name: "panelClassName", type: "string" },
+		{ name: "columns", type: "number", default: "20" },
+		{ name: "duration", type: "number", default: "0.5" },
+		{ name: "staggerDelay", type: "number", default: "0.02" },
+		{ name: "staggerType", type: "\"linear\" | \"center-out\" | \"edge-in\"", default: "\"linear\"" },
+		{ name: "ease", type: "Easing | Easing[]", default: "[0.76, 0, 0.24, 1]" },
+		{ name: "direction", type: "\"horizontal\" | \"vertical\"", default: "\"horizontal\"" },
+		{ name: "origin", type: "\"bottom\" | \"left\" | \"right\" | \"top\" | \"center\"", default: "\"center\"" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

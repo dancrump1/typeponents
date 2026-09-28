@@ -1,0 +1,48 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "sphere-gallery",
+	title: "Sphere Gallery",
+	description:
+		"WebGL gallery of images mapped onto a sphere that you can orbit and focus.",
+	interaction:
+		"Drag to rotate the sphere. Click a tile to bring it forward with a lens-blurred background; Escape dismisses it.",
+	categories: ["Media Galleries", "3D & Canvas"],
+	tags: ["webgl", "cursor-tracking", "keyboard", "responsive"],
+	inspiration: {
+		source: "Atelier UI",
+		url: "https://www.atelier-ui.com/en/docs/components/background/sphere-gallery",
+		authorUrl: "https://www.atelier-ui.com",
+		relationship: "adaptation",
+	},
+	dependencies: ["@react-three/drei", "@react-three/fiber", "motion", "three"],
+	registryDependencies: [],
+	props: [
+		{ name: "items", type: "SphereGalleryItem[]", required: true },
+		{ name: "rows", type: "number", required: true },
+		{ name: "columns", type: "number", required: true },
+		{ name: "latitudeRange", type: "number", required: true },
+		{ name: "gap", type: "number", required: true },
+		{ name: "padding", type: "number", required: true },
+		{ name: "cornerRadius", type: "number", required: true },
+		{ name: "lensBlur", type: "number", required: true },
+		{ name: "fov", type: "number", required: true },
+		{ name: "tileColor", type: "string | null", required: true },
+		{ name: "sphereColor", type: "string", required: true },
+		{ name: "reveal", type: "boolean", required: true },
+		{ name: "revealDuration", type: "number", required: true },
+		{ name: "focusDuration", type: "number", required: true },
+		{ name: "focusScale", type: "number", required: true },
+		{ name: "mouseParallax", type: "number", required: true },
+		{ name: "className", type: "string" },
+		{ name: "onActiveChange", type: "((index: number | null) => void)" },
+		{ name: "onReady", type: "(() => void)" },
+		{ name: "mode", type: "\"texture\" | \"scissor\"", description: "- texture: children render into an FBO each frame: Global post-processing will work on it.\n- scissor: a scissored pass painted on top of the composed frame. lighter, but excluded from global post-processing." },
+		{ name: "priority", type: "number" },
+		{ name: "zIndex", type: "number" },
+		{ name: "transparent", type: "boolean" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

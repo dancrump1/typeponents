@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "improvements",
+  "type": "registry:block",
+  "title": "Improvements",
+  "description": "Improvements",
+  "files": [
+    {
+      "path": "components/usages/improvementsusage.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\nimport Improvements from \"@/registry/open-source/cielia-replication/Improvements\";\r\n\r\nexport default function Usage() {\r\n\treturn (\r\n\t\t<div className=\"relative w-full flex items-center justify-center\"><Improvements /></div>\r\n\t);\r\n}\r\n",
+      "type": "registry:block",
+      "target": "~/example.tsx"
+    },
+    {
+      "path": "components/usages/improvementsusage.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\nimport Improvements from \"@/registry/open-source/cielia-replication/Improvements\";\r\n\r\nexport default function Usage() {\r\n\treturn (\r\n\t\t<div className=\"relative w-full flex items-center justify-center\"><Improvements /></div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "registry/open-source/cielia-replication/Improvements.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useRef } from \"react\";\r\n\r\nimport { useGSAP } from \"@gsap/react\";\r\nimport gsap from \"gsap\";\r\n\r\nimport SectionHeader from \"./SectionHeader\";\r\n\r\nconst galleryItems = [\r\n\t[\"/itjustworks.jpg\", \"/itjustworks.jpg\", \"/itjustworks.jpg\"],\r\n\t[\"/itjustworks.jpg\", \"/itjustworks.jpg\", \"/itjustworks.jpg\"],\r\n\t[\"/itjustworks.jpg\", \"/itjustworks.jpg\", \"/itjustworks.jpg\"],\r\n];\r\n\r\nconst Improvements = () => {\r\n\tconst sectionRef = useRef<HTMLDivElement>(null);\r\n\tconst galleryRef = useRef<HTMLDivElement>(null);\r\n\tuseGSAP(\r\n\t\t() => {\r\n\t\t\tconst GridSecAnim = gsap.timeline({\r\n\t\t\t\tscrollTrigger: {\r\n\t\t\t\t\t// scroller: \".scroll-container\",\r\n\t\t\t\t\ttrigger: \".gallery-wrapper\",\r\n\t\t\t\t\tstart: \"top 100%\",\r\n\t\t\t\t\tend: \"top 0%\",\r\n\t\t\t\t\tscrub: true,\r\n\t\t\t\t},\r\n\t\t\t});\r\n\t\t\tGridSecAnim.fromTo(\r\n\t\t\t\t\".gallery-col:nth-of-type(1)\",\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(-10vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(0vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t\"<\"\r\n\t\t\t);\r\n\t\t\tGridSecAnim.fromTo(\r\n\t\t\t\t\".gallery-col:nth-of-type(2)\",\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(10vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(0vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t\"<\"\r\n\t\t\t);\r\n\t\t\tGridSecAnim.fromTo(\r\n\t\t\t\t\".gallery-col:nth-of-type(3)\",\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(-10vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\ttransform: \"translateY(0vh)\",\r\n\t\t\t\t},\r\n\t\t\t\t\"<\"\r\n\t\t\t);\r\n\r\n\t\t\tconst gridSecPinAnim = gsap.timeline({\r\n\t\t\t\tscrollTrigger: {\r\n\t\t\t\t\t// scroller: \".scroll-container\",\r\n\t\t\t\t\ttrigger: \".gallery-wrapper\",\r\n\t\t\t\t\tstart: \"top 0%\",\r\n\t\t\t\t\tend: \"+=200%\",\r\n\t\t\t\t\tscrub: true,\r\n\t\t\t\t\tpin: true,\r\n\t\t\t\t},\r\n\t\t\t});\r\n\r\n\t\t\tgridSecPinAnim.fromTo(\r\n\t\t\t\t\".gallery-col\",\r\n\t\t\t\t{\r\n\t\t\t\t\twidth: \"31.97vw\",\r\n\t\t\t\t\theight: \"150vh\",\r\n\t\t\t\t\tfilter: \"brightness(1)\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\twidth: \"100vw\",\r\n\t\t\t\t\theight: \"300vh\",\r\n\t\t\t\t\tfilter: \"brightness(0.7)\",\r\n\t\t\t\t},\r\n\t\t\t\t\"<\"\r\n\t\t\t);\r\n\r\n\t\t\tgridSecPinAnim.fromTo(\r\n\t\t\t\t[\".title-wrap\", \".desc-wrap\"],\r\n\t\t\t\t{\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t},\r\n\t\t\t\t\"<\"\r\n\t\t\t);\r\n\t\t\tgridSecPinAnim.fromTo(\r\n\t\t\t\t\".title-wrap h2 span\",\r\n\t\t\t\t{\r\n\t\t\t\t\tclipPath: \"polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)\",\r\n\t\t\t\t},\r\n\t\t\t\t{\r\n\t\t\t\t\tclipPath: \"polygon(0% 100%, 100% 100%, 100% 0%, 0% 0%)\",\r\n\t\t\t\t}\r\n\t\t\t);\r\n\t\t},\r\n\t\t{ scope: sectionRef }\r\n\t);\r\n\treturn (\r\n\t\t<section className=\"overflow-hidden\" ref={sectionRef}>\r\n\t\t\t<SectionHeader>Improvements</SectionHeader>\r\n\t\t\t<div className=\"gallery-wrapper relative h-screen overflow-hidden\">\r\n\t\t\t\t<div\r\n\t\t\t\t\tclassName=\"gallery absolute left-1/2 top-1/2 flex h-[150vh] w-fit -translate-x-1/2 -translate-y-1/2 scale-110 items-center justify-between gap-8\"\r\n\t\t\t\t\tref={galleryRef}\r\n\t\t\t\t>\r\n\t\t\t\t\t{galleryItems.map((cols, index) => (\r\n\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\tkey={index + \"improvements\"}\r\n\t\t\t\t\t\t\tclassName=\"gallery-col flex h-full w-[33vw] flex-col gap-8\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{cols.map((img, colIndex) => (\r\n\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\tkey={colIndex}\r\n\t\t\t\t\t\t\t\t\tclassName=\"gallery-row grid h-[33%] w-full place-items-center overflow-hidden bg-background text-foreground\"\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\t\t\t\tsrc={img}\r\n\t\t\t\t\t\t\t\t\t\talt=\"improve images\"\r\n\t\t\t\t\t\t\t\t\t\tclassName=\"h-full w-full object-cover\"\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div className=\"title-wrap absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-foreground fs-25-43\">\r\n\t\t\t\t\t<h2 className=\"w-max text-center\">\r\n\t\t\t\t\t\t<span>\r\n\t\t\t\t\t\t\tReevaluating past housing facilities and storage features.\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t<br />\r\n\t\t\t\t\t\t<br />\r\n\t\t\t\t\t\t<span>\r\n\t\t\t\t\t\t\tSmall improvements can bring great satisfaction to your\r\n\t\t\t\t\t\t\tdaily life.\r\n\t\t\t\t\t\t</span>\r\n\t\t\t\t\t</h2>\r\n\t\t\t\t</div>\r\n\r\n\t\t\t\t<div className=\"desc-wrap absolute bottom-10 right-[3vw] w-[31vw] border-t border-white pt-2.5 text-right text-foreground\">\r\n\t\t\t\t\tこれまで\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</section>\r\n\t);\r\n};\r\n\r\nexport default Improvements;\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "registry/open-source/cielia-replication/SectionHeader.tsx",
+      "content": "import React, { PropsWithChildren } from \"react\";\n\nconst SectionHeader = ({ children }: PropsWithChildren) => {\n\treturn <div className=\"container py-10 fs-40-85\">{children}</div>;\n};\n\nexport default SectionHeader;\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "Grids & Layouts"
+  ]
+}

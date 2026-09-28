@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tag-cloud-dynamic",
+  "type": "registry:ui",
+  "title": "Tag Cloud Dynamic",
+  "description": "Tag Cloud Dynamic",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tag-cloud-dynamic.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tag-cloud-dynamic.tsx",
+      "content": "\"use client\";\r\n\r\nimport { motion } from \"framer-motion\";\r\nimport { useState } from \"react\";\r\n\r\n// Credit:\r\n// https://ui.tripled.work/components/dynamic-tag-cloud\r\n\r\ntype Tag = {\r\n    id: string;\r\n    label: string;\r\n};\r\n\r\ntype DynamicTagCloudProps = {\r\n    tags?: Tag[];\r\n};\r\n\r\nexport function DynamicTagCloud({\r\n    tags = [\r\n        { id: \"1\", label: \"React\" },\r\n        { id: \"2\", label: \"TypeScript\" },\r\n        { id: \"3\", label: \"Framer Motion\" },\r\n        { id: \"4\", label: \"TailwindCSS\" },\r\n        { id: \"5\", label: \"Next.js\" },\r\n        { id: \"6\", label: \"Design\" },\r\n    ],\r\n}: DynamicTagCloudProps) {\r\n    const [hoveredId, setHoveredId] = useState<string | null>(null);\r\n\r\n    const generateRandomOffset = () => ({\r\n        x: Math.random() * 20 - 10,\r\n        y: Math.random() * 20 - 10,\r\n    });\r\n\r\n    return (\r\n        <div className=\"\">\r\n            <div className=\"flex flex-wrap items-center justify-center gap-3\">\r\n                {tags.map((tag, index) => {\r\n                    const offset = generateRandomOffset();\r\n                    const isHovered = hoveredId === tag.id;\r\n\r\n                    return (\r\n                        <motion.button\r\n                            key={tag.id}\r\n                            initial={{\r\n                                x: offset.x,\r\n                                y: offset.y,\r\n                                opacity: 0,\r\n                                scale: 0.8,\r\n                            }}\r\n                            animate={{\r\n                                x: isHovered ? offset.x * 1.5 : offset.x,\r\n                                y: isHovered ? offset.y * 1.5 : offset.y,\r\n                                opacity: 1,\r\n                                scale: isHovered ? 1.1 : 1,\r\n                            }}\r\n                            whileHover={{\r\n                                scale: 1.15,\r\n                                zIndex: 10,\r\n                            }}\r\n                            transition={{\r\n                                type: \"spring\",\r\n                                stiffness: 200,\r\n                                damping: 20,\r\n                                delay: index * 0.05,\r\n                            }}\r\n                            onHoverStart={() => setHoveredId(tag.id)}\r\n                            onHoverEnd={() => setHoveredId(null)}\r\n                            className=\"rounded-full border border-border bg-muted px-4 py-2 text-sm font-medium transition-colors hover:bg-primary hover:text-primary-foreground\"\r\n                        >\r\n                            {tag.label}\r\n                        </motion.button>\r\n                    );\r\n                })}\r\n            </div>\r\n        </div>\r\n    );\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "ui.tripled.work",
+      "url": "https://ui.tripled.work/components/dynamic-tag-cloud",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "tags",
+        "type": "Tag[]",
+        "default": "[ { id: \"1\", label: \"React\" }, { id: …",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tag-cloud-dynamic"
+  }
+}

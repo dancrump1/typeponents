@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "colorful-text",
+  "type": "registry:ui",
+  "title": "Colorful Text",
+  "description": "Headline text where every letter takes its own colour from a rotating rainbow palette.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/colorful-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/colorful-text.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://ui.aceternity.com/components/colourful-text\n\nexport function ColourfulText({ text }: { text: string }) {\n\tconst colors = [\n\t\t\"rgb(131, 179, 32)\",\n\t\t\"rgb(47, 195, 106)\",\n\t\t\"rgb(42, 169, 210)\",\n\t\t\"rgb(4, 112, 202)\",\n\t\t\"rgb(107, 10, 255)\",\n\t\t\"rgb(183, 0, 218)\",\n\t\t\"rgb(218, 0, 171)\",\n\t\t\"rgb(230, 64, 92)\",\n\t\t\"rgb(232, 98, 63)\",\n\t\t\"rgb(249, 129, 47)\",\n\t];\n\n\tconst [currentColors, setCurrentColors] = React.useState(colors);\n\tconst [count, setCount] = React.useState(0);\n\n\tReact.useEffect(() => {\n\t\tconst interval = setInterval(() => {\n\t\t\tconst shuffled = [...colors].sort(() => Math.random() - 0.5);\n\t\t\tsetCurrentColors(shuffled);\n\t\t\tsetCount((prev) => prev + 1);\n\t\t}, 5000);\n\n\t\treturn () => clearInterval(interval);\n\t}, []);\n\n\treturn text.split(\"\").map((char, index) => (\n\t\t<motion.span\n\t\t\tkey={`${char}-${count}-${index}`}\n\t\t\tinitial={{\n\t\t\t\ty: 0,\n\t\t\t}}\n\t\t\tanimate={{\n\t\t\t\tcolor: currentColors[index % currentColors.length],\n\t\t\t\ty: [0, -3, 0],\n\t\t\t\tscale: [1, 1.01, 1],\n\t\t\t\tfilter: [\"blur(0px)\", `blur(5px)`, \"blur(0px)\"],\n\t\t\t\topacity: [1, 0.8, 1],\n\t\t\t}}\n\t\t\ttransition={{\n\t\t\t\tduration: 0.5,\n\t\t\t\tdelay: index * 0.05,\n\t\t\t}}\n\t\t\tclassName=\"inline-block whitespace-pre font-sans tracking-tight\"\n\t\t>\n\t\t\t{char}\n\t\t</motion.span>\n\t));\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "Runs on its own — every few seconds the palette reshuffles and the letters recolour in a left-to-right ripple, each one blurring, fading and hopping up slightly as its new colour lands.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/colourful-text",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "text",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/colorful-text"
+  }
+}

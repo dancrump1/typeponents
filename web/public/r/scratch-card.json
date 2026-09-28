@@ -1,0 +1,121 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scratch-card",
+  "type": "registry:ui",
+  "title": "Scratch Card",
+  "description": "Scratch-off card that reveals content underneath.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scratch-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scratch-card.tsx",
+      "content": "/**\r\n * Spectrum UI — ScratchCard\r\n *\r\n * A scratch-to-reveal card. An HTML5 canvas foil covers the content and is\r\n * erased on pointer drag, emitting dust particles while scratching. Once the\r\n * cleared area passes the reveal threshold, the remaining foil fades out and\r\n * onReveal fires exactly once.\r\n *\r\n * Dependencies: framer-motion, @/lib/utils\r\n *\r\n * @example\r\n * <ScratchCard onReveal={() => {}} ariaLabel=\"Scratch to reveal your coupon\">\r\n *   <CouponContent />\r\n * </ScratchCard>\r\n */\r\n\r\n\"use client\"\r\n\r\nimport React, { useCallback, useEffect, useRef, useState } from \"react\"\r\nimport { motion, AnimatePresence, useReducedMotion } from \"framer-motion\"\r\nimport type { ReactNode } from \"react\"\r\nimport { cn } from \"@/lib/utils\"\r\n\r\n// ─── Types ───────────────────────────────────────────────────────────────────\r\n\r\nexport interface ScratchCardProps {\r\n    /** Content hidden underneath the scratch foil */\r\n    children: ReactNode\r\n    /** Fires once when the cleared area passes revealThreshold */\r\n    onReveal?: () => void\r\n    /** Fires with the cleared ratio (0–1) while scratching */\r\n    onProgress?: (progress: number) => void\r\n    /** Cleared ratio (0–1) that triggers the full reveal. Default 0.5 */\r\n    revealThreshold?: number\r\n    /** Scratch brush diameter in pixels. Default 28 */\r\n    brushSize?: number\r\n    /** Text printed on the foil surface */\r\n    overlayLabel?: string\r\n    /** Foil surface color */\r\n    overlayColor?: string\r\n    /** Foil label color */\r\n    overlayLabelColor?: string\r\n    /** Dust particle color */\r\n    particleColor?: string\r\n    /** Accessible label for the scratch surface */\r\n    ariaLabel?: string\r\n    /** Announced to screen readers when the content is revealed */\r\n    revealAnnouncement?: string\r\n    className?: string\r\n}\r\n\r\ninterface DustParticle {\r\n    x: number\r\n    y: number\r\n    vx: number\r\n    vy: number\r\n    size: number\r\n    life: number\r\n    maxLife: number\r\n}\r\n\r\n// ─── Constants ───────────────────────────────────────────────────────────────\r\n\r\nconst PROGRESS_SAMPLE_STRIDE = 32\r\nconst PROGRESS_CHECK_EVERY_N_MOVES = 10\r\nconst MAX_PARTICLES = 120\r\nconst PARTICLE_GRAVITY = 0.18\r\n\r\n// ─── Component ───────────────────────────────────────────────────────────────\r\n\r\nexport default function ScratchCard({\r\n    children,\r\n    onReveal,\r\n    onProgress,\r\n    revealThreshold = 0.5,\r\n    brushSize = 28,\r\n    overlayLabel = \"Scratch to reveal\",\r\n    overlayColor = \"#171717\",\r\n    overlayLabelColor = \"#737373\",\r\n    particleColor = \"#a3a3a3\",\r\n    ariaLabel = \"Scratch surface. Press Enter to reveal the hidden content.\",\r\n    revealAnnouncement = \"Hidden content revealed\",\r\n    className,\r\n}: ScratchCardProps) {\r\n    const shouldReduceMotion = useReducedMotion()\r\n    const containerRef = useRef<HTMLDivElement>(null)\r\n    const contentRef = useRef<HTMLDivElement>(null)\r\n    const scratchCanvasRef = useRef<HTMLCanvasElement>(null)\r\n    const particleCanvasRef = useRef<HTMLCanvasElement>(null)\r\n    const particlesRef = useRef<DustParticle[]>([])\r\n    const particleRafRef = useRef<number>(0)\r\n    const lastPointRef = useRef<{ x: number; y: number } | null>(null)\r\n    const isScratchingRef = useRef(false)\r\n    const moveCountRef = useRef(0)\r\n    const revealedRef = useRef(false)\r\n    const [isRevealed, setIsRevealed] = useState(false)\r\n\r\n    // Keep hidden content out of the tab order and accessibility tree until revealed\r\n    useEffect(() => {\r\n        const node = contentRef.current\r\n        if (!node) return\r\n        if (isRevealed) node.removeAttribute(\"inert\")\r\n        else node.setAttribute(\"inert\", \"\")\r\n    }, [isRevealed])\r\n\r\n    const paintOverlay = useCallback(\r\n        (canvas: HTMLCanvasElement, width: number, height: number) => {\r\n            const ctx = canvas.getContext(\"2d\")\r\n            if (!ctx) return\r\n            const dpr = window.devicePixelRatio || 1\r\n            canvas.width = Math.max(1, Math.round(width * dpr))\r\n            canvas.height = Math.max(1, Math.round(height * dpr))\r\n            ctx.scale(dpr, dpr)\r\n\r\n            // Foil base\r\n            ctx.fillStyle = overlayColor\r\n            ctx.fillRect(0, 0, width, height)\r\n\r\n            // Subtle diagonal brushed texture\r\n            ctx.strokeStyle = \"rgba(255, 255, 255, 0.04)\"\r\n            ctx.lineWidth = 1\r\n            for (let x = -height; x < width; x += 8) {\r\n                ctx.beginPath()\r\n                ctx.moveTo(x, 0)\r\n                ctx.lineTo(x + height, height)\r\n                ctx.stroke()\r\n            }\r\n\r\n            // Centered label\r\n            if (overlayLabel) {\r\n                const extendedCtx = ctx as CanvasRenderingContext2D & {\r\n                    letterSpacing?: string\r\n                }\r\n                if (\"letterSpacing\" in extendedCtx) extendedCtx.letterSpacing = \"3px\"\r\n                ctx.fillStyle = overlayLabelColor\r\n                ctx.font =\r\n                    \"500 11px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace\"\r\n                ctx.textAlign = \"center\"\r\n                ctx.textBaseline = \"middle\"\r\n                ctx.fillText(overlayLabel.toUpperCase(), width / 2, height / 2)\r\n            }\r\n        },\r\n        [overlayColor, overlayLabel, overlayLabelColor],\r\n    )\r\n\r\n    // Size both canvases to the container and paint the foil\r\n    useEffect(() => {\r\n        const container = containerRef.current\r\n        const scratchCanvas = scratchCanvasRef.current\r\n        const particleCanvas = particleCanvasRef.current\r\n        if (!container || !scratchCanvas || !particleCanvas) return\r\n\r\n        let lastWidth = 0\r\n        let lastHeight = 0\r\n\r\n        const resize = () => {\r\n            const { width, height } = container.getBoundingClientRect()\r\n            if (width === lastWidth && height === lastHeight) return\r\n            lastWidth = width\r\n            lastHeight = height\r\n            if (revealedRef.current) return\r\n            const dpr = window.devicePixelRatio || 1\r\n            paintOverlay(scratchCanvas, width, height)\r\n            particleCanvas.width = Math.max(1, Math.round(width * dpr))\r\n            particleCanvas.height = Math.max(1, Math.round(height * dpr))\r\n            const particleCtx = particleCanvas.getContext(\"2d\")\r\n            particleCtx?.scale(dpr, dpr)\r\n        }\r\n\r\n        const observer = new ResizeObserver(resize)\r\n        observer.observe(container)\r\n        resize()\r\n\r\n        return () => observer.disconnect()\r\n    }, [paintOverlay])\r\n\r\n    useEffect(() => {\r\n        return () => cancelAnimationFrame(particleRafRef.current)\r\n    }, [])\r\n\r\n    const reveal = useCallback(() => {\r\n        if (revealedRef.current) return\r\n        revealedRef.current = true\r\n        setIsRevealed(true)\r\n        onReveal?.()\r\n    }, [onReveal])\r\n\r\n    const checkProgress = useCallback(() => {\r\n        const canvas = scratchCanvasRef.current\r\n        if (!canvas || revealedRef.current) return\r\n        const ctx = canvas.getContext(\"2d\")\r\n        if (!ctx || canvas.width === 0 || canvas.height === 0) return\r\n\r\n        const { data } = ctx.getImageData(0, 0, canvas.width, canvas.height)\r\n        let cleared = 0\r\n        let sampled = 0\r\n        for (let i = 3; i < data.length; i += 4 * PROGRESS_SAMPLE_STRIDE) {\r\n            if (data[i] < 128) cleared++\r\n            sampled++\r\n        }\r\n        if (sampled === 0) return\r\n\r\n        const progress = cleared / sampled\r\n        onProgress?.(progress)\r\n        if (progress >= revealThreshold) reveal()\r\n    }, [onProgress, revealThreshold, reveal])\r\n\r\n    const runParticleLoop = useCallback(() => {\r\n        const canvas = particleCanvasRef.current\r\n        const ctx = canvas?.getContext(\"2d\")\r\n        if (!canvas || !ctx) return\r\n\r\n        cancelAnimationFrame(particleRafRef.current)\r\n\r\n        const tick = () => {\r\n            const { width, height } = canvas.getBoundingClientRect()\r\n            ctx.clearRect(0, 0, width, height)\r\n\r\n            const alive: DustParticle[] = []\r\n            for (const particle of particlesRef.current) {\r\n                particle.vy += PARTICLE_GRAVITY\r\n                particle.x += particle.vx\r\n                particle.y += particle.vy\r\n                particle.life -= 1\r\n                if (particle.life <= 0) continue\r\n                ctx.globalAlpha = particle.life / particle.maxLife\r\n                ctx.fillStyle = particleColor\r\n                ctx.fillRect(particle.x, particle.y, particle.size, particle.size)\r\n                alive.push(particle)\r\n            }\r\n            ctx.globalAlpha = 1\r\n            particlesRef.current = alive\r\n\r\n            if (alive.length > 0) {\r\n                particleRafRef.current = requestAnimationFrame(tick)\r\n            } else {\r\n                ctx.clearRect(0, 0, width, height)\r\n            }\r\n        }\r\n\r\n        particleRafRef.current = requestAnimationFrame(tick)\r\n    }, [particleColor])\r\n\r\n    const spawnParticles = useCallback(\r\n        (x: number, y: number) => {\r\n            if (shouldReduceMotion) return\r\n            if (particlesRef.current.length >= MAX_PARTICLES) return\r\n            for (let i = 0; i < 2; i++) {\r\n                const maxLife = 24 + Math.random() * 20\r\n                particlesRef.current.push({\r\n                    x: x + (Math.random() - 0.5) * brushSize * 0.6,\r\n                    y: y + (Math.random() - 0.5) * brushSize * 0.6,\r\n                    vx: (Math.random() - 0.5) * 1.6,\r\n                    vy: -Math.random() * 1.4,\r\n                    size: 1.5 + Math.random() * 2,\r\n                    life: maxLife,\r\n                    maxLife,\r\n                })\r\n            }\r\n            runParticleLoop()\r\n        },\r\n        [shouldReduceMotion, brushSize, runParticleLoop],\r\n    )\r\n\r\n    const getPoint = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {\r\n        const rect = event.currentTarget.getBoundingClientRect()\r\n        return { x: event.clientX - rect.left, y: event.clientY - rect.top }\r\n    }, [])\r\n\r\n    const scratchLine = useCallback(\r\n        (from: { x: number; y: number }, to: { x: number; y: number }) => {\r\n            const canvas = scratchCanvasRef.current\r\n            const ctx = canvas?.getContext(\"2d\")\r\n            if (!ctx) return\r\n            ctx.globalCompositeOperation = \"destination-out\"\r\n            ctx.lineWidth = brushSize\r\n            ctx.lineCap = \"round\"\r\n            ctx.lineJoin = \"round\"\r\n            ctx.beginPath()\r\n            ctx.moveTo(from.x, from.y)\r\n            ctx.lineTo(to.x, to.y)\r\n            ctx.stroke()\r\n            ctx.beginPath()\r\n            ctx.arc(to.x, to.y, brushSize / 2, 0, Math.PI * 2)\r\n            ctx.fill()\r\n            ctx.globalCompositeOperation = \"source-over\"\r\n        },\r\n        [brushSize],\r\n    )\r\n\r\n    const handlePointerDown = useCallback(\r\n        (event: React.PointerEvent<HTMLCanvasElement>) => {\r\n            event.currentTarget.setPointerCapture(event.pointerId)\r\n            isScratchingRef.current = true\r\n            const point = getPoint(event)\r\n            scratchLine(point, point)\r\n            spawnParticles(point.x, point.y)\r\n            lastPointRef.current = point\r\n        },\r\n        [getPoint, scratchLine, spawnParticles],\r\n    )\r\n\r\n    const handlePointerMove = useCallback(\r\n        (event: React.PointerEvent<HTMLCanvasElement>) => {\r\n            if (!isScratchingRef.current) return\r\n            const point = getPoint(event)\r\n            scratchLine(lastPointRef.current ?? point, point)\r\n            lastPointRef.current = point\r\n\r\n            moveCountRef.current += 1\r\n            if (moveCountRef.current % 2 === 0) spawnParticles(point.x, point.y)\r\n            if (moveCountRef.current % PROGRESS_CHECK_EVERY_N_MOVES === 0) {\r\n                checkProgress()\r\n            }\r\n        },\r\n        [getPoint, scratchLine, spawnParticles, checkProgress],\r\n    )\r\n\r\n    const handlePointerUp = useCallback(() => {\r\n        isScratchingRef.current = false\r\n        lastPointRef.current = null\r\n        checkProgress()\r\n    }, [checkProgress])\r\n\r\n    const handleKeyDown = useCallback(\r\n        (event: React.KeyboardEvent<HTMLCanvasElement>) => {\r\n            if (event.key === \"Enter\" || event.key === \" \") {\r\n                event.preventDefault()\r\n                reveal()\r\n            }\r\n        },\r\n        [reveal],\r\n    )\r\n\r\n    return (\r\n        <div\r\n            ref={containerRef}\r\n            className={cn(\r\n                \"relative w-full select-none overflow-hidden rounded-2xl\",\r\n                \"border border-neutral-200 dark:border-neutral-800\",\r\n                \"bg-white dark:bg-neutral-900\",\r\n                className,\r\n            )}\r\n        >\r\n            <div ref={contentRef}>{children}</div>\r\n\r\n            <AnimatePresence>\r\n                {!isRevealed && (\r\n                    <motion.div\r\n                        key=\"scratch-foil\"\r\n                        className=\"absolute inset-0 z-10\"\r\n                        initial={false}\r\n                        exit={{ opacity: 0 }}\r\n                        transition={\r\n                            shouldReduceMotion\r\n                                ? { duration: 0 }\r\n                                : { duration: 0.4, ease: \"easeOut\" }\r\n                        }\r\n                    >\r\n                        <canvas\r\n                            ref={scratchCanvasRef}\r\n                            role=\"button\"\r\n                            tabIndex={0}\r\n                            aria-label={ariaLabel}\r\n                            onPointerDown={handlePointerDown}\r\n                            onPointerMove={handlePointerMove}\r\n                            onPointerUp={handlePointerUp}\r\n                            onPointerCancel={handlePointerUp}\r\n                            onKeyDown={handleKeyDown}\r\n                            className={cn(\r\n                                \"block h-full w-full cursor-crosshair touch-none\",\r\n                                \"focus-visible:outline-none focus-visible:ring-1\",\r\n                                \"focus-visible:ring-neutral-950 dark:focus-visible:ring-neutral-300\",\r\n                            )}\r\n                        />\r\n                        <canvas\r\n                            ref={particleCanvasRef}\r\n                            aria-hidden=\"true\"\r\n                            className=\"pointer-events-none absolute inset-0 h-full w-full\"\r\n                        />\r\n                    </motion.div>\r\n                )}\r\n            </AnimatePresence>\r\n\r\n            <span className=\"sr-only\" aria-live=\"polite\">\r\n                {isRevealed ? revealAnnouncement : \"\"}\r\n            </span>\r\n        </div>\r\n    )\r\n}"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "canvas",
+      "drag",
+      "cursor-tracking",
+      "keyboard",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "Drag across the surface to erase the overlay and uncover the prize.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "onReveal",
+        "type": "(() => void)",
+        "description": "Fires once when the cleared area passes revealThreshold",
+        "required": false
+      },
+      {
+        "name": "onProgress",
+        "type": "((progress: number) => void)",
+        "description": "Fires with the cleared ratio (0–1) while scratching",
+        "required": false
+      },
+      {
+        "name": "revealThreshold",
+        "type": "number",
+        "default": "0.5",
+        "description": "Cleared ratio (0–1) that triggers the full reveal. Default 0.5",
+        "required": false
+      },
+      {
+        "name": "brushSize",
+        "type": "number",
+        "default": "28",
+        "description": "Scratch brush diameter in pixels. Default 28",
+        "required": false
+      },
+      {
+        "name": "overlayLabel",
+        "type": "string",
+        "default": "\"Scratch to reveal\"",
+        "description": "Text printed on the foil surface",
+        "required": false
+      },
+      {
+        "name": "overlayColor",
+        "type": "string",
+        "default": "\"#171717\"",
+        "description": "Foil surface color",
+        "required": false
+      },
+      {
+        "name": "overlayLabelColor",
+        "type": "string",
+        "default": "\"#737373\"",
+        "description": "Foil label color",
+        "required": false
+      },
+      {
+        "name": "particleColor",
+        "type": "string",
+        "default": "\"#a3a3a3\"",
+        "description": "Dust particle color",
+        "required": false
+      },
+      {
+        "name": "ariaLabel",
+        "type": "string",
+        "default": "\"Scratch surface. Press Enter to reve…",
+        "description": "Accessible label for the scratch surface",
+        "required": false
+      },
+      {
+        "name": "revealAnnouncement",
+        "type": "string",
+        "default": "\"Hidden content revealed\"",
+        "description": "Announced to screen readers when the content is revealed",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scratch-card"
+  }
+}

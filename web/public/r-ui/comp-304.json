@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-304",
+  "type": "registry:component",
+  "title": "Comp 304",
+  "description": "Comp 304",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-304.tsx",
+      "content": "import { ArrowRightIcon, Eclipse } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"dark bg-muted text-foreground px-4 py-3\">\r\n      <div className=\"flex flex-col justify-between gap-2 md:flex-row\">\r\n        <div className=\"flex grow gap-3\">\r\n          <Eclipse\r\n            className=\"mt-0.5 shrink-0 opacity-60\"\r\n            size={16}\r\n            aria-hidden=\"true\"\r\n          />\r\n          <div className=\"flex grow flex-col justify-between gap-2 md:flex-row md:items-center\">\r\n            <p className=\"text-sm\">\r\n              We just added something awesome to make your experience even\r\n              better.\r\n            </p>\r\n            <a href=\"#\" className=\"group text-sm font-medium whitespace-nowrap\">\r\n              Learn more\r\n              <ArrowRightIcon\r\n                className=\"ms-1 -mt-0.5 inline-flex opacity-60 transition-transform group-hover:translate-x-0.5\"\r\n                size={16}\r\n                aria-hidden=\"true\"\r\n              />\r\n            </a>\r\n          </div>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "magnet-tabs",
+  "type": "registry:ui",
+  "title": "Magnet Tabs",
+  "description": "MagnetTabs is a stylish tab navigation component for switching between sections in a user interface. It’s ideal for dashboards, settings pages, admin panels, or product views, anywhere content needs to be organized into tabs for better usability.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/magnet-tabs.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/magnet-tabs.tsx",
+      "content": "'use client';\r\n\r\nimport React from 'react';\r\nimport { motion } from 'framer-motion';\r\n\r\ninterface MagnetTabsProps {\r\n  slug: string;\r\n  options: string[];\r\n  onSelect: (option: string) => void;\r\n  activeTab: string;\r\n}\r\n\r\nconst MagnetTabs = ({ slug, options, onSelect, activeTab }: MagnetTabsProps) => {\r\n  const [hovered, setHovered] = React.useState<string | undefined>(undefined);\r\n\r\n  return (\r\n    <div className=\"flex items-start justify-start\">\r\n      <ul className=\"flex border-[1px] border-black/10 border-b-0\">\r\n        {options.map((option) => {\r\n          const isActive = activeTab === option;\r\n          return (\r\n            <li\r\n              onMouseEnter={() => setHovered(option)}\r\n              onMouseLeave={() => setHovered(undefined)}\r\n              key={slug + option}\r\n              onClick={() => onSelect(option)}\r\n              className=\"relative cursor-pointer shrink-0\"\r\n            >\r\n              <p\r\n                className={`z-10 relative px-2 py-1 transition-all ${\r\n                  isActive ? 'opacity-100' : 'opacity-50 hover:opacity-100'\r\n                }`}\r\n              >\r\n                {option}\r\n              </p>\r\n\r\n              {isActive && (\r\n                <motion.div\r\n                  layout\r\n                  layoutId={slug + 'magnet'}\r\n                  transition={{ duration: 0.2, type: 'spring', bounce: 0.2 }}\r\n                  className=\"w-full h-1 absolute bottom-full left-0 bg-red-500 rounded-sm\"\r\n                />\r\n              )}\r\n\r\n              {(hovered === option || (hovered === undefined && isActive)) && (\r\n                <motion.div\r\n                  layout\r\n                  layoutId={slug + 'tab-bar-highlight'}\r\n                  transition={{ duration: 0.2, type: 'spring', bounce: 0 }}\r\n                  className=\"w-full h-full absolute bottom-0 left-0 bg-white/10 rounded-sm\"\r\n                />\r\n              )}\r\n            </li>\r\n          );\r\n        })}\r\n      </ul>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default MagnetTabs;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "The active tab's highlight slides to follow the selection like a magnet.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/magnettabs",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "slug",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "options",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "onSelect",
+        "type": "(option: string) => void",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "activeTab",
+        "type": "string",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/magnet-tabs"
+  }
+}

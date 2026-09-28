@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "parallax-carousel",
+  "type": "registry:ui",
+  "title": "Parallax Carousel",
+  "description": "Parallax Carousel",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/parallax-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/parallax-carousel.tsx",
+      "content": "import { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { motion, PanInfo, useMotionValue, useTransform } from \"motion/react\";\r\n// replace icons with your own if needed\r\nimport {\r\n\tFiCircle,\r\n\tFiCode,\r\n\tFiFileText,\r\n\tFiLayers,\r\n\tFiLayout,\r\n} from \"react-icons/fi\";\r\n\r\n/** Default content, inlined so this component ships standalone. */\r\nconst componentDefaults = {\r\n\tprops: {\r\n\t\titems: [\r\n\t\t\t{\r\n\t\t\t\ttitle: \"Text Animations\",\r\n\t\t\t\tdescription: \"Cool text animations for your projects.\",\r\n\t\t\t\tid: 1,\r\n\t\t\t\ticon: \"FiFileText\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\ttitle: \"Animations\",\r\n\t\t\t\tdescription: \"Smooth animations for your projects.\",\r\n\t\t\t\tid: 2,\r\n\t\t\t\ticon: \"FiCircle\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\ttitle: \"Components\",\r\n\t\t\t\tdescription: \"Reusable components for your projects.\",\r\n\t\t\t\tid: 3,\r\n\t\t\t\ticon: \"FiLayers\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\ttitle: \"Backgrounds\",\r\n\t\t\t\tdescription: \"Beautiful backgrounds and patterns for your projects.\",\r\n\t\t\t\tid: 4,\r\n\t\t\t\ticon: \"FiLayout\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\ttitle: \"Common UI\",\r\n\t\t\t\tdescription: \"Common UI components are coming soon!\",\r\n\t\t\t\tid: 5,\r\n\t\t\t\ticon: \"FiCode\",\r\n\t\t\t},\r\n\t\t],\r\n\t},\r\n};\r\n\r\nexport interface CarouselItem {\r\n\ttitle: string;\r\n\tdescription: string;\r\n\tid: number;\r\n\ticon: JSX.Element;\r\n}\r\n\r\ntype CarouselItemDefault = Omit<CarouselItem, \"icon\"> & { icon?: string };\r\n\r\nexport interface CarouselProps {\r\n\titems?: CarouselItem[];\r\n\tbaseWidth?: number;\r\n\tautoplay?: boolean;\r\n\tautoplayDelay?: number;\r\n\tpauseOnHover?: boolean;\r\n\tloop?: boolean;\r\n\tround?: boolean;\r\n}\r\n\r\nconst CAROUSEL_ICONS = {\r\n\tFiFileText,\r\n\tFiCircle,\r\n\tFiLayers,\r\n\tFiLayout,\r\n\tFiCode,\r\n} as const;\r\n\r\nfunction hydrateCarouselItems(items: CarouselItemDefault[]): CarouselItem[] {\r\n\treturn items.map((item) => {\r\n\t\tconst Icon =\r\n\t\t\titem.icon && item.icon in CAROUSEL_ICONS\r\n\t\t\t\t? CAROUSEL_ICONS[item.icon as keyof typeof CAROUSEL_ICONS]\r\n\t\t\t\t: FiFileText;\r\n\t\treturn {\r\n\t\t\t...item,\r\n\t\t\ticon: <Icon className=\"h-[16px] w-[16px] text-foreground\" />,\r\n\t\t};\r\n\t});\r\n}\r\n\r\nconst DRAG_BUFFER = 0;\r\nconst VELOCITY_THRESHOLD = 500;\r\nconst GAP = 16;\r\nconst SPRING_OPTIONS = { type: \"spring\", stiffness: 300, damping: 30 };\r\n\r\nexport default function ParallaxCarousel(props: CarouselProps = {}): JSX.Element {\r\n\t// Defaults carry icons as string keys; callers pass real elements.\r\n\tconst resolved = { ...componentDefaults.props, ...props } as Omit<\r\n\t\tCarouselProps,\r\n\t\t\"items\"\r\n\t> & { items?: CarouselItemDefault[] };\r\n\tconst {\r\n\t\titems: rawItems = [],\r\n\t\tbaseWidth = 300,\r\n\t\tautoplay = false,\r\n\t\tautoplayDelay = 3000,\r\n\t\tpauseOnHover = false,\r\n\t\tloop = false,\r\n\t\tround = false,\r\n\t} = resolved;\r\n\tconst items = props.items?.length\r\n\t\t? props.items\r\n\t\t: hydrateCarouselItems(rawItems as CarouselItemDefault[]);\r\n\tconst containerPadding = 16;\r\n\tconst itemWidth = baseWidth - containerPadding * 2;\r\n\tconst trackItemOffset = itemWidth + GAP;\r\n\r\n\tconst carouselItems = loop ? [...items, items[0]] : items;\r\n\tconst [currentIndex, setCurrentIndex] = useState<number>(0);\r\n\tconst x = useMotionValue(0);\r\n\tconst [isHovered, setIsHovered] = useState<boolean>(false);\r\n\tconst [isResetting, setIsResetting] = useState<boolean>(false);\r\n\r\n\tconst containerRef = useRef<HTMLDivElement>(null);\r\n\tuseEffect(() => {\r\n\t\tif (pauseOnHover && containerRef.current) {\r\n\t\t\tconst container = containerRef.current;\r\n\t\t\tconst handleMouseEnter = () => setIsHovered(true);\r\n\t\t\tconst handleMouseLeave = () => setIsHovered(false);\r\n\t\t\tcontainer.addEventListener(\"mouseenter\", handleMouseEnter);\r\n\t\t\tcontainer.addEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t\treturn () => {\r\n\t\t\t\tcontainer.removeEventListener(\"mouseenter\", handleMouseEnter);\r\n\t\t\t\tcontainer.removeEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t\t};\r\n\t\t}\r\n\t}, [pauseOnHover]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (autoplay && (!pauseOnHover || !isHovered)) {\r\n\t\t\tconst timer = setInterval(() => {\r\n\t\t\t\tsetCurrentIndex((prev) => {\r\n\t\t\t\t\tif (prev === items.length - 1 && loop) {\r\n\t\t\t\t\t\treturn prev + 1; // Animate to clone.\r\n\t\t\t\t\t}\r\n\t\t\t\t\tif (prev === carouselItems.length - 1) {\r\n\t\t\t\t\t\treturn loop ? 0 : prev;\r\n\t\t\t\t\t}\r\n\t\t\t\t\treturn prev + 1;\r\n\t\t\t\t});\r\n\t\t\t}, autoplayDelay);\r\n\t\t\treturn () => clearInterval(timer);\r\n\t\t}\r\n\t}, [\r\n\t\tautoplay,\r\n\t\tautoplayDelay,\r\n\t\tisHovered,\r\n\t\tloop,\r\n\t\titems.length,\r\n\t\tcarouselItems.length,\r\n\t\tpauseOnHover,\r\n\t]);\r\n\r\n\tconst effectiveTransition = isResetting ? { duration: 0 } : SPRING_OPTIONS;\r\n\r\n\tconst handleAnimationComplete = () => {\r\n\t\tif (loop && currentIndex === carouselItems.length - 1) {\r\n\t\t\tsetIsResetting(true);\r\n\t\t\tx.set(0);\r\n\t\t\tsetCurrentIndex(0);\r\n\t\t\tsetTimeout(() => setIsResetting(false), 50);\r\n\t\t}\r\n\t};\r\n\r\n\tconst handleDragEnd = (\r\n\t\t_: MouseEvent | TouchEvent | PointerEvent,\r\n\t\tinfo: PanInfo\r\n\t): void => {\r\n\t\tconst offset = info.offset.x;\r\n\t\tconst velocity = info.velocity.x;\r\n\t\tif (offset < -DRAG_BUFFER || velocity < -VELOCITY_THRESHOLD) {\r\n\t\t\tif (loop && currentIndex === items.length - 1) {\r\n\t\t\t\tsetCurrentIndex(currentIndex + 1);\r\n\t\t\t} else {\r\n\t\t\t\tsetCurrentIndex((prev) =>\r\n\t\t\t\t\tMath.min(prev + 1, carouselItems.length - 1)\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t} else if (offset > DRAG_BUFFER || velocity > VELOCITY_THRESHOLD) {\r\n\t\t\tif (loop && currentIndex === 0) {\r\n\t\t\t\tsetCurrentIndex(items.length - 1);\r\n\t\t\t} else {\r\n\t\t\t\tsetCurrentIndex((prev) => Math.max(prev - 1, 0));\r\n\t\t\t}\r\n\t\t}\r\n\t};\r\n\r\n\tconst dragProps = loop\r\n\t\t? {}\r\n\t\t: {\r\n\t\t\t\tdragConstraints: {\r\n\t\t\t\t\tleft: -trackItemOffset * (carouselItems.length - 1),\r\n\t\t\t\t\tright: 0,\r\n\t\t\t\t},\r\n\t\t\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={containerRef}\r\n\t\t\tclassName={`relative overflow-hidden p-4 ${\r\n\t\t\t\tround\r\n\t\t\t\t\t? \"rounded-full border border-white\"\r\n\t\t\t\t\t: \"rounded-[24px] border border-[#222]\"\r\n\t\t\t}`}\r\n\t\t\tstyle={{\r\n\t\t\t\twidth: `${baseWidth}px`,\r\n\t\t\t\t...(round && { height: `${baseWidth}px` }),\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<motion.div\r\n\t\t\t\tclassName=\"flex\"\r\n\t\t\t\tdrag=\"x\"\r\n\t\t\t\t{...dragProps}\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\twidth: itemWidth,\r\n\t\t\t\t\tgap: `${GAP}px`,\r\n\t\t\t\t\tperspective: 1000,\r\n\t\t\t\t\tperspectiveOrigin: `${\r\n\t\t\t\t\t\tcurrentIndex * trackItemOffset + itemWidth / 2\r\n\t\t\t\t\t}px 50%`,\r\n\t\t\t\t\tx,\r\n\t\t\t\t}}\r\n\t\t\t\tonDragEnd={handleDragEnd}\r\n\t\t\t\tanimate={{ x: -(currentIndex * trackItemOffset) }}\r\n\t\t\t\ttransition={effectiveTransition}\r\n\t\t\t\tonAnimationComplete={handleAnimationComplete}\r\n\t\t\t>\r\n\t\t\t\t{carouselItems.map((item, index) => {\r\n\t\t\t\t\tconst range = [\r\n\t\t\t\t\t\t-(index + 1) * trackItemOffset,\r\n\t\t\t\t\t\t-index * trackItemOffset,\r\n\t\t\t\t\t\t-(index - 1) * trackItemOffset,\r\n\t\t\t\t\t];\r\n\t\t\t\t\tconst outputRange = [90, 0, -90];\r\n\t\t\t\t\tconst rotateY = useTransform(x, range, outputRange, {\r\n\t\t\t\t\t\tclamp: false,\r\n\t\t\t\t\t});\r\n\t\t\t\t\treturn (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tkey={index + \"parallax-carousel\"}\r\n\t\t\t\t\t\t\tclassName={`relative shrink-0 flex flex-col ${\r\n\t\t\t\t\t\t\t\tround\r\n\t\t\t\t\t\t\t\t\t? \"items-center justify-center text-center bg-background border-0\"\r\n\t\t\t\t\t\t\t\t\t: \"items-start justify-between bg-background border border-[#222] rounded-[12px]\"\r\n\t\t\t\t\t\t\t} overflow-hidden cursor-grab active:cursor-grabbing`}\r\n\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\twidth: itemWidth,\r\n\t\t\t\t\t\t\t\theight: round ? itemWidth : \"100%\",\r\n\t\t\t\t\t\t\t\trotateY: rotateY,\r\n\t\t\t\t\t\t\t\t...(round && { borderRadius: \"50%\" }),\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\ttransition={effectiveTransition}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div className={`${round ? \"p-0 m-0\" : \"mb-4 p-5\"}`}>\r\n\t\t\t\t\t\t\t\t<span className=\"flex h-[28px] w-[28px] items-center justify-center rounded-full bg-background\">\r\n\t\t\t\t\t\t\t\t\t{item.icon}\r\n\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div className=\"p-5\">\r\n\t\t\t\t\t\t\t\t<div className=\"mb-1 font-black text-lg text-foreground\">\r\n\t\t\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t\t<p className=\"text-sm text-foreground\">{item.description}</p>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t);\r\n\t\t\t\t})}\r\n\t\t\t</motion.div>\r\n\t\t\t<div\r\n\t\t\t\tclassName={`flex w-full justify-center ${\r\n\t\t\t\t\tround ? \"absolute z-20 bottom-12 left-1/2 -translate-x-1/2\" : \"\"\r\n\t\t\t\t}`}\r\n\t\t\t>\r\n\t\t\t\t<div className=\"mt-4 flex w-[150px] justify-between px-8\">\r\n\t\t\t\t\t{items.map((_, index) => (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tkey={index + \"parallax-carousel-item\"}\r\n\t\t\t\t\t\t\tclassName={`h-2 w-2 rounded-full cursor-pointer transition-colors duration-150 ${\r\n\t\t\t\t\t\t\t\tcurrentIndex % items.length === index\r\n\t\t\t\t\t\t\t\t\t? round\r\n\t\t\t\t\t\t\t\t\t\t? \"bg-background\"\r\n\t\t\t\t\t\t\t\t\t\t: \"bg-background\"\r\n\t\t\t\t\t\t\t\t\t: round\r\n\t\t\t\t\t\t\t\t\t\t? \"bg-background\"\r\n\t\t\t\t\t\t\t\t\t\t: \"bg-[rgba(51,51,51,0.4)]\"\r\n\t\t\t\t\t\t\t}`}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\tscale: currentIndex % items.length === index ? 1.2 : 1,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tonClick={() => setCurrentIndex(index)}\r\n\t\t\t\t\t\t\ttransition={{ duration: 0.15 }}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t))}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "spring",
+      "drag",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "items",
+        "type": "CarouselItem[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "baseWidth",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoplay",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoplayDelay",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pauseOnHover",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "loop",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "round",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/parallax-carousel"
+  }
+}

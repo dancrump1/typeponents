@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-float",
+  "type": "registry:ui",
+  "title": "Scroll Float",
+  "description": "Scroll Float",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-float.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-float.tsx",
+      "content": "import React, { ReactNode, RefObject, useEffect, useMemo, useRef } from \"react\";\r\n\r\nimport { gsap } from \"gsap\";\r\nimport { ScrollTrigger } from \"gsap/dist/ScrollTrigger\";\r\n\r\ngsap.registerPlugin(ScrollTrigger);\r\n\r\ninterface ScrollFloatProps {\r\n\tchildren: ReactNode;\r\n\tscrollContainerRef?: RefObject<HTMLElement>;\r\n\tcontainerClassName?: string;\r\n\ttextClassName?: string;\r\n\tanimationDuration?: number;\r\n\tease?: string;\r\n\tscrollStart?: string;\r\n\tscrollEnd?: string;\r\n\tstagger?: number;\r\n}\r\n\r\nconst ScrollFloat: React.FC<ScrollFloatProps> = ({\r\n\tchildren,\r\n\tscrollContainerRef,\r\n\tcontainerClassName = \"\",\r\n\ttextClassName = \"\",\r\n\tanimationDuration = 1,\r\n\tease = \"back.inOut(2)\",\r\n\tscrollStart = \"center bottom+=50%\",\r\n\tscrollEnd = \"bottom bottom-=40%\",\r\n\tstagger = 0.03,\r\n}) => {\r\n\tconst containerRef = useRef<HTMLHeadingElement>(null);\r\n\r\n\tconst splitText = useMemo(() => {\r\n\t\tconst text = typeof children === \"string\" ? children : \"\";\r\n\t\treturn text.split(\"\").map((char, index) => (\r\n\t\t\t<span className=\"inline-block\" key={index + \"scroll-float\"}>\r\n\t\t\t\t{char === \" \" ? \"\\u00A0\" : char}\r\n\t\t\t</span>\r\n\t\t));\r\n\t}, [children]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst el = containerRef.current;\r\n\t\tif (!el) return;\r\n\r\n\t\tconst scroller =\r\n\t\t\tscrollContainerRef && scrollContainerRef.current\r\n\t\t\t\t? scrollContainerRef.current\r\n\t\t\t\t: window;\r\n\r\n\t\tconst charElements = el.querySelectorAll(\".inline-block\");\r\n\r\n\t\tgsap.fromTo(\r\n\t\t\tcharElements,\r\n\t\t\t{\r\n\t\t\t\twillChange: \"opacity, transform\",\r\n\t\t\t\topacity: 0,\r\n\t\t\t\tyPercent: 120,\r\n\t\t\t\tscaleY: 2.3,\r\n\t\t\t\tscaleX: 0.7,\r\n\t\t\t\ttransformOrigin: \"50% 0%\",\r\n\t\t\t},\r\n\t\t\t{\r\n\t\t\t\tduration: animationDuration,\r\n\t\t\t\tease: ease,\r\n\t\t\t\topacity: 1,\r\n\t\t\t\tyPercent: 0,\r\n\t\t\t\tscaleY: 1,\r\n\t\t\t\tscaleX: 1,\r\n\t\t\t\tstagger: stagger,\r\n\t\t\t\tscrollTrigger: {\r\n\t\t\t\t\ttrigger: el,\r\n\t\t\t\t\tscroller,\r\n\t\t\t\t\tstart: scrollStart,\r\n\t\t\t\t\tend: scrollEnd,\r\n\t\t\t\t\tscrub: true,\r\n\t\t\t\t},\r\n\t\t\t}\r\n\t\t);\r\n\t}, [\r\n\t\tscrollContainerRef,\r\n\t\tanimationDuration,\r\n\t\tease,\r\n\t\tscrollStart,\r\n\t\tscrollEnd,\r\n\t\tstagger,\r\n\t]);\r\n\r\n\treturn (\r\n\t\t<h2\r\n\t\t\tref={containerRef}\r\n\t\t\tclassName={`my-5 overflow-hidden ${containerClassName}`}\r\n\t\t>\r\n\t\t\t<span\r\n\t\t\t\tclassName={`inline-block text-[clamp(1.6rem,4vw,3rem)] leading-normal ${textClassName}`}\r\n\t\t\t>\r\n\t\t\t\t{splitText}\r\n\t\t\t</span>\r\n\t\t</h2>\r\n\t);\r\n};\r\n\r\nexport default ScrollFloat;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "scrollContainerRef",
+        "type": "React.RefObject<HTMLElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDuration",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "ease",
+        "type": "string",
+        "default": "\"back.inOut(2)\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollStart",
+        "type": "string",
+        "default": "\"center bottom+=50%\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollEnd",
+        "type": "string",
+        "default": "\"bottom bottom-=40%\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "stagger",
+        "type": "number",
+        "default": "0.03",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-float"
+  }
+}

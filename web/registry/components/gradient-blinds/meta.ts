@@ -1,0 +1,33 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "gradient-blinds",
+	title: "Gradient Blinds",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["webgl", "cursor-tracking", "autoplay", "responsive"],
+	dependencies: ["ogl"],
+	registryDependencies: [],
+	props: [
+		{ name: "className", type: "string" },
+		{ name: "dpr", type: "number" },
+		{ name: "paused", type: "boolean", default: "false" },
+		{ name: "gradientColors", type: "string[]" },
+		{ name: "angle", type: "number", default: "0" },
+		{ name: "noise", type: "number", default: "0.3" },
+		{ name: "blindCount", type: "number", default: "16" },
+		{ name: "blindMinWidth", type: "number", default: "60" },
+		{ name: "mouseDampening", type: "number", default: "0.15" },
+		{ name: "mirrorGradient", type: "boolean", default: "false" },
+		{ name: "spotlightRadius", type: "number", default: "0.5" },
+		{ name: "spotlightSoftness", type: "number", default: "1" },
+		{ name: "spotlightOpacity", type: "number", default: "1" },
+		{ name: "distortAmount", type: "number", default: "0" },
+		{ name: "shineDirection", type: "\"left\" | \"right\"", default: "\"left\"" },
+		{ name: "mixBlendMode", type: "string", default: "\"lighten\"" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

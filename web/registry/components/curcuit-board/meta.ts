@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "curcuit-board",
+	title: "Curcuit Board",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["spring", "hover", "responsive"],
+	inspiration: {
+		source: "Componentry",
+		url: "https://www.componentry.fun/docs/components/circuit-board",
+		authorUrl: "https://www.componentry.fun",
+		relationship: "adaptation",
+	},
+	dependencies: ["framer-motion", "lucide-react"],
+	registryDependencies: [],
+	props: [
+		{ name: "nodes", type: "CircuitNode[]", required: true },
+		{ name: "connections", type: "CircuitConnection[]", required: true },
+		{ name: "width", type: "number", default: "600" },
+		{ name: "height", type: "number", default: "400" },
+		{ name: "gridSize", type: "number", default: "20" },
+		{ name: "showGrid", type: "boolean", default: "true" },
+		{ name: "gridColor", type: "string" },
+		{ name: "traceColor", type: "string" },
+		{ name: "pulseColor", type: "string" },
+		{ name: "nodeColor", type: "string" },
+		{ name: "pulseSpeed", type: "number", default: "2" },
+		{ name: "traceWidth", type: "number", default: "2" },
+		{ name: "variant", type: "\"light\" | \"dark\" | \"auto\"", default: "\"auto\"", description: "Force a specific theme variant. Defaults to auto-detect from system." },
+	],
+	risk: { heavy: false, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

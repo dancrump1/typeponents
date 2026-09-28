@@ -1,0 +1,41 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pipeline",
+  "type": "registry:ui",
+  "title": "Pipeline",
+  "description": "Pipeline",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/pipeline.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/pipeline.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useState } from \"react\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\nconst YEARS = Array.from({ length: 2024 - 1993 + 1 }, (_, i) => 2024 - i);\r\n\r\nexport function DemoPipelineView() {\r\n\tconst [hoveredIndex, setHoveredIndex] = useState<number | null>(null);\r\n\tconst [selected, setSelected] = useState<number | null>(null);\r\n\r\n\tconst handleMouseEnter = (index: number) => {\r\n\t\tsetHoveredIndex(index);\r\n\t};\r\n\r\n\tconst handleMouseLeave = () => {\r\n\t\tsetHoveredIndex(null);\r\n\t};\r\n\r\n\tconst calculateScale = (index: number) => {\r\n\t\tif (hoveredIndex === null) return 0.4;\r\n\t\tconst distance = Math.abs(index - hoveredIndex);\r\n\t\treturn Math.max(1 - distance * 0.2, 0.4);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"flex flex-col\">\r\n\t\t\t{YEARS.map((year, i) => {\r\n\t\t\t\tconst isSelected = selected === i;\r\n\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<button\r\n\t\t\t\t\t\tkey={year}\r\n\t\t\t\t\t\tclassName=\"relative inline-flex items-end justify-center py-1\"\r\n\t\t\t\t\t\tonMouseEnter={() => handleMouseEnter(i)}\r\n\t\t\t\t\t\tonMouseLeave={handleMouseLeave}\r\n\t\t\t\t\t\tonClick={() => setSelected(i)}\r\n\t\t\t\t\t\tonTouchStart={() => handleMouseEnter(i)}\r\n\t\t\t\t\t\tonTouchEnd={handleMouseLeave}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tkey={i + \"pipeline\"}\r\n\t\t\t\t\t\t\tclassName={`h-1 w-10 rounded-[4px] ${\r\n\t\t\t\t\t\t\t\tselected === i ? \"bg-yellow-400\" : \"bg-primary\"\r\n\t\t\t\t\t\t\t}`}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\tscale: calculateScale(i),\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tinitial={{ scale: 0.4 }}\r\n\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t\t\tdamping: 20,\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t{hoveredIndex === i ? (\r\n\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\tclassName={`absolute -top-0.5 left-12 text-[11px] ${\r\n\t\t\t\t\t\t\t\t\tisSelected ? \"text-yellow-400\" : \"text-primary\"\r\n\t\t\t\t\t\t\t\t}`}\r\n\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\tfilter: \"blur(4px)\",\r\n\t\t\t\t\t\t\t\t\tscale: 0.4,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\tanimate={{ opacity: 1, filter: \"blur(0px)\", scale: 1 }}\r\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.15, delay: 0.1 }}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{year}\r\n\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t) : null}\r\n\t\t\t\t\t</button>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/pipeline"
+  }
+}

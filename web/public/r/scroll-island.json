@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-island",
+  "type": "registry:ui",
+  "title": "Scroll Island",
+  "description": "Floating pill docked at the bottom of the page showing a circular progress ring, the current section title and a scroll percentage.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-island.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-island.tsx",
+      "content": "\"use client\";\n\nimport { Fragment, useCallback, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tAnimatePresence,\n\tmotion,\n\tMotionConfig,\n\tuseMotionValueEvent,\n\tuseScroll,\n} from \"motion/react\";\nimport type { HTMLMotionProps } from \"motion/react\";\n\n// Credit:\n// https://starui.link/docs/components/scroll-island\n\nexport function ScrollIsland({ children, containerRef, gridView }) {\n\tconst [open, setOpen] = useState(false);\n\tconst { scrollYProgress } = useScroll();\n\tconst [percent, setPercent] = useState(0);\n\tconst [titleEls, setTitleEls] = useState<HTMLElement[]>([]);\n\tconst [currentTitle, setCurrentTitle] = useState(\"stack\");\n\n\tconst setupTitles = useCallback((node: HTMLDivElement) => {\n\t\tif (node) {\n\t\t\tconst titleEls = Array.from(\n\t\t\t\tnode.querySelectorAll(\".component-container\")\n\t\t\t);\n\t\t\tsetTitleEls(titleEls.map((el) => el.children[0].children[0]));\n\t\t}\n\t}, []);\n\n\tuseMotionValueEvent(scrollYProgress, \"change\", (latest) => {\n\t\tsetPercent(Math.floor(latest * 100));\n\t\ttitleEls.forEach((el, index) => {\n\t\t\tconst top = el.getBoundingClientRect().top;\n\t\t\tif (top >= 0 && top < 32) {\n\t\t\t\tsetCurrentTitle(el.textContent || \"\");\n\t\t\t}\n\t\t});\n\t});\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\"relative w-full grid grid-cols-1 gap-8\", {\n\t\t\t\t\"grid-cols-1\": gridView === \"1\",\n\t\t\t\t\"grid-cols-2\": gridView === \"2\",\n\t\t\t\t\"grid-cols-3\": gridView === \"3\",\n\t\t\t\t\"grid-cols-4\": gridView === \"4\",\n\t\t\t})}\n\t\t\tref={setupTitles}\n\t\t>\n\t\t\t<MotionConfig transition={{ type: \"spring\", bounce: 0.3 }}>\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{open && <Overlay onClick={() => setOpen(false)} />}\n\t\t\t\t</AnimatePresence>\n\t\t\t\t{children}\n\t\t\t\t<motion.div\n\t\t\t\t\tclassName=\"fixed bottom-8 left-1/2 -translate-x-1/2 bg-background text-foreground z-10 overflow-hidden\"\n\t\t\t\t\tinitial={false}\n\t\t\t\t\tstyle={{ borderRadius: 22 }}\n\t\t\t\t\tanimate={{ width: open ? 320 : 260, height: open ? \"auto\" : 44 }}\n\t\t\t\t>\n\t\t\t\t\t<ol\n\t\t\t\t\t\tclassName=\"px-4 pt-4 overflow-auto max-h-96\"\n\t\t\t\t\t\tstyle={{ marginBlockEnd: 44 }}\n\t\t\t\t\t>\n\t\t\t\t\t\t{titleEls.map((item) => {\n\t\t\t\t\t\t\treturn (\n\t\t\t\t\t\t\t\t<motion.li\n\t\t\t\t\t\t\t\t\tkey={item?.textContent\n\t\t\t\t\t\t\t\t\t\t?.replaceAll(\" \", \"\")\n\t\t\t\t\t\t\t\t\t\t?.toLowerCase()}\n\t\t\t\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\t\t\t\"list-inside list-decimal transition-[filter] text-foreground\",\n\t\t\t\t\t\t\t\t\t\topen ? \"blur-none\" : \"blur-xs\"\n\t\t\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\t\thref={`#${item?.textContent\n\t\t\t\t\t\t\t\t\t\t\t?.replaceAll(\" \", \"\")\n\t\t\t\t\t\t\t\t\t\t\t?.toLowerCase()}`}\n\t\t\t\t\t\t\t\t\t\tclassName=\"h-7 inline-flex items-center\"\n\t\t\t\t\t\t\t\t\t\tonClick={() => setOpen(false)}\n\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t{item?.textContent}\n\t\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t\t</motion.li>\n\t\t\t\t\t\t\t);\n\t\t\t\t\t\t})}\n\t\t\t\t\t</ol>\n\n\t\t\t\t\t<button\n\t\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t\tonClick={() => setOpen(!open)}\n\t\t\t\t\t\tstyle={{ height: 44 }}\n\t\t\t\t\t\tclassName=\"pl-2 pr-4 absolute inset-x-0 bottom-0 bg-inherit flex items-center justify-between gap-2\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<span className=\"flex grow min-w-0 items-center gap-1\">\n\t\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\t\tclassName=\"size-7 -rotate-90 shrink-0\"\n\t\t\t\t\t\t\t\tviewBox=\"0 0 100 100\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<circle\n\t\t\t\t\t\t\t\t\tcx=\"50\"\n\t\t\t\t\t\t\t\t\tcy=\"50\"\n\t\t\t\t\t\t\t\t\tr=\"35\"\n\t\t\t\t\t\t\t\t\tstrokeWidth=\"15\"\n\t\t\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\t\t\tclassName=\"stroke-neutral-500\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t<motion.circle\n\t\t\t\t\t\t\t\t\tcx=\"50\"\n\t\t\t\t\t\t\t\t\tcy=\"50\"\n\t\t\t\t\t\t\t\t\tr=\"35\"\n\t\t\t\t\t\t\t\t\tstrokeWidth=\"15\"\n\t\t\t\t\t\t\t\t\tstrokeDashoffset=\"0\"\n\t\t\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\t\t\tpathLength=\"1\"\n\t\t\t\t\t\t\t\t\tstyle={{ pathLength: scrollYProgress }}\n\t\t\t\t\t\t\t\t\tclassName=\"stroke-neutral-50\"\n\t\t\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t</svg>\n\n\t\t\t\t\t\t\t<span className=\"truncate\">{currentTitle}</span>\n\t\t\t\t\t\t</span>\n\n\t\t\t\t\t\t<span>{percent}%</span>\n\t\t\t\t\t</button>\n\t\t\t\t</motion.div>\n\t\t\t</MotionConfig>\n\t\t</div>\n\t);\n}\n\nfunction Overlay(props: HTMLMotionProps<\"div\">) {\n\treturn (\n\t\t<motion.div\n\t\t\tinitial={{\n\t\t\t\topacity: 0,\n\t\t\t}}\n\t\t\tanimate={{\n\t\t\t\topacity: 1,\n\t\t\t}}\n\t\t\texit={{\n\t\t\t\topacity: 0,\n\t\t\t}}\n\t\t\tclassName=\"fixed inset-0 z-10 bg-background/50 backdrop-blur-sm\"\n\t\t\t{...props}\n\t\t/>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven"
+    ],
+    "interaction": "Scrolling fills the ring and updates the title and percentage; clicking the pill grows it upward into a list of section links that sharpen from blurred, and picking one jumps to that section and collapses the pill.",
+    "inspiration": {
+      "source": "Star UI",
+      "url": "https://starui.link/docs/components/scroll-island",
+      "authorUrl": "https://starui.link",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-island"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "interest-picker",
+  "type": "registry:ui",
+  "title": "Interest Picker",
+  "description": "An interactive component that allows users to select their interests from a visually appealing marquee-style grid. Users can choose from predefined categories with smooth animations and a minimum selection requirement.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/interest-picker.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/interest-picker.tsx",
+      "content": "'use client';\n\nimport React, { useEffect, useState } from 'react';\r\nimport {\r\n  Gamepad2,\r\n  Music,\r\n  BookOpen,\r\n  GraduationCap,\r\n  Camera,\r\n  Palette,\r\n  Code,\r\n  Dumbbell,\r\n  Plane,\r\n  Heart,\r\n  Coffee,\r\n  Car,\r\n  Home,\r\n  Utensils,\r\n  Shirt,\r\n  TreePine,\r\n  Star,\r\n  Users,\r\n  Globe,\r\n  Zap,\r\n  LucideIcon,\r\n  ArrowRight,\r\n  LoaderCircle,\r\n  Brush,\r\n  Guitar,\r\n  Mountain,\r\n  Waves,\r\n  Microscope,\r\n  Coins,\r\n  PenTool,\r\n  Headphones,\r\n  Flower,\r\n  Rocket,\r\n  Brain,\r\n  Compass,\r\n  Trophy,\r\n  Briefcase,\r\n  Sparkles\r\n} from 'lucide-react';\r\nimport { useAnimationControls, motion, AnimatePresence } from 'framer-motion';\r\nimport { cn } from '@/lib/utils';\r\n\r\nexport interface Interest {\r\n  id: string;\r\n  name: string;\r\n  icon: LucideIcon;\r\n}\r\n\r\nexport const DUMMY_INTERESTS: Interest[] = [\r\n  { id: '23', name: 'Hiking & Climbing', icon: Mountain },\r\n  { id: '7', name: 'Programming', icon: Code },\r\n  { id: '31', name: 'Psychology & Mind', icon: Brain },\r\n  { id: '12', name: 'Fashion', icon: Shirt },\r\n  { id: '28', name: 'Podcasts & Audio', icon: Headphones },\r\n  { id: '5', name: 'Photography', icon: Camera },\r\n  { id: '17', name: 'Sports', icon: Zap },\r\n  { id: '35', name: 'Magic & Illusion', icon: Sparkles },\r\n  { id: '2', name: 'Music', icon: Music },\r\n  { id: '26', name: 'Finance & Investing', icon: Coins },\r\n  { id: '14', name: 'Movies & TV', icon: Star },\r\n  { id: '9', name: 'Travel', icon: Plane },\r\n  { id: '21', name: 'Painting', icon: Brush },\r\n  { id: '34', name: 'Entrepreneurship', icon: Briefcase },\r\n  { id: '8', name: 'Fitness', icon: Dumbbell },\r\n  { id: '18', name: 'Coffee Culture', icon: Coffee },\r\n  { id: '30', name: 'Space & Astronomy', icon: Rocket },\r\n  { id: '4', name: 'Learning', icon: GraduationCap },\r\n  { id: '11', name: 'Food & Cooking', icon: Utensils },\r\n  { id: '24', name: 'Water Sports', icon: Waves },\r\n  { id: '16', name: 'Technology', icon: Globe },\r\n  { id: '33', name: 'Competitive Gaming', icon: Trophy },\r\n  { id: '1', name: 'Gaming', icon: Gamepad2 },\r\n  { id: '29', name: 'Gardening & Plants', icon: Flower },\r\n  { id: '6', name: 'Art & Design', icon: Palette },\r\n  { id: '19', name: 'Automotive', icon: Car },\r\n  { id: '27', name: 'Writing & Blogging', icon: PenTool },\r\n  { id: '13', name: 'Nature', icon: TreePine },\r\n  { id: '22', name: 'Musical Instruments', icon: Guitar },\r\n  { id: '10', name: 'Health & Wellness', icon: Heart },\r\n  { id: '32', name: 'Adventure & Exploring', icon: Compass },\r\n  { id: '15', name: 'Socializing', icon: Users },\r\n  { id: '25', name: 'Science & Research', icon: Microscope },\r\n  { id: '3', name: 'Reading', icon: BookOpen },\r\n  { id: '20', name: 'Home & Garden', icon: Home }\r\n];\r\n\r\nconst MarqueeItem = ({\r\n  interest,\r\n  row,\r\n  isSelected = false,\r\n  onSelect,\r\n  onRemove,\r\n  showEmptySlot\r\n}: {\r\n  interest: Interest;\r\n  row: number;\r\n  isSelected?: boolean;\r\n  onSelect?: (interest: Interest) => Promise<void>;\r\n  onRemove?: (interest: Interest) => Promise<void>;\r\n  showEmptySlot?: boolean;\r\n}) => {\r\n  const animate = useAnimationControls();\r\n  const [isAnimating, setIsAnimating] = useState(false);\r\n  const [firstTime, setFirstTime] = useState(true);\r\n\r\n  useEffect(() => {\r\n    if (isSelected) return;\r\n    if (firstTime) {\r\n      setFirstTime(false);\r\n      return;\r\n    }\r\n    animate.start({\r\n      y: 0,\r\n      zIndex: 0,\r\n      rotateZ: 0,\r\n      opacity: 1,\r\n      transition: {\r\n        type: 'spring',\r\n        stiffness: 100,\r\n        damping: 20\r\n      }\r\n    });\r\n  }, [isSelected]);\r\n\r\n  const handleClick = async () => {\r\n    if (onSelect) {\r\n      setIsAnimating(true);\r\n      try {\r\n        await Promise.all([\r\n          animate.start({\r\n            y: 32 * 7 - row * 32,\r\n            zIndex: 1,\r\n            rotateZ: Math.random() > 0.5 ? 45 : -45,\r\n            opacity: 0,\r\n            transition: {\r\n              type: 'spring',\r\n              stiffness: 100,\r\n              damping: 20\r\n            }\r\n          }),\r\n          onSelect(interest)\r\n        ]);\r\n      } catch (error) {\r\n        console.error(error);\r\n      }\r\n      setIsAnimating(false);\r\n    } else if (onRemove) {\r\n      try {\r\n        // reverse the animation\r\n        await onRemove(interest);\r\n      } catch (error) {\r\n        console.error(error);\r\n      }\r\n    }\r\n  };\r\n\r\n  return (\r\n    <motion.div\r\n      layout\r\n      className={cn('rounded-full active:scale-[0.97]', showEmptySlot && 'bg-white/5')}\r\n    >\r\n      <motion.button\r\n        layout\r\n        initial={{\r\n          opacity: 0\r\n        }}\r\n        whileInView={{\r\n          opacity: 1\r\n        }}\r\n        animate={animate}\r\n        onClick={handleClick}\r\n        className={cn(\r\n          'w-fit bg-zinc-900 border border-white/10 hover:border-white/20 flex items-center justify-start gap-2 shrink-0 h-8 px-3 rounded-full select-none cursor-pointer',\r\n          isSelected && 'pointer-events-none',\r\n          isSelected && !isAnimating && '!opacity-0'\r\n        )}\r\n      >\r\n        <interest.icon className=\"w-4 h-4\" />\r\n        <p className=\"text-sm whitespace-nowrap\">{interest.name}</p>\r\n      </motion.button>\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst InterestMarquee = ({\r\n  selectedInterests,\r\n  onSelect,\r\n  interests,\r\n  showEmptySlot\r\n}: {\r\n  selectedInterests: Interest[];\r\n  onSelect: (interest: Interest) => Promise<void>;\r\n  interests: Interest[];\r\n  showEmptySlot?: boolean;\r\n}) => {\r\n  return (\r\n    <div className=\"relative mt-4\">\r\n      <div className=\"absolute w-full h-full inset-0 z-10 bg-gradient-to-l from-[#111111] pointer-events-none to-20% to-transparent\" />\r\n      <div className=\"absolute w-full h-full inset-0 z-10 bg-gradient-to-t from-[#111111] pointer-events-none to-20% to-transparent\" />\r\n\r\n      <div className=\"grid grid-rows-5 gap-2 overflow-x-auto overflow-y-hidden relative pr-20 pb-10\">\r\n        {Array.from({ length: 5 }).map((_, index) => {\r\n          return (\r\n            <div key={index} className=\"w-full flex items-center justify-start gap-2\">\r\n              {interests\r\n                .slice(index * (interests.length / 5), (index + 1) * (interests.length / 5))\r\n                .map((interest) => {\r\n                  return (\r\n                    <MarqueeItem\r\n                      key={interest.id}\r\n                      interest={interest}\r\n                      row={index}\r\n                      isSelected={selectedInterests.some((i) => i.id === interest.id)}\r\n                      onSelect={onSelect}\r\n                      showEmptySlot={showEmptySlot}\r\n                    />\r\n                  );\r\n                })}\r\n            </div>\r\n          );\r\n        })}\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nconst SelectedInterests = ({\r\n  selectedInterests,\r\n  onRemove\r\n}: {\r\n  selectedInterests: Interest[];\r\n  onRemove: (interest: Interest) => Promise<void>;\r\n}) => {\r\n  return (\r\n    <div className=\"flex max-w-[500px] w-full overflow-x-auto items-center justify-start gap-2 h-8\">\r\n      {selectedInterests.map((interest) => (\r\n        <MarqueeItem key={interest.id} interest={interest} row={0} onRemove={onRemove} />\r\n      ))}\r\n    </div>\r\n  );\r\n};\r\n\r\nconst InterestPicker = ({\r\n  interests = DUMMY_INTERESTS, // You can pass your own interests category here\r\n  showEmptySlot = false, // You can choose to show an empty slot for the selected interests\r\n  onSubmit = async (interests: Interest[]) => {\r\n    // You can pass your own onSubmit function here\r\n    console.log('Selected interests:', interests);\r\n    await new Promise((resolve) => setTimeout(resolve, 4000));\r\n  }\r\n}: {\r\n  interests?: Interest[];\r\n  showEmptySlot?: boolean;\r\n  onSubmit?: (interests: Interest[]) => Promise<void> | void;\r\n}) => {\r\n  const [selectedInterests, setSelectedInterests] = useState<Interest[]>([]);\r\n  const [loading, setLoading] = useState(false);\r\n\r\n  const handleSelect = async (interest: Interest) => {\r\n    setSelectedInterests((prev) => [interest, ...prev]);\r\n  };\r\n\r\n  const handleRemove = async (interest: Interest) => {\r\n    setSelectedInterests((prev) => prev.filter((i) => i.id !== interest.id));\r\n  };\r\n\r\n  const handleSubmit = async () => {\r\n    if (onSubmit) {\r\n      setLoading(true);\r\n      await onSubmit(selectedInterests);\r\n      setLoading(false);\r\n    }\r\n  };\r\n\r\n  return (\r\n    <div className=\"flex flex-col max-w-[500px] w-full\">\r\n      <div className=\"flex items-end justify-between\">\r\n        <div className=\"flex flex-col\">\r\n          <p className=\"text-base font-medium\">Tell us about your interests</p>\r\n          <p className=\"text-sm font-muted-foreground text-white/70\">Select atleast 5 interests</p>\r\n        </div>\r\n        <AnimatePresence mode=\"popLayout\">\r\n          {selectedInterests.length >= 5 ? (\r\n            <motion.button\r\n              initial={{\r\n                x: -10,\r\n                opacity: 0\r\n              }}\r\n              animate={{\r\n                x: 0,\r\n                opacity: 1\r\n              }}\r\n              exit={{\r\n                x: -10,\r\n                opacity: 0\r\n              }}\r\n              key=\"button\"\r\n              type=\"button\"\r\n              className=\"w-9 h-9 flex items-center justify-center rounded-full bg-blue-500 cursor-pointer\"\r\n              onClick={handleSubmit}\r\n              disabled={loading}\r\n            >\r\n              {loading ? (\r\n                <motion.div\r\n                  initial={{\r\n                    opacity: 0\r\n                  }}\r\n                  animate={{\r\n                    opacity: 1\r\n                  }}\r\n                  exit={{\r\n                    opacity: 0\r\n                  }}\r\n                  key=\"loader\"\r\n                >\r\n                  <LoaderCircle className=\"animate-spin\" />{' '}\r\n                </motion.div>\r\n              ) : (\r\n                <motion.div\r\n                  initial={{\r\n                    opacity: 0\r\n                  }}\r\n                  animate={{\r\n                    opacity: 1\r\n                  }}\r\n                  exit={{\r\n                    opacity: 0\r\n                  }}\r\n                  key=\"arrow\"\r\n                >\r\n                  <ArrowRight />\r\n                </motion.div>\r\n              )}\r\n            </motion.button>\r\n          ) : (\r\n            <motion.p\r\n              initial={{\r\n                x: 10,\r\n                opacity: 0\r\n              }}\r\n              animate={{\r\n                x: 0,\r\n                opacity: 1\r\n              }}\r\n              exit={{\r\n                x: 10,\r\n                opacity: 0\r\n              }}\r\n              key=\"selected-interests-length\"\r\n              className=\"text-sm font-muted-foreground text-white/70\"\r\n            >\r\n              {selectedInterests.length}\r\n            </motion.p>\r\n          )}\r\n        </AnimatePresence>\r\n      </div>\r\n      <InterestMarquee\r\n        selectedInterests={selectedInterests}\r\n        onSelect={handleSelect}\r\n        interests={interests}\r\n        showEmptySlot={showEmptySlot}\r\n      />\r\n      <SelectedInterests selectedInterests={selectedInterests} onRemove={handleRemove} />\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default InterestPicker;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Pick interests from a marquee grid; selected chips collect until you submit.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/interestpicker",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "interests",
+        "type": "Interest[]",
+        "default": "DUMMY_INTERESTS",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showEmptySlot",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSubmit",
+        "type": "((interests: Interest[]) => Promise<void> | void)",
+        "default": "async (interests: Interest[]) => { //…",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/interest-picker"
+  }
+}

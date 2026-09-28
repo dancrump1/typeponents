@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-with-image",
+  "type": "registry:component",
+  "title": "Card With Image",
+  "description": "Card With Image",
+  "files": [
+    {
+      "path": "registry/ui-basic/CardWithImage.tsx",
+      "content": "import React from \"react\";\r\n\r\nexport default function CardWithImages() {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/*<!-- Component: Basic image card --> */}\r\n\t\t\t<div className=\"overflow-hidden rounded bg-white text-slate-500 shadow-md shadow-slate-200\">\r\n\t\t\t\t{/*  <!--  Image --> */}\r\n\t\t\t\t<figure>\r\n\t\t\t\t\t<img\r\n\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\r\n\t\t\t\t\t\talt=\"card image\"\r\n\t\t\t\t\t\tclassName=\"aspect-video w-full\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</figure>\r\n\t\t\t\t{/*  <!-- Body--> */}\r\n\t\t\t\t<div className=\"p-6\">\r\n\t\t\t\t\t<header className=\"\">\r\n\t\t\t\t\t\t<h3 className=\"text-xl font-medium text-slate-700\">\r\n\t\t\t\t\t\t\tMemories of the past\r\n\t\t\t\t\t\t</h3>\r\n\t\t\t\t\t\t<p className=\"text-sm text-slate-400\">\r\n\t\t\t\t\t\t\t{\" \"}\r\n\t\t\t\t\t\t\tBy George, jun 3 2023\r\n\t\t\t\t\t\t</p>\r\n\t\t\t\t\t</header>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t{/*<!-- End Basic image card --> */}\r\n\t\t</>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

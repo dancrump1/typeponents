@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "swap-logos",
+  "type": "registry:ui",
+  "title": "Swap Logos",
+  "description": "Swap Logos",
+  "dependencies": [
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/swap-logos.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/swap-logos.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport { motion } from \"motion/react\";\r\n\r\n\r\nconst TRANSITION = {\r\n    ease: \"easeInOut\",\r\n    duration: 10,\r\n    repeat: Infinity,\r\n    times: [0, 0.3, 0.4, 0.7, 0.8, 1],\r\n};\r\n\r\nexport const Spinner = ({\r\n    top,\r\n    bottom,\r\n}: {\r\n    top: React.ReactNode;\r\n    bottom: React.ReactNode;\r\n}) => {\r\n    return (\r\n        <div className=\"relative h-12 w-full overflow-hidden bg-neutral-900 text-2xl\">\r\n            {/* TOP SPINNER */}\r\n            <motion.div\r\n                style={{\r\n                    y: \"-50%\",\r\n                    x: \"-50%\",\r\n                }}\r\n                animate={{\r\n                    rotate: [\"0deg\", \"0deg\", \"180deg\", \"180deg\", \"360deg\", \"360deg\"],\r\n                }}\r\n                transition={{\r\n                    ease: \"easeInOut\",\r\n                    duration: 10,\r\n                    repeat: Infinity,\r\n                    times: [0, 0.3, 0.4, 0.7, 0.8, 1],\r\n                }}\r\n                className=\"absolute left-1/2 z-10 h-12 w-[50px] overflow-hidden rounded-full bg-neutral-900 ring-[1px] ring-neutral-700\"\r\n            >\r\n                <div\r\n                    style={{\r\n                        bottom: 0,\r\n                        transform: \"translateY(50%) translateX(-50%)\",\r\n                    }}\r\n                    className=\"absolute left-1/2\"\r\n                >\r\n                    {top}\r\n                </div>\r\n                <div\r\n                    style={{\r\n                        top: 0,\r\n                        transform: \"translateY(-50%) translateX(-50%) rotate(180deg)\",\r\n                    }}\r\n                    className=\"absolute left-1/2\"\r\n                >\r\n                    {bottom}\r\n                </div>\r\n            </motion.div>\r\n\r\n            {/* BOTTOM SPINNER */}\r\n            <motion.div\r\n                style={{\r\n                    y: \"50%\",\r\n                    x: \"-50%\",\r\n                }}\r\n                animate={{\r\n                    rotate: [\"0deg\", \"0deg\", \"180deg\", \"180deg\", \"360deg\", \"360deg\"],\r\n                }}\r\n                transition={{\r\n                    ease: \"easeInOut\",\r\n                    duration: 10,\r\n                    repeat: Infinity,\r\n                    times: [0, 0.3, 0.4, 0.7, 0.8, 1],\r\n                }}\r\n                className=\"absolute left-1/2 z-10 h-12 w-[50px] overflow-hidden rounded-full bg-neutral-900 ring-[1px] ring-neutral-700\"\r\n            >\r\n                <div\r\n                    style={{\r\n                        bottom: 0,\r\n                        transform: \"translateY(50%) translateX(-50%) rotate(180deg)\",\r\n                    }}\r\n                    className=\"absolute left-1/2\"\r\n                >\r\n                    {bottom}\r\n                </div>\r\n                <div\r\n                    style={{\r\n                        top: 0,\r\n                        transform: \"translateY(-50%) translateX(-50%)\",\r\n                    }}\r\n                    className=\"absolute left-1/2\"\r\n                >\r\n                    {top}\r\n                </div>\r\n            </motion.div>\r\n        </div>\r\n    );\r\n};"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "top",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "bottom",
+        "type": "React.ReactNode",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/swap-logos"
+  }
+}

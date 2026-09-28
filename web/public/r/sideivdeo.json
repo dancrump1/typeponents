@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sideivdeo",
+  "type": "registry:ui",
+  "title": "Sideivdeo",
+  "description": "Sideivdeo",
+  "dependencies": [
+    "motion",
+    "react-use-measure"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/sideivdeo.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/sideivdeo.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { forwardRef, ReactNode } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { AnimatePresence, motion, MotionConfig } from \"motion/react\";\r\nimport useMeasure from \"react-use-measure\";\r\n\r\ntype PanelContainerProps = {\r\n\tpanelOpen: boolean;\r\n\thandlePanelOpen: () => void;\r\n\tclassName?: string;\r\n\tvideoUrl?: string;\r\n\trenderButton?: (handleToggle: () => void) => ReactNode;\r\n\tchildren: ReactNode;\r\n};\r\n\r\nconst sectionVariants = {\r\n\topen: {\r\n\t\twidth: \"97%\",\r\n\t\ttransition: {\r\n\t\t\tduration: 0.3,\r\n\t\t\tease: \"easeInOut\",\r\n\t\t\tdelayChildren: 0.3,\r\n\t\t\tstaggerChildren: 0.2,\r\n\t\t},\r\n\t},\r\n\tclosed: {\r\n\t\ttransition: { duration: 0.2, ease: \"easeInOut\" },\r\n\t},\r\n};\r\n\r\nconst sharedTransition = { duration: 0.6, ease: \"easeInOut\" };\r\n\r\nexport const SidePanel = forwardRef<HTMLDivElement, PanelContainerProps>(\r\n\t({ panelOpen, handlePanelOpen, className, renderButton, children }, ref) => {\r\n\t\tconst [measureRef, bounds] = useMeasure();\r\n\r\n\t\treturn (\r\n\t\t\t<ResizablePanel>\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"bg-background rounded-r-[44px] w-[160px] md:w-[260px]\",\r\n\t\t\t\t\t\tclassName\r\n\t\t\t\t\t)}\r\n\t\t\t\t\tanimate={panelOpen ? \"open\" : \"closed\"}\r\n\t\t\t\t\tvariants={sectionVariants}\r\n\t\t\t\t\ttransition={{ duration: 0.2, ease: \"easeInOut\" }}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tanimate={{ height: bounds.height > 0 ? bounds.height : 0.1 }}\r\n\t\t\t\t\t\tclassName=\"h-auto\"\r\n\t\t\t\t\t\ttransition={{ type: \"spring\", bounce: 0.02, duration: 0.65 }}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<div ref={measureRef}>\r\n\t\t\t\t\t\t\t<AnimatePresence mode=\"popLayout\">\r\n\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\texit={{ opacity: 0 }}\r\n\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t...sharedTransition,\r\n\t\t\t\t\t\t\t\t\t\tduration: sharedTransition.duration / 2,\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\tkey=\"form\"\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\"flex items-center w-full justify-start pl-4 md:pl-4 py-1 md:py-3\",\r\n\t\t\t\t\t\t\t\t\t\t\tpanelOpen ? \"pr-3\" : \"\"\r\n\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t{renderButton && renderButton(handlePanelOpen)}\r\n\t\t\t\t\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t\t\t\t\t{panelOpen && (\r\n\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\texit={{ opacity: 0 }}\r\n\t\t\t\t\t\t\t\t\t\t\ttransition={sharedTransition}\r\n\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t{children}\r\n\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</ResizablePanel>\r\n\t\t);\r\n\t}\r\n);\r\n\r\nSidePanel.displayName = \"SidePanel\";\r\n\r\nexport default SidePanel;\r\n\r\ntype ResizablePanelProps = {\r\n\tchildren: React.ReactNode;\r\n};\r\n\r\nconst ResizablePanel = React.forwardRef<HTMLDivElement, ResizablePanelProps>(\r\n\t({ children }, ref) => {\r\n\t\tconst transition = { type: \"ease\", ease: \"easeInOut\", duration: 0.4 };\r\n\r\n\t\treturn (\r\n\t\t\t<MotionConfig transition={transition}>\r\n\t\t\t\t<div className=\"flex w-full flex-col items-start\">\r\n\t\t\t\t\t<div className=\"mx-auto w-full\">\r\n\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\tref={ref}\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\tchildren ? \"rounded-r-none\" : \"rounded-sm\",\r\n\t\t\t\t\t\t\t\t\"relative overflow-hidden\"\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{children}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</MotionConfig>\r\n\t\t);\r\n\t}\r\n);\r\n\r\nResizablePanel.displayName = \"ResizablePanel\";\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons",
+      "Media Galleries"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/sideivdeo"
+  }
+}

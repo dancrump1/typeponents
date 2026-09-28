@@ -1,0 +1,48 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "family-button",
+  "type": "registry:ui",
+  "title": "Family Button",
+  "description": "Family Button",
+  "dependencies": [
+    "lucide-react",
+    "motion",
+    "react-use-measure"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/family-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/family-button.tsx",
+      "content": "\"use client\"\r\n\r\nimport { FC, ReactNode, useState } from \"react\"\r\nimport { PlusIcon, XIcon } from \"lucide-react\"\r\nimport { motion } from \"motion/react\"\r\nimport { cn } from \"@/lib/utils\"\r\n\r\n// Credit:\r\n// https://www.cult-ui.com/docs/components/family-button\r\n\r\nconst CONTAINER_SIZE = 200\r\n\r\ninterface FamilyButtonProps {\r\n    children: React.ReactNode\r\n}\r\n\r\nconst FamilyButton: React.FC<FamilyButtonProps> = ({ children }) => {\r\n    const [isExpanded, setIsExpanded] = useState(false)\r\n    const toggleExpand = () => setIsExpanded(!isExpanded)\r\n\r\n    return (\r\n        <div\r\n            className={cn(\r\n                \"rounded-[24px] border border-black/10  shadow-xs dark:border-yellow-400/20\",\r\n                \"bg-linear-to-b  from-neutral-900 to-black\",\r\n                isExpanded\r\n                    ? \"w-[204px] bg-linear-to-b dark:from-stone-900 dark:to-neutral-900/80\"\r\n                    : \"dark:from-neutral-900 dark:to-stone-950 bg-linear-to-b\"\r\n            )}\r\n        >\r\n            <div className=\"rounded-[23px] border   border-black/10 \">\r\n                <div className=\"rounded-[22px] border  dark:border-stone-800 border-white/50 \">\r\n                    <div className=\"rounded-[21px] border    border-neutral-950/20   flex items-center justify-center \">\r\n                        <FamilyButtonContainer\r\n                            isExpanded={isExpanded}\r\n                            toggleExpand={toggleExpand}\r\n                        >\r\n                            {isExpanded ? (\r\n                                <motion.div\r\n                                    initial={{ opacity: 0 }}\r\n                                    animate={{\r\n                                        opacity: 1,\r\n                                        transition: {\r\n                                            delay: 0.3,\r\n                                            duration: 0.4,\r\n                                            ease: \"easeOut\",\r\n                                        },\r\n                                    }}\r\n                                >\r\n                                    {children}\r\n                                </motion.div>\r\n                            ) : null}\r\n                        </FamilyButtonContainer>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    )\r\n}\r\n\r\n// A container that wraps content and handles animations\r\ninterface FamilyButtonContainerProps {\r\n    isExpanded: boolean\r\n    toggleExpand: () => void\r\n    children: ReactNode\r\n}\r\n\r\nconst FamilyButtonContainer: FC<FamilyButtonContainerProps> = ({\r\n    isExpanded,\r\n    toggleExpand,\r\n    children,\r\n}) => {\r\n    return (\r\n        <motion.div\r\n            className={cn(\r\n                \"relative   border-white/10 border shadow-lg flex flex-col space-y-1  items-center  text-white  cursor-pointer z-10\",\r\n                !isExpanded\r\n                    ? \"bg-linear-to-b from-neutral-900 to-stone-900 dark:from-stone-700 dark:to-neutral-800/80\"\r\n                    : \"\"\r\n            )}\r\n            layoutRoot\r\n            layout\r\n            initial={{ borderRadius: 21, width: \"4rem\", height: \"4rem\" }}\r\n            animate={\r\n                isExpanded\r\n                    ? {\r\n                        borderRadius: 20,\r\n                        width: CONTAINER_SIZE,\r\n                        height: CONTAINER_SIZE + 50,\r\n\r\n                        transition: {\r\n                            type: \"spring\",\r\n                            damping: 25,\r\n                            stiffness: 400,\r\n                            when: \"beforeChildren\",\r\n                        },\r\n                    }\r\n                    : {\r\n                        borderRadius: 21,\r\n                        width: \"4rem\",\r\n                        height: \"4rem\",\r\n                    }\r\n            }\r\n        >\r\n            {children}\r\n\r\n            <motion.div\r\n                className=\"absolute  \"\r\n                initial={{ x: \"-50%\" }}\r\n                animate={{\r\n                    x: isExpanded ? \"0%\" : \"-50%\",\r\n                    transition: {\r\n                        type: \"tween\",\r\n                        ease: \"easeOut\",\r\n                        duration: 0.3,\r\n                    },\r\n                }}\r\n                style={{\r\n                    left: isExpanded ? \"\" : \"50%\",\r\n                    bottom: 6,\r\n                }}\r\n            >\r\n                {isExpanded ? (\r\n                    <motion.div\r\n                        className=\"p-[10px] group bg-neutral-800/50 dark:bg-black/50 border border-cyan-100/30 hover:border-neutral-200 text-orange-50 rounded-full shadow-2xl transition-colors duration-300 \"\r\n                        onClick={toggleExpand}\r\n                        layoutId=\"expand-toggle\"\r\n                        initial={false}\r\n                        animate={{\r\n                            rotate: -360,\r\n                            transition: {\r\n                                duration: 0.4,\r\n                            },\r\n                        }}\r\n                    >\r\n                        <XIcon\r\n                            className={cn(\r\n                                \"h-7 w-7 text-cyan-100/30 dark:text-neutral-400/80 group-hover:text-neutral-500 transition-colors duration-200 \"\r\n                            )}\r\n                        />\r\n                    </motion.div>\r\n                ) : (\r\n                    <motion.div\r\n                        className={cn(\r\n                            \"p-[10px] group bg-neutral-200 dark:bg-cyan-500/90 text-cyan-50 border border-cyan-100/10  shadow-2xl transition-colors duration-200\"\r\n                        )}\r\n                        style={{ borderRadius: 24 }}\r\n                        onClick={toggleExpand}\r\n                        layoutId=\"expand-toggle\"\r\n                        initial={{ rotate: 180 }}\r\n                        animate={{\r\n                            rotate: -360,\r\n                            transition: {\r\n                                duration: 0.4,\r\n                            },\r\n                        }}\r\n                    >\r\n                        <PlusIcon className=\"h-7 w-7 text-black dark:text-neutral-900\" />\r\n                    </motion.div>\r\n                )}\r\n            </motion.div>\r\n        </motion.div>\r\n    )\r\n}\r\n\r\nexport default FamilyButton;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/family-button",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/family-button"
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "expandable-screen",
+  "type": "registry:ui",
+  "title": "Expandable Screen",
+  "description": "Expandable Screen",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/expandable-screen.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/expandable-screen.tsx",
+      "content": "\"use client\";\n\nimport {\n\tcreateContext,\n\tuseContext,\n\tuseEffect,\n\tuseState,\n\ttype ReactNode,\n} from \"react\";\n\nimport { X } from \"lucide-react\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://www.cult-ui.com/docs/components/expandable-screen\n\n// Context\ninterface ExpandableScreenContextValue {\n\tisExpanded: boolean;\n\texpand: () => void;\n\tcollapse: () => void;\n\tlayoutId: string;\n\ttriggerRadius: string;\n\tcontentRadius: string;\n\tanimationDuration: number;\n}\n\nconst ExpandableScreenContext =\n\tcreateContext<ExpandableScreenContextValue | null>(null);\n\nfunction useExpandableScreen() {\n\tconst context = useContext(ExpandableScreenContext);\n\tif (!context) {\n\t\tthrow new Error(\n\t\t\t\"useExpandableScreen must be used within an ExpandableScreen\"\n\t\t);\n\t}\n\treturn context;\n}\n\n// Root Component\ninterface ExpandableScreenProps {\n\tchildren: ReactNode;\n\tdefaultExpanded?: boolean;\n\tonExpandChange?: (expanded: boolean) => void;\n\tlayoutId?: string;\n\ttriggerRadius?: string;\n\tcontentRadius?: string;\n\tanimationDuration?: number;\n\tlockScroll?: boolean;\n}\n\nexport function ExpandableScreen({\n\tchildren,\n\tdefaultExpanded = false,\n\tonExpandChange,\n\tlayoutId = \"expandable-card\",\n\ttriggerRadius = \"100px\",\n\tcontentRadius = \"24px\",\n\tanimationDuration = 0.3,\n\tlockScroll = true,\n}: ExpandableScreenProps) {\n\tconst [isExpanded, setIsExpanded] = useState(defaultExpanded);\n\n\tconst expand = () => {\n\t\tsetIsExpanded(true);\n\t\tonExpandChange?.(true);\n\t};\n\n\tconst collapse = () => {\n\t\tsetIsExpanded(false);\n\t\tonExpandChange?.(false);\n\t};\n\n\tuseEffect(() => {\n\t\tif (lockScroll) {\n\t\t\tif (isExpanded) {\n\t\t\t\tdocument.body.style.overflow = \"hidden\";\n\t\t\t} else {\n\t\t\t\tdocument.body.style.overflow = \"unset\";\n\t\t\t}\n\t\t}\n\t}, [isExpanded, lockScroll]);\n\n\treturn (\n\t\t<ExpandableScreenContext.Provider\n\t\t\tvalue={{\n\t\t\t\tisExpanded,\n\t\t\t\texpand,\n\t\t\t\tcollapse,\n\t\t\t\tlayoutId,\n\t\t\t\ttriggerRadius,\n\t\t\t\tcontentRadius,\n\t\t\t\tanimationDuration,\n\t\t\t}}\n\t\t>\n\t\t\t{children}\n\t\t</ExpandableScreenContext.Provider>\n\t);\n}\n\n// Trigger Component\ninterface ExpandableScreenTriggerProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n}\n\nexport function ExpandableScreenTrigger({\n\tchildren,\n\tclassName = \"\",\n}: ExpandableScreenTriggerProps) {\n\tconst { isExpanded, expand, layoutId, triggerRadius } =\n\t\tuseExpandableScreen();\n\n\treturn (\n\t\t<AnimatePresence initial={false}>\n\t\t\t{!isExpanded && (\n\t\t\t\t<motion.div className={`inline-block relative ${className}`}>\n\t\t\t\t\t{/* Background layer with shared layoutId for morphing */}\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tborderRadius: triggerRadius,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tlayout\n\t\t\t\t\t\tlayoutId={layoutId}\n\t\t\t\t\t\tclassName=\"absolute inset-0 transform-gpu will-change-transform\"\n\t\t\t\t\t/>\n\t\t\t\t\t{/* Content layer that fades out on expand */}\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tinitial={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\t\tanimate={{ opacity: 1, scale: 1 }}\n\t\t\t\t\t\ttransition={{ delay: 0.2 }}\n\t\t\t\t\t\texit={{ opacity: 0, scale: 0.8 }}\n\t\t\t\t\t\tlayout={false}\n\t\t\t\t\t\tonClick={expand}\n\t\t\t\t\t\tclassName=\"relative cursor-pointer\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{children}\n\t\t\t\t\t</motion.div>\n\t\t\t\t</motion.div>\n\t\t\t)}\n\t\t</AnimatePresence>\n\t);\n}\n\n// Content Component\ninterface ExpandableScreenContentProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n\tshowCloseButton?: boolean;\n\tcloseButtonClassName?: string;\n}\n\nexport function ExpandableScreenContent({\n\tchildren,\n\tclassName = \"\",\n\tshowCloseButton = true,\n\tcloseButtonClassName = \"\",\n}: ExpandableScreenContentProps) {\n\tconst { isExpanded, collapse, layoutId, contentRadius, animationDuration } =\n\t\tuseExpandableScreen();\n\n\treturn (\n\t\t<AnimatePresence initial={false}>\n\t\t\t{isExpanded && (\n\t\t\t\t<div className=\"fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-2\">\n\t\t\t\t\t{/* Morphing background with shared layoutId */}\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tlayoutId={layoutId}\n\t\t\t\t\t\ttransition={{ duration: animationDuration }}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tborderRadius: contentRadius,\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tlayout\n\t\t\t\t\t\tclassName={`relative flex h-full w-full overflow-y-auto transform-gpu will-change-transform ${className}`}\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\t\t\t\ttransition={{ delay: 0.15, duration: 0.4 }}\n\t\t\t\t\t\t\tclassName=\"relative z-20 w-full\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{children}\n\t\t\t\t\t\t</motion.div>\n\n\t\t\t\t\t\t{showCloseButton && (\n\t\t\t\t\t\t\t<motion.button\n\t\t\t\t\t\t\t\tonClick={collapse}\n\t\t\t\t\t\t\t\tclassName={`absolute right-6 top-6 z-30 flex h-10 w-10 items-center justify-center transition-colors rounded-full ${\n\t\t\t\t\t\t\t\t\tcloseButtonClassName ||\n\t\t\t\t\t\t\t\t\t\"text-white bg-transparent hover:bg-white/10\"\n\t\t\t\t\t\t\t\t}`}\n\t\t\t\t\t\t\t\taria-label=\"Close\"\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<X className=\"h-5 w-5\" />\n\t\t\t\t\t\t\t</motion.button>\n\t\t\t\t\t\t)}\n\t\t\t\t\t</motion.div>\n\t\t\t\t</div>\n\t\t\t)}\n\t\t</AnimatePresence>\n\t);\n}\n\n// Background Component (optional)\ninterface ExpandableScreenBackgroundProps {\n\ttrigger?: ReactNode;\n\tcontent?: ReactNode;\n\tclassName?: string;\n}\n\nexport function ExpandableScreenBackground({\n\ttrigger,\n\tcontent,\n\tclassName = \"\",\n}: ExpandableScreenBackgroundProps) {\n\tconst { isExpanded } = useExpandableScreen();\n\n\tif (isExpanded && content) {\n\t\treturn <div className={className}>{content}</div>;\n\t}\n\n\tif (!isExpanded && trigger) {\n\t\treturn <div className={className}>{trigger}</div>;\n\t}\n\n\treturn null;\n}\n\nexport { useExpandableScreen };\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Cult UI",
+      "url": "https://www.cult-ui.com/docs/components/expandable-screen",
+      "authorUrl": "https://www.cult-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "defaultExpanded",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onExpandChange",
+        "type": "((expanded: boolean) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "layoutId",
+        "type": "string",
+        "default": "\"expandable-card\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "triggerRadius",
+        "type": "string",
+        "default": "\"100px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "contentRadius",
+        "type": "string",
+        "default": "\"24px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDuration",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "lockScroll",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/expandable-screen"
+  }
+}

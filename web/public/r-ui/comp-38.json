@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-38",
+  "type": "registry:component",
+  "title": "Comp 38",
+  "description": "Comp 38",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-38.tsx",
+      "content": "\"use client\";\r\n\r\nimport { ClockIcon } from \"lucide-react\";\r\nimport {\r\n\tDateInput,\r\n\tDateSegment,\r\n\tLabel,\r\n\tTimeField,\r\n} from \"react-aria-components\";\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<TimeField className=\"not-first:*:mt-2\">\r\n\t\t\t<Label className=\"text-foreground text-sm font-medium\">\r\n\t\t\t\tTime input with start icon\r\n\t\t\t</Label>\r\n\t\t\t<div className=\"relative\">\r\n\t\t\t\t<div className=\"text-muted-foreground/80 pointer-events-none absolute inset-y-0 inset-s-0 z-10 flex items-center justify-center ps-3\">\r\n\t\t\t\t\t<ClockIcon size={16} aria-hidden=\"true\" />\r\n\t\t\t\t</div>\r\n\t\t\t\t<DateInput>\r\n\t\t\t\t\t{(segment) => <DateSegment segment={segment} />}\r\n\t\t\t\t</DateInput>{\" \"}\r\n\t\t\t</div>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tBuilt with{\" \"}\r\n\t\t\t\t<a\r\n\t\t\t\t\tclassName=\"hover:text-foreground underline\"\r\n\t\t\t\t\thref=\"https://react-spectrum.adobe.com/react-aria/DateField.html\"\r\n\t\t\t\t\ttarget=\"_blank\"\r\n\t\t\t\t\trel=\"noopener nofollow\"\r\n\t\t\t\t>\r\n\t\t\t\t\tReact Aria\r\n\t\t\t\t</a>\r\n\t\t\t</p>\r\n\t\t</TimeField>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

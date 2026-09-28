@@ -1,0 +1,138 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cubes",
+  "type": "registry:ui",
+  "title": "Cubes",
+  "description": "Cubes",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/cubes.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/cubes.tsx",
+      "content": "import React, { useCallback, useEffect, useRef } from \"react\";\n\nimport gsap from \"gsap\";\n\ninterface Gap {\n\trow: number;\n\tcol: number;\n}\ninterface Duration {\n\tenter: number;\n\tleave: number;\n}\n\nexport interface CubesProps {\n\tgridSize?: number;\n\tcubeSize?: number;\n\tmaxAngle?: number;\n\tradius?: number;\n\teasing?: gsap.EaseString;\n\tduration?: Duration;\n\tcellGap?: number | Gap;\n\tborderStyle?: string;\n\tfaceColor?: string;\n\tshadow?: boolean | string;\n\tautoAnimate?: boolean;\n\trippleOnClick?: boolean;\n\trippleColor?: string;\n\trippleSpeed?: number;\n}\n\nconst Cubes: React.FC<CubesProps> = ({\n\tgridSize = 10,\n\tcubeSize,\n\tmaxAngle = 45,\n\tradius = 3,\n\teasing = \"power3.out\",\n\tduration = { enter: 0.3, leave: 0.6 },\n\tcellGap,\n\tborderStyle = \"1px solid #fff\",\n\tfaceColor = \"#060010\",\n\tshadow = false,\n\tautoAnimate = true,\n\trippleOnClick = true,\n\trippleColor = \"#fff\",\n\trippleSpeed = 2,\n}) => {\n\tconst sceneRef = useRef<HTMLDivElement | null>(null);\n\tconst rafRef = useRef<number | null>(null);\n\tconst idleTimerRef = useRef<NodeJS.Timeout | null>(null);\n\tconst userActiveRef = useRef(false);\n\tconst simPosRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });\n\tconst simTargetRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });\n\tconst simRAFRef = useRef<number | null>(null);\n\n\tconst colGap =\n\t\ttypeof cellGap === \"number\"\n\t\t\t? `${cellGap}px`\n\t\t\t: (cellGap as Gap)?.col !== undefined\n\t\t\t\t? `${(cellGap as Gap).col}px`\n\t\t\t\t: \"5%\";\n\tconst rowGap =\n\t\ttypeof cellGap === \"number\"\n\t\t\t? `${cellGap}px`\n\t\t\t: (cellGap as Gap)?.row !== undefined\n\t\t\t\t? `${(cellGap as Gap).row}px`\n\t\t\t\t: \"5%\";\n\n\tconst enterDur = duration.enter;\n\tconst leaveDur = duration.leave;\n\n\tconst tiltAt = useCallback(\n\t\t(rowCenter: number, colCenter: number) => {\n\t\t\tif (!sceneRef.current) return;\n\t\t\tsceneRef.current\n\t\t\t\t.querySelectorAll<HTMLDivElement>(\".cube\")\n\t\t\t\t.forEach((cube) => {\n\t\t\t\t\tconst r = +cube.dataset.row!;\n\t\t\t\t\tconst c = +cube.dataset.col!;\n\t\t\t\t\tconst dist = Math.hypot(r - rowCenter, c - colCenter);\n\t\t\t\t\tif (dist <= radius) {\n\t\t\t\t\t\tconst pct = 1 - dist / radius;\n\t\t\t\t\t\tconst angle = pct * maxAngle;\n\t\t\t\t\t\tgsap.to(cube, {\n\t\t\t\t\t\t\tduration: enterDur,\n\t\t\t\t\t\t\tease: easing,\n\t\t\t\t\t\t\toverwrite: true,\n\t\t\t\t\t\t\trotateX: -angle,\n\t\t\t\t\t\t\trotateY: angle,\n\t\t\t\t\t\t});\n\t\t\t\t\t} else {\n\t\t\t\t\t\tgsap.to(cube, {\n\t\t\t\t\t\t\tduration: leaveDur,\n\t\t\t\t\t\t\tease: \"power3.out\",\n\t\t\t\t\t\t\toverwrite: true,\n\t\t\t\t\t\t\trotateX: 0,\n\t\t\t\t\t\t\trotateY: 0,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t},\n\t\t[radius, maxAngle, enterDur, leaveDur, easing]\n\t);\n\n\tconst onPointerMove = useCallback(\n\t\t(e: PointerEvent) => {\n\t\t\tuserActiveRef.current = true;\n\t\t\tif (idleTimerRef.current) clearTimeout(idleTimerRef.current);\n\n\t\t\tconst rect = sceneRef.current!.getBoundingClientRect();\n\t\t\tconst cellW = rect.width / gridSize;\n\t\t\tconst cellH = rect.height / gridSize;\n\t\t\tconst colCenter = (e.clientX - rect.left) / cellW;\n\t\t\tconst rowCenter = (e.clientY - rect.top) / cellH;\n\n\t\t\tif (rafRef.current) cancelAnimationFrame(rafRef.current);\n\t\t\trafRef.current = requestAnimationFrame(() =>\n\t\t\t\ttiltAt(rowCenter, colCenter)\n\t\t\t);\n\n\t\t\tidleTimerRef.current = setTimeout(() => {\n\t\t\t\tuserActiveRef.current = false;\n\t\t\t}, 3000);\n\t\t},\n\t\t[gridSize, tiltAt]\n\t);\n\n\tconst resetAll = useCallback(() => {\n\t\tif (!sceneRef.current) return;\n\t\tsceneRef.current\n\t\t\t.querySelectorAll<HTMLDivElement>(\".cube\")\n\t\t\t.forEach((cube) =>\n\t\t\t\tgsap.to(cube, {\n\t\t\t\t\tduration: leaveDur,\n\t\t\t\t\trotateX: 0,\n\t\t\t\t\trotateY: 0,\n\t\t\t\t\tease: \"power3.out\",\n\t\t\t\t})\n\t\t\t);\n\t}, [leaveDur]);\n\n\tconst onClick = useCallback(\n\t\t(e: MouseEvent) => {\n\t\t\tif (!rippleOnClick || !sceneRef.current) return;\n\t\t\tconst rect = sceneRef.current.getBoundingClientRect();\n\t\t\tconst cellW = rect.width / gridSize;\n\t\t\tconst cellH = rect.height / gridSize;\n\t\t\tconst colHit = Math.floor((e.clientX - rect.left) / cellW);\n\t\t\tconst rowHit = Math.floor((e.clientY - rect.top) / cellH);\n\n\t\t\tconst baseRingDelay = 0.15;\n\t\t\tconst baseAnimDur = 0.3;\n\t\t\tconst baseHold = 0.6;\n\n\t\t\tconst spreadDelay = baseRingDelay / rippleSpeed;\n\t\t\tconst animDuration = baseAnimDur / rippleSpeed;\n\t\t\tconst holdTime = baseHold / rippleSpeed;\n\n\t\t\tconst rings: Record<number, HTMLDivElement[]> = {};\n\t\t\tsceneRef.current\n\t\t\t\t.querySelectorAll<HTMLDivElement>(\".cube\")\n\t\t\t\t.forEach((cube) => {\n\t\t\t\t\tconst r = +cube.dataset.row!;\n\t\t\t\t\tconst c = +cube.dataset.col!;\n\t\t\t\t\tconst dist = Math.hypot(r - rowHit, c - colHit);\n\t\t\t\t\tconst ring = Math.round(dist);\n\t\t\t\t\tif (!rings[ring]) rings[ring] = [];\n\t\t\t\t\trings[ring].push(cube);\n\t\t\t\t});\n\n\t\t\tObject.keys(rings)\n\t\t\t\t.map(Number)\n\t\t\t\t.sort((a, b) => a - b)\n\t\t\t\t.forEach((ring) => {\n\t\t\t\t\tconst delay = ring * spreadDelay;\n\t\t\t\t\tconst faces = rings[ring].flatMap((cube) =>\n\t\t\t\t\t\tArray.from(cube.querySelectorAll<HTMLElement>(\".cube-face\"))\n\t\t\t\t\t);\n\n\t\t\t\t\tgsap.to(faces, {\n\t\t\t\t\t\tbackgroundColor: rippleColor,\n\t\t\t\t\t\tduration: animDuration,\n\t\t\t\t\t\tdelay,\n\t\t\t\t\t\tease: \"power3.out\",\n\t\t\t\t\t});\n\t\t\t\t\tgsap.to(faces, {\n\t\t\t\t\t\tbackgroundColor: faceColor,\n\t\t\t\t\t\tduration: animDuration,\n\t\t\t\t\t\tdelay: delay + animDuration + holdTime,\n\t\t\t\t\t\tease: \"power3.out\",\n\t\t\t\t\t});\n\t\t\t\t});\n\t\t},\n\t\t[rippleOnClick, gridSize, faceColor, rippleColor, rippleSpeed]\n\t);\n\n\tuseEffect(() => {\n\t\tif (!autoAnimate || !sceneRef.current) return;\n\t\tsimPosRef.current = {\n\t\t\tx: Math.random() * gridSize,\n\t\t\ty: Math.random() * gridSize,\n\t\t};\n\t\tsimTargetRef.current = {\n\t\t\tx: Math.random() * gridSize,\n\t\t\ty: Math.random() * gridSize,\n\t\t};\n\t\tconst speed = 0.02;\n\t\tconst loop = () => {\n\t\t\tif (!userActiveRef.current) {\n\t\t\t\tconst pos = simPosRef.current;\n\t\t\t\tconst tgt = simTargetRef.current;\n\t\t\t\tpos.x += (tgt.x - pos.x) * speed;\n\t\t\t\tpos.y += (tgt.y - pos.y) * speed;\n\t\t\t\ttiltAt(pos.y, pos.x);\n\t\t\t\tif (Math.hypot(pos.x - tgt.x, pos.y - tgt.y) < 0.1) {\n\t\t\t\t\tsimTargetRef.current = {\n\t\t\t\t\t\tx: Math.random() * gridSize,\n\t\t\t\t\t\ty: Math.random() * gridSize,\n\t\t\t\t\t};\n\t\t\t\t}\n\t\t\t}\n\t\t\tsimRAFRef.current = requestAnimationFrame(loop);\n\t\t};\n\t\tsimRAFRef.current = requestAnimationFrame(loop);\n\t\treturn () => {\n\t\t\tif (simRAFRef.current != null) cancelAnimationFrame(simRAFRef.current);\n\t\t};\n\t}, [autoAnimate, gridSize, tiltAt]);\n\n\tuseEffect(() => {\n\t\tconst el = sceneRef.current;\n\t\tif (!el) return;\n\t\tel.addEventListener(\"pointermove\", onPointerMove);\n\t\tel.addEventListener(\"pointerleave\", resetAll);\n\t\tel.addEventListener(\"click\", onClick);\n\t\treturn () => {\n\t\t\tel.removeEventListener(\"pointermove\", onPointerMove);\n\t\t\tel.removeEventListener(\"pointerleave\", resetAll);\n\t\t\tel.removeEventListener(\"click\", onClick);\n\t\t\tif (rafRef.current != null) cancelAnimationFrame(rafRef.current);\n\t\t\tif (idleTimerRef.current) clearTimeout(idleTimerRef.current);\n\t\t};\n\t}, [onPointerMove, resetAll, onClick]);\n\n\tconst cells = Array.from({ length: gridSize });\n\tconst sceneStyle: React.CSSProperties = {\n\t\tgridTemplateColumns: cubeSize\n\t\t\t? `repeat(${gridSize}, ${cubeSize}px)`\n\t\t\t: `repeat(${gridSize}, 1fr)`,\n\t\tgridTemplateRows: cubeSize\n\t\t\t? `repeat(${gridSize}, ${cubeSize}px)`\n\t\t\t: `repeat(${gridSize}, 1fr)`,\n\t\tcolumnGap: colGap,\n\t\trowGap: rowGap,\n\t\tperspective: \"99999999px\",\n\t\tgridAutoRows: \"1fr\",\n\t};\n\tconst wrapperStyle = {\n\t\t\"--cube-face-border\": borderStyle,\n\t\t\"--cube-face-bg\": faceColor,\n\t\t\"--cube-face-shadow\":\n\t\t\tshadow === true ? \"0 0 6px rgba(0,0,0,.5)\" : shadow || \"none\",\n\t\t...(cubeSize\n\t\t\t? {\n\t\t\t\t\twidth: `${gridSize * cubeSize}px`,\n\t\t\t\t\theight: `${gridSize * cubeSize}px`,\n\t\t\t\t}\n\t\t\t: {}),\n\t} as React.CSSProperties;\n\n\treturn (\n\t\t<div\n\t\t\tclassName=\"relative w-1/2 max-md:w-11/12 aspect-square\"\n\t\t\tstyle={wrapperStyle}\n\t\t>\n\t\t\t<div ref={sceneRef} className=\"grid w-full h-full\" style={sceneStyle}>\n\t\t\t\t{cells.map((_, r) =>\n\t\t\t\t\tcells.map((__, c) => (\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tkey={`${r}-${c}`}\n\t\t\t\t\t\t\tclassName=\"cube relative w-full h-full aspect-square transform-3d\"\n\t\t\t\t\t\t\tdata-row={r}\n\t\t\t\t\t\t\tdata-col={c}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<span className=\"absolute pointer-events-none -inset-9\" />\n\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform: \"translateY(-50%) rotateX(90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform: \"translateY(50%) rotateX(-90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform: \"translateX(-50%) rotateY(-90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform: \"translateX(50%) rotateY(90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform:\n\t\t\t\t\t\t\t\t\t\t\"rotateY(-90deg) translateX(50%) rotateY(90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"cube-face absolute inset-0 flex items-center justify-center\"\n\t\t\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t\t\tbackground: \"var(--cube-face-bg)\",\n\t\t\t\t\t\t\t\t\tborder: \"var(--cube-face-border)\",\n\t\t\t\t\t\t\t\t\tboxShadow: \"var(--cube-face-shadow)\",\n\t\t\t\t\t\t\t\t\ttransform:\n\t\t\t\t\t\t\t\t\t\t\"rotateY(90deg) translateX(-50%) rotateY(-90deg)\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t))\n\t\t\t\t)}\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default Cubes;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "gridSize",
+        "type": "number",
+        "default": "10",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cubeSize",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxAngle",
+        "type": "number",
+        "default": "45",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "default": "3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "easing",
+        "type": "gsap.EaseString",
+        "default": "\"power3.out\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "Duration",
+        "default": "{ enter: 0.3, leave: 0.6 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cellGap",
+        "type": "number | Gap",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderStyle",
+        "type": "string",
+        "default": "\"1px solid #fff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "faceColor",
+        "type": "string",
+        "default": "\"#060010\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "shadow",
+        "type": "string | boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoAnimate",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rippleOnClick",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rippleColor",
+        "type": "string",
+        "default": "\"#fff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rippleSpeed",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/cubes"
+  }
+}

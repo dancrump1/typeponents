@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "glowing-background",
+  "type": "registry:ui",
+  "title": "Glowing Background",
+  "description": "Dark card topped with a grid of tiny dots that light up like stars, above a title and description.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/glowing-background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/glowing-background.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\n// https://ui.aceternity.com/components/glowing-stars-effect\r\n\r\nexport const GlowingStarsBackgroundCard = ({\r\n\tclassName,\r\n\tchildren,\r\n}: {\r\n\tclassName?: string;\r\n\tchildren?: React.ReactNode;\r\n}) => {\r\n\tconst [mouseEnter, setMouseEnter] = useState(false);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tonMouseEnter={() => {\r\n\t\t\t\tsetMouseEnter(true);\r\n\t\t\t}}\r\n\t\t\tonMouseLeave={() => {\r\n\t\t\t\tsetMouseEnter(false);\r\n\t\t\t}}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"bg-[linear-gradient(110deg,#333_0.6%,#222)] p-4 max-w-md max-h-80 h-full w-full rounded-xl border border-[#eaeaea] dark:border-neutral-600\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t<div className=\"flex justify-center items-center\">\r\n\t\t\t\t<Illustration mouseEnter={mouseEnter} />\r\n\t\t\t</div>\r\n\t\t\t<div className=\"px-2 pb-6\">{children}</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport const GlowingStarsDescription = ({\r\n\tclassName,\r\n\tchildren,\r\n}: {\r\n\tclassName?: string;\r\n\tchildren?: React.ReactNode;\r\n}) => {\r\n\treturn (\r\n\t\t<p className={cn(\"text-base text-foreground max-w-[16rem]\", className)}>\r\n\t\t\t{children}\r\n\t\t</p>\r\n\t);\r\n};\r\n\r\nexport const GlowingStarsTitle = ({\r\n\tclassName,\r\n\tchildren,\r\n}: {\r\n\tclassName?: string;\r\n\tchildren?: React.ReactNode;\r\n}) => {\r\n\treturn (\r\n\t\t<h2 className={cn(\"font-bold text-2xl text-foreground\", className)}>\r\n\t\t\t{children}\r\n\t\t</h2>\r\n\t);\r\n};\r\n\r\nexport const Illustration = ({ mouseEnter }: { mouseEnter: boolean }) => {\r\n\tconst stars = 108;\r\n\tconst columns = 18;\r\n\r\n\tconst [glowingStars, setGlowingStars] = useState<number[]>([]);\r\n\r\n\tconst highlightedStars = useRef<number[]>([]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst interval = setInterval(() => {\r\n\t\t\thighlightedStars.current = Array.from({ length: 5 }, () =>\r\n\t\t\t\tMath.floor(Math.random() * stars)\r\n\t\t\t);\r\n\t\t\tsetGlowingStars([...highlightedStars.current]);\r\n\t\t}, 3000);\r\n\r\n\t\treturn () => clearInterval(interval);\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"h-48 p-1 w-full\"\r\n\t\t\tstyle={{\r\n\t\t\t\tdisplay: \"grid\",\r\n\t\t\t\tgridTemplateColumns: `repeat(${columns}, 1fr)`,\r\n\t\t\t\tgap: `1px`,\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t{[...Array(stars)].map((_, starIdx) => {\r\n\t\t\t\tconst isGlowing = glowingStars.includes(starIdx);\r\n\t\t\t\tconst delay = (starIdx % 10) * 0.1;\r\n\t\t\t\tconst staticDelay = starIdx * 0.01;\r\n\t\t\t\treturn (\r\n\t\t\t\t\t<div\r\n\t\t\t\t\t\tkey={`matrix-col-${starIdx}}`}\r\n\t\t\t\t\t\tclassName=\"relative flex items-center justify-center\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<Star\r\n\t\t\t\t\t\t\tisGlowing={mouseEnter ? true : isGlowing}\r\n\t\t\t\t\t\t\tdelay={mouseEnter ? staticDelay : delay}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t{mouseEnter && <Glow delay={staticDelay} />}\r\n\t\t\t\t\t\t<AnimatePresence mode=\"wait\">\r\n\t\t\t\t\t\t\t{isGlowing && <Glow delay={delay} />}\r\n\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t);\r\n\t\t\t})}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst Star = ({ isGlowing, delay }: { isGlowing: boolean; delay: number }) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tkey={delay}\r\n\t\t\tinitial={{\r\n\t\t\t\tscale: 1,\r\n\t\t\t}}\r\n\t\t\tanimate={{\r\n\t\t\t\tscale: isGlowing ? [1, 1.2, 2.5, 2.2, 1.5] : 1,\r\n\t\t\t\tbackground: isGlowing ? \"#fff\" : \"#666\",\r\n\t\t\t}}\r\n\t\t\ttransition={{\r\n\t\t\t\tduration: 2,\r\n\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\tdelay: delay,\r\n\t\t\t}}\r\n\t\t\tclassName={cn(\"bg-background h-px w-px rounded-full relative z-20\")}\r\n\t\t></motion.div>\r\n\t);\r\n};\r\n\r\nconst Glow = ({ delay }: { delay: number }) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tinitial={{\r\n\t\t\t\topacity: 0,\r\n\t\t\t}}\r\n\t\t\tanimate={{\r\n\t\t\t\topacity: 1,\r\n\t\t\t}}\r\n\t\t\ttransition={{\r\n\t\t\t\tduration: 2,\r\n\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\tdelay: delay,\r\n\t\t\t}}\r\n\t\t\texit={{\r\n\t\t\t\topacity: 0,\r\n\t\t\t}}\r\n\t\t\tclassName=\"absolute  left-1/2 -translate-x-1/2 z-10 h-[4px] w-[4px] rounded-full bg-blue-500 blur-[1px] shadow-2xl shadow-blue-400\"\r\n\t\t/>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "Left alone, a handful of dots flare white with a blue halo every few seconds and fade back. Hovering the card lights the whole grid, the glow rippling across the dots in sequence.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/glowing-stars-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/glowing-background"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-curve",
+  "type": "registry:ui",
+  "title": "Text Curve",
+  "description": "Oversized marquee whose repeating words run along a curved arc instead of a straight line.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-curve.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-curve.tsx",
+      "content": "import {\r\n\tFC,\r\n\tPointerEvent,\r\n\tuseEffect,\r\n\tuseId,\r\n\tuseMemo,\r\n\tuseRef,\r\n\tuseState,\r\n} from \"react\";\r\n\r\n// Credit\r\n// https://reactbits.dev/text-animations/curved-loop\r\n\r\ninterface TextCurveProps {\r\n\tmarqueeText?: string;\r\n\tspeed?: number;\r\n\tclassName?: string;\r\n\tcurveAmount?: number;\r\n\tdirection?: \"left\" | \"right\";\r\n\tinteractive?: boolean;\r\n}\r\n\r\nconst TextCurve: FC<TextCurveProps> = ({\r\n\tmarqueeText = \"\",\r\n\tspeed = 2,\r\n\tclassName,\r\n\tcurveAmount = 400,\r\n\tdirection = \"left\",\r\n\tinteractive = true,\r\n}) => {\r\n\tconst text = useMemo(() => {\r\n\t\tconst hasTrailing = /\\s|\\u00A0$/.test(marqueeText);\r\n\t\treturn (\r\n\t\t\t(hasTrailing ? marqueeText.replace(/\\s+$/, \"\") : marqueeText) +\r\n\t\t\t\"\\u00A0\"\r\n\t\t);\r\n\t}, [marqueeText]);\r\n\r\n\tconst measureRef = useRef<SVGTextElement | null>(null);\r\n\tconst tspansRef = useRef<SVGTSpanElement[]>([]);\r\n\tconst pathRef = useRef<SVGPathElement | null>(null);\r\n\tconst [pathLength, setPathLength] = useState(0);\r\n\tconst [spacing, setSpacing] = useState(0);\r\n\tconst uid = useId();\r\n\tconst pathId = `curve-${uid}`;\r\n\tconst pathD = `M-100,40 Q500,${40 + curveAmount} 1540,40`;\r\n\r\n\tconst dragRef = useRef(false);\r\n\tconst lastXRef = useRef(0);\r\n\tconst dirRef = useRef<\"left\" | \"right\">(direction);\r\n\tconst velRef = useRef(0);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (measureRef.current)\r\n\t\t\tsetSpacing(measureRef.current.getComputedTextLength());\r\n\t}, [text, className]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (pathRef.current) setPathLength(pathRef.current.getTotalLength());\r\n\t}, [curveAmount]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!spacing) return;\r\n\t\tlet frame = 0;\r\n\t\tconst step = () => {\r\n\t\t\ttspansRef.current.forEach((t) => {\r\n\t\t\t\tif (!t) return;\r\n\t\t\t\tlet x = parseFloat(t.getAttribute(\"x\") || \"0\");\r\n\t\t\t\tif (!dragRef.current) {\r\n\t\t\t\t\tconst delta =\r\n\t\t\t\t\t\tdirRef.current === \"right\"\r\n\t\t\t\t\t\t\t? Math.abs(speed)\r\n\t\t\t\t\t\t\t: -Math.abs(speed);\r\n\t\t\t\t\tx += delta;\r\n\t\t\t\t}\r\n\t\t\t\tconst maxX = (tspansRef.current.length - 1) * spacing;\r\n\t\t\t\tif (x < -spacing) x = maxX;\r\n\t\t\t\tif (x > maxX) x = -spacing;\r\n\t\t\t\tt.setAttribute(\"x\", x.toString());\r\n\t\t\t});\r\n\t\t\tframe = requestAnimationFrame(step);\r\n\t\t};\r\n\t\tstep();\r\n\t\treturn () => cancelAnimationFrame(frame);\r\n\t}, [spacing, speed]);\r\n\r\n\tconst repeats =\r\n\t\tpathLength && spacing ? Math.ceil(pathLength / spacing) + 2 : 0;\r\n\tconst ready = pathLength > 0 && spacing > 0;\r\n\r\n\tconst onPointerDown = (e: PointerEvent) => {\r\n\t\tif (!interactive) return;\r\n\t\tdragRef.current = true;\r\n\t\tlastXRef.current = e.clientX;\r\n\t\tvelRef.current = 0;\r\n\t\t(e.target as HTMLElement).setPointerCapture(e.pointerId);\r\n\t};\r\n\r\n\tconst onPointerMove = (e: PointerEvent) => {\r\n\t\tif (!interactive || !dragRef.current) return;\r\n\t\tconst dx = e.clientX - lastXRef.current;\r\n\t\tlastXRef.current = e.clientX;\r\n\t\tvelRef.current = dx;\r\n\t\ttspansRef.current.forEach((t) => {\r\n\t\t\tif (!t) return;\r\n\t\t\tlet x = parseFloat(t.getAttribute(\"x\") || \"0\");\r\n\t\t\tx += dx;\r\n\t\t\tconst maxX = (tspansRef.current.length - 1) * spacing;\r\n\t\t\tif (x < -spacing) x = maxX;\r\n\t\t\tif (x > maxX) x = -spacing;\r\n\t\t\tt.setAttribute(\"x\", x.toString());\r\n\t\t});\r\n\t};\r\n\r\n\tconst endDrag = () => {\r\n\t\tif (!interactive) return;\r\n\t\tdragRef.current = false;\r\n\t\tdirRef.current = velRef.current > 0 ? \"right\" : \"left\";\r\n\t};\r\n\r\n\tconst cursorStyle = interactive\r\n\t\t? dragRef.current\r\n\t\t\t? \"grabbing\"\r\n\t\t\t: \"grab\"\r\n\t\t: \"auto\";\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"min-h-screen flex items-center justify-center w-full\"\r\n\t\t\tstyle={{\r\n\t\t\t\tvisibility: ready ? \"visible\" : \"hidden\",\r\n\t\t\t\tcursor: cursorStyle,\r\n\t\t\t}}\r\n\t\t\tonPointerDown={onPointerDown}\r\n\t\t\tonPointerMove={onPointerMove}\r\n\t\t\tonPointerUp={endDrag}\r\n\t\t\tonPointerLeave={endDrag}\r\n\t\t>\r\n\t\t\t<svg\r\n\t\t\t\tclassName=\"select-none w-full overflow-visible block aspect-100/12 text-[6rem] font-bold tracking-[5px] uppercase leading-none\"\r\n\t\t\t\tviewBox=\"0 0 1440 120\"\r\n\t\t\t>\r\n\t\t\t\t<text\r\n\t\t\t\t\tref={measureRef}\r\n\t\t\t\t\txmlSpace=\"preserve\"\r\n\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\tvisibility: \"hidden\",\r\n\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\tpointerEvents: \"none\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t>\r\n\t\t\t\t\t{text}\r\n\t\t\t\t</text>\r\n\t\t\t\t<defs>\r\n\t\t\t\t\t<path\r\n\t\t\t\t\t\tref={pathRef}\r\n\t\t\t\t\t\tid={pathId}\r\n\t\t\t\t\t\td={pathD}\r\n\t\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\t\tstroke=\"transparent\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</defs>\r\n\t\t\t\t{ready && (\r\n\t\t\t\t\t<text\r\n\t\t\t\t\t\txmlSpace=\"preserve\"\r\n\t\t\t\t\t\tclassName={`fill-white ${className ?? \"\"}`}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<textPath href={`#${pathId}`} xmlSpace=\"preserve\">\r\n\t\t\t\t\t\t\t{Array.from({ length: repeats }).map((_, i) => (\r\n\t\t\t\t\t\t\t\t<tspan\r\n\t\t\t\t\t\t\t\t\tkey={i}\r\n\t\t\t\t\t\t\t\t\tx={i * spacing}\r\n\t\t\t\t\t\t\t\t\tref={(el) => {\r\n\t\t\t\t\t\t\t\t\t\tif (el) tspansRef.current[i] = el;\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{text}\r\n\t\t\t\t\t\t\t\t</tspan>\r\n\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t</textPath>\r\n\t\t\t\t\t</text>\r\n\t\t\t\t)}\r\n\t\t\t</svg>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default TextCurve;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "drag",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "The words slide continuously around the curve on their own; dragging left or right pushes them along by hand, and letting go hands control back to the loop running in whichever direction you flicked it.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://reactbits.dev/text-animations/curved-loop",
+      "authorUrl": "https://reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "marqueeText",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "curveAmount",
+        "type": "number",
+        "default": "400",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "direction",
+        "type": "\"left\" | \"right\"",
+        "default": "\"left\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "interactive",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-curve"
+  }
+}

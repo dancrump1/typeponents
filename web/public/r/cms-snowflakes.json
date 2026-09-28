@@ -1,0 +1,53 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cms-snowflakes",
+  "type": "registry:block",
+  "title": "Snowflakes (CMS block)",
+  "description": "Craft-ready Snowflakes block with injectable Editable wrapper.",
+  "registryDependencies": [
+    "@dbs/snowflakes"
+  ],
+  "files": [
+    {
+      "path": "registry/cms/_types.ts",
+      "content": "import type { ComponentPropsWithoutRef, ElementType, ReactNode } from \"react\";\r\n\r\n/** Standard Craft Matrix block fields used by Drive CMS wrappers. */\r\nexport interface CmsBlockData {\r\n\tid: string;\r\n\tuid: string;\r\n\ttitle: string;\r\n\theadline?: string | null;\r\n\tcopy?: string | null;\r\n\thero?: Array<{\r\n\t\turl: string;\r\n\t\talt?: string | null;\r\n\t\twidth?: number;\r\n\t\theight?: number;\r\n\t}>;\r\n\tbutton?: Array<{\r\n\t\ttext?: string | null;\r\n\t\tlinkText?: string | null;\r\n\t\turl?: string | null;\r\n\t\tlinkUrl?: string | null;\r\n\t\tnewWindow?: string | boolean | null;\r\n\t}>;\r\n}\r\n\r\n/**\r\n * CmsBlockData aligns with SharedBlockContent in @/lib/component-content:\r\n *   title, headline, copy → copy fields\r\n *   hero[0]               → image\r\n *   button[0]             → button\r\n */\r\n\r\nexport type EditableMode = \"inline\" | \"panel\" | \"focus\";\r\n\r\nexport interface CmsFieldMapping {\r\n\tcmsField: keyof CmsBlockData | \"componentHandle\";\r\n\tprop: string;\r\n\tlabel: string;\r\n\teditable?: EditableMode;\r\n\t/** e.g. \"comma-list\" to split headline into string[] */\r\n\tformat?: \"comma-list\";\r\n}\r\n\r\nexport interface CmsComponentMeta {\r\n\tenabled: boolean;\r\n\tusesBlockStyles?: boolean;\r\n\tfields: CmsFieldMapping[];\r\n}\r\n\r\nexport interface EditableFieldProps {\r\n\tsubfield: string;\r\n\tlabel: string;\r\n\tinline?: boolean;\r\n\tpanelOnly?: boolean;\r\n\tclassName?: string;\r\n\tas?: ElementType;\r\n\tchildren: ReactNode;\r\n}\r\n\r\nexport type EditableComponent = (\r\n\tprops: EditableFieldProps,\r\n) => ReactNode;\r\n\r\nexport interface CmsBlockContext {\r\n\tfieldHandle: string;\r\n\tblockId: string;\r\n\tblockUid: string;\r\n\tentryId?: string;\r\n\tEditable: EditableComponent;\r\n}\r\n\r\nexport type CmsBlockProps<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\tCmsBlockContext & {\r\n\t\tdata: CmsBlockData;\r\n\t} & TProps;\r\n\r\nexport type CmsBlockComponent<TProps extends Record<string, unknown> = Record<string, unknown>> =\r\n\t(props: CmsBlockProps<TProps>) => ReactNode;\r\n\r\nexport function mapCommaList(value?: string | null): string[] {\r\n\tif (!value?.trim()) {\r\n\t\treturn [];\r\n\t}\r\n\r\n\treturn value\r\n\t\t.split(/[,;]+/)\r\n\t\t.map((part) => part.trim())\r\n\t\t.filter(Boolean);\r\n}\r\n\r\nexport function getBlockButton(data: CmsBlockData) {\r\n\treturn data.button?.[0];\r\n}\r\n\r\nexport function getBlockImage(data: CmsBlockData) {\r\n\treturn data.hero?.[0];\r\n}\r\n",
+      "type": "registry:lib",
+      "target": "~/registry/cms/_types.ts"
+    },
+    {
+      "path": "registry/cms/snowflakes.block.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect } from \"react\";\r\n\r\nimport {\r\n\tCmsBlockComponent,\r\n\tgetBlockButton,\r\n\tgetBlockImage,\r\n} from \"./_types\";\r\n\r\n/** CMS block for side-effect snowflakes background module. */\r\nexport const snowflakesCmsMeta = {\r\n\tenabled: true,\r\n\tusesBlockStyles: true,\r\n\tfields: [\r\n\t\t{ cmsField: \"title\", prop: \"title\", label: \"Title\", editable: \"inline\" },\r\n\t\t{ cmsField: \"headline\", prop: \"headline\", label: \"Headline\", editable: \"inline\" },\r\n\t\t{ cmsField: \"copy\", prop: \"copy\", label: \"Body\", editable: \"panel\" },\r\n\t],\r\n} as const;\r\n\r\nexport const SnowflakesCmsBlock: CmsBlockComponent = ({ data, Editable }) => {\r\n\tuseEffect(() => {\r\n\t\tvoid import(\"@/registry/open-source/snowflakes\");\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"relative min-h-[400px] w-full overflow-hidden\">\r\n\t\t\t<Editable subfield=\"title\" label=\"Title\" inline>\r\n\t\t\t\t<h2 className=\"text-2xl font-semibold tracking-tight\">\r\n\t\t\t\t\t{data.title || \"Snowflakes\"}\r\n\t\t\t\t</h2>\r\n\t\t\t</Editable>\r\n\t\t\t{data.headline ? (\r\n\t\t\t\t<Editable subfield=\"headline\" label=\"Headline\" inline>\r\n\t\t\t\t\t<p className=\"mt-2 text-base text-neutral-600 dark:text-neutral-300\">\r\n\t\t\t\t\t\t{data.headline}\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t{data.copy ? (\r\n\t\t\t\t<Editable subfield=\"copy\" label=\"Body\">\r\n\t\t\t\t\t<p className=\"mt-3 text-sm text-neutral-500 dark:text-neutral-400\">\r\n\t\t\t\t\t\t{data.copy}\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</Editable>\r\n\t\t\t) : null}\r\n\t\t\t<div className=\"mt-6 flex min-h-[320px] w-full items-center justify-center rounded-lg border border-dashed border-neutral-300 text-sm text-neutral-500 dark:border-neutral-700\">\r\n\t\t\t\tSnowflakes particle background loads on mount\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n",
+      "type": "registry:block",
+      "target": "~/registry/cms/snowflakes.block.tsx"
+    }
+  ],
+  "meta": {
+    "cms": {
+      "handle": "snowflakes",
+      "usesBlockStyles": true,
+      "fields": [
+        {
+          "cmsField": "title",
+          "prop": "title",
+          "label": "Title",
+          "editable": "inline"
+        },
+        {
+          "cmsField": "headline",
+          "prop": "headline",
+          "label": "Headline",
+          "editable": "inline"
+        },
+        {
+          "cmsField": "copy",
+          "prop": "copy",
+          "label": "Body",
+          "editable": "panel"
+        }
+      ]
+    }
+  },
+  "categories": [
+    "Backgrounds"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "theme-animations",
+  "type": "registry:ui",
+  "title": "Theme Animations",
+  "description": "View-transition recipes for circular, blurred and polygonal theme switches.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/theme-animations.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/theme-animations.tsx",
+      "content": "// animations.ts\r\nexport type AnimationVariant = \"circle\" | \"circle-blur\" | \"polygon\" | \"gif\";\r\nexport type AnimationStart =\r\n\t| \"top-left\"\r\n\t| \"top-right\"\r\n\t| \"bottom-left\"\r\n\t| \"bottom-right\"\r\n\t| \"center\";\r\n\r\ninterface Animation {\r\n\tname: string;\r\n\tcss: string;\r\n}\r\n\r\nconst getPositionCoords = (position: AnimationStart) => {\r\n\tswitch (position) {\r\n\t\tcase \"top-left\":\r\n\t\t\treturn { cx: \"0\", cy: \"0\" };\r\n\t\tcase \"top-right\":\r\n\t\t\treturn { cx: \"40\", cy: \"0\" };\r\n\t\tcase \"bottom-left\":\r\n\t\t\treturn { cx: \"0\", cy: \"40\" };\r\n\t\tcase \"bottom-right\":\r\n\t\t\treturn { cx: \"40\", cy: \"40\" };\r\n\t}\r\n};\r\n\r\nconst generateSVG = (variant: AnimationVariant, start: AnimationStart) => {\r\n\tif (start === \"center\") return;\r\n\r\n\tconst positionCoords = getPositionCoords(start);\r\n\tif (!positionCoords) {\r\n\t\tthrow new Error(`Invalid start position: ${start}`);\r\n\t}\r\n\tconst { cx, cy } = positionCoords;\r\n\r\n\tif (variant === \"circle\") {\r\n\t\treturn `data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 40 40\"><circle cx=\"${cx}\" cy=\"${cy}\" r=\"20\" fill=\"white\"/></svg>`;\r\n\t}\r\n\r\n\tif (variant === \"circle-blur\") {\r\n\t\treturn `data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 40 40\"><defs><filter id=\"blur\"><feGaussianBlur stdDeviation=\"2\"/></filter></defs><circle cx=\"${cx}\" cy=\"${cy}\" r=\"18\" fill=\"white\" filter=\"url(%23blur)\"/></svg>`;\r\n\t}\r\n\r\n\treturn \"\";\r\n};\r\n\r\nconst getTransformOrigin = (start: AnimationStart) => {\r\n\tswitch (start) {\r\n\t\tcase \"top-left\":\r\n\t\t\treturn \"top left\";\r\n\t\tcase \"top-right\":\r\n\t\t\treturn \"top right\";\r\n\t\tcase \"bottom-left\":\r\n\t\t\treturn \"bottom left\";\r\n\t\tcase \"bottom-right\":\r\n\t\t\treturn \"bottom right\";\r\n\t}\r\n};\r\n\r\nexport const createAnimation = (\r\n\tvariant: AnimationVariant,\r\n\tstart: AnimationStart,\r\n\turl?: string\r\n): Animation => {\r\n\tconst svg = generateSVG(variant, start);\r\n\tconst transformOrigin = getTransformOrigin(start);\r\n\r\n\tif (variant === \"polygon\") {\r\n\t\treturn {\r\n\t\t\tname: `${variant}-${start}`,\r\n\t\t\tcss: `\r\n       ::view-transition-group(root) {\r\n        animation-duration: 0.7s;\r\n        animation-timing-function: var(--expo-out);\r\n      }\r\n            \r\n      ::view-transition-new(root) {\r\n        animation-name: reveal-light;\r\n      }\r\n\r\n      ::view-transition-old(root),\r\n      .dark::view-transition-old(root) {\r\n        animation: none;\r\n        z-index: -1;\r\n      }\r\n      .dark::view-transition-new(root) {\r\n        animation-name: reveal-dark;\r\n      }\r\n\r\n      @keyframes reveal-dark {\r\n        from {\r\n          clip-path: polygon(50% -71%, -50% 71%, -50% 71%, 50% -71%);\r\n        }\r\n        to {\r\n          clip-path: polygon(50% -71%, -50% 71%, 50% 171%, 171% 50%);\r\n        }\r\n      }\r\n\r\n      @keyframes reveal-light {\r\n        from {\r\n          clip-path: polygon(171% 50%, 50% 171%, 50% 171%, 171% 50%);\r\n        }\r\n        to {\r\n          clip-path: polygon(171% 50%, 50% 171%, -50% 71%, 50% -71%);\r\n        }\r\n      }\r\n      `,\r\n\t\t};\r\n\t}\r\n\tif (variant === \"circle\" && start == \"center\") {\r\n\t\treturn {\r\n\t\t\tname: `${variant}-${start}`,\r\n\t\t\tcss: `\r\n       ::view-transition-group(root) {\r\n        animation-duration: 0.7s;\r\n        animation-timing-function: var(--expo-out);\r\n      }\r\n            \r\n      ::view-transition-new(root) {\r\n        animation-name: reveal-light;\r\n      }\r\n\r\n      ::view-transition-old(root),\r\n      .dark::view-transition-old(root) {\r\n        animation: none;\r\n        z-index: -1;\r\n      }\r\n      .dark::view-transition-new(root) {\r\n        animation-name: reveal-dark;\r\n      }\r\n\r\n      @keyframes reveal-dark {\r\n        from {\r\n          clip-path: circle(0% at 50% 50%);\r\n        }\r\n        to {\r\n          clip-path: circle(100.0% at 50% 50%);\r\n        }\r\n      }\r\n\r\n      @keyframes reveal-light {\r\n        from {\r\n           clip-path: circle(0% at 50% 50%);\r\n        }\r\n        to {\r\n          clip-path: circle(100.0% at 50% 50%);\r\n        }\r\n      }\r\n      `,\r\n\t\t};\r\n\t}\r\n\tif (variant === \"gif\") {\r\n\t\treturn {\r\n\t\t\tname: `${variant}-${start}`,\r\n\t\t\tcss: `\r\n      ::view-transition-group(root) {\r\n  animation-timing-function: var(--expo-in);\r\n}\r\n\r\n::view-transition-new(root) {\r\n  mask: url('${url}') center / 0 no-repeat;\r\n  animation: scale 3s;\r\n}\r\n\r\n::view-transition-old(root),\r\n.dark::view-transition-old(root) {\r\n  animation: scale 3s;\r\n}\r\n\r\n@keyframes scale {\r\n  0% {\r\n    mask-size: 0;\r\n  }\r\n  10% {\r\n    mask-size: 50vmax;\r\n  }\r\n  90% {\r\n    mask-size: 50vmax;\r\n  }\r\n  100% {\r\n    mask-size: 2000vmax;\r\n  }\r\n}`,\r\n\t\t};\r\n\t}\r\n\r\n\treturn {\r\n\t\tname: `${variant}-${start}`,\r\n\t\tcss: `\r\n      ::view-transition-group(root) {\r\n        animation-timing-function: var(--expo-out);\r\n      }\r\n      ::view-transition-new(root) {\r\n        mask: url('${svg}') ${start.replace(\"-\", \" \")} / 0 no-repeat;\r\n        mask-origin: content-box;\r\n        animation: scale-${start} 1s;\r\n        transform-origin: ${transformOrigin};\r\n      }\r\n      ::view-transition-old(root),\r\n      .dark::view-transition-old(root) {\r\n        animation: scale-${start} 1s;\r\n        transform-origin: ${transformOrigin};\r\n        z-index: -1;\r\n      }\r\n      @keyframes scale-${start} {\r\n        to {\r\n          mask-size: 350vmax;\r\n        }\r\n      }\r\n    `,\r\n\t};\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [],
+    "interaction": "Call createAnimation with a variant and origin; the returned CSS drives a view transition when the theme toggles.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/theme-animations"
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flowing-nav",
+  "type": "registry:ui",
+  "title": "Flowing Nav",
+  "description": "Flowing Nav",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/flowing-nav.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/flowing-nav.tsx",
+      "content": "import React, { useRef, useEffect, useState } from 'react';\nimport { gsap } from 'gsap';\n\ninterface MenuItemData {\n\tlink: string;\n\ttext: string;\n\timage: string;\n}\n\ninterface FlowingMenuProps {\n\titems?: MenuItemData[];\n\tspeed?: number;\n\ttextColor?: string;\n\tbgColor?: string;\n\tmarqueeBgColor?: string;\n\tmarqueeTextColor?: string;\n\tborderColor?: string;\n}\n\ninterface MenuItemProps extends MenuItemData {\n\tspeed: number;\n\ttextColor: string;\n\tmarqueeBgColor: string;\n\tmarqueeTextColor: string;\n\tborderColor: string;\n\tisFirst: boolean;\n}\n\nconst FlowingMenu: React.FC<FlowingMenuProps> = ({\n\titems = [],\n\tspeed = 15,\n\ttextColor = '#fff',\n\tbgColor = '#060010',\n\tmarqueeBgColor = '#fff',\n\tmarqueeTextColor = '#060010',\n\tborderColor = '#fff'\n}) => {\n\treturn (\n\t\t<div className=\"w-full h-full overflow-hidden\" style={{ backgroundColor: bgColor }}>\n\t\t\t<nav className=\"flex flex-col h-full m-0 p-0\">\n\t\t\t\t{items.map((item, idx) => (\n\t\t\t\t\t<MenuItem\n\t\t\t\t\t\tkey={idx}\n\t\t\t\t\t\t{...item}\n\t\t\t\t\t\tspeed={speed}\n\t\t\t\t\t\ttextColor={textColor}\n\t\t\t\t\t\tmarqueeBgColor={marqueeBgColor}\n\t\t\t\t\t\tmarqueeTextColor={marqueeTextColor}\n\t\t\t\t\t\tborderColor={borderColor}\n\t\t\t\t\t\tisFirst={idx === 0}\n\t\t\t\t\t/>\n\t\t\t\t))}\n\t\t\t</nav>\n\t\t</div>\n\t);\n};\n\nconst MenuItem: React.FC<MenuItemProps> = ({\n\tlink,\n\ttext,\n\timage,\n\tspeed,\n\ttextColor,\n\tmarqueeBgColor,\n\tmarqueeTextColor,\n\tborderColor,\n\tisFirst\n}) => {\n\tconst itemRef = useRef<HTMLDivElement>(null);\n\tconst marqueeRef = useRef<HTMLDivElement>(null);\n\tconst marqueeInnerRef = useRef<HTMLDivElement>(null);\n\tconst animationRef = useRef<gsap.core.Tween | null>(null);\n\tconst [repetitions, setRepetitions] = useState(4);\n\n\tconst animationDefaults = { duration: 0.6, ease: 'expo' };\n\n\tconst findClosestEdge = (mouseX: number, mouseY: number, width: number, height: number): 'top' | 'bottom' => {\n\t\tconst topEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY, 2);\n\t\tconst bottomEdgeDist = Math.pow(mouseX - width / 2, 2) + Math.pow(mouseY - height, 2);\n\t\treturn topEdgeDist < bottomEdgeDist ? 'top' : 'bottom';\n\t};\n\n\tuseEffect(() => {\n\t\tconst calculateRepetitions = () => {\n\t\t\tif (!marqueeInnerRef.current) return;\n\t\t\tconst marqueeContent = marqueeInnerRef.current.querySelector('.marquee-part') as HTMLElement;\n\t\t\tif (!marqueeContent) return;\n\t\t\tconst contentWidth = marqueeContent.offsetWidth;\n\t\t\tconst viewportWidth = window.innerWidth;\n\t\t\tconst needed = Math.ceil(viewportWidth / contentWidth) + 2;\n\t\t\tsetRepetitions(Math.max(4, needed));\n\t\t};\n\n\t\tcalculateRepetitions();\n\t\twindow.addEventListener('resize', calculateRepetitions);\n\t\treturn () => window.removeEventListener('resize', calculateRepetitions);\n\t}, [text, image]);\n\n\tuseEffect(() => {\n\t\tconst setupMarquee = () => {\n\t\t\tif (!marqueeInnerRef.current) return;\n\t\t\tconst marqueeContent = marqueeInnerRef.current.querySelector('.marquee-part') as HTMLElement;\n\t\t\tif (!marqueeContent) return;\n\t\t\tconst contentWidth = marqueeContent.offsetWidth;\n\t\t\tif (contentWidth === 0) return;\n\n\t\t\tif (animationRef.current) {\n\t\t\t\tanimationRef.current.kill();\n\t\t\t}\n\n\t\t\tanimationRef.current = gsap.to(marqueeInnerRef.current, {\n\t\t\t\tx: -contentWidth,\n\t\t\t\tduration: speed,\n\t\t\t\tease: 'none',\n\t\t\t\trepeat: -1\n\t\t\t});\n\t\t};\n\n\t\tconst timer = setTimeout(setupMarquee, 50);\n\t\treturn () => {\n\t\t\tclearTimeout(timer);\n\t\t\tif (animationRef.current) {\n\t\t\t\tanimationRef.current.kill();\n\t\t\t}\n\t\t};\n\t}, [text, image, repetitions, speed]);\n\n\tconst handleMouseEnter = (ev: React.MouseEvent<HTMLAnchorElement>) => {\n\t\tif (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;\n\t\tconst rect = itemRef.current.getBoundingClientRect();\n\t\tconst edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height);\n\n\t\tgsap\n\t\t\t.timeline({ defaults: animationDefaults })\n\t\t\t.set(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)\n\t\t\t.set(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0)\n\t\t\t.to([marqueeRef.current, marqueeInnerRef.current], { y: '0%' }, 0);\n\t};\n\n\tconst handleMouseLeave = (ev: React.MouseEvent<HTMLAnchorElement>) => {\n\t\tif (!itemRef.current || !marqueeRef.current || !marqueeInnerRef.current) return;\n\t\tconst rect = itemRef.current.getBoundingClientRect();\n\t\tconst edge = findClosestEdge(ev.clientX - rect.left, ev.clientY - rect.top, rect.width, rect.height);\n\n\t\tgsap\n\t\t\t.timeline({ defaults: animationDefaults })\n\t\t\t.to(marqueeRef.current, { y: edge === 'top' ? '-101%' : '101%' }, 0)\n\t\t\t.to(marqueeInnerRef.current, { y: edge === 'top' ? '101%' : '-101%' }, 0);\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tclassName=\"flex-1 relative overflow-hidden text-center\"\n\t\t\tref={itemRef}\n\t\t\tstyle={{ borderTop: isFirst ? 'none' : `1px solid ${borderColor}` }}\n\t\t>\n\t\t\t<a\n\t\t\t\tclassName=\"flex items-center justify-center h-full relative cursor-pointer uppercase no-underline font-semibold text-[4vh]\"\n\t\t\t\thref={link}\n\t\t\t\tonMouseEnter={handleMouseEnter}\n\t\t\t\tonMouseLeave={handleMouseLeave}\n\t\t\t\tstyle={{ color: textColor }}\n\t\t\t>\n\t\t\t\t{text}\n\t\t\t</a>\n\t\t\t<div\n\t\t\t\tclassName=\"absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none translate-y-[101%]\"\n\t\t\t\tref={marqueeRef}\n\t\t\t\tstyle={{ backgroundColor: marqueeBgColor }}\n\t\t\t>\n\t\t\t\t<div className=\"h-full w-fit flex\" ref={marqueeInnerRef}>\n\t\t\t\t\t{[...Array(repetitions)].map((_, idx) => (\n\t\t\t\t\t\t<div className=\"marquee-part flex items-center shrink-0\" key={idx} style={{ color: marqueeTextColor }}>\n\t\t\t\t\t\t\t<span className=\"whitespace-nowrap uppercase font-normal text-[4vh] leading-none px-[1vw]\">{text}</span>\n\t\t\t\t\t\t\t<div\n\t\t\t\t\t\t\t\tclassName=\"w-[200px] h-[7vh] my-[2em] mx-[2vw] py-[1em] rounded-[50px] bg-cover bg-center\"\n\t\t\t\t\t\t\t\tstyle={{ backgroundImage: `url(${image})` }}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t))}\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\n\nexport default FlowingMenu;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "items",
+        "type": "MenuItemData[]",
+        "default": "[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "15",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textColor",
+        "type": "string",
+        "default": "'#fff'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "bgColor",
+        "type": "string",
+        "default": "'#060010'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "marqueeBgColor",
+        "type": "string",
+        "default": "'#fff'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "marqueeTextColor",
+        "type": "string",
+        "default": "'#060010'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderColor",
+        "type": "string",
+        "default": "'#fff'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/flowing-nav"
+  }
+}

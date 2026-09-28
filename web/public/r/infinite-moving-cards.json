@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "infinite-moving-cards",
+  "type": "registry:ui",
+  "title": "Infinite Moving Cards",
+  "description": "Infinite Moving Cards",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/infinite-moving-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/infinite-moving-cards.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// https://ui.aceternity.com/components/infinite-moving-cards\r\n\r\nexport const InfiniteMovingCards = ({\r\n\titems,\r\n\tdirection = \"left\",\r\n\tspeed = \"fast\",\r\n\tpauseOnHover = true,\r\n\tclassName,\r\n}: {\r\n\titems: {\r\n\t\tquote: string;\r\n\t\tname: string;\r\n\t\ttitle: string;\r\n\t}[];\r\n\tdirection?: \"left\" | \"right\";\r\n\tspeed?: \"fast\" | \"normal\" | \"slow\";\r\n\tpauseOnHover?: boolean;\r\n\tclassName?: string;\r\n}) => {\r\n\tconst containerRef = React.useRef<HTMLDivElement>(null);\r\n\tconst scrollerRef = React.useRef<HTMLUListElement>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\taddAnimation();\r\n\t}, []);\r\n\tconst [start, setStart] = useState(false);\r\n\tfunction addAnimation() {\r\n\t\tif (containerRef.current && scrollerRef.current) {\r\n\t\t\tconst scrollerContent = Array.from(scrollerRef.current.children);\r\n\r\n\t\t\tscrollerContent.forEach((item) => {\r\n\t\t\t\tconst duplicatedItem = item.cloneNode(true);\r\n\t\t\t\tif (scrollerRef.current) {\r\n\t\t\t\t\tscrollerRef.current.appendChild(duplicatedItem);\r\n\t\t\t\t}\r\n\t\t\t});\r\n\r\n\t\t\tgetDirection();\r\n\t\t\tgetSpeed();\r\n\t\t\tsetStart(true);\r\n\t\t}\r\n\t}\r\n\tconst getDirection = () => {\r\n\t\tif (containerRef.current) {\r\n\t\t\tif (direction === \"left\") {\r\n\t\t\t\tcontainerRef.current.style.setProperty(\r\n\t\t\t\t\t\"--animation-direction\",\r\n\t\t\t\t\t\"forwards\"\r\n\t\t\t\t);\r\n\t\t\t} else {\r\n\t\t\t\tcontainerRef.current.style.setProperty(\r\n\t\t\t\t\t\"--animation-direction\",\r\n\t\t\t\t\t\"reverse\"\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t}\r\n\t};\r\n\tconst getSpeed = () => {\r\n\t\tif (containerRef.current) {\r\n\t\t\tif (speed === \"fast\") {\r\n\t\t\t\tcontainerRef.current.style.setProperty(\r\n\t\t\t\t\t\"--animation-duration\",\r\n\t\t\t\t\t\"20s\"\r\n\t\t\t\t);\r\n\t\t\t} else if (speed === \"normal\") {\r\n\t\t\t\tcontainerRef.current.style.setProperty(\r\n\t\t\t\t\t\"--animation-duration\",\r\n\t\t\t\t\t\"40s\"\r\n\t\t\t\t);\r\n\t\t\t} else {\r\n\t\t\t\tcontainerRef.current.style.setProperty(\r\n\t\t\t\t\t\"--animation-duration\",\r\n\t\t\t\t\t\"80s\"\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t}\r\n\t};\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={containerRef}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"scroller relative z-20  max-w-7xl overflow-hidden  mask-[linear-gradient(to_right,transparent,white_20%,white_80%,transparent)]\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t<ul\r\n\t\t\t\tref={scrollerRef}\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\" flex min-w-full shrink-0 gap-4 py-4 w-max flex-nowrap\",\r\n\t\t\t\t\tstart && \"animate-scroll \",\r\n\t\t\t\t\tpauseOnHover && \"hover:paused\"\r\n\t\t\t\t)}\r\n\t\t\t>\r\n\t\t\t\t{items.map((item, idx) => (\r\n\t\t\t\t\t<li\r\n\t\t\t\t\t\tclassName=\"w-[350px] max-w-full relative rounded-2xl border border-b-0 shrink-0 border-slate-700 px-8 py-6 md:w-[450px]\"\r\n\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\tbackground:\r\n\t\t\t\t\t\t\t\t\"linear-gradient(180deg, var(--slate-800), var(--slate-900)\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\tkey={item.name}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<blockquote>\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t\t\t\t\tclassName=\"user-select-none -z-1 pointer-events-none absolute -left-0.5 -top-0.5 h-[calc(100%+4px)] w-[calc(100%+4px)]\"\r\n\t\t\t\t\t\t\t></div>\r\n\t\t\t\t\t\t\t<span className=\" relative z-20 text-sm leading-[1.6] text-foreground font-normal\">\r\n\t\t\t\t\t\t\t\t{item.quote}\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t<div className=\"relative z-20 mt-6 flex flex-row items-center\">\r\n\t\t\t\t\t\t\t\t<span className=\"flex flex-col gap-1\">\r\n\t\t\t\t\t\t\t\t\t<span className=\" text-sm leading-[1.6] text-foreground font-normal\">\r\n\t\t\t\t\t\t\t\t\t\t{item.name}\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t\t<span className=\" text-sm leading-[1.6] text-foreground font-normal\">\r\n\t\t\t\t\t\t\t\t\t\t{item.title}\r\n\t\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</blockquote>\r\n\t\t\t\t\t</li>\r\n\t\t\t\t))}\r\n\t\t\t</ul>\r\n\t\t</div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/infinite-moving-cards",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ quote: string; name: string; title: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "direction",
+        "type": "\"left\" | \"right\"",
+        "default": "\"left\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "speed",
+        "type": "\"fast\" | \"normal\" | \"slow\"",
+        "default": "\"fast\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pauseOnHover",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/infinite-moving-cards"
+  }
+}

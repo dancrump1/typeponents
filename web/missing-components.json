@@ -1,0 +1,172 @@
+[
+  {
+    "importedBy": "registry/open-source/3dNavBar.tsx",
+    "importPath": "../utils/debounce",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/AccordionSlices.tsx",
+    "importPath": "@/registry/utils/useWindowSize",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Attractor.tsx",
+    "importPath": "@/registry/utils/calculatePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Attractor.tsx",
+    "importPath": "@/registry/utils/parsePathToVertices",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Attractor.tsx",
+    "importPath": "@/registry/utils/useMousePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/BookTestimonials.tsx",
+    "importPath": "@/registry/utils/useOrientation",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorCarousel.tsx",
+    "importPath": "@/public/itjustworks.jpg",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorCarousel.tsx",
+    "importPath": "@/public/itjustworks.jpg",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorCarousel.tsx",
+    "importPath": "@/public/itjustworks.jpg",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorCarousel.tsx",
+    "importPath": "@/public/itjustworks.jpg",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorCarousel.tsx",
+    "importPath": "@/public/itjustworks.jpg",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/CursorMask.tsx",
+    "importPath": "@/registry/utils/elasticLinePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/DynamicTheme.tsx",
+    "importPath": "@/hooks/useLenis",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ElasticLine.tsx",
+    "importPath": "@/registry/utils/useDimensions",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ElasticLine.tsx",
+    "importPath": "@/registry/utils/useElasticeLineEvents",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ExampleReplication.tsx",
+    "importPath": "./About",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Improvements.tsx",
+    "importPath": "./SectionHeader.tsx",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Introduction.tsx",
+    "importPath": "./SectionHeader.tsx",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Globe.tsx",
+    "importPath": "@/registry/utils/globe.json",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Gravity.tsx",
+    "importPath": "@/registry/utils/calculatePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Gravity.tsx",
+    "importPath": "@/registry/utils/parsePathToVertices",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/HorizontalScrollGallery.tsx",
+    "importPath": "@/hooks/useLenis",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ImageRipple.tsx",
+    "importPath": "@/registry/utils/rippleDimensions",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ImageRipple.tsx",
+    "importPath": "@/registry/utils/useMouse",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ImageRipple.tsx",
+    "importPath": "@/registry/utils/useMousePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Improvements.tsx",
+    "importPath": "./SectionHeader.tsx",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Introduction.tsx",
+    "importPath": "./SectionHeader.tsx",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Lamp.tsx",
+    "importPath": "@/lib/utils.ts",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/Lamp.tsx",
+    "importPath": "./Sparkles.tsx",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/LinearDialog.tsx",
+    "importPath": "@/hooks/useClickOutside",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ParallaxFloating.tsx",
+    "importPath": "@/registry/utils/useMousePosition",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ResizeNavbar.tsx",
+    "importPath": "./atoms/mode-toggle",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/ScreenSaver.tsx",
+    "importPath": "@/registry/utils/useDimensions",
+    "reason": "Import not resolvable"
+  },
+  {
+    "importedBy": "registry/open-source/TextProximity.tsx",
+    "importPath": "@/registry/utils/useMousePosition",
+    "reason": "Import not resolvable"
+  }
+]

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-302",
+  "type": "registry:component",
+  "title": "Comp 302",
+  "description": "Comp 302",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-302.tsx",
+      "content": "import { ArrowRightIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"dark bg-muted text-foreground px-4 py-3\">\r\n      <p className=\"flex justify-center text-sm\">\r\n        <a href=\"#\" className=\"group\">\r\n          <span className=\"me-1 text-base leading-none\">✨</span>\r\n          Introducing transactional and marketing emails\r\n          <ArrowRightIcon\r\n            className=\"ms-2 -mt-0.5 inline-flex opacity-60 transition-transform group-hover:translate-x-0.5\"\r\n            size={16}\r\n            aria-hidden=\"true\"\r\n          />\r\n        </a>\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

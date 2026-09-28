@@ -1,0 +1,51 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "focus-cards",
+  "type": "registry:ui",
+  "title": "Focus Cards",
+  "description": "Focus Cards",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/focus-cards.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/focus-cards.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\n// https://ui.aceternity.com/components/focus-cards\r\n\r\nexport const Card = React.memo(\r\n\t({\r\n\t\tcard,\r\n\t\tindex,\r\n\t\thovered,\r\n\t\tsetHovered,\r\n\t}: {\r\n\t\tcard: any;\r\n\t\tindex: number;\r\n\t\thovered: number | null;\r\n\t\tsetHovered: React.Dispatch<React.SetStateAction<number | null>>;\r\n\t}) => (\r\n\t\t<div\r\n\t\t\tonMouseEnter={() => setHovered(index)}\r\n\t\t\tonMouseLeave={() => setHovered(null)}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"rounded-lg relative bg-background dark:bg-background overflow-hidden h-60 md:h-96 w-full transition-transform duration-300 ease-out\",\r\n\t\t\t\thovered !== null && hovered !== index && \"blur-xs scale-[0.98]\"\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t<Image\r\n\t\t\t\tsrc={card.src}\r\n\t\t\t\talt={card.title}\r\n\t\t\t\tfill\r\n\t\t\t\tclassName=\"object-cover absolute inset-0\"\r\n\t\t\t/>\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"absolute inset-0 bg-background/50 flex items-end py-8 px-4 transition-opacity duration-300\",\r\n\t\t\t\t\thovered === index ? \"opacity-100\" : \"opacity-0\"\r\n\t\t\t\t)}\r\n\t\t\t>\r\n\t\t\t\t<div className=\"text-xl md:text-2xl font-medium bg-clip-text text-transparent bg-linear-to-b from-background to-background\">\r\n\t\t\t\t\t{card.title}\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t)\r\n);\r\n\r\nCard.displayName = \"Card\";\r\n\r\ntype Card = {\r\n\ttitle: string;\r\n\tsrc: string;\r\n};\r\n\r\nconst cardsExamples = [\r\n\t{\r\n\t\ttitle: \"Forest Adventure\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"Valley of life\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"Sala behta hi jayega\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"Camping is for pros\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"The road not taken\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n\t{\r\n\t\ttitle: \"The First Rule\",\r\n\t\tsrc: \"/itjustworks.jpg\",\r\n\t},\r\n];\r\n\r\nexport function FocusCards({ cards = cardsExamples }: { cards: Card[] }) {\r\n\tconst [hovered, setHovered] = useState<number | null>(null);\r\n\r\n\treturn (\r\n\t\t<div className=\"grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full\">\r\n\t\t\t{cards.map((card, index) => (\r\n\t\t\t\t<Card\r\n\t\t\t\t\tkey={card.title}\r\n\t\t\t\t\tcard={card}\r\n\t\t\t\t\tindex={index}\r\n\t\t\t\t\thovered={hovered}\r\n\t\t\t\t\tsetHovered={setHovered}\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/focus-cards",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "cards",
+        "type": "Card[]",
+        "default": "cardsExamples",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/focus-cards"
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spiral-gallery",
+  "type": "registry:ui",
+  "title": "Spiral Gallery",
+  "description": "Spiral Gallery",
+  "dependencies": [
+    "@react-three/drei",
+    "@react-three/fiber",
+    "motion",
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/spiral-gallery.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/spiral-gallery.tsx",
+      "content": "\"use client\"\n\nimport { shaderMaterial, useFBO, useTexture } from \"@react-three/drei\"\nimport { createPortal, extend, type ThreeElement, useFrame, useThree } from \"@react-three/fiber\"\nimport type { Easing } from \"motion\"\nimport { animate, useMotionValue, useSpring, wrap } from \"motion/react\"\nimport {\n    type ComponentRef,\n    type ReactNode,\n    type RefObject,\n    useCallback,\n    useEffect,\n    useLayoutEffect,\n    useMemo,\n    useRef,\n    useState,\n} from \"react\"\nimport * as THREE from \"three\"\nimport { MathUtils } from \"three\"\nimport { WebglScene, WebglSceneProps } from \"@/lib/webgl-scene\"\n\n// Credit:\n// https://www.atelier-ui.com/en/docs/components/background/spiral-gallery\n\nconst WHEEL_STEP = 0.0025 as const\nconst DRAG_STEP = 0.005 as const\nconst DRAG_X_MULTIPLIER = 0.3 as const\nconst DRAG_THRESHOLD = 6 as const\nconst MAX_LAG = 1.5 as const\nconst REFERENCE_ASPECT = 16 / 9\nconst REVEAL_SCALE = 0.35 as const\nconst REVEAL_DELAY = 0.25 as const\nconst REVEAL_EASING = [0.4, 0.2, 0.15, 1] as Easing\nconst FOCUS_EASING = [0.7, 0.03, 0.26, 0.99] as Easing\nconst SLIDE_DURATION_RATIO = 0.4 as const\nconst FOCUS_FADE_KEYFRAMES = [0, 0.6, 1]\nconst FOCUS_GAP_RATIO = 0.06 as const\nconst ROW_TILE_ASPECT = 0.8 as const\nconst FOCUS_LENS_FLARE = 3 as const\n\nconst DEFAULT_PROPS = {\n    radius: 4.5,\n    tileHeight: 2.25,\n    tileAspect: 1.5,\n    tileCount: 16,\n    verticalSpacing: 0.75,\n    turnAngle: 46,\n    tileRotation: 1,\n    cornerRadius: 0,\n    curve: 0.09,\n    autoScroll: 0.1,\n    easing: 0.1,\n    input: \"wheel\" as SpiralInput,\n    inputSpeed: 1.1,\n    drag: true,\n    scrollSpread: 0.5,\n    scrollGrowth: 0.65,\n    wave: 0.8,\n    lensBlur: 0.24,\n    reveal: true,\n    revealDuration: 2,\n    focusDuration: 1.6,\n    focusScale: 0.7,\n    autoScale: true,\n    scale: 1.3,\n}\n\ntype SpiralInput = \"wheel\" | \"scroll\" | \"none\"\n\ntype Bounds = {\n    width: number\n    height: number\n}\n\ntype RowMetrics = {\n    openAspect: number\n    openWidth: number\n    fitScale: number\n    flatSpacing: number\n}\n\ntype FrameState = {\n    position: number\n    tension: number\n    presence: number\n    spiral: number\n    focus: number\n    time: number\n}\n\nexport type SpiralGalleryItem = {\n    src: string\n    alt: string\n}\n\nexport type SpiralGalleryProps = {\n    items: SpiralGalleryItem[]\n    className?: string\n} & Partial<typeof DEFAULT_PROPS> &\n    Pick<WebglSceneProps, \"mode\" | \"priority\" | \"zIndex\" | \"transparent\" | \"autoReflow\">\n\ntype SpiralSceneProps = {\n    sources: string[]\n    surface: RefObject<HTMLElement | null>\n    activeIndex: number | null\n    onSelect: (index: number | null) => void\n} & typeof DEFAULT_PROPS\n\ntype PlaneMesh = THREE.Mesh<THREE.PlaneGeometry, InstanceType<typeof SpiralTileMaterial>>\n\ndeclare module \"@react-three/fiber\" {\n    interface ThreeElements {\n        spiralTileMaterial: ThreeElement<typeof SpiralTileMaterial>\n        spiralLensBlurMaterial: ThreeElement<typeof SpiralLensBlurMaterial>\n    }\n}\n\nconst SpiralTileMaterial = shaderMaterial(\n    {\n        uMap: new THREE.Texture(),\n        uTileSize: new THREE.Vector2(1, 1),\n        uUvScale: new THREE.Vector2(1, 1),\n        uUvOffset: new THREE.Vector2(0, 0),\n        uRadius: 0,\n        uCurve: 0,\n        uOpacity: 1,\n        uWave: 0,\n        uTime: 0,\n    },\n    /* glsl */ `\n        uniform float uCurve;\n        uniform float uWave;\n        uniform float uTime;\n        varying vec2 vUv;\n        void main() {\n            vUv = uv;\n            vec3 transformed = position;\n            transformed.z -= uCurve * position.x * position.x;\n            transformed.z -= (0.5 + 0.5 * cos(position.x * 1.1 + uTime * 1.5)) * uWave;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);\n        }\n    `,\n    /* glsl */ `\n        uniform sampler2D uMap;\n        uniform vec2 uTileSize;\n        uniform vec2 uUvScale;\n        uniform vec2 uUvOffset;\n        uniform float uRadius;\n        uniform float uOpacity;\n        varying vec2 vUv;\n\n        float sdRoundBox(vec2 point, vec2 halfSize, float radius) {\n            vec2 corner = abs(point) - halfSize + radius;\n            return min(max(corner.x, corner.y), 0.0) + length(max(corner, 0.0)) - radius;\n        }\n\n        void main() {\n            vec2 baseUv = uUvOffset + vUv * uUvScale;\n            vec4 texel = texture2D(uMap, baseUv);\n\n            vec2 point = (vUv - 0.5) * uTileSize;\n            vec2 halfSize = uTileSize * 0.5;\n            float radius = min(uRadius, min(halfSize.x, halfSize.y));\n            float boxDistance = sdRoundBox(point, halfSize, radius);\n            float boxAntialias = fwidth(boxDistance);\n            float mask = smoothstep(boxAntialias, -boxAntialias, boxDistance);\n\n            gl_FragColor = vec4(texel.rgb, texel.a * mask * uOpacity);\n        }\n    `,\n)\n\nconst SpiralLensBlurMaterial = shaderMaterial(\n    {\n        uScene: new THREE.Texture(),\n        uStrength: 0,\n        uRadius: 0.18,\n        uSmoothness: 0.5,\n        uDispersion: 0.35,\n    },\n    /* glsl */ `\n        varying vec2 vUv;\n        void main() {\n            vUv = uv;\n            gl_Position = vec4(position.xy, 0.0, 1.0);\n        }\n    `,\n    /* glsl */ `\n        uniform sampler2D uScene;\n        uniform float uStrength;\n        uniform float uRadius;\n        uniform float uSmoothness;\n        uniform float uDispersion;\n\n        varying vec2 vUv;\n\n        const int SAMPLES = 24;\n\n        void main() {\n            vec2 toCenter = vUv - 0.5;\n            float distanceFromCenter = length(toCenter);\n\n            float mask = smoothstep(uRadius, uRadius + uSmoothness, distanceFromCenter);\n            float amount = mask * mask * uStrength;\n\n            if (amount <= 0.0) {\n                gl_FragColor = texture2D(uScene, vUv);\n                return;\n            }\n\n            vec3 color = vec3(0.0);\n            float alpha = 0.0;\n            float total = 0.0;\n\n            for (int sampleIndex = 0; sampleIndex < SAMPLES; sampleIndex++) {\n                float progress = float(sampleIndex) / float(SAMPLES - 1);\n                float weight = 1.0 - progress * 0.6;\n\n                float scale = 1.0 - amount * progress;\n                float spread = uDispersion * amount * progress;\n\n                vec4 mid = texture2D(uScene, 0.5 + toCenter * scale);\n                color.r += texture2D(uScene, 0.5 + toCenter * (scale + spread)).r * weight;\n                color.g += mid.g * weight;\n                color.b += texture2D(uScene, 0.5 + toCenter * (scale - spread)).b * weight;\n                alpha += mid.a * weight;\n\n                total += weight;\n            }\n\n            gl_FragColor = vec4(color / total, alpha / total);\n        }\n    `,\n)\n\nextend({ SpiralTileMaterial, SpiralLensBlurMaterial })\n\nfunction useSurfaceBounds(surface: RefObject<HTMLElement | null>) {\n    const bounds = useRef<Bounds>({ width: 0, height: 0 })\n\n    useLayoutEffect(() => {\n        const element = surface.current\n        if (!element) return\n\n        const measure = () => {\n            const rect = element.getBoundingClientRect()\n            bounds.current.width = rect.width\n            bounds.current.height = rect.height\n        }\n\n        measure()\n        const observer = new ResizeObserver(measure)\n        observer.observe(element)\n        return () => observer.disconnect()\n    }, [surface])\n\n    return bounds\n}\n\ntype PostProcessingProps = {\n    bounds: RefObject<Bounds>\n    strength: RefObject<number>\n    children: ReactNode\n}\n\nfunction PostProcessing({ bounds, strength, children }: PostProcessingProps) {\n    const gl = useThree((state) => state.gl)\n    const camera = useThree((state) => state.camera)\n    const content = useMemo(() => new THREE.Scene(), [])\n    const fbo = useFBO(1, 1, { samples: 4 })\n    const blurRef = useRef<InstanceType<typeof SpiralLensBlurMaterial>>(null)\n\n    useFrame(() => {\n        if (blurRef.current) {\n            blurRef.current.uStrength = strength.current\n        }\n\n        const { width, height } = bounds.current\n        if (width === 0 || height === 0) return\n\n        const pixelRatio = gl.getPixelRatio()\n        const fboWidth = Math.max(1, Math.ceil(width * pixelRatio))\n        const fboHeight = Math.max(1, Math.ceil(height * pixelRatio))\n        if (fbo.width !== fboWidth || fbo.height !== fboHeight) {\n            fbo.setSize(fboWidth, fboHeight)\n        }\n\n        const previousClearAlpha = gl.getClearAlpha()\n        gl.setRenderTarget(fbo)\n        gl.setClearAlpha(0)\n        gl.clear()\n        gl.render(content, camera)\n        gl.setRenderTarget(null)\n        gl.setClearAlpha(previousClearAlpha)\n    }, -1)\n\n    return (\n        <>\n            {createPortal(children, content)}\n\n            <mesh frustumCulled={false}>\n                <planeGeometry args={[2, 2]} />\n                <spiralLensBlurMaterial\n                    ref={blurRef}\n                    key={SpiralLensBlurMaterial.key}\n                    uScene={fbo.texture}\n                    uStrength={0}\n                    transparent\n                    premultipliedAlpha\n                    depthTest={false}\n                    depthWrite={false}\n                />\n            </mesh>\n        </>\n    )\n}\n\nfunction surfaceScale(bounds: Bounds, autoScale: boolean) {\n    if (!autoScale || bounds.height === 0) return 1\n    return Math.min(1, bounds.width / bounds.height / REFERENCE_ASPECT)\n}\n\nfunction rowZoom(camera: THREE.PerspectiveCamera, focusScale: number, tileHeight: number) {\n    const visibleHeight = 2 * Math.tan(MathUtils.degToRad(camera.fov) / 2) * camera.position.z\n    const visibleWidth = visibleHeight * camera.aspect\n\n    return (Math.min(visibleHeight, visibleWidth / ROW_TILE_ASPECT) * focusScale) / tileHeight\n}\n\nfunction coverCrop(material: PlaneMesh[\"material\"], imageAspect: number, tileAspect: number) {\n    let cropX = 1\n    let cropY = imageAspect / tileAspect\n\n    if (imageAspect > tileAspect) {\n        cropX = tileAspect / imageAspect\n        cropY = 1\n    }\n\n    material.uUvScale.set(cropX, cropY)\n    material.uUvOffset.set((1 - cropX) / 2, (1 - cropY) / 2)\n}\n\nfunction SpiralScene({\n    sources,\n    surface,\n    activeIndex,\n    onSelect,\n    radius,\n    tileHeight,\n    tileAspect,\n    tileCount,\n    verticalSpacing,\n    turnAngle,\n    tileRotation,\n    cornerRadius,\n    curve,\n    autoScroll,\n    easing,\n    input,\n    inputSpeed,\n    drag,\n    scrollSpread,\n    scrollGrowth,\n    wave,\n    lensBlur,\n    reveal,\n    revealDuration,\n    focusDuration,\n    focusScale,\n    autoScale,\n    scale,\n}: SpiralSceneProps) {\n    const textures = useTexture(sources)\n    const bounds = useSurfaceBounds(surface)\n    const camera = useThree((state) => state.camera)\n    const fitRef = useRef<THREE.Group>(null)\n    const groupRef = useRef<THREE.Group>(null)\n    const meshRefs = useRef<(PlaneMesh | null)[]>([])\n    const target = useMotionValue(0)\n    const scroll = useSpring(target, { visualDuration: easing, bounce: 0 })\n    const progress = useRef({ presence: reveal ? 0 : 1, spiral: reveal ? 0 : 1, focus: 0 })\n    const pointer = useRef({ dragging: false, moved: false, hovering: false })\n    const animating = useRef(reveal)\n    const tensionRef = useRef(0)\n    const blurRef = useRef(lensBlur)\n    const lastScrollY = useRef<number | null>(null)\n    const tileCountRef = useRef(tileCount)\n    tileCountRef.current = tileCount\n\n    const applyCursor = useCallback(() => {\n        const element = surface.current\n        if (!element) return\n\n        let cursor = \"\"\n\n        if (drag && activeIndex === null) {\n            cursor = \"grab\"\n        }\n\n        if (pointer.current.hovering) {\n            cursor = \"pointer\"\n        }\n\n        if (pointer.current.dragging) {\n            cursor = \"grabbing\"\n        }\n\n        element.style.cursor = cursor\n    }, [surface, drag, activeIndex])\n\n    const select = useCallback(\n        (index: number | null) => {\n            if (pointer.current.moved || animating.current) return\n            onSelect(index === activeIndex ? null : index)\n        },\n        [onSelect, activeIndex],\n    )\n\n    useEffect(() => {\n        applyCursor()\n    }, [applyCursor])\n\n    const width = tileHeight * tileAspect\n    const angleStep = MathUtils.degToRad(turnAngle)\n    const half = tileCount / 2\n    const bandSpacing = radius * angleStep\n\n    const tiles = useMemo(() => {\n        return Array.from({ length: tileCount }, (_, index) => {\n            const texture = textures[index % textures.length]\n            const image = texture.image as HTMLImageElement\n\n            return {\n                texture,\n                imageAspect: image.width / image.height,\n                uvScale: new THREE.Vector2(1, 1),\n                uvOffset: new THREE.Vector2(0, 0),\n            }\n        })\n    }, [textures, tileCount])\n\n    useEffect(() => {\n        const element = surface.current\n        if (!element || input !== \"wheel\" || activeIndex !== null) return\n\n        const onWheel = (event: WheelEvent) => {\n            event.preventDefault()\n            target.set(target.get() + event.deltaY * WHEEL_STEP * inputSpeed)\n        }\n        element.addEventListener(\"wheel\", onWheel, { passive: false })\n        return () => element.removeEventListener(\"wheel\", onWheel)\n    }, [surface, target, input, inputSpeed, activeIndex])\n\n    useEffect(() => {\n        const element = surface.current\n        if (!element || !drag || activeIndex !== null) return\n\n        const origin = { x: 0, y: 0, target: 0 }\n\n        const beginDrag = (event: PointerEvent) => {\n            pointer.current.dragging = true\n            pointer.current.moved = false\n            origin.x = event.clientX\n            origin.y = event.clientY\n            origin.target = target.get()\n            applyCursor()\n        }\n\n        const moveDrag = (event: PointerEvent) => {\n            if (!pointer.current.dragging) return\n\n            const sideways = event.clientX - origin.x\n            const vertical = event.clientY - origin.y\n\n            if (Math.abs(sideways) > DRAG_THRESHOLD || Math.abs(vertical) > DRAG_THRESHOLD) {\n                pointer.current.moved = true\n            }\n\n            target.set(\n                origin.target + (vertical - sideways * DRAG_X_MULTIPLIER) * DRAG_STEP * inputSpeed,\n            )\n        }\n\n        const endDrag = () => {\n            pointer.current.dragging = false\n            applyCursor()\n        }\n\n        element.addEventListener(\"pointerdown\", beginDrag)\n        window.addEventListener(\"pointermove\", moveDrag)\n        window.addEventListener(\"pointerup\", endDrag)\n        window.addEventListener(\"pointercancel\", endDrag)\n\n        return () => {\n            endDrag()\n            element.removeEventListener(\"pointerdown\", beginDrag)\n            window.removeEventListener(\"pointermove\", moveDrag)\n            window.removeEventListener(\"pointerup\", endDrag)\n            window.removeEventListener(\"pointercancel\", endDrag)\n        }\n    }, [surface, target, drag, inputSpeed, applyCursor, activeIndex])\n\n    useEffect(() => {\n        const onKeyDown = (event: KeyboardEvent) => {\n            if (event.key === \"Escape\") select(null)\n        }\n\n        window.addEventListener(\"keydown\", onKeyDown)\n        return () => window.removeEventListener(\"keydown\", onKeyDown)\n    }, [select])\n\n    useEffect(() => {\n        function revealAnimation() {\n            const group = groupRef.current\n            if (!group) return\n\n            if (!reveal) {\n                group.scale.setScalar(1)\n                progress.current.presence = 1\n                progress.current.spiral = 1\n                animating.current = false\n                return\n            }\n\n            group.scale.setScalar(REVEAL_SCALE)\n            progress.current.presence = 0\n            progress.current.spiral = 0\n            animating.current = true\n\n            const settings = {\n                duration: revealDuration,\n                ease: REVEAL_EASING,\n                delay: revealDuration * REVEAL_DELAY,\n                at: 0,\n            }\n\n            const controls = animate([\n                [group.scale, { x: 1, y: 1, z: 1 }, settings],\n                [progress.current, { presence: 1, spiral: 1 }, settings],\n                [target, target.get() + tileCountRef.current, settings],\n            ])\n\n            controls.then(() => {\n                animating.current = false\n            })\n\n            return () => {\n                controls.stop()\n                animating.current = false\n            }\n        }\n\n        return revealAnimation()\n    }, [reveal, revealDuration, target])\n\n    useEffect(() => {\n        const unfolded = progress.current.focus === 1\n        if (activeIndex === null && !unfolded) return\n\n        function focusAnimation() {\n            const from = target.get()\n            const count = tileCountRef.current\n\n            if (activeIndex !== null && unfolded) {\n                const settings = {\n                    duration: focusDuration * SLIDE_DURATION_RATIO,\n                    ease: FOCUS_EASING,\n                }\n                const travel = wrap(0, count, activeIndex - from + count / 2) - count / 2\n                const controls = animate(target, from + travel, settings)\n\n                return () => controls.stop()\n            }\n\n            const settings = { duration: focusDuration, ease: FOCUS_EASING, at: 0 }\n            const opening = activeIndex !== null\n            let travel = count\n\n            if (opening) {\n                travel += wrap(0, count, activeIndex - from)\n            }\n\n            const controls = animate([\n                [progress.current, { spiral: opening ? 0 : 1, focus: opening ? 1 : 0 }, settings],\n                [\n                    progress.current,\n                    { presence: [1, 0, 1] },\n                    { ...settings, times: FOCUS_FADE_KEYFRAMES },\n                ],\n                [target, from + travel, settings],\n            ])\n\n            animating.current = true\n            controls.then(() => {\n                animating.current = false\n            })\n\n            return () => {\n                controls.stop()\n                animating.current = false\n            }\n        }\n\n        return focusAnimation()\n    }, [activeIndex, focusDuration, target])\n\n    const advanceScroll = useCallback(\n        (step: number) => {\n            const scrollY = window.scrollY\n            const scrolled = scrollY - (lastScrollY.current ?? scrollY)\n            lastScrollY.current = scrollY\n\n            if (activeIndex !== null) return\n\n            if (input === \"scroll\") {\n                target.set(target.get() + scrolled * WHEEL_STEP * inputSpeed)\n            }\n\n            if (!pointer.current.dragging) {\n                target.set(target.get() + autoScroll * step)\n            }\n        },\n        [activeIndex, input, inputSpeed, autoScroll, target],\n    )\n\n    const measureRow = useCallback(\n        (focus: number): RowMetrics => {\n            const openAspect = MathUtils.lerp(tileAspect, ROW_TILE_ASPECT, focus)\n            const openWidth = tileHeight * openAspect\n            const fitScale = surfaceScale(bounds.current, autoScale) * scale\n\n            if (focus === 0 || !(camera instanceof THREE.PerspectiveCamera)) {\n                return { openAspect, openWidth, fitScale, flatSpacing: bandSpacing }\n            }\n\n            return {\n                openAspect,\n                openWidth,\n                fitScale: MathUtils.lerp(fitScale, rowZoom(camera, focusScale, tileHeight), focus),\n                flatSpacing: MathUtils.lerp(bandSpacing, openWidth * (1 + FOCUS_GAP_RATIO), focus),\n            }\n        },\n        [tileAspect, tileHeight, autoScale, scale, camera, focusScale, bandSpacing, bounds],\n    )\n\n    const layoutTiles = useCallback(\n        (row: RowMetrics, frame: FrameState) => {\n            const { position, tension, presence, spiral, focus, time } = frame\n            const growth = 1 + tension * scrollGrowth\n            const pitch = angleStep * (1 + tension * scrollSpread)\n            const grownRadius = radius * growth\n\n            meshRefs.current.forEach((mesh, index) => {\n                if (!mesh) return\n\n                const offset = wrap(0, tileCount, index - position + half) - half\n                const angle = offset * pitch\n                const distance = Math.abs(offset)\n\n                const edgeFade = 1 - MathUtils.smoothstep(distance, half * 0.46, half * 0.75)\n                const rowFade = 1 - MathUtils.smoothstep(distance, 1, 2)\n                const opacity = MathUtils.lerp(edgeFade, rowFade, focus) * presence\n\n                mesh.position.set(\n                    MathUtils.lerp(offset * row.flatSpacing, Math.sin(angle) * grownRadius, spiral),\n                    offset * verticalSpacing * growth * spiral,\n                    (Math.cos(angle) * grownRadius - radius) * spiral,\n                )\n                mesh.rotation.y = angle * tileRotation * spiral\n                mesh.scale.x = row.openAspect / tileAspect\n                mesh.renderOrder = Math.round(mesh.position.z * 100)\n                mesh.visible = opacity > 0.002\n                mesh.material.depthWrite = opacity > 0.99\n\n                coverCrop(mesh.material, tiles[index].imageAspect, row.openAspect)\n                mesh.material.uTileSize.set(row.openWidth, tileHeight)\n                mesh.material.uOpacity = opacity\n                mesh.material.uCurve = curve * spiral\n                mesh.material.uWave = tension * wave * (1 - focus)\n                mesh.material.uTime = time\n            })\n        },\n        [\n            tiles,\n            tileCount,\n            half,\n            angleStep,\n            radius,\n            scrollGrowth,\n            scrollSpread,\n            verticalSpacing,\n            tileRotation,\n            tileAspect,\n            tileHeight,\n            curve,\n            wave,\n        ],\n    )\n\n    useFrame((state, delta) => {\n        const fit = fitRef.current\n        if (!fit) return\n\n        const step = Math.min(delta, 0.05)\n        const { presence, spiral, focus } = progress.current\n\n        advanceScroll(step)\n\n        const row = measureRow(focus)\n        fit.scale.setScalar(row.fitScale)\n        blurRef.current = lensBlur * (1 - focus + Math.sin(focus * Math.PI) * FOCUS_LENS_FLARE)\n\n        const position = MathUtils.lerp(scroll.get(), target.get(), focus)\n        const lag = Math.min(Math.abs(target.get() - position) / MAX_LAG, 1)\n        tensionRef.current = MathUtils.damp(tensionRef.current, lag, 8, step)\n\n        layoutTiles(row, {\n            position,\n            tension: tensionRef.current,\n            presence,\n            spiral,\n            focus,\n            time: state.clock.elapsedTime,\n        })\n    })\n\n    return (\n        <PostProcessing bounds={bounds} strength={blurRef}>\n            <group ref={fitRef}>\n                <group\n                    ref={groupRef}\n                    onPointerMissed={() => select(null)}\n                    onPointerOver={() => {\n                        pointer.current.hovering = true\n                        applyCursor()\n                    }}\n                    onPointerOut={() => {\n                        pointer.current.hovering = false\n                        applyCursor()\n                    }}\n                >\n                    {tiles.map((tile, index) => (\n                        <mesh\n                            key={index}\n                            ref={(mesh) => {\n                                meshRefs.current[index] = mesh as PlaneMesh | null\n                            }}\n                            onClick={(event) => {\n                                event.stopPropagation()\n                                select(index)\n                            }}\n                        >\n                            <planeGeometry args={[width, tileHeight, 24, 2]} />\n                            <spiralTileMaterial\n                                key={SpiralTileMaterial.key}\n                                uMap={tile.texture}\n                                uTileSize={new THREE.Vector2(width, tileHeight)}\n                                uUvScale={tile.uvScale}\n                                uUvOffset={tile.uvOffset}\n                                uRadius={cornerRadius}\n                                uOpacity={0}\n                                side={THREE.DoubleSide}\n                                transparent\n                                depthWrite={false}\n                            />\n                        </mesh>\n                    ))}\n                </group>\n            </group>\n        </PostProcessing>\n    )\n}\n\nexport function SpiralGallery({\n    items,\n    className,\n    mode,\n    priority,\n    zIndex,\n    transparent,\n    autoReflow,\n    ...rest\n}: SpiralGalleryProps) {\n    const surface = useRef<ComponentRef<\"div\">>(null)\n    const sceneProps = { ...DEFAULT_PROPS, ...rest }\n    const [activeIndex, setActiveIndex] = useState<number | null>(null)\n    let touch = \"\"\n\n    if (sceneProps.input === \"wheel\" || sceneProps.drag) {\n        touch = \"touch-none\"\n    }\n\n    return (\n        <div ref={surface} className={`${touch} select-none ${className ?? \"\"}`}>\n            <ul className=\"sr-only\">\n                {items.map((image, index) => (\n                    <li key={image.src}>\n                        <button\n                            type=\"button\"\n                            aria-current={activeIndex === index}\n                            onClick={() => setActiveIndex(index)}\n                        >\n                            <img src={image.src} alt={image.alt} />\n                        </button>\n                    </li>\n                ))}\n            </ul>\n\n            {items.length > 0 && (\n                <WebglScene\n                    track={surface}\n                    mode={mode}\n                    priority={priority}\n                    zIndex={zIndex}\n                    transparent={transparent}\n                    autoReflow={autoReflow}\n                >\n                    <SpiralScene\n                        {...sceneProps}\n                        surface={surface}\n                        sources={items.map((image) => image.src)}\n                        activeIndex={activeIndex}\n                        onSelect={setActiveIndex}\n                    />\n                </WebglScene>\n            )}\n        </div>\n    )\n}\n"
+    },
+    {
+      "path": "lib/webgl-portal.tsx",
+      "type": "registry:lib",
+      "target": "lib/webgl-portal.tsx",
+      "content": "\"use client\"\n\nimport {\n    type ReactNode,\n    Suspense,\n    useEffect,\n    useId,\n    useLayoutEffect,\n    useSyncExternalStore,\n} from \"react\"\n\nconst useIsoLayoutEffect = typeof window !== \"undefined\" ? useLayoutEffect : useEffect\n\n// Minimal teleport: <In> registers children in an external store,\n// <Out> renders them — bridges across the Canvas React root the same\nfunction WebglTeleport() {\n    const items = new Map<string, ReactNode>()\n    const listeners = new Set<() => void>()\n    let snapshot: [string, ReactNode][] = []\n\n    const emit = () => {\n        snapshot = Array.from(items.entries())\n        for (const listener of listeners) {\n            listener()\n        }\n    }\n\n    const subscribe = (listener: () => void) => {\n        listeners.add(listener)\n        return () => {\n            listeners.delete(listener)\n        }\n    }\n    const getSnapshot = () => snapshot\n\n    function useItems() {\n        return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)\n    }\n\n    return {\n        In({ children }: { children: ReactNode }) {\n            const id = useId()\n\n            useIsoLayoutEffect(() => {\n                items.set(id, children)\n                emit()\n                return () => {\n                    items.delete(id)\n                    emit()\n                }\n            }, [id, children])\n            return null\n        },\n        useItems,\n        Out() {\n            const list = useItems()\n            return (\n                <>\n                    {list.map(([id, node]) => (\n                        <Suspense key={id} fallback={null}>\n                            {node}\n                        </Suspense>\n                    ))}\n                </>\n            )\n        },\n    }\n}\n\nconst webglTeleport = WebglTeleport()\nconst effectTeleport = WebglTeleport()\n\nexport function WebglPortal() {\n    return <webglTeleport.Out />\n}\n\nexport { effectTeleport, webglTeleport }\n"
+    },
+    {
+      "path": "lib/webgl-scene.tsx",
+      "type": "registry:lib",
+      "target": "lib/webgl-scene.tsx",
+      "content": "\"use client\"\n\nimport { shaderMaterial, useFBO } from \"@react-three/drei\"\nimport { createPortal, extend, type ThreeElement, useFrame, useThree } from \"@react-three/fiber\"\nimport { type ReactNode, type RefObject, useLayoutEffect, useMemo, useRef } from \"react\"\nimport { type Mesh, PerspectiveCamera, Scene, Texture } from \"three\"\nimport { webglTeleport } from \"@/lib/webgl-portal\"\n\nconst DisplayMaterial = shaderMaterial(\n    { uMap: new Texture() },\n    /* glsl */ `\n        varying vec2 vUv;\n        void main() {\n            vUv = uv;\n            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\n        }\n    `,\n    /* glsl */ `\n        uniform sampler2D uMap;\n        varying vec2 vUv;\n        void main() {\n            gl_FragColor = texture2D(uMap, vUv);\n        }\n    `,\n)\n\nextend({ DisplayMaterial })\n\ndeclare module \"@react-three/fiber\" {\n    interface ThreeElements {\n        displayMaterial: ThreeElement<typeof DisplayMaterial>\n    }\n}\n\nexport type WebglSceneProps = {\n    track: RefObject<HTMLElement | null>\n    children: ReactNode\n    camera?: PerspectiveCamera\n    /**\n     * - texture: children render into an FBO each frame: Global post-processing will work on it.\n     * - scissor: a scissored pass painted on top of the composed frame. lighter, but excluded from global post-processing.\n     */\n    mode?: \"texture\" | \"scissor\"\n    priority?: number\n    zIndex?: number\n    transparent?: boolean\n    /**\n     * Re-measures the DOM rect every frame so the plane follows animated parents (motion, parallax).\n     * Costs one layout read per frame, so only enable it when needed.\n     */\n    autoReflow?: boolean\n}\n\nfunction WebglScenePortal({\n    track,\n    children,\n    camera: propCamera,\n    mode = \"scissor\",\n    priority,\n    zIndex = 0,\n    transparent = true,\n    autoReflow = false,\n}: WebglSceneProps) {\n    const defaultCamera = useMemo(() => {\n        const cam = new PerspectiveCamera(75, 1, 0.1, 1000)\n        cam.position.z = 5\n        return cam\n    }, [])\n\n    const scene = useMemo(() => new Scene(), [])\n    const camera = propCamera ?? defaultCamera\n    const bounds = useRef({\n        x: 0,\n        y: 0,\n        width: 0,\n        height: 0,\n    })\n\n    const gl = useThree((s) => s.gl)\n    const size = useThree((s) => s.size)\n    const viewport = useThree((s) => s.viewport)\n    const displayMesh = useRef<Mesh>(null)\n    const fbo = useFBO(1, 1, { samples: 4 })\n\n    useLayoutEffect(() => {\n        fbo.texture.colorSpace = gl.outputColorSpace\n    }, [fbo, gl])\n\n    useLayoutEffect(() => {\n        const target = track.current\n        if (!target) return\n\n        const measure = () => {\n            const rect = target.getBoundingClientRect()\n            bounds.current.x = rect.left + window.scrollX\n            bounds.current.y = rect.top + window.scrollY\n            bounds.current.width = rect.width\n            bounds.current.height = rect.height\n        }\n\n        measure()\n        const resizeObserver = new ResizeObserver(measure)\n        resizeObserver.observe(target)\n        resizeObserver.observe(document.body)\n        return () => resizeObserver.disconnect()\n    }, [track])\n\n    const renderPriority = priority ?? (mode === \"texture\" ? 0 : 2)\n\n    useFrame(() => {\n        const transitioning = document.documentElement.hasAttribute(\"data-atelier-transitioning\")\n\n        let left: number\n        let top: number\n        let width: number\n        let height: number\n\n        if ((autoReflow || transitioning) && track.current) {\n            const rect = track.current.getBoundingClientRect()\n            left = rect.left\n            top = rect.top\n            width = rect.width\n            height = rect.height\n        } else {\n            const b = bounds.current\n            left = b.x - window.scrollX\n            top = b.y - window.scrollY\n            width = b.width\n            height = b.height\n        }\n\n        if (width === 0 || height === 0) return\n\n        const aspect = width / height\n        if (camera.aspect !== aspect) {\n            camera.aspect = aspect\n            camera.updateProjectionMatrix()\n        }\n\n        if (mode === \"scissor\") {\n            const canvasHeight = gl.domElement.clientHeight\n            const canvasWidth = gl.domElement.clientWidth\n\n            const previousAutoClear = gl.autoClear\n            gl.autoClear = false\n            gl.setViewport(left, canvasHeight - (top + height), width, height)\n            gl.setScissor(left, canvasHeight - (top + height), width, height)\n            gl.setScissorTest(true)\n            gl.clear()\n            gl.render(scene, camera)\n            gl.setScissorTest(false)\n            gl.setViewport(0, 0, canvasWidth, canvasHeight)\n            gl.setScissor(0, 0, canvasWidth, canvasHeight)\n            gl.autoClear = previousAutoClear\n            return\n        }\n\n        const pixelRatio = gl.getPixelRatio()\n        const fboWidth = Math.max(1, Math.ceil(width * pixelRatio))\n        const fboHeight = Math.max(1, Math.ceil(height * pixelRatio))\n\n        if (fbo.width !== fboWidth || fbo.height !== fboHeight) {\n            fbo.setSize(fboWidth, fboHeight)\n        }\n\n        const previousClearAlpha = gl.getClearAlpha()\n        const previousAutoClear = gl.autoClear\n\n        gl.autoClear = true\n        gl.setRenderTarget(fbo)\n        gl.setClearAlpha(transparent ? 0 : 1)\n        gl.clear()\n        gl.render(scene, camera)\n        gl.setRenderTarget(null)\n        gl.setClearAlpha(previousClearAlpha)\n        gl.autoClear = previousAutoClear\n\n        const mesh = displayMesh.current\n\n        if (mesh) {\n            const pxToWorld = viewport.height / size.height\n            mesh.position.x = (left + width / 2 - size.width / 2) * pxToWorld\n            mesh.position.y = -(top + height / 2 - size.height / 2) * pxToWorld\n            mesh.scale.x = width * pxToWorld\n            mesh.scale.y = height * pxToWorld\n        }\n    }, renderPriority)\n\n    const portal = createPortal(children, scene, {\n        camera,\n        events: {\n            compute: (event, state) => {\n                const rect = track.current?.getBoundingClientRect()\n                if (!rect) return\n                state.pointer.set(\n                    ((event.clientX - rect.left) / rect.width) * 2 - 1,\n                    -(((event.clientY - rect.top) / rect.height) * 2 - 1),\n                )\n                state.raycaster.setFromCamera(state.pointer, camera)\n            },\n        },\n    })\n\n    return (\n        <>\n            {portal}\n            {mode === \"texture\" && (\n                <mesh ref={displayMesh} renderOrder={zIndex}>\n                    <planeGeometry args={[1, 1]} />\n                    <displayMaterial\n                        key={DisplayMaterial.key}\n                        uMap={fbo.texture}\n                        transparent\n                        premultipliedAlpha\n                        depthTest={false}\n                        depthWrite={false}\n                    />\n                </mesh>\n            )}\n        </>\n    )\n}\n\nexport function WebglScene(props: WebglSceneProps) {\n    return (\n        <webglTeleport.In>\n            <WebglScenePortal {...props} />\n        </webglTeleport.In>\n    )\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "webgl",
+      "spring",
+      "cursor-tracking",
+      "keyboard",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Atelier UI",
+      "url": "https://www.atelier-ui.com/en/docs/components/background/spiral-gallery",
+      "authorUrl": "https://www.atelier-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "SpiralGalleryItem[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "radius",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "tileHeight",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "tileAspect",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "tileCount",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "verticalSpacing",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "turnAngle",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "tileRotation",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "cornerRadius",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "curve",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "autoScroll",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "easing",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "input",
+        "type": "SpiralInput",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "inputSpeed",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "drag",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "scrollSpread",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "scrollGrowth",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "wave",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "lensBlur",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "reveal",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "revealDuration",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "focusDuration",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "focusScale",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "autoScale",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "scale",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mode",
+        "type": "\"texture\" | \"scissor\"",
+        "description": "- texture: children render into an FBO each frame: Global post-processing will work on it.\n- scissor: a scissored pass painted on top of the composed frame. lighter, but excluded from global post-processing.",
+        "required": false
+      },
+      {
+        "name": "priority",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "zIndex",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transparent",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoReflow",
+        "type": "boolean",
+        "description": "Re-measures the DOM rect every frame so the plane follows animated parents (motion, parallax).\nCosts one layout read per frame, so only enable it when needed.",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/spiral-gallery"
+  }
+}

@@ -1,0 +1,225 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "model-viewer",
+  "type": "registry:ui",
+  "title": "Model Viewer",
+  "description": "Model Viewer",
+  "dependencies": [
+    "@react-three/drei",
+    "@react-three/fiber",
+    "three"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/model-viewer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/model-viewer.tsx",
+      "content": "import {\r\n\tFC,\r\n\tSuspense,\r\n\tuseEffect,\r\n\tuseLayoutEffect,\r\n\tuseMemo,\r\n\tuseRef,\r\n} from \"react\";\r\n\r\nimport {\r\n\tContactShadows,\r\n\tEnvironment,\r\n\tHtml,\r\n\tOrbitControls,\r\n\tuseFBX,\r\n\tuseGLTF,\r\n\tuseProgress,\r\n} from \"@react-three/drei\";\r\nimport {\r\n\tCanvas,\r\n\tinvalidate,\r\n\tuseFrame,\r\n\tuseLoader,\r\n\tuseThree,\r\n} from \"@react-three/fiber\";\r\nimport * as THREE from \"three\";\r\nimport { OBJLoader } from \"three/examples/jsm/loaders/OBJLoader.js\";\r\n\r\nexport interface ViewerProps {\r\n\turl: string;\r\n\twidth?: number | string;\r\n\theight?: number | string;\r\n\tmodelXOffset?: number;\r\n\tmodelYOffset?: number;\r\n\tdefaultRotationX?: number;\r\n\tdefaultRotationY?: number;\r\n\tdefaultZoom?: number;\r\n\tminZoomDistance?: number;\r\n\tmaxZoomDistance?: number;\r\n\tenableMouseParallax?: boolean;\r\n\tenableManualRotation?: boolean;\r\n\tenableHoverRotation?: boolean;\r\n\tenableManualZoom?: boolean; // ── NEW\r\n\tambientIntensity?: number;\r\n\tkeyLightIntensity?: number;\r\n\tfillLightIntensity?: number;\r\n\trimLightIntensity?: number;\r\n\tenvironmentPreset?:\r\n\t\t| \"city\"\r\n\t\t| \"sunset\"\r\n\t\t| \"night\"\r\n\t\t| \"dawn\"\r\n\t\t| \"studio\"\r\n\t\t| \"apartment\"\r\n\t\t| \"forest\"\r\n\t\t| \"park\"\r\n\t\t| \"none\";\r\n\tautoFrame?: boolean;\r\n\tplaceholderSrc?: string;\r\n\tshowScreenshotButton?: boolean;\r\n\tfadeIn?: boolean;\r\n\tautoRotate?: boolean;\r\n\tautoRotateSpeed?: number;\r\n\tonModelLoaded?: () => void;\r\n}\r\n\r\nconst deg2rad = (d: number) => (d * Math.PI) / 180;\r\n\r\nconst Loader: FC<{ placeholderSrc?: string }> = ({ placeholderSrc }) => {\r\n\tconst { progress, active } = useProgress();\r\n\tif (!active && placeholderSrc) return null;\r\n\treturn (\r\n\t\t<Html center>\r\n\t\t\t{placeholderSrc ? (\r\n\t\t\t\t<img\r\n\t\t\t\t\tsrc={placeholderSrc}\r\n\t\t\t\t\twidth={128}\r\n\t\t\t\t\theight={128}\r\n\t\t\t\t\tclassName=\"blur-lg rounded-lg\"\r\n\t\t\t\t/>\r\n\t\t\t) : (\r\n\t\t\t\t`${Math.round(progress)} %`\r\n\t\t\t)}\r\n\t\t</Html>\r\n\t);\r\n};\r\n\r\nconst AdaptiveControls: FC<{\r\n\tpivot: THREE.Vector3;\r\n\tminDistance: number;\r\n\tmaxDistance: number;\r\n\tenableManualZoom: boolean;\r\n}> = ({ pivot, minDistance, maxDistance, enableManualZoom }) => {\r\n\tconst ref = useRef<any>(null);\r\n\tuseFrame(() => ref.current?.target.copy(pivot));\r\n\treturn (\r\n\t\t<OrbitControls\r\n\t\t\tref={ref}\r\n\t\t\tmakeDefault\r\n\t\t\tenablePan={false}\r\n\t\t\tenableRotate={false}\r\n\t\t\tenableZoom={enableManualZoom}\r\n\t\t\tminDistance={minDistance}\r\n\t\t\tmaxDistance={maxDistance}\r\n\t\t\ttouches={{ TWO: THREE.TOUCH.DOLLY_ROTATE }}\r\n\t\t/>\r\n\t);\r\n};\r\n\r\nconst ROTATE_SPEED = 0.005;\r\nconst INERTIA = 0.925;\r\nconst PARALLAX_MAG = 0.05;\r\nconst PARALLAX_EASE = 0.12;\r\nconst HOVER_MAG = deg2rad(6);\r\nconst HOVER_EASE = 0.15;\r\n\r\ninterface ModelInnerProps {\r\n\turl: string;\r\n\txOffset: number;\r\n\tyOffset: number;\r\n\tpivot: THREE.Vector3;\r\n\tinitYaw: number;\r\n\tinitPitch: number;\r\n\tenableMouseParallax: boolean;\r\n\tenableManualRotation: boolean;\r\n\tenableHoverRotation: boolean;\r\n\tautoFrame: boolean;\r\n\tfadeIn: boolean;\r\n\tautoRotate: boolean;\r\n\tautoRotateSpeed: number;\r\n\tonLoaded?: () => void;\r\n}\r\n\r\nconst ModelInner: FC<ModelInnerProps> = ({\r\n\turl,\r\n\txOffset,\r\n\tyOffset,\r\n\tpivot,\r\n\tinitYaw,\r\n\tinitPitch,\r\n\tenableMouseParallax,\r\n\tenableManualRotation,\r\n\tenableHoverRotation,\r\n\tautoFrame,\r\n\tfadeIn,\r\n\tautoRotate,\r\n\tautoRotateSpeed,\r\n\tonLoaded,\r\n}) => {\r\n\tconst outer = useRef<THREE.Group>(null!);\r\n\tconst inner = useRef<THREE.Group>(null!);\r\n\tconst { camera, gl } = useThree();\r\n\r\n\tconst dragging = useRef(false);\r\n\tconst dragStart = useRef({ x: 0, y: 0 });\r\n\tconst velocity = useRef({ x: 0, y: 0 });\r\n\r\n\tconst targetPar = useRef({ x: 0, y: 0 });\r\n\tconst curPar = useRef({ x: 0, y: 0 });\r\n\tconst targetHover = useRef({ x: 0, y: 0 });\r\n\tconst curHover = useRef({ x: 0, y: 0 });\r\n\r\n\tconst ext = useMemo(() => url.split(\".\").pop()!.toLowerCase(), [url]);\r\n\tconst content = useMemo<THREE.Object3D | null>(() => {\r\n\t\tif (ext === \"glb\" || ext === \"gltf\") return useGLTF(url).scene.clone();\r\n\t\tif (ext === \"fbx\") return useFBX(url).clone();\r\n\t\tif (ext === \"obj\") return useLoader(OBJLoader, url).clone();\r\n\t\tconsole.error(\"Unsupported format:\", ext);\r\n\t\treturn null;\r\n\t}, [url, ext]);\r\n\r\n\tconst pivotW = useRef(new THREE.Vector3());\r\n\tuseLayoutEffect(() => {\r\n\t\tif (!content) return;\r\n\t\tconst g = inner.current;\r\n\t\tg.updateWorldMatrix(true, true);\r\n\r\n\t\tconst sphere = new THREE.Box3()\r\n\t\t\t.setFromObject(g)\r\n\t\t\t.getBoundingSphere(new THREE.Sphere());\r\n\t\tconst scale = 1 / (sphere.radius * 2);\r\n\t\tg.position.set(-sphere.center.x, -sphere.center.y, -sphere.center.z);\r\n\t\tg.scale.setScalar(scale);\r\n\r\n\t\tg.traverse((o: any) => {\r\n\t\t\tif (o.isMesh) {\r\n\t\t\t\to.castShadow = true;\r\n\t\t\t\to.receiveShadow = true;\r\n\t\t\t\tif (fadeIn) {\r\n\t\t\t\t\to.material.transparent = true;\r\n\t\t\t\t\to.material.opacity = 0;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t});\r\n\r\n\t\tg.getWorldPosition(pivotW.current);\r\n\t\tpivot.copy(pivotW.current);\r\n\r\n\t\touter.current.rotation.set(initPitch, initYaw, 0);\r\n\r\n\t\tif (\r\n\t\t\tautoFrame &&\r\n\t\t\t(camera as THREE.PerspectiveCamera).isPerspectiveCamera\r\n\t\t) {\r\n\t\t\tconst persp = camera as THREE.PerspectiveCamera;\r\n\t\t\tconst fitR = sphere.radius * scale;\r\n\t\t\tconst dist = (fitR * 1.2) / Math.sin((persp.fov * Math.PI) / 180 / 2);\r\n\t\t\tpersp.position.set(\r\n\t\t\t\tpivotW.current.x,\r\n\t\t\t\tpivotW.current.y,\r\n\t\t\t\tpivotW.current.z + dist\r\n\t\t\t);\r\n\t\t\tpersp.near = dist / 10;\r\n\t\t\tpersp.far = dist * 10;\r\n\t\t\tpersp.updateProjectionMatrix();\r\n\t\t}\r\n\r\n\t\tif (fadeIn) {\r\n\t\t\tlet t = 0;\r\n\t\t\tconst id = setInterval(() => {\r\n\t\t\t\tt += 0.05;\r\n\t\t\t\tconst v = Math.min(t, 1);\r\n\t\t\t\tg.traverse((o: any) => {\r\n\t\t\t\t\tif (o.isMesh) o.material.opacity = v;\r\n\t\t\t\t});\r\n\t\t\t\tinvalidate();\r\n\t\t\t\tif (v === 1) {\r\n\t\t\t\t\tclearInterval(id);\r\n\t\t\t\t\tonLoaded?.();\r\n\t\t\t\t}\r\n\t\t\t}, 16);\r\n\t\t\treturn () => clearInterval(id);\r\n\t\t} else {\r\n\t\t\tonLoaded?.();\r\n\t\t}\r\n\t\t// eslint-disable-next-line react-hooks/exhaustive-deps\r\n\t}, [content]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!enableManualRotation) return;\r\n\t\tconst elem = gl.domElement;\r\n\t\tconst down = (e: PointerEvent) => {\r\n\t\t\tdragging.current = true;\r\n\t\t\tdragStart.current = { x: e.clientX, y: e.clientY };\r\n\t\t\tvelocity.current = { x: 0, y: 0 };\r\n\t\t\twindow.addEventListener(\"pointerup\", up);\r\n\t\t\tinvalidate();\r\n\t\t};\r\n\t\tconst move = (e: PointerEvent) => {\r\n\t\t\tif (!dragging.current) return;\r\n\t\t\tconst dx = e.clientX - dragStart.current.x;\r\n\t\t\tconst dy = e.clientY - dragStart.current.y;\r\n\t\t\tdragStart.current = { x: e.clientX, y: e.clientY };\r\n\t\t\touter.current.rotation.y += dx * ROTATE_SPEED;\r\n\t\t\touter.current.rotation.x += dy * ROTATE_SPEED;\r\n\t\t\tvelocity.current = { x: dx * ROTATE_SPEED, y: dy * ROTATE_SPEED };\r\n\t\t\tinvalidate();\r\n\t\t};\r\n\t\tconst up = () => (dragging.current = false);\r\n\r\n\t\telem.addEventListener(\"pointerdown\", down);\r\n\t\telem.addEventListener(\"pointermove\", move);\r\n\t\treturn () => {\r\n\t\t\telem.removeEventListener(\"pointerdown\", down);\r\n\t\t\telem.removeEventListener(\"pointermove\", move);\r\n\t\t\twindow.removeEventListener(\"pointerup\", up);\r\n\t\t};\r\n\t}, [gl, enableManualRotation]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst onMove = (e: PointerEvent) => {\r\n\t\t\tconst nx = (e.clientX / window.innerWidth) * 2 - 1;\r\n\t\t\tconst ny = (e.clientY / window.innerHeight) * 2 - 1;\r\n\r\n\t\t\tif (enableMouseParallax) {\r\n\t\t\t\ttargetPar.current = {\r\n\t\t\t\t\tx: -nx * PARALLAX_MAG,\r\n\t\t\t\t\ty: -ny * PARALLAX_MAG,\r\n\t\t\t\t};\r\n\t\t\t}\r\n\t\t\tif (enableHoverRotation) {\r\n\t\t\t\ttargetHover.current = { x: ny * HOVER_MAG, y: nx * HOVER_MAG };\r\n\t\t\t}\r\n\t\t\tinvalidate();\r\n\t\t};\r\n\t\twindow.addEventListener(\"pointermove\", onMove);\r\n\t\treturn () => window.removeEventListener(\"pointermove\", onMove);\r\n\t}, [enableMouseParallax, enableHoverRotation]);\r\n\r\n\tuseFrame((_, delta) => {\r\n\t\tlet need = false;\r\n\r\n\t\tcurPar.current.x +=\r\n\t\t\t(targetPar.current.x - curPar.current.x) * PARALLAX_EASE;\r\n\t\tcurPar.current.y +=\r\n\t\t\t(targetPar.current.y - curPar.current.y) * PARALLAX_EASE;\r\n\r\n\t\tconst prevHovX = curHover.current.x;\r\n\t\tconst prevHovY = curHover.current.y;\r\n\t\tcurHover.current.x +=\r\n\t\t\t(targetHover.current.x - curHover.current.x) * HOVER_EASE;\r\n\t\tcurHover.current.y +=\r\n\t\t\t(targetHover.current.y - curHover.current.y) * HOVER_EASE;\r\n\r\n\t\tconst ndc = pivotW.current.clone().project(camera);\r\n\t\tndc.x += xOffset + curPar.current.x;\r\n\t\tndc.y += yOffset + curPar.current.y;\r\n\t\touter.current.position.copy(ndc.unproject(camera));\r\n\r\n\t\touter.current.rotation.x += curHover.current.x - prevHovX;\r\n\t\touter.current.rotation.y += curHover.current.y - prevHovY;\r\n\r\n\t\tif (autoRotate && !dragging.current) {\r\n\t\t\touter.current.rotation.y += autoRotateSpeed * delta;\r\n\t\t\tneed = true;\r\n\t\t}\r\n\r\n\t\tif (!dragging.current) {\r\n\t\t\touter.current.rotation.y += velocity.current.x;\r\n\t\t\touter.current.rotation.x += velocity.current.y;\r\n\t\t\tvelocity.current.x *= INERTIA;\r\n\t\t\tvelocity.current.y *= INERTIA;\r\n\t\t\tif (\r\n\t\t\t\tMath.abs(velocity.current.x) > 1e-4 ||\r\n\t\t\t\tMath.abs(velocity.current.y) > 1e-4\r\n\t\t\t)\r\n\t\t\t\tneed = true;\r\n\t\t}\r\n\r\n\t\tif (\r\n\t\t\tMath.abs(curPar.current.x - targetPar.current.x) > 1e-4 ||\r\n\t\t\tMath.abs(curPar.current.y - targetPar.current.y) > 1e-4 ||\r\n\t\t\tMath.abs(curHover.current.x - targetHover.current.x) > 1e-4 ||\r\n\t\t\tMath.abs(curHover.current.y - targetHover.current.y) > 1e-4\r\n\t\t)\r\n\t\t\tneed = true;\r\n\r\n\t\tif (need) invalidate();\r\n\t});\r\n\r\n\tif (!content) return null;\r\n\treturn (\r\n\t\t<group ref={outer}>\r\n\t\t\t<group ref={inner}>\r\n\t\t\t\t<primitive object={content} />\r\n\t\t\t</group>\r\n\t\t</group>\r\n\t);\r\n};\r\n\r\nconst ModelViewer: FC<ViewerProps> = ({\r\n\turl,\r\n\twidth = 400,\r\n\theight = 400,\r\n\tmodelXOffset = 0,\r\n\tmodelYOffset = 0,\r\n\tdefaultRotationX = -50,\r\n\tdefaultRotationY = 20,\r\n\tdefaultZoom = 0.5,\r\n\tminZoomDistance = 0.5,\r\n\tmaxZoomDistance = 10,\r\n\tenableMouseParallax = true,\r\n\tenableManualRotation = true,\r\n\tenableHoverRotation = true,\r\n\tenableManualZoom = true,\r\n\tambientIntensity = 0.3,\r\n\tkeyLightIntensity = 1,\r\n\tfillLightIntensity = 0.5,\r\n\trimLightIntensity = 0.8,\r\n\tenvironmentPreset = \"forest\",\r\n\tautoFrame = false,\r\n\tplaceholderSrc,\r\n\tshowScreenshotButton = true,\r\n\tfadeIn = false,\r\n\tautoRotate = false,\r\n\tautoRotateSpeed = 0.35,\r\n\tonModelLoaded,\r\n}) => {\r\n\tuseEffect(() => void useGLTF.preload(url), [url]);\r\n\r\n\tconst pivot = useRef(new THREE.Vector3()).current;\r\n\tconst contactRef = useRef<THREE.Mesh>(null);\r\n\tconst rendererRef = useRef<THREE.WebGLRenderer>(null);\r\n\tconst sceneRef = useRef<THREE.Scene>(null);\r\n\tconst cameraRef = useRef<THREE.Camera>(null);\r\n\r\n\tconst initYaw = deg2rad(defaultRotationX);\r\n\tconst initPitch = deg2rad(defaultRotationY);\r\n\tconst camZ = Math.min(\r\n\t\tMath.max(defaultZoom, minZoomDistance),\r\n\t\tmaxZoomDistance\r\n\t);\r\n\r\n\tconst capturePNG = () => {\r\n\t\tconst gl = rendererRef.current;\r\n\t\tconst scene = sceneRef.current;\r\n\t\tconst cam = cameraRef.current;\r\n\t\tif (!gl || !scene || !cam) return;\r\n\r\n\t\tgl.shadowMap.enabled = false;\r\n\t\tconst changed: { l: THREE.Light; cast: boolean }[] = [];\r\n\t\tscene.traverse((o: any) => {\r\n\t\t\tif (o.isLight && \"castShadow\" in o) {\r\n\t\t\t\tchanged.push({ l: o, cast: o.castShadow });\r\n\t\t\t\to.castShadow = false;\r\n\t\t\t}\r\n\t\t});\r\n\t\tif (contactRef.current) contactRef.current.visible = false;\r\n\r\n\t\tgl.render(scene, cam);\r\n\t\tconst url = gl.domElement.toDataURL(\"image/png\");\r\n\t\tconst link = document.createElement(\"a\");\r\n\t\tlink.download = \"model.png\";\r\n\t\tlink.href = url;\r\n\t\tlink.click();\r\n\r\n\t\tgl.shadowMap.enabled = true;\r\n\t\tchanged.forEach(({ l, cast }) => (l.castShadow = cast));\r\n\t\tif (contactRef.current) contactRef.current.visible = true;\r\n\t\tinvalidate();\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div className=\"relative\" style={{ width, height }}>\r\n\t\t\t{showScreenshotButton && (\r\n\t\t\t\t<button\r\n\t\t\t\t\tonClick={capturePNG}\r\n\t\t\t\t\tclassName=\"absolute top-4 right-4 z-10 cursor-pointer px-4 py-2 border border-white rounded-xl bg-transparent text-foreground hover:bg-background hover:text-foreground transition-colors\"\r\n\t\t\t\t>\r\n\t\t\t\t\tTake Screenshot\r\n\t\t\t\t</button>\r\n\t\t\t)}\r\n\r\n\t\t\t<Canvas\r\n\t\t\t\tshadows\r\n\t\t\t\tframeloop=\"demand\"\r\n\t\t\t\tgl={{ preserveDrawingBuffer: true }}\r\n\t\t\t\tonCreated={({ gl, scene, camera }) => {\r\n\t\t\t\t\trendererRef.current = gl;\r\n\t\t\t\t\tsceneRef.current = scene;\r\n\t\t\t\t\tcameraRef.current = camera;\r\n\t\t\t\t\tgl.toneMapping = THREE.ACESFilmicToneMapping;\r\n\t\t\t\t\tgl.outputColorSpace = THREE.SRGBColorSpace;\r\n\t\t\t\t}}\r\n\t\t\t\tcamera={{ fov: 150, position: [0, 0, camZ], near: 0.01, far: 100 }}\r\n\t\t\t>\r\n\t\t\t\t{environmentPreset !== \"none\" && (\r\n\t\t\t\t\t<Environment\r\n\t\t\t\t\t\tpreset={environmentPreset as any}\r\n\t\t\t\t\t\tbackground={false}\r\n\t\t\t\t\t/>\r\n\t\t\t\t)}\r\n\r\n\t\t\t\t<ambientLight intensity={ambientIntensity} />\r\n\t\t\t\t<directionalLight\r\n\t\t\t\t\tposition={[5, 5, 5]}\r\n\t\t\t\t\tintensity={keyLightIntensity}\r\n\t\t\t\t\tcastShadow\r\n\t\t\t\t/>\r\n\t\t\t\t<directionalLight\r\n\t\t\t\t\tposition={[-5, 2, 5]}\r\n\t\t\t\t\tintensity={fillLightIntensity}\r\n\t\t\t\t/>\r\n\t\t\t\t<directionalLight\r\n\t\t\t\t\tposition={[0, 4, -5]}\r\n\t\t\t\t\tintensity={rimLightIntensity}\r\n\t\t\t\t/>\r\n\r\n\t\t\t\t<ContactShadows\r\n\t\t\t\t\tref={contactRef as any}\r\n\t\t\t\t\tposition={[0, -0.5, 0]}\r\n\t\t\t\t\topacity={0.35}\r\n\t\t\t\t\tscale={10}\r\n\t\t\t\t\tblur={2}\r\n\t\t\t\t/>\r\n\r\n\t\t\t\t<Suspense fallback={<Loader placeholderSrc={placeholderSrc} />}>\r\n\t\t\t\t\t<ModelInner\r\n\t\t\t\t\t\turl={url}\r\n\t\t\t\t\t\txOffset={modelXOffset}\r\n\t\t\t\t\t\tyOffset={modelYOffset}\r\n\t\t\t\t\t\tpivot={pivot}\r\n\t\t\t\t\t\tinitYaw={initYaw}\r\n\t\t\t\t\t\tinitPitch={initPitch}\r\n\t\t\t\t\t\tenableMouseParallax={enableMouseParallax}\r\n\t\t\t\t\t\tenableManualRotation={enableManualRotation}\r\n\t\t\t\t\t\tenableHoverRotation={enableHoverRotation}\r\n\t\t\t\t\t\tautoFrame={autoFrame}\r\n\t\t\t\t\t\tfadeIn={fadeIn}\r\n\t\t\t\t\t\tautoRotate={autoRotate}\r\n\t\t\t\t\t\tautoRotateSpeed={autoRotateSpeed}\r\n\t\t\t\t\t\tonLoaded={onModelLoaded}\r\n\t\t\t\t\t/>\r\n\t\t\t\t</Suspense>\r\n\r\n\t\t\t\t<AdaptiveControls\r\n\t\t\t\t\tpivot={pivot}\r\n\t\t\t\t\tminDistance={minZoomDistance}\r\n\t\t\t\t\tmaxDistance={maxZoomDistance}\r\n\t\t\t\t\tenableManualZoom={enableManualZoom}\r\n\t\t\t\t/>\r\n\t\t\t</Canvas>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ModelViewer;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "3D & Canvas"
+    ],
+    "tags": [
+      "webgl",
+      "hover",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "url",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "default": "400",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "default": "400",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "modelXOffset",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "modelYOffset",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultRotationX",
+        "type": "number",
+        "default": "-50",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultRotationY",
+        "type": "number",
+        "default": "20",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultZoom",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "minZoomDistance",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxZoomDistance",
+        "type": "number",
+        "default": "10",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableMouseParallax",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableManualRotation",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableHoverRotation",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableManualZoom",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "ambientIntensity",
+        "type": "number",
+        "default": "0.3",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "keyLightIntensity",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fillLightIntensity",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "rimLightIntensity",
+        "type": "number",
+        "default": "0.8",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "environmentPreset",
+        "type": "\"city\" | \"sunset\" | \"night\" | \"dawn\" | \"studio\" | \"apartm…",
+        "default": "\"forest\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoFrame",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "placeholderSrc",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showScreenshotButton",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fadeIn",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoRotate",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "autoRotateSpeed",
+        "type": "number",
+        "default": "0.35",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onModelLoaded",
+        "type": "(() => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/model-viewer"
+  }
+}

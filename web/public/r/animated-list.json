@@ -1,0 +1,103 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "animated-list",
+  "type": "registry:ui",
+  "title": "Animated List",
+  "description": "Scrollable list of rows that appear as they come into view, with the top and bottom edges fading out.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/animated-list.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/animated-list.tsx",
+      "content": "import React, {\n\tMouseEventHandler,\n\tReactNode,\n\tUIEvent,\n\tuseEffect,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { motion, useInView } from \"motion/react\";\n\n// Credit:\n// https://www.reactbits.dev/components/animated-list\n\ninterface AnimatedItemProps {\n\tchildren: ReactNode;\n\tdelay?: number;\n\tindex: number;\n\tonMouseEnter?: MouseEventHandler<HTMLDivElement>;\n\tonClick?: MouseEventHandler<HTMLDivElement>;\n}\n\nconst AnimatedItem: React.FC<AnimatedItemProps> = ({\n\tchildren,\n\tdelay = 0,\n\tindex,\n\tonMouseEnter,\n\tonClick,\n}) => {\n\tconst ref = useRef<HTMLDivElement>(null);\n\tconst inView = useInView(ref, { amount: 0.5, once: false });\n\treturn (\n\t\t<motion.div\n\t\t\tref={ref}\n\t\t\tdata-index={index}\n\t\t\tonMouseEnter={onMouseEnter}\n\t\t\tonClick={onClick}\n\t\t\tinitial={{ scale: 0.7, opacity: 0 }}\n\t\t\tanimate={\n\t\t\t\tinView ? { scale: 1, opacity: 1 } : { scale: 0.7, opacity: 0 }\n\t\t\t}\n\t\t\ttransition={{ duration: 0.2, delay }}\n\t\t\tclassName=\"mb-4 cursor-pointer\"\n\t\t>\n\t\t\t{children}\n\t\t</motion.div>\n\t);\n};\n\ninterface AnimatedListProps {\n\titems?: string[];\n\tonItemSelect?: (item: string, index: number) => void;\n\tshowGradients?: boolean;\n\tenableArrowNavigation?: boolean;\n\tclassName?: string;\n\titemClassName?: string;\n\tdisplayScrollbar?: boolean;\n\tinitialSelectedIndex?: number;\n}\n\nconst AnimatedList: React.FC<AnimatedListProps> = ({\n\titems = [\n\t\t\"Item 1\",\n\t\t\"Item 2\",\n\t\t\"Item 3\",\n\t\t\"Item 4\",\n\t\t\"Item 5\",\n\t\t\"Item 6\",\n\t\t\"Item 7\",\n\t\t\"Item 8\",\n\t\t\"Item 9\",\n\t\t\"Item 10\",\n\t\t\"Item 11\",\n\t\t\"Item 12\",\n\t\t\"Item 13\",\n\t\t\"Item 14\",\n\t\t\"Item 15\",\n\t],\n\tonItemSelect,\n\tshowGradients = true,\n\tenableArrowNavigation = true,\n\tclassName = \"\",\n\titemClassName = \"\",\n\tdisplayScrollbar = true,\n\tinitialSelectedIndex = -1,\n}) => {\n\tconst listRef = useRef<HTMLDivElement>(null);\n\tconst [selectedIndex, setSelectedIndex] =\n\t\tuseState<number>(initialSelectedIndex);\n\tconst [keyboardNav, setKeyboardNav] = useState<boolean>(false);\n\tconst [topGradientOpacity, setTopGradientOpacity] = useState<number>(0);\n\tconst [bottomGradientOpacity, setBottomGradientOpacity] =\n\t\tuseState<number>(1);\n\n\tconst handleScroll = (e: UIEvent<HTMLDivElement>) => {\n\t\tconst { scrollTop, scrollHeight, clientHeight } =\n\t\t\te.target as HTMLDivElement;\n\t\tsetTopGradientOpacity(Math.min(scrollTop / 50, 1));\n\t\tconst bottomDistance = scrollHeight - (scrollTop + clientHeight);\n\t\tsetBottomGradientOpacity(\n\t\t\tscrollHeight <= clientHeight ? 0 : Math.min(bottomDistance / 50, 1)\n\t\t);\n\t};\n\n\t// Keyboard navigation: arrow keys, tab, and enter selection\n\tuseEffect(() => {\n\t\tif (!enableArrowNavigation) return;\n\t\tconst handleKeyDown = (e: KeyboardEvent) => {\n\t\t\tif (e.key === \"ArrowDown\" || (e.key === \"Tab\" && !e.shiftKey)) {\n\t\t\t\te.preventDefault();\n\t\t\t\tsetKeyboardNav(true);\n\t\t\t\tsetSelectedIndex((prev) => Math.min(prev + 1, items.length - 1));\n\t\t\t} else if (e.key === \"ArrowUp\" || (e.key === \"Tab\" && e.shiftKey)) {\n\t\t\t\te.preventDefault();\n\t\t\t\tsetKeyboardNav(true);\n\t\t\t\tsetSelectedIndex((prev) => Math.max(prev - 1, 0));\n\t\t\t} else if (e.key === \"Enter\") {\n\t\t\t\tif (selectedIndex >= 0 && selectedIndex < items.length) {\n\t\t\t\t\te.preventDefault();\n\t\t\t\t\tif (onItemSelect) {\n\t\t\t\t\t\tonItemSelect(items[selectedIndex], selectedIndex);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\n\t\twindow.addEventListener(\"keydown\", handleKeyDown);\n\t\treturn () => window.removeEventListener(\"keydown\", handleKeyDown);\n\t}, [items, selectedIndex, onItemSelect, enableArrowNavigation]);\n\n\t// Scroll the selected item into view if needed\n\tuseEffect(() => {\n\t\tif (!keyboardNav || selectedIndex < 0 || !listRef.current) return;\n\t\tconst container = listRef.current;\n\t\tconst selectedItem = container.querySelector(\n\t\t\t`[data-index=\"${selectedIndex}\"]`\n\t\t) as HTMLElement | null;\n\t\tif (selectedItem) {\n\t\t\tconst extraMargin = 50;\n\t\t\tconst containerScrollTop = container.scrollTop;\n\t\t\tconst containerHeight = container.clientHeight;\n\t\t\tconst itemTop = selectedItem.offsetTop;\n\t\t\tconst itemBottom = itemTop + selectedItem.offsetHeight;\n\t\t\tif (itemTop < containerScrollTop + extraMargin) {\n\t\t\t\tcontainer.scrollTo({\n\t\t\t\t\ttop: itemTop - extraMargin,\n\t\t\t\t\tbehavior: \"smooth\",\n\t\t\t\t});\n\t\t\t} else if (\n\t\t\t\titemBottom >\n\t\t\t\tcontainerScrollTop + containerHeight - extraMargin\n\t\t\t) {\n\t\t\t\tcontainer.scrollTo({\n\t\t\t\t\ttop: itemBottom - containerHeight + extraMargin,\n\t\t\t\t\tbehavior: \"smooth\",\n\t\t\t\t});\n\t\t\t}\n\t\t}\n\t\tsetKeyboardNav(false);\n\t}, [selectedIndex, keyboardNav]);\n\n\treturn (\n\t\t<div className={`relative w-[500px] ${className}`}>\n\t\t\t<div\n\t\t\t\tref={listRef}\n\t\t\t\tclassName={`max-h-[400px] overflow-y-auto p-4 ${\n\t\t\t\t\tdisplayScrollbar\n\t\t\t\t\t\t? \"[&::-webkit-scrollbar]:w-[8px] [&::-webkit-scrollbar-track]:bg-background [&::-webkit-scrollbar-thumb]:bg-background [&::-webkit-scrollbar-thumb]:rounded-[4px]\"\n\t\t\t\t\t\t: \"scrollbar-hide\"\n\t\t\t\t}`}\n\t\t\t\tonScroll={handleScroll}\n\t\t\t\tstyle={{\n\t\t\t\t\tscrollbarWidth: \"thin\",\n\t\t\t\t\tscrollbarColor: \"#222 #060606\",\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t{items.map((item, index) => (\n\t\t\t\t\t<AnimatedItem\n\t\t\t\t\t\tkey={index + \"animated-list\"}\n\t\t\t\t\t\tdelay={0.1}\n\t\t\t\t\t\tindex={index}\n\t\t\t\t\t\tonMouseEnter={() => setSelectedIndex(index)}\n\t\t\t\t\t\tonClick={() => {\n\t\t\t\t\t\t\tsetSelectedIndex(index);\n\t\t\t\t\t\t\tif (onItemSelect) {\n\t\t\t\t\t\t\t\tonItemSelect(item, index);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<div\n\t\t\t\t\t\t\tclassName={`p-4 bg-background rounded-lg ${\n\t\t\t\t\t\t\t\tselectedIndex === index ? \"bg-background\" : \"\"\n\t\t\t\t\t\t\t} ${itemClassName}`}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<p className=\"text-foreground m-0\">{item}</p>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</AnimatedItem>\n\t\t\t\t))}\n\t\t\t</div>\n\t\t\t{showGradients && (\n\t\t\t\t<>\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"absolute top-0 left-0 right-0 h-[50px] bg-linear-to-b from-[#060606] to-transparent pointer-events-none transition-opacity duration-300 ease\"\n\t\t\t\t\t\tstyle={{ opacity: topGradientOpacity }}\n\t\t\t\t\t></div>\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"absolute bottom-0 left-0 right-0 h-[100px] bg-linear-to-t from-[#060606] to-transparent pointer-events-none transition-opacity duration-300 ease\"\n\t\t\t\t\t\tstyle={{ opacity: bottomGradientOpacity }}\n\t\t\t\t\t></div>\n\t\t\t\t</>\n\t\t\t)}\n\t\t</div>\n\t);\n};\n\nexport default AnimatedList;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover",
+      "keyboard"
+    ],
+    "interaction": "Rows grow and fade in as you scroll them into view and shrink back out as they leave; hovering or clicking a row selects it, and the arrow keys walk the selection up and down, scrolling it into view.",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/components/animated-list",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "string[]",
+        "default": "[ \"Item 1\", \"Item 2\", \"Item 3\", \"Item…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onItemSelect",
+        "type": "((item: string, index: number) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showGradients",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableArrowNavigation",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "itemClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "displayScrollbar",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "initialSelectedIndex",
+        "type": "number",
+        "default": "-1",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/animated-list"
+  }
+}

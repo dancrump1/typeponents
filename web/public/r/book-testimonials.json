@@ -1,0 +1,58 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "book-testimonials",
+  "type": "registry:ui",
+  "title": "Book Testimonials",
+  "description": "Testimonials bound as a hardback book, with a cover, a clickable index and one quote, photo and star rating per page.",
+  "dependencies": [
+    "react-pageflip"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/book-testimonials/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/book-testimonials/component.tsx",
+      "content": "\"use client\";\n\nimport React, { useRef } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { useOrientation } from \"./use-orientation\";\nimport HTMLFlipBook from \"react-pageflip\";\n\n// Credit:\n// https://www.serenity-ui.com/components/testimonials/3dbooktestimonial\n\ninterface Testimonial {\n\timage?: string;\n\ttext: string;\n\tname: string;\n\tjobtitle: string;\n\trating: number;\n}\n\ninterface BookTestimonial3DProps {\n\ttestimonials: Testimonial[];\n}\n\nfunction BookTestimonial3D({ testimonials }: BookTestimonial3DProps) {\n\tconst book = useRef<typeof HTMLFlipBook>(null);\n\n\tconst { isMobile } = useOrientation;\n\n\tconst handleFlip = (pageNum: number) => {\n\t\t(book.current as any)?.pageFlip()?.flip(pageNum);\n\t\t(book.current as any)?.pageFlip()?.flipNext(false);\n\t};\n\n\treturn (\n\t\t<div className=\"w-full text-foreground h-500px flex justify-center items-center py-10\">\n\t\t\t<HTMLFlipBook\n\t\t\t\tref={book}\n\t\t\t\twidth={300}\n\t\t\t\theight={450}\n\t\t\t\tshowCover={true}\n\t\t\t\tusePortrait={isMobile}\n\t\t\t\tonFlip={(e) => {\n\t\t\t\t\t// console.log(e.data);\n\t\t\t\t\treturn null;\n\t\t\t\t}}\n\t\t\t\tonChangeState={(e) => {\n\t\t\t\t\t// console.log(e.data)\n\t\t\t\t\treturn null;\n\t\t\t\t}}\n\t\t\t\tclassName={\"\"}\n\t\t\t\tstyle={{}}\n\t\t\t\tstartPage={0}\n\t\t\t\tsize={\"fixed\"}\n\t\t\t\tminWidth={0}\n\t\t\t\tmaxWidth={0}\n\t\t\t\tminHeight={0}\n\t\t\t\tmaxHeight={0}\n\t\t\t\tdrawShadow={true}\n\t\t\t\tflippingTime={1000}\n\t\t\t\tstartZIndex={0}\n\t\t\t\tautoSize={false}\n\t\t\t\tmaxShadowOpacity={0}\n\t\t\t\tmobileScrollSupport={true}\n\t\t\t\tclickEventForward={true}\n\t\t\t\tuseMouseEvents={true}\n\t\t\t\tswipeDistance={0}\n\t\t\t\tshowPageCorners={true}\n\t\t\t\tdisableFlipByClick={false}\n\t\t\t>\n\t\t\t\t{/* Cover Page */}\n\t\t\t\t<div className=\"relative bg-background border rounded-lg p-8 text-foreground flex flex-col items-center justify-center shadow-lg shadow-gray-600 cursor-grab\">\n\t\t\t\t\t{/* Company Logo */}\n\t\t\t\t\t<div className=\"flex justify-center items-center \">\n\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\tsrc={\"\"}\n\t\t\t\t\t\t\talt=\"Serenity UI Logo\"\n\t\t\t\t\t\t\twidth={100}\n\t\t\t\t\t\t\theight={100}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</div>\n\t\t\t\t\t{/* Company Name */}\n\t\t\t\t\t<h1 className=\"text-4xl mb-36 text-center relative z-10\">\n\t\t\t\t\t\tSerenity UI\n\t\t\t\t\t</h1>\n\t\t\t\t\t<div className=\"w-full h-1 bg-background mb-6 relative z-10\"></div>\n\t\t\t\t\t<div className=\"text-center\">\n\t\t\t\t\t\t<span className=\"text-lg text-foreground text-center hover:text-foreground transition-colors duration-300 relative z-10\">\n\t\t\t\t\t\t\tRead what virtual people are saying about us\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t{/* Index Page */}\n\t\t\t\t<div className=\"w-full h-full flex justify-center items-center bg-background border border-gray-300 box-border\">\n\t\t\t\t\t<div className=\"page-front text-start text-foreground p-3 bg-background\">\n\t\t\t\t\t\tIndex\n\t\t\t\t\t</div>\n\t\t\t\t\t<div className=\"flex flex-col justify-start items-start p-8 space-y-3\">\n\t\t\t\t\t\t<div>\n\t\t\t\t\t\t\t<ol className=\"grid grid-cols-2 gap-2 \">\n\t\t\t\t\t\t\t\t{testimonials.map((testimonial, index) => (\n\t\t\t\t\t\t\t\t\t<React.Fragment key={index + \"book-fragment\"}>\n\t\t\t\t\t\t\t\t\t\t<li\n\t\t\t\t\t\t\t\t\t\t\tonClick={() => handleFlip(index + 2)}\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"flex justify-start items-center text-xs cursor-pointer\"\n\t\t\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\t\t\t\t\tsrc={testimonial.image || \"\"}\n\t\t\t\t\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\t\t\t\t\twidth={20}\n\t\t\t\t\t\t\t\t\t\t\t\theight={20}\n\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"rounded-full mr-2\"\n\t\t\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t\t\t\t{testimonial.name}\n\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t\t<li className=\"flex justify-end text-xs items-center\">\n\t\t\t\t\t\t\t\t\t\t\t{index + 2}\n\t\t\t\t\t\t\t\t\t\t</li>\n\t\t\t\t\t\t\t\t\t</React.Fragment>\n\t\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t</ol>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\n\t\t\t\t{/* Testimonials Pages */}\n\t\t\t\t{testimonials.map((testimonial, index) => (\n\t\t\t\t\t<div\n\t\t\t\t\t\tkey={index + \"testimonial-page\"}\n\t\t\t\t\t\tclassName=\"w-full h-full flex justify-center items-center bg-background border border-gray-300 box-border cursor-grab\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<div className=\"page-front text-end text-foreground p-3 bg-background\">\n\t\t\t\t\t\t\t{index + 2}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"flex justify-center items-center mt-7 \">\n\t\t\t\t\t\t\t<Image\n\t\t\t\t\t\t\t\tsrc={testimonial.image || \"\"}\n\t\t\t\t\t\t\t\talt=\"image\"\n\t\t\t\t\t\t\t\twidth={100}\n\t\t\t\t\t\t\t\theight={100}\n\t\t\t\t\t\t\t\tclassName=\"rounded-full\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"flex flex-col justify-center items-center mt-3\">\n\t\t\t\t\t\t\t<span>{testimonial.name}</span>\n\t\t\t\t\t\t\t<span className=\"text-foreground text-sm\">\n\t\t\t\t\t\t\t\t{testimonial.jobtitle}\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"p-5 font-serif font-semibold text-center mt\">\n\t\t\t\t\t\t\t{testimonial.text}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"flex justify-center items-center mt-3 \">\n\t\t\t\t\t\t\t{[...Array(testimonial.rating)].map((_, i) => (\n\t\t\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\t\t\tkey={i + \"testimonial-svg\"}\n\t\t\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\t\t\t\tfill=\"#FFA800\"\n\t\t\t\t\t\t\t\t\tclassName=\"size-8\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\t\t\tfillRule=\"evenodd\"\n\t\t\t\t\t\t\t\t\t\td=\"M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z\"\n\t\t\t\t\t\t\t\t\t\tclipRule=\"evenodd\"\n\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t\t{[...Array(5 - testimonial.rating)].map((_, i) => (\n\t\t\t\t\t\t\t\t<svg\n\t\t\t\t\t\t\t\t\tkey={i + \"testimonial-svg-2\"}\n\t\t\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\t\t\t\tfill=\"#CBD5E1\"\n\t\t\t\t\t\t\t\t\tclassName=\"size-8\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<path\n\t\t\t\t\t\t\t\t\t\tfillRule=\"evenodd\"\n\t\t\t\t\t\t\t\t\t\td=\"M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z\"\n\t\t\t\t\t\t\t\t\t\tclipRule=\"evenodd\"\n\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t</svg>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t))}\n\n\t\t\t\t{/* Back Cover */}\n\t\t\t\t<div className=\"bg-background border p-8  text-foreground flex flex-col items-center justify-center\">\n\t\t\t\t\t<h1 className=\"text-4xl font-bold mb-4 text-center font-serif\">\n\t\t\t\t\t\tThank You!\n\t\t\t\t\t</h1>\n\t\t\t\t\t<p className=\"text-lg text-center\">\n\t\t\t\t\t\tWe appreciate your feedback\n\t\t\t\t\t</p>\n\t\t\t\t</div>\n\t\t\t</HTMLFlipBook>\n\t\t</div>\n\t);\n}\n\nexport default BookTestimonial3D;\n"
+    },
+    {
+      "path": "components/ui/book-testimonials/use-orientation.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/book-testimonials/use-orientation.tsx",
+      "content": "import { useEffect, useState } from \"react\";\n\nexport const useOrientation = () => {\n\tconst [orientation, setOrientation] = useState(\"\");\n\tconst [isMobile, setIsMobile] = useState(true);\n\n\tuseEffect(() => {\n\t\t// Function to update the orientation state\n\t\tfunction updateOrientation() {\n\t\t\tsetOrientation(window.screen.orientation.type);\n\t\t}\n\t\t// Initial update of the orientation state\n\t\tupdateOrientation();\n\n\t\tif (typeof window !== \"undefined\") {\n\t\t\tsetIsMobile(window.innerWidth < 770);\n\t\t}\n\n\t\t// Add an event listener for orientation change\n\t\twindow.addEventListener(\"orientationchange\", updateOrientation);\n\t\t// Clean up the event listener when the component unmounts\n\t\treturn () => {\n\t\t\twindow.removeEventListener(\"orientationchange\", updateOrientation);\n\t\t};\n\t}, [orientation]);\n\n\treturn { isMobile, orientation };\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Testimonials"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Dragging a page corner or clicking the edge of the book turns the page with a curling flip; picking a name from the index flips straight through to that person's page.",
+    "inspiration": {
+      "source": "Serenity UI",
+      "url": "https://www.serenity-ui.com/components/testimonials/3dbooktestimonial",
+      "authorUrl": "https://www.serenity-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "testimonials",
+        "type": "Testimonial[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/book-testimonials/component"
+  }
+}

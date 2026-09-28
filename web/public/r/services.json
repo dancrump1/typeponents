@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "services",
+  "type": "registry:ui",
+  "title": "Services",
+  "description": "Services",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/services.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/services.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\n\r\nexport function FeaturesSectionDemo() {\r\n\tconst features = [\r\n\t\t{\r\n\t\t\ttitle: \"Vestibular Rehabilitation\",\r\n\t\t\tdescription: \"Treat balance and dizziness issues\",\r\n\t\t\ticon: (\r\n\t\t\t\t<svg\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\twidth={24}\r\n\t\t\t\t\theight={24}\r\n\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\tstrokeWidth={2}\r\n\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\tclassName=\"icon icon-tabler icons-tabler-outline icon-tabler-mood-smile\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" />\r\n\t\t\t\t\t<path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\" />\r\n\t\t\t\t\t<path d=\"M9 10l.01 0\" />\r\n\t\t\t\t\t<path d=\"M15 10l.01 0\" />\r\n\t\t\t\t\t<path d=\"M9.5 15a3.5 3.5 0 0 0 5 0\" />\r\n\t\t\t\t</svg>\r\n\t\t\t),\r\n\t\t},\r\n\t\t{\r\n\t\t\ttitle: \"Bike Fitting\",\r\n\t\t\tdescription:\r\n\t\t\t\t\"Evaluate your body mechanics, riding history, and goals to determine the best position for your bike. \",\r\n\t\t\ticon: (\r\n\t\t\t\t<svg\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\twidth={24}\r\n\t\t\t\t\theight={24}\r\n\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\tstrokeWidth={2}\r\n\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\tclassName=\"icon icon-tabler icons-tabler-outline icon-tabler-bike\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" />\r\n\t\t\t\t\t<path d=\"M5 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0\" />\r\n\t\t\t\t\t<path d=\"M19 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0\" />\r\n\t\t\t\t\t<path d=\"M12 19l0 -4l-3 -3l5 -4l2 3l3 0\" />\r\n\t\t\t\t\t<path d=\"M17 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0\" />\r\n\t\t\t\t</svg>\r\n\t\t\t),\r\n\t\t},\r\n\t\t{\r\n\t\t\ttitle: \"Physical Therapy\",\r\n\t\t\tdescription:\r\n\t\t\t\t\"If you donot like EveryAI, we will convince you to like us.\",\r\n\t\t\ticon: (\r\n\t\t\t\t<svg\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\twidth={24}\r\n\t\t\t\t\theight={24}\r\n\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\tstrokeWidth={2}\r\n\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\tclassName=\"icon icon-tabler icons-tabler-outline icon-tabler-stretching-2\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" />\r\n\t\t\t\t\t<path d=\"M11 4a1 1 0 1 0 2 0a1 1 0 0 0 -2 0\" />\r\n\t\t\t\t\t<path d=\"M6.5 21l3.5 -5\" />\r\n\t\t\t\t\t<path d=\"M5 11l7 -2\" />\r\n\t\t\t\t\t<path d=\"M16 21l-4 -7v-5l7 -4\" />\r\n\t\t\t\t</svg>\r\n\t\t\t),\r\n\t\t},\r\n\t\t{\r\n\t\t\ttitle: \"Schedule today\",\r\n\t\t\tdescription: \"Personalized care for real people\",\r\n\t\t\ticon: (\r\n\t\t\t\t<svg\r\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\twidth={24}\r\n\t\t\t\t\theight={24}\r\n\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\tstrokeWidth={2}\r\n\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\tclassName=\"icon icon-tabler icons-tabler-outline icon-tabler-calendar-month\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" />\r\n\t\t\t\t\t<path d=\"M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12z\" />\r\n\t\t\t\t\t<path d=\"M16 3v4\" />\r\n\t\t\t\t\t<path d=\"M8 3v4\" />\r\n\t\t\t\t\t<path d=\"M4 11h16\" />\r\n\t\t\t\t\t<path d=\"M7 14h.013\" />\r\n\t\t\t\t\t<path d=\"M10.01 14h.005\" />\r\n\t\t\t\t\t<path d=\"M13.01 14h.005\" />\r\n\t\t\t\t\t<path d=\"M16.015 14h.005\" />\r\n\t\t\t\t\t<path d=\"M13.015 17h.005\" />\r\n\t\t\t\t\t<path d=\"M7.01 17h.005\" />\r\n\t\t\t\t\t<path d=\"M10.01 17h.005\" />\r\n\t\t\t\t</svg>\r\n\t\t\t),\r\n\t\t},\r\n\t];\r\n\treturn (\r\n\t\t<div className=\"cont-page grid grid-cols-1 md:grid-cols-2 relative z-10 py-24 max-w-7xl mx-auto\">\r\n\t\t\t{features.map((feature, index) => (\r\n\t\t\t\t<Feature key={feature.title} {...feature} index={index} />\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n}\r\n\r\nexport const Feature = ({\r\n\ttitle,\r\n\tdescription,\r\n\ticon,\r\n\tindex,\r\n}: {\r\n\ttitle: string;\r\n\tdescription: string;\r\n\ticon: any;\r\n\tindex: number;\r\n}) => {\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"flex flex-col lg:border-r  py-10 relative group/feature dark:border-neutral-800\",\r\n\t\t\t\t(index === 0 || index === 2) &&\r\n\t\t\t\t\t\"lg:border-l dark:border-neutral-800\"\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t{index < 4 && (\r\n\t\t\t\t<div className=\"opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-linear-to-t from-background dark:from-background to-transparent pointer-events-none\" />\r\n\t\t\t)}\r\n\t\t\t{index >= 4 && (\r\n\t\t\t\t<div className=\"opacity-0 group-hover/feature:opacity-100 transition duration-200 absolute inset-0 h-full w-full bg-linear-to-b from-background dark:from-background to-transparent pointer-events-none\" />\r\n\t\t\t)}\r\n\t\t\t<div className=\"mb-4 relative z-10 px-10 text-foreground dark:text-foreground\">\r\n\t\t\t\t<Image\r\n\t\t\t\t\tsrc={icon.url || \"/itjustworks.jpg\"}\r\n\t\t\t\t\talt={icon.title}\r\n\t\t\t\t\theight={48}\r\n\t\t\t\t\twidth={48}\r\n\t\t\t\t/>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"text-lg font-bold mb-2 relative z-10 px-10\">\r\n\t\t\t\t<div className=\"absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-background dark:bg-background group-hover/feature:bg-background transition-[height,background-color] duration-200 origin-center\" />\r\n\t\t\t\t<span className=\"group-hover/feature:translate-x-2 transition duration-200 inline-block text-foreground dark:text-foreground\">\r\n\t\t\t\t\t{title}\r\n\t\t\t\t</span>\r\n\t\t\t</div>\r\n\t\t\t<span className=\"text-sm text-foreground dark:text-foreground lg:max-w-[75%] relative z-10 px-10\">\r\n\t\t\t\t{description}\r\n\t\t\t</span>\r\n\t\t</div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/services"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "searchbar",
+  "type": "registry:ui",
+  "title": "Searchbar",
+  "description": "Searchbar",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [
+    "https://components.drivedev.net/r/three-dot-loader.json",
+    "three-dot-loader"
+  ],
+  "files": [
+    {
+      "path": "components/ui/searchbar.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/searchbar.tsx",
+      "content": "\"use client\";\n\nimport { useCallback, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\nimport ThreeDotLoaderGrowing from \"@/components/ui/three-dot-loader\";\n\nconst placeholdersDefault = [\n\t\"Searching for something?\",\n\t\"second placeholder\",\n\t\"third placeholder\",\n];\n\n// https://ui.aceternity.com/components/placeholders-and-vanish-input\nexport function PlaceholdersAndVanishInput({\n\tplaceholders = placeholdersDefault,\n\tonChange,\n\tonSubmit,\n\tloading,\n\tsetLoading,\n}: {\n\tplaceholders?: string[];\n\tonChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;\n\tonSubmit: (e: React.FormEvent<HTMLFormElement>, value: any) => void;\n}) {\n\tconst [currentPlaceholder, setCurrentPlaceholder] = useState(0);\n\n\tconst canvasRef = useRef<HTMLCanvasElement>(null);\n\tconst newDataRef = useRef<any[]>([]);\n\tconst inputRef = useRef<HTMLInputElement>(null);\n\tconst [value, setValue] = useState(\"\");\n\tconst [animating, setAnimating] = useState(false);\n\n\tconst draw = useCallback(() => {\n\t\tif (!inputRef.current) return;\n\t\tconst canvas = canvasRef.current;\n\t\tif (!canvas) return;\n\t\tconst ctx = canvas.getContext(\"2d\");\n\t\tif (!ctx) return;\n\n\t\tcanvas.width = 800;\n\t\tcanvas.height = 800;\n\t\tctx.clearRect(0, 0, 800, 800);\n\t\tconst computedStyles = getComputedStyle(inputRef.current);\n\n\t\tconst fontSize = parseFloat(computedStyles.getPropertyValue(\"font-size\"));\n\t\tctx.font = `${fontSize * 2}px ${computedStyles.fontFamily}`;\n\t\tctx.fillStyle = \"#FFF\";\n\t\tctx.fillText(value, 16, 40);\n\n\t\tconst imageData = ctx.getImageData(0, 0, 800, 800);\n\t\tconst pixelData = imageData.data;\n\t\tconst newData: any[] = [];\n\n\t\tfor (let t = 0; t < 800; t++) {\n\t\t\tlet i = 4 * t * 800;\n\t\t\tfor (let n = 0; n < 800; n++) {\n\t\t\t\tlet e = i + 4 * n;\n\t\t\t\tif (\n\t\t\t\t\tpixelData[e] !== 0 &&\n\t\t\t\t\tpixelData[e + 1] !== 0 &&\n\t\t\t\t\tpixelData[e + 2] !== 0\n\t\t\t\t) {\n\t\t\t\t\tnewData.push({\n\t\t\t\t\t\tx: n,\n\t\t\t\t\t\ty: t,\n\t\t\t\t\t\tcolor: [\n\t\t\t\t\t\t\tpixelData[e],\n\t\t\t\t\t\t\tpixelData[e + 1],\n\t\t\t\t\t\t\tpixelData[e + 2],\n\t\t\t\t\t\t\tpixelData[e + 3],\n\t\t\t\t\t\t],\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\n\t\tnewDataRef.current = newData.map(({ x, y, color }) => ({\n\t\t\tx,\n\t\t\ty,\n\t\t\tr: 1,\n\t\t\tcolor: `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`,\n\t\t}));\n\t}, [value]);\n\n\tuseEffect(() => {\n\t\tdraw();\n\t}, [value, draw]);\n\n\tconst animate = (start: number, e: React.FormEvent<HTMLFormElement>) => {\n\t\tconst animateFrame = (pos: number = 0) => {\n\t\t\trequestAnimationFrame(() => {\n\t\t\t\tconst newArr = [];\n\t\t\t\tfor (let i = 0; i < newDataRef.current.length; i++) {\n\t\t\t\t\tconst current = newDataRef.current[i];\n\t\t\t\t\tif (current.x < pos) {\n\t\t\t\t\t\tnewArr.push(current);\n\t\t\t\t\t} else {\n\t\t\t\t\t\tif (current.r <= 0) {\n\t\t\t\t\t\t\tcurrent.r = 0;\n\t\t\t\t\t\t\tcontinue;\n\t\t\t\t\t\t}\n\t\t\t\t\t\tcurrent.x += Math.random() > 0.5 ? 1 : -1;\n\t\t\t\t\t\tcurrent.y += Math.random() > 0.5 ? 1 : -1;\n\t\t\t\t\t\tcurrent.r -= 0.05 * Math.random();\n\t\t\t\t\t\tnewArr.push(current);\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t\tnewDataRef.current = newArr;\n\t\t\t\tconst ctx = canvasRef.current?.getContext(\"2d\");\n\t\t\t\tif (ctx) {\n\t\t\t\t\tctx.clearRect(pos, 0, 800, 800);\n\t\t\t\t\tnewDataRef.current.forEach((t) => {\n\t\t\t\t\t\tconst { x: n, y: i, r: s, color: color } = t;\n\t\t\t\t\t\tif (n > pos) {\n\t\t\t\t\t\t\tctx.beginPath();\n\t\t\t\t\t\t\tctx.rect(n, i, s, s);\n\t\t\t\t\t\t\tctx.fillStyle = color;\n\t\t\t\t\t\t\tctx.strokeStyle = color;\n\t\t\t\t\t\t\tctx.stroke();\n\t\t\t\t\t\t}\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t\tif (newDataRef.current.length > 0) {\n\t\t\t\t\tanimateFrame(pos - 8);\n\t\t\t\t} else {\n\t\t\t\t\tsetValue(\"\");\n\t\t\t\t\tsetAnimating(false);\n\t\t\t\t\tonSubmit && onSubmit(e, value);\n\t\t\t\t}\n\t\t\t});\n\t\t};\n\t\tanimateFrame(start);\n\t};\n\n\tconst handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {\n\t\tif (e.key === \"Enter\" && !animating && !loading) {\n\t\t\tvanishAndSubmit();\n\t\t}\n\t};\n\n\tconst vanishAndSubmit = (e?: React.FormEvent<HTMLFormElement>) => {\n\t\tsetAnimating(true);\n\t\tsetLoading(true);\n\n\t\tdraw();\n\n\t\tconst value = inputRef.current?.value || \"\";\n\t\tif (value && inputRef.current) {\n\t\t\tconst maxX = newDataRef.current.reduce(\n\t\t\t\t(prev, current) => (current.x > prev ? current.x : prev),\n\t\t\t\t0\n\t\t\t);\n\t\t\tanimate(maxX, e);\n\t\t}\n\t};\n\n\tconst handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {\n\t\te.preventDefault();\n\n\t\tvanishAndSubmit(e);\n\t};\n\n\treturn (\n\t\t<form\n\t\t\tclassName={cn(\n\t\t\t\t\"relative mx-auto w-full max-w-xl bg-background dark:bg-background h-12 rounded-full overflow-hidden shadow-[0px_2px_3px_-1px_rgba(0,0,0,0.1),0px_1px_0px_0px_rgba(25,28,33,0.02),0px_0px_0px_1px_rgba(25,28,33,0.08)] transition duration-200\",\n\t\t\t\tvalue && \"bg-background\"\n\t\t\t)}\n\t\t\tonSubmit={handleSubmit}\n\t\t>\n\t\t\t{/* <canvas\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"absolute pointer-events-none  text-base transform scale-50 top-[20%] left-2 sm:left-8 origin-top-left filter invert dark:invert-0 pr-20\",\n\t\t\t\t\t!animating ? \"opacity-0\" : \"opacity-100\"\n\t\t\t\t)}\n\t\t\t\tref={canvasRef}\n\t\t\t/> */}\n\t\t\t<input\n\t\t\t\tonChange={(e) => {\n\t\t\t\t\tif (!animating) {\n\t\t\t\t\t\tsetValue(e.target.value || \"\");\n\t\t\t\t\t\tonChange && onChange(e);\n\t\t\t\t\t}\n\t\t\t\t}}\n\t\t\t\tonKeyDown={handleKeyDown}\n\t\t\t\tref={inputRef}\n\t\t\t\tvalue={value}\n\t\t\t\tname=\"search\"\n\t\t\t\ttype=\"text\"\n\t\t\t\tclassName={cn(\n\t\t\t\t\t\"w-full relative text-sm sm:text-base z-10 border-none dark:text-foreground bg-transparent text-foreground h-full rounded-full focus:outline-hidden focus:ring-0 pl-4 pr-20\",\n\t\t\t\t\tanimating && \"text-transparent dark:text-transparent\"\n\t\t\t\t)}\n\t\t\t/>\n\n\t\t\t<button\n\t\t\t\tdisabled={!value || animating || !loading}\n\t\t\t\ttype=\"submit\"\n\t\t\t\tclassName=\"absolute right-2 top-1/2 z-10 -translate-y-1/2 h-8 w-8 rounded-full disabled:bg-background bg-background dark:bg-background dark:disabled:bg-background transition duration-200 flex items-center justify-center\"\n\t\t\t>\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{loading ? (\n\t\t\t\t\t\t<ThreeDotLoaderGrowing />\n\t\t\t\t\t) : (\n\t\t\t\t\t\t<motion.svg\n\t\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\t\twidth=\"24\"\n\t\t\t\t\t\t\theight=\"24\"\n\t\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\t\tstrokeWidth=\"2\"\n\t\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\t\tclassName=\"text-foreground h-4 w-4 cursor-pointer\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t<path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\" />\n\t\t\t\t\t\t\t<motion.path\n\t\t\t\t\t\t\t\td=\"M5 12l14 0\"\n\t\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\t\tstrokeDasharray: \"50%\",\n\t\t\t\t\t\t\t\t\tstrokeDashoffset: \"50%\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\tstrokeDashoffset: value ? 0 : \"50%\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\t\tduration: 0.3,\n\t\t\t\t\t\t\t\t\tease: \"linear\",\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t<path d=\"M13 18l6 -6\" />\n\t\t\t\t\t\t\t<path d=\"M13 6l6 6\" />\n\t\t\t\t\t\t</motion.svg>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t</button>\n\n\t\t\t<div className=\"absolute inset-0 flex items-center rounded-full pointer-events-none\">\n\t\t\t\t<AnimatePresence mode=\"wait\">\n\t\t\t\t\t{!value && (\n\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\tinitial={{\n\t\t\t\t\t\t\t\ty: 5,\n\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tkey={`current-placeholder-${currentPlaceholder}`}\n\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\ty: 0,\n\t\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\texit={{\n\t\t\t\t\t\t\t\ty: -15,\n\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\ttransition={{\n\t\t\t\t\t\t\t\tduration: 0.3,\n\t\t\t\t\t\t\t\tease: \"linear\",\n\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\tclassName=\"dark:text-foreground text-sm sm:text-base font-normal text-foreground pl-4 text-left w-[calc(100%-2rem)] truncate\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{placeholders[currentPlaceholder]}\n\t\t\t\t\t\t</motion.span>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t</div>\n\t\t</form>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "canvas",
+      "keyboard",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/placeholders-and-vanish-input",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "onSubmit",
+        "type": "(e: React.FormEvent<HTMLFormElement>, value: any) => void",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "placeholders",
+        "type": "string[]",
+        "default": "placeholdersDefault",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onChange",
+        "type": "((e: React.ChangeEvent<HTMLInputElement>) => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/searchbar"
+  }
+}

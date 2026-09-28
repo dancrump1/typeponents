@@ -1,0 +1,143 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "video-player2",
+  "type": "registry:ui",
+  "title": "Video Player2",
+  "description": "Custom video player with overlay controls.",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/video-player2.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/video-player2.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useState } from \"react\";\r\n\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { cn } from \"@/lib/utils\";\r\nimport { Maximize2, Minimize2, Play } from \"lucide-react\";\r\nimport { AnimatePresence, motion } from \"motion/react\";\r\n\r\ninterface YouTubePlayer2Props {\r\n\tvideoId: string;\r\n\ttitle?: string;\r\n\tdefaultExpanded?: boolean;\r\n\tcustomThumbnail?: string;\r\n\r\n\t// Container & Layout\r\n\tclassName?: string;\r\n\tcontainerClassName?: string;\r\n\texpandedClassName?: string;\r\n\r\n\t// Thumbnail & Media\r\n\tthumbnailClassName?: string;\r\n\tthumbnailImageClassName?: string;\r\n\r\n\t// Play Button\r\n\tplayButtonClassName?: string;\r\n\tplayIconClassName?: string;\r\n\r\n\t// Title\r\n\ttitleClassName?: string;\r\n\r\n\t// Controls\r\n\tcontrolsClassName?: string;\r\n\texpandButtonClassName?: string;\r\n\r\n\t// Backdrop\r\n\tbackdropClassName?: string;\r\n\r\n\t// Player\r\n\tplayerClassName?: string;\r\n}\r\n\r\nexport function YouTubePlayer2({\r\n\tvideoId,\r\n\ttitle,\r\n\tdefaultExpanded = false,\r\n\tcustomThumbnail,\r\n\r\n\t// Styling props\r\n\tclassName,\r\n\tcontainerClassName,\r\n\texpandedClassName,\r\n\tthumbnailClassName,\r\n\tthumbnailImageClassName,\r\n\tplayButtonClassName,\r\n\tplayIconClassName,\r\n\ttitleClassName,\r\n\tcontrolsClassName,\r\n\texpandButtonClassName,\r\n\tbackdropClassName,\r\n\tplayerClassName,\r\n}: YouTubePlayer2Props) {\r\n\tconst [expanded, setExpanded] = useState(defaultExpanded);\r\n\tconst [playing, setPlaying] = useState(false);\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\r\n\t// Extract video ID from full URL if needed\r\n\tconst extractVideoId = (id: string) => {\r\n\t\tif (id.includes(\"youtube.com\") || id.includes(\"youtu.be\")) {\r\n\t\t\ttry {\r\n\t\t\t\tconst url = new URL(id);\r\n\t\t\t\tif (id.includes(\"youtube.com\")) {\r\n\t\t\t\t\treturn url.searchParams.get(\"v\") || \"\";\r\n\t\t\t\t} else {\r\n\t\t\t\t\treturn url.pathname.substring(1);\r\n\t\t\t\t}\r\n\t\t\t} catch (error) {\r\n\t\t\t\tconsole.error(\"Invalid YouTube URL:\", error);\r\n\t\t\t\treturn id;\r\n\t\t\t}\r\n\t\t}\r\n\t\treturn id;\r\n\t};\r\n\r\n\tconst actualVideoId = extractVideoId(videoId);\r\n\r\n\tconst handlePlay = () => {\r\n\t\tsetPlaying(true);\r\n\t};\r\n\r\n\tconst toggleExpand = () => {\r\n\t\tsetExpanded(!expanded);\r\n\t};\r\n\r\n\t// Handle Escape key to minimize when expanded\r\n\tuseEffect(() => {\r\n\t\tconst handleKeyDown = (event: KeyboardEvent) => {\r\n\t\t\tif (event.key === \"Escape\" && expanded) {\r\n\t\t\t\tsetExpanded(false);\r\n\t\t\t}\r\n\t\t};\r\n\t\tif (expanded) {\r\n\t\t\tdocument.addEventListener(\"keydown\", handleKeyDown);\r\n\t\t}\r\n\t\treturn () => {\r\n\t\t\tdocument.removeEventListener(\"keydown\", handleKeyDown);\r\n\t\t};\r\n\t}, [expanded]);\r\n\r\n\tconst getThumbnailUrl = () => {\r\n\t\tif (customThumbnail) return customThumbnail;\r\n\t\treturn actualVideoId\r\n\t\t\t? `https://i.ytimg.com/vi/${actualVideoId}/hqdefault.jpg`\r\n\t\t\t: \"\";\r\n\t};\r\n\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/* Main container - always in the document flow */}\r\n\t\t\t<div\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"relative\",\r\n\t\t\t\t\texpanded ? \"invisible\" : \"visible\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t>\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tlayoutId={`youtube-player-${videoId}`}\r\n\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\"overflow-hidden border bg-card text-card-foreground shadow-lg rounded-xl\",\r\n\t\t\t\t\t\tcontainerClassName\r\n\t\t\t\t\t)}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tlayoutId={`youtube-player-content-${videoId}`}\r\n\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\"relative aspect-video bg-muted\",\r\n\t\t\t\t\t\t\tplayerClassName\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{!playing && (\r\n\t\t\t\t\t\t\t<>\r\n\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-thumbnail-container-${videoId}`}\r\n\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\"absolute inset-0 bg-linear-to-br from-muted to-muted/80\",\r\n\t\t\t\t\t\t\t\t\t\tthumbnailClassName\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{getThumbnailUrl() && (\r\n\t\t\t\t\t\t\t\t\t\t<motion.img\r\n\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-thumbnail-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\tsrc={getThumbnailUrl()}\r\n\t\t\t\t\t\t\t\t\t\t\talt={title || \"Video thumbnail\"}\r\n\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\"absolute inset-0 h-full w-full object-cover opacity-70\",\r\n\t\t\t\t\t\t\t\t\t\t\t\tthumbnailImageClassName\r\n\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t</motion.div>\r\n\r\n\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-content-overlay-${videoId}`}\r\n\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 flex flex-col items-center justify-center z-10\"\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<Button\r\n\t\t\t\t\t\t\t\t\t\tsize=\"lg\"\r\n\t\t\t\t\t\t\t\t\t\tvariant=\"secondary\"\r\n\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\"relative h-16 w-16 rounded-full border border-border/20 bg-background/80 backdrop-blur-xs md:h-20 md:w-20 p-0\",\r\n\t\t\t\t\t\t\t\t\t\t\t\"focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background\",\r\n\t\t\t\t\t\t\t\t\t\t\tplayButtonClassName\r\n\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\tonClick={handlePlay}\r\n\t\t\t\t\t\t\t\t\t\taria-label=\"Play video\"\r\n\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t<Play\r\n\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\"h-6 w-6 translate-x-[2px] fill-primary text-primary md:h-8 md:w-8\",\r\n\t\t\t\t\t\t\t\t\t\t\t\tplayIconClassName\r\n\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t</Button>\r\n\r\n\t\t\t\t\t\t\t\t\t{title && (\r\n\t\t\t\t\t\t\t\t\t\t<motion.h3\r\n\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-title-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\"mt-4 max-w-xs text-center text-sm font-medium text-secondary/90 md:max-w-md md:text-base\",\r\n\t\t\t\t\t\t\t\t\t\t\t\ttitleClassName\r\n\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t{title}\r\n\t\t\t\t\t\t\t\t\t\t</motion.h3>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t</>\r\n\t\t\t\t\t\t)}\r\n\r\n\t\t\t\t\t\t{playing && (\r\n\t\t\t\t\t\t\t<iframe\r\n\t\t\t\t\t\t\t\tsrc={`https://www.youtube.com/embed/${actualVideoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&controls=1`}\r\n\t\t\t\t\t\t\t\ttitle={title}\r\n\t\t\t\t\t\t\t\tallow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\r\n\t\t\t\t\t\t\t\tallowFullScreen\r\n\t\t\t\t\t\t\t\tclassName=\"h-full w-full border-0\"\r\n\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t)}\r\n\r\n\t\t\t\t\t\t{/* Controls Overlay */}\r\n\t\t\t\t\t\t<YouTubePlayerControls\r\n\t\t\t\t\t\t\tvideoId={videoId}\r\n\t\t\t\t\t\t\texpanded={expanded}\r\n\t\t\t\t\t\t\tplaying={playing}\r\n\t\t\t\t\t\t\tisHovered={isHovered}\r\n\t\t\t\t\t\t\tonToggleExpand={toggleExpand}\r\n\t\t\t\t\t\t\tcontrolsClassName={controlsClassName}\r\n\t\t\t\t\t\t\texpandButtonClassName={expandButtonClassName}\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t</div>\r\n\r\n\t\t\t{/* Expanded state - fixed position */}\r\n\t\t\t<AnimatePresence>\r\n\t\t\t\t{expanded && (\r\n\t\t\t\t\t<>\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tinitial={{ opacity: 0 }}\r\n\t\t\t\t\t\t\tanimate={{ opacity: 1 }}\r\n\t\t\t\t\t\t\texit={{ opacity: 0 }}\r\n\t\t\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\"fixed inset-0 z-40 bg-background/80 backdrop-blur-xs\",\r\n\t\t\t\t\t\t\t\tbackdropClassName\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\tonClick={toggleExpand}\r\n\t\t\t\t\t\t\taria-label=\"Close expanded video\"\r\n\t\t\t\t\t\t/>\r\n\r\n\t\t\t\t\t\t<div className=\"fixed inset-0 z-50 flex items-center justify-center pointer-events-none\">\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tlayoutId={`youtube-player-${videoId}`}\r\n\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\"overflow-hidden border bg-card text-card-foreground shadow-xl rounded-lg pointer-events-auto\",\r\n\t\t\t\t\t\t\t\t\t\"w-[90vw] max-w-[1200px] max-h-[90vh] aspect-video\",\r\n\t\t\t\t\t\t\t\t\texpandedClassName\r\n\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-content-${videoId}`}\r\n\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\"relative aspect-video bg-muted\",\r\n\t\t\t\t\t\t\t\t\t\tplayerClassName\r\n\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{!playing && (\r\n\t\t\t\t\t\t\t\t\t\t<>\r\n\t\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-thumbnail-container-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\"absolute inset-0 bg-linear-to-br from-muted to-muted/80\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tthumbnailClassName\r\n\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t{getThumbnailUrl() && (\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<motion.img\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-thumbnail-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tsrc={getThumbnailUrl()}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\talt={title || \"Video thumbnail\"}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\"absolute inset-0 h-full w-full object-cover opacity-70\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tthumbnailImageClassName\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-content-overlay-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 flex flex-col items-center justify-center z-10\"\r\n\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t<Button\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tsize=\"lg\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tvariant=\"secondary\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\"relative h-16 w-16 rounded-full border border-border/20 bg-background/80 backdrop-blur-xs md:h-20 md:w-20 p-0\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\"focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tplayButtonClassName\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tonClick={handlePlay}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\taria-label=\"Play video\"\r\n\t\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<Play\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\"h-6 w-6 translate-x-[2px] fill-primary text-primary md:h-8 md:w-8\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tplayIconClassName\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t\t\t\t</Button>\r\n\r\n\t\t\t\t\t\t\t\t\t\t\t\t{title && (\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t<motion.h3\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tlayoutId={`youtube-player-title-${videoId}`}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\"mt-4 max-w-xs text-center text-sm font-medium text-foreground/90 md:max-w-md md:text-base\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\ttitleClassName\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t{title}\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t</motion.h3>\r\n\t\t\t\t\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t\t\t\t</>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\r\n\t\t\t\t\t\t\t\t\t{playing && (\r\n\t\t\t\t\t\t\t\t\t\t<iframe\r\n\t\t\t\t\t\t\t\t\t\t\tsrc={`https://www.youtube.com/embed/${actualVideoId}?autoplay=1&rel=0&modestbranding=1&iv_load_policy=3&showinfo=0&controls=1`}\r\n\t\t\t\t\t\t\t\t\t\t\ttitle={title}\r\n\t\t\t\t\t\t\t\t\t\t\tallow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\"\r\n\t\t\t\t\t\t\t\t\t\t\tallowFullScreen\r\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"h-full w-full border-0\"\r\n\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t)}\r\n\r\n\t\t\t\t\t\t\t\t\t{/* Controls Overlay */}\r\n\t\t\t\t\t\t\t\t\t<YouTubePlayerControls\r\n\t\t\t\t\t\t\t\t\t\tvideoId={videoId}\r\n\t\t\t\t\t\t\t\t\t\texpanded={expanded}\r\n\t\t\t\t\t\t\t\t\t\tplaying={playing}\r\n\t\t\t\t\t\t\t\t\t\tisHovered={isHovered}\r\n\t\t\t\t\t\t\t\t\t\tonToggleExpand={toggleExpand}\r\n\t\t\t\t\t\t\t\t\t\tcontrolsClassName={controlsClassName}\r\n\t\t\t\t\t\t\t\t\t\texpandButtonClassName={expandButtonClassName}\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</>\r\n\t\t\t\t)}\r\n\t\t\t</AnimatePresence>\r\n\t\t</>\r\n\t);\r\n}\r\n\r\n// Controls Component\r\ninterface YouTubePlayerControlsProps {\r\n\tvideoId: string;\r\n\texpanded: boolean;\r\n\tplaying: boolean;\r\n\tisHovered: boolean;\r\n\tonToggleExpand: () => void;\r\n\tcontrolsClassName?: string;\r\n\texpandButtonClassName?: string;\r\n}\r\n\r\nfunction YouTubePlayerControls({\r\n\tvideoId,\r\n\texpanded,\r\n\tplaying,\r\n\tisHovered,\r\n\tonToggleExpand,\r\n\tcontrolsClassName,\r\n\texpandButtonClassName,\r\n}: YouTubePlayerControlsProps) {\r\n\tconst shouldShow = !playing || isHovered || expanded;\r\n\r\n\treturn (\r\n\t\t<AnimatePresence>\r\n\t\t\t{shouldShow && (\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\tlayoutId={`youtube-player-controls-${videoId}`}\r\n\t\t\t\t\tinitial={{ opacity: 0 }}\r\n\t\t\t\t\tanimate={{ opacity: 1 }}\r\n\t\t\t\t\texit={{ opacity: 0 }}\r\n\t\t\t\t\ttransition={{ duration: 0.2 }}\r\n\t\t\t\t\tclassName={cn(\"absolute right-2 top-2 z-20\", controlsClassName)}\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\twhileHover={{ scale: 1.05 }}\r\n\t\t\t\t\t\twhileTap={{ scale: 0.95 }}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<Button\r\n\t\t\t\t\t\t\tvariant=\"secondary\"\r\n\t\t\t\t\t\t\tsize=\"icon\"\r\n\t\t\t\t\t\t\tonClick={onToggleExpand}\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\"h-8 w-8 rounded-full bg-background/40 backdrop-blur-xs hover:bg-background/60 focus-visible:ring-ring/50 md:h-9 md:w-9\",\r\n\t\t\t\t\t\t\t\texpandButtonClassName\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\taria-label={expanded ? \"Minimize video\" : \"Maximize video\"}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tanimate={{ rotate: expanded ? 180 : 0 }}\r\n\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t\t\t\tdamping: 20,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t{expanded ? (\r\n\t\t\t\t\t\t\t\t\t<Minimize2 className=\"h-4 w-4 md:h-5 md:w-5\" />\r\n\t\t\t\t\t\t\t\t) : (\r\n\t\t\t\t\t\t\t\t\t<Maximize2 className=\"h-4 w-4 md:h-5 md:w-5\" />\r\n\t\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t</Button>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t</motion.div>\r\n\t\t\t)}\r\n\t\t</AnimatePresence>\r\n\t);\r\n}\r\n\r\n// Export sub-components for advanced customization\r\nexport { YouTubePlayerControls };\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Videos"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "keyboard"
+    ],
+    "interaction": "Play, pause and scrub a video from the custom chrome rather than native controls.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "videoId",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "title",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "defaultExpanded",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "customThumbnail",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "expandedClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "thumbnailClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "thumbnailImageClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "playButtonClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "playIconClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "titleClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "controlsClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "expandButtonClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "backdropClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "playerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/video-player2"
+  }
+}

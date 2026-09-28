@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "frequency",
+  "type": "registry:ui",
+  "title": "Frequency",
+  "description": "Frequency",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/frequency.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/frequency.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { motion } from \"framer-motion\";\r\n\r\n// credit:\r\n// https://ground.bossadizenith.me/docs/components/cards/frequency\r\n\r\nconst Frequency: React.FC = () => {\r\n\tconst [audioData, setAudioData] = useState<number[]>(Array(30).fill(100)); // Initial heights\r\n\tconst audioContextRef = useRef<AudioContext | null>(null);\r\n\tconst analyserRef = useRef<AnalyserNode | null>(null);\r\n\tconst sourceRef = useRef<MediaElementAudioSourceNode | null>(null);\r\n\tconst audioElementRef = useRef<HTMLAudioElement | null>(null);\r\n\tconst animationIdRef = useRef<number | null>(null);\r\n\r\n\tconst setupAudio = () => {\r\n\t\tif (audioContextRef.current) return; // Prevent multiple AudioContexts\r\n\r\n\t\taudioContextRef.current = new (window.AudioContext ||\r\n\t\t\t(window as any).webkitAudioContext)();\r\n\t\tconst audio = audioElementRef.current!;\r\n\r\n\t\t// Create a MediaElementSource from the audio element\r\n\t\tsourceRef.current =\r\n\t\t\taudioContextRef.current.createMediaElementSource(audio);\r\n\r\n\t\t// Create an AnalyserNode\r\n\t\tanalyserRef.current = audioContextRef.current.createAnalyser();\r\n\t\tanalyserRef.current.fftSize = 64; // Smaller FFT for lower frequencies\r\n\r\n\t\t// Connect audio source to analyser and destination\r\n\t\tsourceRef.current.connect(analyserRef.current);\r\n\t\tanalyserRef.current.connect(audioContextRef.current.destination);\r\n\r\n\t\t// Create a buffer array to store the audio data\r\n\t\tconst dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);\r\n\r\n\t\t// Function to update the audio data and animate\r\n\t\tconst updateAudioData = () => {\r\n\t\t\tanalyserRef.current!.getByteFrequencyData(dataArray);\r\n\r\n\t\t\t// Map the dataArray to fit the number of bars (30 bars)\r\n\t\t\tconst normalizedData = Array.from(dataArray)\r\n\t\t\t\t.slice(0, 30)\r\n\t\t\t\t.map((val) => {\r\n\t\t\t\t\treturn (val / 255) * 200 + 100; // Normalize to fit the height (100px to 300px)\r\n\t\t\t\t});\r\n\r\n\t\t\tsetAudioData(normalizedData); // Update the height values\r\n\r\n\t\t\t// Request the next animation frame\r\n\t\t\tanimationIdRef.current = requestAnimationFrame(updateAudioData);\r\n\t\t};\r\n\r\n\t\t// Start updating the audio data\r\n\t\tanimationIdRef.current = requestAnimationFrame(updateAudioData);\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\t// Clean up on unmount\r\n\t\treturn () => {\r\n\t\t\tif (animationIdRef.current)\r\n\t\t\t\tcancelAnimationFrame(animationIdRef.current);\r\n\t\t\tif (audioContextRef.current) {\r\n\t\t\t\t// Disconnect and close audio context to prevent memory leaks\r\n\t\t\t\tif (sourceRef.current) {\r\n\t\t\t\t\tsourceRef.current.disconnect();\r\n\t\t\t\t}\r\n\t\t\t\taudioContextRef.current.close();\r\n\t\t\t}\r\n\t\t};\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<div className=\"size-full center flex-col\">\r\n\t\t\t<audio\r\n\t\t\t\tref={audioElementRef}\r\n\t\t\t\tsrc=\"/music/audio2.mp3\"\r\n\t\t\t\tonPlay={setupAudio}\r\n\t\t\t\tcontrols\r\n\t\t\t\tclassName=\"mb-20\"\r\n\t\t\t\tautoPlay\r\n\t\t\t/>\r\n\r\n\t\t\t<div className=\"flex items-end h-60\">\r\n\t\t\t\t{audioData.map((height, index) => (\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tkey={index}\r\n\t\t\t\t\t\tclassName=\"bg-background w-2 mx-0.5 rounded-2xl\"\r\n\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\theight: `${height}px`, // Dynamic height based on the audio data\r\n\t\t\t\t\t\t\tbackgroundColor: height > 200 ? \"#3B82F6\" : \"#6B7280\", // Change color based on intensity\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\tstiffness: 200,\r\n\t\t\t\t\t\t\tdamping: 20,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default Frequency;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [
+      "spring",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "ground.bossadizenith.me",
+      "url": "https://ground.bossadizenith.me/docs/components/cards/frequency",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/frequency"
+  }
+}

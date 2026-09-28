@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "features-centered",
+  "type": "registry:component",
+  "title": "Features Centered",
+  "description": "Features Centered",
+  "files": [
+    {
+      "path": "registry/ui-basic/FeaturesCentered.tsx",
+      "content": "import React from \"react\";\r\n\r\nexport default function FeatureCentered() {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{/*          <!-- Component: Feature item with square icon title and text --> */}\r\n\t\t\t<div className=\"flex flex-col items-center gap-4 text-center\">\r\n\t\t\t\t<div className=\"flex items-center rounded bg-emerald-500 p-2 text-white\">\r\n\t\t\t\t\t<svg\r\n\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\r\n\t\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\t\tviewBox=\"0 0 24 24\"\r\n\t\t\t\t\t\tstrokeWidth=\"1.5\"\r\n\t\t\t\t\t\tstroke=\"currentColor\"\r\n\t\t\t\t\t\tclassName=\"h-6 w-6\"\r\n\t\t\t\t\t\taria-label=\"Dashboard icon\"\r\n\t\t\t\t\t\trole=\"graphics-symbol\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<path\r\n\t\t\t\t\t\t\tstrokeLinecap=\"round\"\r\n\t\t\t\t\t\t\tstrokeLinejoin=\"round\"\r\n\t\t\t\t\t\t\td=\"M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t</svg>\r\n\t\t\t\t</div>\r\n\t\t\t\t<div className=\"flex w-full min-w-0 flex-col items-center justify-center gap-0 text-base\">\r\n\t\t\t\t\t<h3 className=\"mb-2 py-2 text-lg leading-6 text-slate-700\">\r\n\t\t\t\t\t\tResponsive Design\r\n\t\t\t\t\t</h3>\r\n\t\t\t\t\t<p className=\"text-slate-500\">\r\n\t\t\t\t\t\tWind UI ensures your web application looks and functions\r\n\t\t\t\t\t\tflawlessly on various devices, from smartphones to desktops.\r\n\t\t\t\t\t</p>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t\t{/*          <!-- End Feature item with square icon title and text --> */}\r\n\t\t</>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

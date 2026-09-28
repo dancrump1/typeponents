@@ -1,0 +1,204 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "project-showcase",
+  "type": "registry:ui",
+  "title": "Project Showcase",
+  "description": "Two-column project showcase pairing a stack of tilted screenshots with the project name, role and write-up.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/project-showcase.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/project-showcase.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useCallback, useEffect, useRef, useState } from \"react\";\r\n\r\nimport Image from \"next/image\";\r\n\r\nimport { AnimatePresence, motion } from \"framer-motion\";\r\n\r\n// Credit:\r\n// https://namer-ui.netlify.app/components\r\n\r\ntype Testimonial = {\r\n\tquote: string;\r\n\tname: string;\r\n\tdesignation: string;\r\n\tsrc: string;\r\n\tlink?: string;\r\n};\r\n\r\ntype ProjectShowcaseProps = {\r\n\ttestimonials: Testimonial[];\r\n\tautoplay?: boolean;\r\n\tcolors?: {\r\n\t\tname?: string;\r\n\t\tposition?: string;\r\n\t\ttestimony?: string;\r\n\t};\r\n\tfontSizes?: {\r\n\t\tname?: string;\r\n\t\tposition?: string;\r\n\t\ttestimony?: string;\r\n\t};\r\n\tspacing?: {\r\n\t\ttop?: string;\r\n\t\tbottom?: string;\r\n\t\tlineHeight?: string;\r\n\t\tnameTop?: string;\r\n\t\tnameBottom?: string;\r\n\t\tpositionTop?: string;\r\n\t\tpositionBottom?: string;\r\n\t\ttestimonyTop?: string;\r\n\t\ttestimonyBottom?: string;\r\n\t};\r\n\tdesktopVersionBottomThreshold?: number;\r\n\tmaxImageWidth?: number;\r\n\timageWidthPercentage?: number;\r\n\tmobile?: {\r\n\t\tfontSizes?: {\r\n\t\t\tname?: string;\r\n\t\t\tposition?: string;\r\n\t\t\ttestimony?: string;\r\n\t\t};\r\n\t\tspacing?: {\r\n\t\t\ttop?: string;\r\n\t\t\tbottom?: string;\r\n\t\t\tlineHeight?: string;\r\n\t\t\tnameTop?: string;\r\n\t\t\tnameBottom?: string;\r\n\t\t\tpositionTop?: string;\r\n\t\t\tpositionBottom?: string;\r\n\t\t\ttestimonyTop?: string;\r\n\t\t\ttestimonyBottom?: string;\r\n\t\t};\r\n\t};\r\n\timageAspectRatio?: number; // Added prop for image aspect ratio\r\n\tisRTL?: boolean; // Added prop for RTL support\r\n\tonItemClick?: (link: string) => void;\r\n\touterRounding?: string; // Added prop for outer rounding\r\n\tinnerRounding?: string; // Added prop for inner rounding\r\n\toutlineColor?: string; // Added prop for outline color\r\n\thoverOutlineColor?: string; // Added prop for hover outline color\r\n\tbuttonInscriptions?: {\r\n\t\tpreviousButton: string;\r\n\t\tnextButton: string;\r\n\t\topenWebAppButton: string;\r\n\t};\r\n\thalomotButtonGradient?: string;\r\n\thalomotButtonBackground?: string;\r\n\thalomotButtonTextColor?: string;\r\n\thalomotButtonOuterBorderRadius?: string; // Border radius for the gradient outer border\r\n\thalomotButtonInnerBorderRadius?: string; // Border radius for the inner button\r\n\thalomotButtonHoverTextColor?: string;\r\n};\r\n\r\nexport const ProjectShowcase = ({\r\n\ttestimonials,\r\n\tautoplay = false,\r\n\tcolors = {\r\n\t\tname: \"#fff\",\r\n\t\tposition: \"gray-500\",\r\n\t\ttestimony: \"gray-500\",\r\n\t},\r\n\tfontSizes = {\r\n\t\tname: \"2xl\",\r\n\t\tposition: \"sm\",\r\n\t\ttestimony: \"lg\",\r\n\t},\r\n\tspacing = {\r\n\t\ttop: \"20\",\r\n\t\tbottom: \"20\",\r\n\t\tlineHeight: \"1.5\",\r\n\t\tnameTop: \"0\",\r\n\t\tnameBottom: \"0.5em\",\r\n\t\tpositionTop: \"0\",\r\n\t\tpositionBottom: \"0.25em\",\r\n\t\ttestimonyTop: \"1em\",\r\n\t\ttestimonyBottom: \"1em\",\r\n\t},\r\n\tdesktopVersionBottomThreshold = 1024,\r\n\tmobile = {},\r\n\timageAspectRatio = 1.37, // Default image aspect ratio\r\n\tisRTL = false, // Default value for RTL support\r\n\tonItemClick,\r\n\touterRounding = \"18.2px\", // Default outer rounding\r\n\tinnerRounding = \"18px\", // Default inner rounding\r\n\toutlineColor = \"#33313d\", // Default outline color\r\n\thoverOutlineColor = \"#403d4d\", // Default hover outline color\r\n\tbuttonInscriptions = {\r\n\t\tpreviousButton: \"Previous\",\r\n\t\tnextButton: \"Next\",\r\n\t\topenWebAppButton: \"Open Web App\",\r\n\t},\r\n\thalomotButtonGradient = \"linear-gradient(to right, #a123f4, #603dec)\",\r\n\thalomotButtonBackground = \"#111014\",\r\n\thalomotButtonTextColor = \"#fff\",\r\n\thalomotButtonOuterBorderRadius = \"6.34px\",\r\n\thalomotButtonInnerBorderRadius = \"6px\",\r\n\thalomotButtonHoverTextColor,\r\n}: ProjectShowcaseProps) => {\r\n\tconst [active, setActive] = useState(0);\r\n\tconst [isMobileView, setIsMobileView] = useState(false);\r\n\tconst [componentWidth, setComponentWidth] = useState(0);\r\n\tconst componentRef = useRef<HTMLDivElement>(null);\r\n\r\n\t// Use Mobile Config (with defaults)\r\n\tconst currentFontSizes =\r\n\t\tisMobileView && mobile.fontSizes ? mobile.fontSizes : fontSizes;\r\n\tconst currentSpacing = {\r\n\t\t...spacing,\r\n\t\t...(isMobileView && mobile.spacing ? mobile.spacing : {}),\r\n\t};\r\n\r\n\tconst handleNext = () => {\r\n\t\tsetActive((prev) => (prev + 1) % testimonials.length);\r\n\t};\r\n\r\n\tconst handlePrev = () => {\r\n\t\tsetActive(\r\n\t\t\t(prev) => (prev - 1 + testimonials.length) % testimonials.length\r\n\t\t);\r\n\t};\r\n\r\n\tconst isActive = (index: number) => {\r\n\t\treturn index === active;\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\tif (autoplay) {\r\n\t\t\tconst interval = setInterval(handleNext, 5000);\r\n\t\t\treturn () => clearInterval(interval);\r\n\t\t}\r\n\t}, [autoplay]);\r\n\r\n\tconst handleResize = useCallback(() => {\r\n\t\tif (componentRef.current) {\r\n\t\t\tsetComponentWidth(componentRef.current.offsetWidth);\r\n\t\t\tsetIsMobileView(\r\n\t\t\t\tcomponentRef.current.offsetWidth < desktopVersionBottomThreshold\r\n\t\t\t);\r\n\t\t}\r\n\t}, [desktopVersionBottomThreshold]);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst resizeObserver = new ResizeObserver(handleResize);\r\n\t\tif (componentRef.current) {\r\n\t\t\tresizeObserver.observe(componentRef.current);\r\n\t\t}\r\n\t\thandleResize(); // Initial check\r\n\t\treturn () => {\r\n\t\t\tif (componentRef.current) {\r\n\t\t\t\tresizeObserver.unobserve(componentRef.current);\r\n\t\t\t}\r\n\t\t};\r\n\t}, [handleResize]);\r\n\r\n\tconst randomRotateY = () => {\r\n\t\treturn Math.floor(Math.random() * 21) - 10;\r\n\t};\r\n\r\n\tconst calculateGap = (width: number) => {\r\n\t\tconst minWidth = 1024;\r\n\t\tconst maxWidth = 1456;\r\n\t\tconst minGap = 60;\r\n\t\tconst maxGap = 86;\r\n\t\tif (width <= minWidth) return minGap;\r\n\t\tif (width >= maxWidth)\r\n\t\t\treturn Math.max(minGap, maxGap + 0.06018 * (width - maxWidth));\r\n\t\treturn (\r\n\t\t\tminGap +\r\n\t\t\t(maxGap - minGap) * ((width - minWidth) / (maxWidth - minWidth))\r\n\t\t);\r\n\t};\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tref={componentRef}\r\n\t\t\tclassName={`w-full mx-auto antialiased font-sans py-${currentSpacing.top} pb-${currentSpacing.bottom}`}\r\n\t\t\tstyle={{\r\n\t\t\t\tlineHeight: currentSpacing.lineHeight,\r\n\t\t\t\tbackgroundColor: \"transparent\",\r\n\t\t\t\tdirection: isRTL ? \"rtl\" : \"ltr\",\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<div\r\n\t\t\t\tclassName=\"relative\"\r\n\t\t\t\tstyle={{\r\n\t\t\t\t\tdisplay: \"grid\",\r\n\t\t\t\t\tgridTemplateColumns: isMobileView\r\n\t\t\t\t\t\t? \"1fr\"\r\n\t\t\t\t\t\t: isRTL\r\n\t\t\t\t\t\t\t? \"1fr 1fr\"\r\n\t\t\t\t\t\t\t: \"1fr 1fr\",\r\n\t\t\t\t\tgap: `${calculateGap(componentWidth)}px`,\r\n\t\t\t\t}}\r\n\t\t\t>\r\n\t\t\t\t{isRTL && !isMobileView ? (\r\n\t\t\t\t\t<>\r\n\t\t\t\t\t\t<div className=\"w-full\">\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tclassName=\"relative\"\r\n\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\tpaddingTop: `${(1 / imageAspectRatio) * 100}%`,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t\t\t\t{testimonials.map((testimonial, index) => (\r\n\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\tkey={testimonial.src}\r\n\t\t\t\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: 0.9,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: -100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: isActive(index) ? 1 : 0.7,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: isActive(index) ? 1 : 0.95,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: isActive(index) ? 0 : -100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: isActive(index)\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t? 0\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t\tzIndex: isActive(index)\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t? 999\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t: testimonials.length + 2 - index,\r\n\t\t\t\t\t\t\t\t\t\t\t\ty: isActive(index) ? [0, -80, 0] : 0,\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\texit={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: 0.9,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: 100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\t\tduration: 0.4,\r\n\t\t\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 origin-bottom\"\r\n\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t<ImageContainer\r\n\t\t\t\t\t\t\t\t\t\t\t\tsrc={testimonial.src}\r\n\t\t\t\t\t\t\t\t\t\t\t\talt={testimonial.name}\r\n\t\t\t\t\t\t\t\t\t\t\t\touterRounding={outerRounding}\r\n\t\t\t\t\t\t\t\t\t\t\t\tinnerRounding={innerRounding}\r\n\t\t\t\t\t\t\t\t\t\t\t\toutlineColor={outlineColor}\r\n\t\t\t\t\t\t\t\t\t\t\t\thoverOutlineColor={hoverOutlineColor}\r\n\t\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div className=\"flex justify-between flex-col py-4 w-full\">\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tkey={active}\r\n\t\t\t\t\t\t\t\tinitial={{ y: 20, opacity: 0 }}\r\n\t\t\t\t\t\t\t\tanimate={{ y: 0, opacity: 1 }}\r\n\t\t\t\t\t\t\t\texit={{ y: -20, opacity: 0 }}\r\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.2, ease: \"easeInOut\" }}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<h3\r\n\t\t\t\t\t\t\t\t\tclassName={`font-bold`}\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.name,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.name,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.nameTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.nameBottom,\r\n\t\t\t\t\t\t\t\t\t\ttextAlign: \"right\",\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].name}\r\n\t\t\t\t\t\t\t\t</h3>\r\n\t\t\t\t\t\t\t\t<p\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.position,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.position,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.positionTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.positionBottom,\r\n\t\t\t\t\t\t\t\t\t\ttextAlign: \"right\",\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].designation}\r\n\t\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t\t\t<motion.p\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.testimony,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.testimony,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.testimonyTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.testimonyBottom,\r\n\t\t\t\t\t\t\t\t\t\ttextAlign: \"right\",\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].quote\r\n\t\t\t\t\t\t\t\t\t\t.split(\" \")\r\n\t\t\t\t\t\t\t\t\t\t.map((word, index) => (\r\n\t\t\t\t\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\t\t\t\t\tkey={index + \"project-testimonial\"}\r\n\t\t\t\t\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\ty: 5,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tdelay: 0.02 * index,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"inline-block\"\r\n\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t{word}&nbsp;\r\n\t\t\t\t\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t\t\t</motion.p>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tclassName={`flex gap-4 ${isMobileView ? \"pt-12\" : \"md:pt-0\"} w-full`}\r\n\t\t\t\t\t\t\t\tstyle={{ justifyContent: \"flex-start\" }}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<button onClick={handlePrev}>prev</button>\r\n\t\t\t\t\t\t\t\t<button onClick={handleNext}>next</button>\r\n\t\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\t\tonClick={() =>\r\n\t\t\t\t\t\t\t\t\t\tonItemClick &&\r\n\t\t\t\t\t\t\t\t\t\tonItemClick(testimonials[active].link || \"\")\r\n\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t\thref={testimonials[active].link} // Set the href attribute\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\topen web app\r\n\t\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</>\r\n\t\t\t\t) : (\r\n\t\t\t\t\t<>\r\n\t\t\t\t\t\t<div className=\"w-full\">\r\n\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\tclassName=\"relative\"\r\n\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\tpaddingTop: `${(1 / imageAspectRatio) * 100}%`,\r\n\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<AnimatePresence>\r\n\t\t\t\t\t\t\t\t\t{testimonials.map((testimonial, index) => (\r\n\t\t\t\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\t\t\t\tkey={testimonial.src}\r\n\t\t\t\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: 0.9,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: -100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: isActive(index) ? 1 : 0.7,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: isActive(index) ? 1 : 0.95,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: isActive(index) ? 0 : -100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: isActive(index)\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t? 0\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t\tzIndex: isActive(index)\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t? 999\r\n\t\t\t\t\t\t\t\t\t\t\t\t\t: testimonials.length + 2 - index,\r\n\t\t\t\t\t\t\t\t\t\t\t\ty: isActive(index) ? [0, -80, 0] : 0,\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\texit={{\r\n\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\tscale: 0.9,\r\n\t\t\t\t\t\t\t\t\t\t\t\tz: 100,\r\n\t\t\t\t\t\t\t\t\t\t\t\trotate: randomRotateY(),\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\t\tduration: 0.4,\r\n\t\t\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 origin-bottom\"\r\n\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t<ImageContainer\r\n\t\t\t\t\t\t\t\t\t\t\t\tsrc={testimonial.src}\r\n\t\t\t\t\t\t\t\t\t\t\t\talt={testimonial.name}\r\n\t\t\t\t\t\t\t\t\t\t\t\touterRounding={outerRounding}\r\n\t\t\t\t\t\t\t\t\t\t\t\tinnerRounding={innerRounding}\r\n\t\t\t\t\t\t\t\t\t\t\t\toutlineColor={outlineColor}\r\n\t\t\t\t\t\t\t\t\t\t\t\thoverOutlineColor={hoverOutlineColor}\r\n\t\t\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t<div className=\"flex justify-between flex-col py-4 w-full\">\r\n\t\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\t\tkey={active}\r\n\t\t\t\t\t\t\t\tinitial={{ y: 20, opacity: 0 }}\r\n\t\t\t\t\t\t\t\tanimate={{ y: 0, opacity: 1 }}\r\n\t\t\t\t\t\t\t\texit={{ y: -20, opacity: 0 }}\r\n\t\t\t\t\t\t\t\ttransition={{ duration: 0.2, ease: \"easeInOut\" }}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<h3\r\n\t\t\t\t\t\t\t\t\tclassName={`font-bold`}\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.name,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.name,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.nameTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.nameBottom,\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].name}\r\n\t\t\t\t\t\t\t\t</h3>\r\n\t\t\t\t\t\t\t\t<p\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.position,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.position,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.positionTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.positionBottom,\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].designation}\r\n\t\t\t\t\t\t\t\t</p>\r\n\t\t\t\t\t\t\t\t<motion.p\r\n\t\t\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\t\t\tfontSize: currentFontSizes.testimony,\r\n\t\t\t\t\t\t\t\t\t\tcolor: colors.testimony,\r\n\t\t\t\t\t\t\t\t\t\tmarginTop: currentSpacing.testimonyTop,\r\n\t\t\t\t\t\t\t\t\t\tmarginBottom: currentSpacing.testimonyBottom,\r\n\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t{testimonials[active].quote\r\n\t\t\t\t\t\t\t\t\t\t.split(\" \")\r\n\t\t\t\t\t\t\t\t\t\t.map((word, index) => (\r\n\t\t\t\t\t\t\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\t\t\t\t\t\t\tkey={index + \"project-active-testimonial\"}\r\n\t\t\t\t\t\t\t\t\t\t\t\tinitial={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\topacity: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\ty: 5,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tease: \"easeInOut\",\r\n\t\t\t\t\t\t\t\t\t\t\t\t\tdelay: 0.02 * index,\r\n\t\t\t\t\t\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\t\t\t\t\t\tclassName=\"inline-block\"\r\n\t\t\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\t\t\t{word}&nbsp;\r\n\t\t\t\t\t\t\t\t\t\t\t</motion.span>\r\n\t\t\t\t\t\t\t\t\t\t))}\r\n\t\t\t\t\t\t\t\t</motion.p>\r\n\t\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t\t\t{isRTL ? (\r\n\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\tclassName={`flex gap-4 ${isMobileView ? \"pt-12\" : \"md:pt-0\"} w-full`}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<button onClick={handlePrev}>prev</button>\r\n\t\t\t\t\t\t\t\t\t<button onClick={handleNext}>next</button>\r\n\t\t\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\t\t\tonClick={() =>\r\n\t\t\t\t\t\t\t\t\t\t\tonItemClick &&\r\n\t\t\t\t\t\t\t\t\t\t\tonItemClick(testimonials[active].link || \"\")\r\n\t\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t\t\thref={testimonials[active].link} // Set the href attribute\r\n\t\t\t\t\t\t\t\t\t/>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t) : (\r\n\t\t\t\t\t\t\t\t<div\r\n\t\t\t\t\t\t\t\t\tclassName={`flex gap-4 ${isMobileView ? \"pt-12\" : \"md:pt-0\"} w-full`}\r\n\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t<button onClick={handlePrev}>prev</button>\r\n\t\t\t\t\t\t\t\t\t<button onClick={handleNext}>next</button>\r\n\t\t\t\t\t\t\t\t\t<a\r\n\t\t\t\t\t\t\t\t\t\tonClick={() =>\r\n\t\t\t\t\t\t\t\t\t\t\tonItemClick &&\r\n\t\t\t\t\t\t\t\t\t\t\tonItemClick(testimonials[active].link || \"\")\r\n\t\t\t\t\t\t\t\t\t\t}\r\n\t\t\t\t\t\t\t\t\t\thref={testimonials[active].link} // Set the href attribute\r\n\t\t\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t\t\topen web app\r\n\t\t\t\t\t\t\t\t\t</a>\r\n\t\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t</div>\r\n\t\t\t\t\t</>\r\n\t\t\t\t)}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\ntype ImageContainerProps = {\r\n\tsrc: string;\r\n\talt: string;\r\n\touterRounding: string;\r\n\tinnerRounding: string;\r\n\toutlineColor: string;\r\n\thoverOutlineColor: string;\r\n};\r\n\r\nconst ImageContainer = ({\r\n\tsrc,\r\n\talt,\r\n\touterRounding,\r\n\tinnerRounding,\r\n\toutlineColor,\r\n\thoverOutlineColor,\r\n}: ImageContainerProps) => (\r\n\t<div\r\n\t\tclassName=\"relative h-full w-full\"\r\n\t\tstyle={{\r\n\t\t\tborderRadius: outerRounding,\r\n\t\t\tpadding: \"1px\",\r\n\t\t\tbackgroundColor: outlineColor,\r\n\t\t\ttransition: \"background-color 0.3s ease-in-out\",\r\n\t\t}}\r\n\t>\r\n\t\t<div\r\n\t\t\tclassName=\"relative h-full w-full overflow-hidden\"\r\n\t\t\tstyle={{\r\n\t\t\t\tborderRadius: innerRounding,\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<Image\r\n\t\t\t\tsrc={src}\r\n\t\t\t\talt={alt}\r\n\t\t\t\tlayout=\"fill\"\r\n\t\t\t\tobjectFit=\"cover\"\r\n\t\t\t\tdraggable={false}\r\n\t\t\t\tclassName=\"h-full w-full object-cover object-center\"\r\n\t\t\t/>\r\n\t\t</div>\r\n\t\t<style jsx>{`\r\n\t\t\tdiv:hover {\r\n\t\t\t\tbackground-color: ${hoverOutlineColor} !important;\r\n\t\t\t}\r\n\t\t`}</style>\r\n\t</div>\r\n);\r\n\r\nexport default ProjectShowcase;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "drag",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "Prev and next swap the top screenshot, which hops upward and settles flat while the rest sit behind it at random angles; the write-up re-enters word by word, sharpening from blurred as it goes. Hovering a screenshot brightens its thin outline.",
+    "inspiration": {
+      "source": "Namer UI",
+      "url": "https://namer-ui.netlify.app/components",
+      "authorUrl": "https://namer-ui.netlify.app",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "testimonials",
+        "type": "Testimonial[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "autoplay",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "colors",
+        "type": "{ name?: string; position?: string; testimony?: string; }",
+        "default": "{ name: \"#fff\", position: \"gray-500\",…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontSizes",
+        "type": "{ name?: string; position?: string; testimony?: string; }",
+        "default": "{ name: \"2xl\", position: \"sm\", testim…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "spacing",
+        "type": "{ top?: string; bottom?: string; lineHeight?: string; nam…",
+        "default": "{ top: \"20\", bottom: \"20\", lineHeight…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "desktopVersionBottomThreshold",
+        "type": "number",
+        "default": "1024",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "maxImageWidth",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "imageWidthPercentage",
+        "type": "number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mobile",
+        "type": "{ fontSizes?: { name?: string; position?: string; testimo…",
+        "default": "{}",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "imageAspectRatio",
+        "type": "number",
+        "default": "1.37",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "isRTL",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onItemClick",
+        "type": "((link: string) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "outerRounding",
+        "type": "string",
+        "default": "\"18.2px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "innerRounding",
+        "type": "string",
+        "default": "\"18px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "outlineColor",
+        "type": "string",
+        "default": "\"#33313d\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hoverOutlineColor",
+        "type": "string",
+        "default": "\"#403d4d\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "buttonInscriptions",
+        "type": "{ previousButton: string; nextButton: string; openWebAppB…",
+        "default": "{ previousButton: \"Previous\", nextBut…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonGradient",
+        "type": "string",
+        "default": "\"linear-gradient(to right, #a123f4, #…",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonBackground",
+        "type": "string",
+        "default": "\"#111014\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonTextColor",
+        "type": "string",
+        "default": "\"#fff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonOuterBorderRadius",
+        "type": "string",
+        "default": "\"6.34px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonInnerBorderRadius",
+        "type": "string",
+        "default": "\"6px\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "halomotButtonHoverTextColor",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/project-showcase"
+  }
+}

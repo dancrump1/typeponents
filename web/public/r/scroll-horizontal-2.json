@@ -1,0 +1,46 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scroll-horizontal-2",
+  "type": "registry:ui",
+  "title": "Scroll Horizontal 2",
+  "description": "Scroll Horizontal 2",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scroll-horizontal-2.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scroll-horizontal-2.tsx",
+      "content": "\"use client\";\n\n// * based on: https://gist.github.com/coleturner/34396fb826c12fbd88d6591173d178c2\nimport { useEffect, useRef, useState } from \"react\";\n\nimport {\n\tmotion,\n\tMotionProps,\n\tuseMotionValueEvent,\n\tuseScroll,\n\tuseTransform,\n} from \"motion/react\";\n\nexport function throttle(fn: (...args: any[]) => any, wait: number) {\n\tlet shouldWait = false;\n\n\treturn function throttledFunction(this: any, ...args: any[]) {\n\t\tif (!shouldWait) {\n\t\t\tfn.apply(this, args);\n\t\t\tshouldWait = true;\n\t\t\tsetTimeout(() => (shouldWait = false), wait);\n\t\t}\n\t};\n}\n// Credit:\n// https://www.ui-layouts.com/components/horizontal-scroll\nexport const items = [\n\t{\n\t\tid: 1,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 2,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 3,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 4,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 5,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\n\t{\n\t\tid: 7,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 8,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\n\t{\n\t\tid: 91,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 92,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 10,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 11,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 12,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 13,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 14,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 15,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n\t{\n\t\tid: 16,\n\t\turl: \"/itjustworks.jpg\",\n\t},\n];\n\n// * based on: https://gist.github.com/coleturner/34396fb826c12fbd88d6591173d178c2\nfunction useElementViewportPosition(ref: React.RefObject<HTMLElement | null>) {\n\tconst [position, setPosition] = useState<[number, number]>([0, 0]);\n\n\tuseEffect(() => {\n\t\tif (!ref || !ref.current) return;\n\n\t\tconst pageHeight = document.body.scrollHeight;\n\t\tconst start = ref.current.offsetTop;\n\t\tconst end = start + ref.current.offsetHeight;\n\n\t\tsetPosition([start / pageHeight, end / pageHeight]);\n\t}, []);\n\n\treturn { position };\n}\n\nconst slideAnimation: MotionProps = {\n\tvariants: {\n\t\tfull: { backgroundColor: \"#008299\" },\n\t\tpartial: { backgroundColor: \"#ffffff\" },\n\t},\n\tinitial: \"partial\",\n\twhileInView: \"full\",\n\tviewport: { amount: 1, once: false },\n};\n\nexport default function ScrollHorizontal() {\n\tconst mainRef = useRef<HTMLDivElement>(null);\n\tconst carouselRef = useRef<HTMLDivElement>(null);\n\tconst { position } = useElementViewportPosition(mainRef);\n\t//   const { ref, start, end } = useRefScrollProgress(mainRef)\n\tconst [carouselEndPosition, setCarouselEndPosition] = useState(0);\n\tconst { scrollYProgress, scrollY } = useScroll();\n\tconst x = useTransform(scrollYProgress, position, [0, carouselEndPosition]);\n\n\tuseMotionValueEvent(scrollY, \"change\");\n\n\n\tuseEffect(() => {\n\t\tif (!carouselRef || !carouselRef.current) return;\n\t\tconst parent = carouselRef.current.parentElement;\n\t\tconst scrollbarWidth =\n\t\t\twindow.innerWidth - document.documentElement.clientWidth;\n\n\t\tconst resetCarouselEndPosition = () => {\n\t\t\tif (carouselRef && carouselRef.current) {\n\t\t\t\tconst newPosition =\n\t\t\t\t\tcarouselRef.current.clientWidth -\n\t\t\t\t\twindow.innerWidth +\n\t\t\t\t\tscrollbarWidth +\n\t\t\t\t\t(parent as HTMLElement).offsetLeft * 2;\n\n\t\t\t\tsetCarouselEndPosition(-newPosition);\n\t\t\t}\n\t\t};\n\n\t\tresetCarouselEndPosition();\n\t\tconst handleResize = throttle(resetCarouselEndPosition, 10);\n\n\t\twindow.addEventListener(\"resize\", handleResize);\n\t\treturn () => window.removeEventListener(\"resize\", handleResize);\n\t}, []);\n\n\treturn (\n\t\t<>\n\t\t\t<section ref={mainRef}>\n\t\t\t\t<div className=\"w-full mx-auto\" style={{ height: \"300vh\" }}>\n\t\t\t\t\t<div className=\"sticky top-0 h-screen w-full flex flex-col items-start justify-center overflow-hidden\">\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tref={carouselRef}\n\t\t\t\t\t\t\tclassName=\"flex gap-10\"\n\t\t\t\t\t\t\tstyle={{ x }}\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{items.map((item, index) => (\n\t\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\t\t{...slideAnimation}\n\t\t\t\t\t\t\t\t\tkey={item.id + \"scroll-2-horizontal-item\"}\n\t\t\t\t\t\t\t\t\tclassName=\"group relative h-[300px] w-[300px] overflow-hidden bg-background\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<motion.img\n\t\t\t\t\t\t\t\t\t\tkey={item.id}\n\t\t\t\t\t\t\t\t\t\tclassName=\"w-full shrink-0 h-full object-cover\"\n\t\t\t\t\t\t\t\t\t\tsrc={item?.url}\n\t\t\t\t\t\t\t\t\t\talt={\"img\"}\n\t\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</section>\n\t\t\t<footer className=\"group \">\n\t\t\t\t<h1 className=\"text-[16vw] group-hover:translate-y-4 translate-y-20 leading-[100%] uppercase font-semibold text-center bg-linear-to-r from-background to-background bg-clip-text text-transparent transition-all ease-linear\">\n\t\t\t\t\tui-layout\n\t\t\t\t</h1>\n\t\t\t\t<section className=\"bg-background h-40 relative z-10 grid place-content-center text-2xl rounded-tr-full rounded-tl-full\">\n\t\t\t\t\tThanks for Scrolling\n\t\t\t\t</section>\n\t\t\t</footer>\n\t\t</>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "UI Layouts",
+      "url": "https://www.ui-layouts.com/components/horizontal-scroll",
+      "authorUrl": "https://www.ui-layouts.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scroll-horizontal-2"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "view-list",
+  "type": "registry:ui",
+  "title": "View List",
+  "description": "View List",
+  "dependencies": [
+    "lucide-react",
+    "motion"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/view-list.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/view-list.tsx",
+      "content": "import React from \"react\";\r\n\r\nimport { buttonVariants } from \"@/components/ui/button\";\r\nimport { cn } from \"@/lib/utils\";\r\nimport { Layers2, LayoutGrid, List, LucideIcon, Star } from \"lucide-react\";\r\nimport { AnimatePresence, motion, MotionConfig } from \"motion/react\";\r\n\r\ntype Views = \"List\" | \"Grid\" | \"Stacked\";\r\n\r\ntype ViewItem = {\r\n\ticon: LucideIcon;\r\n\tname: string;\r\n\tview: Views;\r\n};\r\n\r\ntype Item = {\r\n\tname: string;\r\n\tdescription: string;\r\n\timage: string;\r\n\tangle?: number;\r\n};\r\n\r\nconst views: ViewItem[] = [\r\n\t{\r\n\t\tname: \"List view\",\r\n\t\ticon: List,\r\n\t\tview: \"List\",\r\n\t},\r\n\t{\r\n\t\tname: \"Card view\",\r\n\t\ticon: LayoutGrid,\r\n\t\tview: \"Grid\",\r\n\t},\r\n\t{\r\n\t\tname: \"Pack view\",\r\n\t\ticon: Layers2,\r\n\t\tview: \"Stacked\",\r\n\t},\r\n];\r\n\r\nconst TRANSITION = {\r\n\ttype: \"spring\",\r\n\tstiffness: 300,\r\n\tdamping: 30,\r\n\tmass: 0.5,\r\n\tduration: 0.5,\r\n};\r\n\r\nconst items = [\r\n\t{\r\n\t\tname: \"Succession\",\r\n\t\tdescription: \"Tv show - Comedy\",\r\n\t\timage: \"/itjustworks.jpg\",\r\n\t\tangle: -10,\r\n\t},\r\n\t{\r\n\t\tname: \"Dune 2\",\r\n\t\tdescription: \"Movie - Sci-fi\",\r\n\t\timage: \"/itjustworks.jpg\",\r\n\t\tangle: 15,\r\n\t},\r\n];\r\n\r\nconst View = () => {\r\n\tconst [view, setView] = React.useState<Views>(\"List\");\r\n\tconst handleClick = (newView: Views) => {\r\n\t\tsetView(newView);\r\n\t};\r\n\treturn (\r\n\t\t<MotionConfig transition={TRANSITION}>\r\n\t\t\t<div className=\"center full\">\r\n\t\t\t\t<div className=\"max-w-sm w-full space-y-4\">\r\n\t\t\t\t\t<div className=\"h-14 border-b flex gap-2\">\r\n\t\t\t\t\t\t{views.map((item) => (\r\n\t\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\t\tkey={item.name}\r\n\t\t\t\t\t\t\t\tclassName={buttonVariants({\r\n\t\t\t\t\t\t\t\t\tvariant:\r\n\t\t\t\t\t\t\t\t\t\titem.view === view ? \"default\" : \"secondary\",\r\n\t\t\t\t\t\t\t\t\tclassName: \"flex-1\",\r\n\t\t\t\t\t\t\t\t})}\r\n\t\t\t\t\t\t\t\tonClick={() => handleClick(item.view)}\r\n\t\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t\t<item.icon className=\"w-4 h-4\" />\r\n\t\t\t\t\t\t\t\t{item.name}\r\n\t\t\t\t\t\t\t</button>\r\n\t\t\t\t\t\t))}\r\n\t\t\t\t\t</div>\r\n\r\n\t\t\t\t\t<div className=\"min-h-80 relative \">\r\n\t\t\t\t\t\t<AnimatePresence mode=\"popLayout\">\r\n\t\t\t\t\t\t\t{view === \"List\" && <ListView view={view} />}\r\n\t\t\t\t\t\t\t{view === \"Grid\" && <GridView view={view} />}\r\n\t\t\t\t\t\t\t{view === \"Stacked\" && <StackedView view={view} />}\r\n\t\t\t\t\t\t</AnimatePresence>\r\n\t\t\t\t\t</div>\r\n\t\t\t\t</div>\r\n\t\t\t</div>\r\n\t\t</MotionConfig>\r\n\t);\r\n};\r\n\r\nconst ListView = ({ view }: { view: Views }) => {\r\n\treturn (\r\n\t\t<div className=\"flex flex-col gap-2\">\r\n\t\t\t{items.map((item, idx) => (\r\n\t\t\t\t<ItemView\r\n\t\t\t\t\tkey={idx + \"view-list\"}\r\n\t\t\t\t\titem={item}\r\n\t\t\t\t\tidx={idx}\r\n\t\t\t\t\tview={view}\r\n\t\t\t\t\tclassName=\"flex items-center gap-2 flex-row\"\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst GridView = ({ view }: { view: Views }) => {\r\n\treturn (\r\n\t\t<div className=\"grid grid-cols-2 gap-6\">\r\n\t\t\t{items.map((item, idx) => (\r\n\t\t\t\t<ItemView\r\n\t\t\t\t\tkey={idx + \"view-list-item\"}\r\n\t\t\t\t\titem={item}\r\n\t\t\t\t\tidx={idx}\r\n\t\t\t\t\tview={view}\r\n\t\t\t\t/>\r\n\t\t\t))}\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst StackedView = ({ view }: { view: Views }) => {\r\n\treturn (\r\n\t\t<div>\r\n\t\t\t<div className=\"relative flex w-full items-center justify-center h-32\">\r\n\t\t\t\t{items.map((item, idx) => (\r\n\t\t\t\t\t<ItemView\r\n\t\t\t\t\t\tkey={idx + \"view-list-item-stacked\"}\r\n\t\t\t\t\t\titem={item}\r\n\t\t\t\t\t\tidx={idx}\r\n\t\t\t\t\t\tview={view}\r\n\t\t\t\t\t\tclassName=\"absolute \"\r\n\t\t\t\t\t/>\r\n\t\t\t\t))}\r\n\t\t\t</div>\r\n\t\t\t<div className=\"text-center mt-2\">\r\n\t\t\t\t<p className=\"clas\">{items.length} Movies</p>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nconst ItemView = ({\r\n\titem,\r\n\tidx,\r\n\tview,\r\n\tclassName,\r\n}: {\r\n\titem: Item;\r\n\tidx: number;\r\n\tview: Views;\r\n\tclassName?: string;\r\n}) => {\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tclassName={cn(\"flex flex-col gap-2 \", className)}\r\n\t\t\tlayoutId={`view-item-container-${idx}`}\r\n\t\t\tstyle={{\r\n\t\t\t\trotate: view === \"Stacked\" ? item.angle : 0,\r\n\t\t\t\tzIndex: view === \"Stacked\" ? items.length - idx : 0,\r\n\t\t\t}}\r\n\t\t>\r\n\t\t\t<motion.img\r\n\t\t\t\tlayoutId={`view-item-image-${idx}`}\r\n\t\t\t\tsrc={item.image}\r\n\t\t\t\talt={item.name}\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"w-full h-auto\",\r\n\t\t\t\t\tview === \"Grid\"\r\n\t\t\t\t\t\t? \"w-full h-44\"\r\n\t\t\t\t\t\t: view === \"List\"\r\n\t\t\t\t\t\t\t? \"size-16\"\r\n\t\t\t\t\t\t\t: \"size-20\",\r\n\t\t\t\t\t\"object-cover rounded-2xl border\"\r\n\t\t\t\t)}\r\n\t\t\t/>\r\n\t\t\t<AnimatePresence>\r\n\t\t\t\t{view !== \"Stacked\" && (\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\tinitial={{ opacity: 0, x: -50 }}\r\n\t\t\t\t\t\tanimate={{ opacity: 1, x: 0 }}\r\n\t\t\t\t\t\texit={{ opacity: 0, x: -50 }}\r\n\t\t\t\t\t\tclassName=\"flex-1\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<motion.h3\r\n\t\t\t\t\t\t\tlayoutId={`view-item-title-${idx}`}\r\n\t\t\t\t\t\t\tclassName=\"text-lg font-bold\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t{item.name}\r\n\t\t\t\t\t\t</motion.h3>\r\n\t\t\t\t\t\t<motion.p\r\n\t\t\t\t\t\t\tlayoutId={`view-item-description-${idx}`}\r\n\t\t\t\t\t\t\tclassName=\"text-sm flex items-center gap-2 justify-between\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<span>{item.description}</span>\r\n\t\t\t\t\t\t\t<span className=\"flex items-center gap-1\">\r\n\t\t\t\t\t\t\t\t<Star className=\"size-3 text-muted-foreground fill-muted-foreground\" />{\" \"}\r\n\t\t\t\t\t\t\t\t3\r\n\t\t\t\t\t\t\t</span>\r\n\t\t\t\t\t\t</motion.p>\r\n\t\t\t\t\t</motion.div>\r\n\t\t\t\t)}\r\n\t\t\t</AnimatePresence>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n\r\nexport default View;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Data & Tables"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/view-list"
+  }
+}

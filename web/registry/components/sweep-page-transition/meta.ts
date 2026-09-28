@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "sweep-page-transition",
+	title: "Sweep Page Transition",
+	description: "A premium multi-layered wipe screen transition that animates overlapping sheets of color in sequence across the viewport.",
+	interaction: "Programmatically triggered on route change or view swaps, showing three overlapping solid color sweeps sliding in sequence and sliding offscreen in reverse order to reveal content.",
+	categories: ["Special Effects & FX"],
+	tags: [],
+	inspiration: {
+		source: "Great UI",
+		url: "https://www.great-ui.com/components/sweep-page-transition",
+		author: "Saurabh Sharma",
+		authorUrl: "https://github.com/Saurabh-2607",
+		license: "Great UI Custom License",
+		relationship: "port",
+	},
+	dependencies: ["motion"],
+	registryDependencies: [],
+	props: [
+		{ name: "trigger", type: "number", required: true },
+		{ name: "onViewSwap", type: "(() => void)" },
+		{ name: "className", type: "string" },
+		{ name: "colors", type: "string[]", default: "[\"#e2e8f0\", \"#cbd5e1\", \"#94a3b8\"]" },
+		{ name: "duration", type: "number", default: "0.7" },
+		{ name: "staggerDelay", type: "number", default: "0.1" },
+		{ name: "ease", type: "Easing | Easing[]", default: "[0.76, 0, 0.24, 1]" },
+		{ name: "direction", type: "\"bottom\" | \"left\" | \"right\" | \"top\"", default: "\"left\"" },
+		{ name: "exitOpposite", type: "boolean", default: "true" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+	gated: true,
+});

@@ -1,0 +1,52 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "performant-sidebar",
+  "type": "registry:ui",
+  "title": "Performant Sidebar",
+  "description": "Performant Sidebar",
+  "dependencies": [
+    "clsx",
+    "is-hotkey",
+    "lodash.clamp",
+    "motion",
+    "uuid"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/performant-sidebar/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/performant-sidebar/component.tsx",
+      "content": "import { PerfSlayer } from \"./perf-slayer\";\n\nexport function Content() {\n\treturn (\n\t\t<>\n\t\t\t<h2>External links to all the sidebars</h2>\n\t\t\t<div className=\"flex space-x-4\">\n\t\t\t\t<a href=\"https://react-components-from-scratch.vercel.app/sidebar/initial\">\n\t\t\t\t\tInitial\n\t\t\t\t</a>\n\t\t\t\t<a href=\"https://react-components-from-scratch.vercel.app/sidebar/linear\">\n\t\t\t\t\tLinear\n\t\t\t\t</a>\n\t\t\t\t<a href=\"https://react-components-from-scratch.vercel.app/sidebar/notion\">\n\t\t\t\t\tNotion\n\t\t\t\t</a>\n\t\t\t\t<a href=\"https://react-components-from-scratch.vercel.app/sidebar/gitlab\">\n\t\t\t\t\tGitlab\n\t\t\t\t</a>\n\t\t\t</div>\n\n\t\t\t<h2>\n\t\t\t\t<code>PerfSlayer</code>\n\t\t\t</h2>\n\t\t\t<p className=\"\">\n\t\t\t\tIncrease this value to intentionally bottle neck the main thread\n\t\t\t</p>\n\n\t\t\t<PerfSlayer className=\"h-96 w-full mb-12\" />\n\t\t\t<h2>External links to each sidebar examples</h2>\n\n\t\t\t<p>\n\t\t\t\t<strong>Pellentesque habitant morbi tristique</strong> senectus et\n\t\t\t\tnetus et malesuada fames ac turpis egestas. Vestibulum tortor quam,\n\t\t\t\tfeugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu\n\t\t\t\tlibero sit amet quam egestas semper.{\" \"}\n\t\t\t\t<em>Aenean ultricies mi vitae est.</em> Mauris placerat eleifend\n\t\t\t\tleo. Quisque sit amet est et sapien ullamcorper pharetra. Vestibulum\n\t\t\t\terat wisi, condimentum sed, <code>commodo vitae</code>, ornare sit\n\t\t\t\tamet, wisi. Aenean fermentum, elit eget tincidunt condimentum, eros\n\t\t\t\tipsum rutrum orci, sagittis tempus lacus enim ac dui.{\" \"}\n\t\t\t\t<a href=\"#\">Donec non enim</a> in turpis pulvinar facilisis. Ut\n\t\t\t\tfelis.\n\t\t\t</p>\n\n\t\t\t<h2>Header Level 2</h2>\n\n\t\t\t<ol>\n\t\t\t\t<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>\n\t\t\t\t<li>Aliquam tincidunt mauris eu risus.</li>\n\t\t\t</ol>\n\n\t\t\t<blockquote>\n\t\t\t\t<p>\n\t\t\t\t\tLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus\n\t\t\t\t\tmagna. Cras in mi at felis aliquet congue. Ut a est eget ligula\n\t\t\t\t\tmolestie gravida. Curabitur massa. Donec eleifend, libero at\n\t\t\t\t\tsagittis mollis, tellus est malesuada tellus, at luctus turpis\n\t\t\t\t\telit sit amet quam. Vivamus pretium ornare est.\n\t\t\t\t</p>\n\t\t\t</blockquote>\n\n\t\t\t<h3>Header Level 3</h3>\n\n\t\t\t<ul>\n\t\t\t\t<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>\n\t\t\t\t<li>Aliquam tincidunt mauris eu risus.</li>\n\t\t\t</ul>\n\n\t\t\t<pre>\n\t\t\t\t<code>\n\t\t\t\t\t{`#header h1 a {\ndisplay: block;\nwidth: 300px;\nheight: 80px;\n}`}\n\t\t\t\t</code>\n\t\t\t</pre>\n\t\t\t<h2>Header Level 2</h2>\n\n\t\t\t<ol>\n\t\t\t\t<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>\n\t\t\t\t<li>Aliquam tincidunt mauris eu risus.</li>\n\t\t\t</ol>\n\n\t\t\t<blockquote>\n\t\t\t\t<p>\n\t\t\t\t\tLorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus\n\t\t\t\t\tmagna. Cras in mi at felis aliquet congue. Ut a est eget ligula\n\t\t\t\t\tmolestie gravida. Curabitur massa. Donec eleifend, libero at\n\t\t\t\t\tsagittis mollis, tellus est malesuada tellus, at luctus turpis\n\t\t\t\t\telit sit amet quam. Vivamus pretium ornare est.\n\t\t\t\t</p>\n\t\t\t</blockquote>\n\n\t\t\t<h3>Header Level 3</h3>\n\n\t\t\t<ul>\n\t\t\t\t<li>Lorem ipsum dolor sit amet, consectetuer adipiscing elit.</li>\n\t\t\t\t<li>Aliquam tincidunt mauris eu risus.</li>\n\t\t\t</ul>\n\n\t\t\t<pre>\n\t\t\t\t<code>\n\t\t\t\t\t{`#header h1 a {\ndisplay: block;\nwidth: 300px;\nheight: 80px;\n}`}\n\t\t\t\t</code>\n\t\t\t</pre>\n\t\t</>\n\t);\n}\n"
+    },
+    {
+      "path": "components/ui/performant-sidebar/perf-slayer.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/performant-sidebar/perf-slayer.tsx",
+      "content": "import { ComponentPropsWithoutRef, useEffect, useRef, useState } from \"react\";\n\nimport clsx from \"clsx\";\nimport clamp from \"lodash.clamp\";\n\nfunction Truck() {\n\tconst [positionY] = useState(() => Math.random());\n\tconst [speed] = useState(() => Math.random());\n\n\treturn (\n\t\t<svg\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\tfill=\"none\"\n\t\t\tviewBox=\"0 0 24 24\"\n\t\t\tstrokeWidth={2}\n\t\t\tstroke=\"black\"\n\t\t\tclassName=\"absolute w-6 h-6 -z-10\"\n\t\t\tdata-truck\n\t\t\tdata-speed={speed}\n\t\t\tdata-positiony={positionY}\n\t\t>\n\t\t\t<path\n\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\tstroke=\"black\"\n\t\t\t\td=\"M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12\"\n\t\t\t/>\n\t\t</svg>\n\t);\n}\n\nexport function PerfSlayer(props: ComponentPropsWithoutRef<\"div\">) {\n\tconst [number, setNumber] = useState(0);\n\tconst ref = useRef<HTMLDivElement | null>(null);\n\tconst offset = useRef(0);\n\tconst requestRef = useRef<number>(0);\n\n\tuseEffect(() => {\n\t\tconst animate = () => {\n\t\t\toffset.current = offset.current + 1;\n\t\t\tif (number === 0 || ref.current == null) return;\n\n\t\t\tconst rect = ref.current.getBoundingClientRect();\n\n\t\t\tdocument\n\t\t\t\t.querySelectorAll<SVGElement>(\"[data-truck]\")\n\t\t\t\t.forEach((truck) => {\n\t\t\t\t\tconst speed = parseFloat(truck.dataset.speed ?? \"0\");\n\t\t\t\t\tconst positionY = parseFloat(truck.dataset[\"positiony\"] ?? \"0\");\n\n\t\t\t\t\tconst direction = Math.cos((offset.current * speed) / 100) > 0;\n\n\t\t\t\t\tconst positionX =\n\t\t\t\t\t\t(Math.sin((offset.current * speed) / 100) * rect.width +\n\t\t\t\t\t\t\trect.width) /\n\t\t\t\t\t\t2;\n\n\t\t\t\t\ttruck.style.top = `${positionY * rect.height}px`;\n\t\t\t\t\ttruck.style.left = `${positionX}px`;\n\t\t\t\t\ttruck.style.transform = `rotateY(${\n\t\t\t\t\t\tdirection ? \"0deg\" : \"180deg\"\n\t\t\t\t\t}) translateX(-50%)`;\n\t\t\t\t});\n\n\t\t\trequestRef.current = requestAnimationFrame(animate);\n\t\t};\n\t\trequestRef.current = requestAnimationFrame(animate);\n\t\treturn () => cancelAnimationFrame(requestRef.current);\n\t}, [number]);\n\n\treturn (\n\t\t<div {...props} className={clsx(\"relative p-4\", props.className)}>\n\t\t\t{new Array(number).fill(\"\").map((_, i) => (\n\t\t\t\t<Truck key={i + \"truck\"} />\n\t\t\t))}\n\n\t\t\t<div className=\"relative flex w-min mx-auto border-black border-4 p-2 translate-y-1/4 justify-center items-center bg-background\">\n\t\t\t\t<button\n\t\t\t\t\tonClick={() => setNumber((prev) => clamp(prev + 5, 0, 5000))}\n\t\t\t\t>\n\t\t\t\t\t<svg\n\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\tstrokeWidth={3.5}\n\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\tclassName=\"w-8 h-8\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<path d=\"M12 4.5v15m7.5-7.5h-15\" />\n\t\t\t\t\t</svg>\n\t\t\t\t</button>\n\t\t\t\t<svg\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\tfill=\"none\"\n\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\tstrokeWidth={3.5}\n\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\tclassName=\"absolute -top-10 text-center animate-bounce ease-in-out mx-auto w-8 h-8\"\n\t\t\t\t>\n\t\t\t\t\t<path\n\t\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\t\tstrokeLinejoin=\"round\"\n\t\t\t\t\t\td=\"M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3\"\n\t\t\t\t\t/>\n\t\t\t\t</svg>\n\t\t\t\t<input\n\t\t\t\t\tclassName=\"w-20 font-semibold text-3xl text-center\"\n\t\t\t\t\tvalue={number}\n\t\t\t\t\tonChange={(e) => {\n\t\t\t\t\t\tconst num = parseInt(e.currentTarget.value);\n\t\t\t\t\t\tisNaN(num) ? setNumber(0) : setNumber(clamp(num, 0, 5000));\n\t\t\t\t\t}}\n\t\t\t\t></input>\n\t\t\t\t<button\n\t\t\t\t\tonClick={() => setNumber((prev) => clamp(prev - 5, 0, 5000))}\n\t\t\t\t>\n\t\t\t\t\t<svg\n\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\tviewBox=\"0 0 24 24\"\n\t\t\t\t\t\tstrokeWidth={3.5}\n\t\t\t\t\t\tstroke=\"currentColor\"\n\t\t\t\t\t\tclassName=\"w-8 h-8\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<path d=\"M19.5 12h-15\" />\n\t\t\t\t\t</svg>\n\t\t\t\t</button>\n\t\t\t</div>\n\t\t\t<div ref={ref} className=\"h-full w-full\"></div>\n\t\t</div>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Navigation"
+    ],
+    "tags": [],
+    "interaction": "",
+    "inspiration": {
+      "source": "joshuawootonn.com",
+      "url": "https://www.joshuawootonn.com/react-treeview-component",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/performant-sidebar/component"
+  }
+}

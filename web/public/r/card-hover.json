@@ -1,0 +1,58 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "card-hover",
+  "type": "registry:ui",
+  "title": "Card Hover",
+  "description": "Grid of linked title-and-description cards with a rounded highlight panel that follows the pointer.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/card-hover.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/card-hover.tsx",
+      "content": "import React, { useState } from \"react\";\n\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// https://ui.aceternity.com/components/card-hover-effect\n\nexport const HoverEffect = ({\n\titems,\n\tclassName,\n}: {\n\titems: {\n\t\ttitle: string;\n\t\tdescription: string;\n\t\tlink: string;\n\t}[];\n\tclassName?: string;\n}) => {\n\tlet [hoveredIndex, setHoveredIndex] = useState<number | null>(null);\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"grid grid-cols-1 md:grid-cols-2  lg:grid-cols-3  py-10\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{items.map((item, idx) => (\n\t\t\t\t<Link\n\t\t\t\t\thref={item?.link || \"\"}\n\t\t\t\t\tkey={item?.link}\n\t\t\t\t\tclassName=\"relative group  block p-2 h-full w-full\"\n\t\t\t\t\tonMouseEnter={() => setHoveredIndex(idx)}\n\t\t\t\t\tonMouseLeave={() => setHoveredIndex(null)}\n\t\t\t\t>\n\t\t\t\t\t<AnimatePresence>\n\t\t\t\t\t\t{hoveredIndex === idx && (\n\t\t\t\t\t\t\t<motion.span\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 h-full w-full bg-background dark:bg-slate-800/80 block  rounded-3xl\"\n\t\t\t\t\t\t\t\tlayoutId=\"hoverBackground\"\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t\t\t\ttransition: { duration: 0.15 },\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\texit={{\n\t\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\t\ttransition: { duration: 0.15, delay: 0.2 },\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t)}\n\t\t\t\t\t</AnimatePresence>\n\t\t\t\t\t<Card>\n\t\t\t\t\t\t<CardTitle>{item.title}</CardTitle>\n\t\t\t\t\t\t<CardDescription>{item.description}</CardDescription>\n\t\t\t\t\t</Card>\n\t\t\t\t</Link>\n\t\t\t))}\n\t\t</div>\n\t);\n};\n\nexport const Card = ({\n\tclassName,\n\tchildren,\n}: {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n}) => {\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\n\t\t\t\t\"rounded-2xl h-full w-full p-4 overflow-hidden bg-background border border-transparent dark:border-white/20 group-hover:border-slate-700 relative z-20\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t<div className=\"relative z-40\">\n\t\t\t\t<div className=\"p-4\">{children}</div>\n\t\t\t</div>\n\t\t</div>\n\t);\n};\nexport const CardTitle = ({\n\tclassName,\n\tchildren,\n}: {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n}) => {\n\treturn (\n\t\t<h4\n\t\t\tclassName={cn(\"text-foreground font-bold tracking-wide mt-4\", className)}\n\t\t>\n\t\t\t{children}\n\t\t</h4>\n\t);\n};\nexport const CardDescription = ({\n\tclassName,\n\tchildren,\n}: {\n\tclassName?: string;\n\tchildren: React.ReactNode;\n}) => {\n\treturn (\n\t\t<p\n\t\t\tclassName={cn(\n\t\t\t\t\"mt-8 text-foreground tracking-wide leading-relaxed text-sm\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{children}\n\t\t</p>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "Hovering a card fades a soft rounded block in behind it and outlines its border; moving to another card glides that block across to the new one rather than making it reappear.",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/card-hover-effect",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ title: string; description: string; link: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/card-hover"
+  }
+}

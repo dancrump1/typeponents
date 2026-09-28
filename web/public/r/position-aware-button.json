@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "position-aware-button",
+  "type": "registry:ui",
+  "title": "Position Aware Button",
+  "description": "Solid pill button that fills with a dark circle growing from wherever the pointer touched it.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/position-aware-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/position-aware-button.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\n// Credit:\r\n// https://namer-ui.netlify.app/components\r\n\r\ninterface PositionAwareButtonProps {\r\n\tbuttonText: string;\r\n\tbuttonWidth?: string;\r\n\tborderRadius?: string;\r\n\tbuttonColor?: string;\r\n\tonClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;\r\n}\r\n\r\nconst PositionAwareButton: React.FC<PositionAwareButtonProps> = ({\r\n\tbuttonText,\r\n\tbuttonWidth = \"auto\",\r\n\tborderRadius = \"2em\",\r\n\tbuttonColor = \"#ff4500\",\r\n\tonClick,\r\n}) => {\r\n\tconst buttonRef = useRef<HTMLButtonElement>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst updatePosition = (e: MouseEvent) => {\r\n\t\t\tconst button = buttonRef.current;\r\n\t\t\tif (button) {\r\n\t\t\t\tconst rect = button.getBoundingClientRect();\r\n\t\t\t\tbutton.style.setProperty(\"--x\", `${e.clientX - rect.left}px`);\r\n\t\t\t\tbutton.style.setProperty(\"--y\", `${e.clientY - rect.top}px`);\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tconst button = buttonRef.current;\r\n\t\tif (button) {\r\n\t\t\tbutton.addEventListener(\"mousemove\", updatePosition);\r\n\t\t\tbutton.addEventListener(\"mouseenter\", updatePosition);\r\n\t\t\tbutton.addEventListener(\"mouseleave\", updatePosition);\r\n\t\t}\r\n\r\n\t\treturn () => {\r\n\t\t\tif (button) {\r\n\t\t\t\tbutton.removeEventListener(\"mousemove\", updatePosition);\r\n\t\t\t\tbutton.removeEventListener(\"mouseenter\", updatePosition);\r\n\t\t\t\tbutton.removeEventListener(\"mouseleave\", updatePosition);\r\n\t\t\t}\r\n\t\t};\r\n\t}, []);\r\n\r\n\treturn (\r\n\t\t<button\r\n\t\t\tref={buttonRef}\r\n\t\t\tonClick={onClick}\r\n\t\t\tstyle={\r\n\t\t\t\t{\r\n\t\t\t\t\twidth: buttonWidth,\r\n\t\t\t\t\tborderRadius: borderRadius,\r\n\t\t\t\t\t\"--button-color\": buttonColor,\r\n\t\t\t\t} as React.CSSProperties\r\n\t\t\t}\r\n\t\t>\r\n\t\t\t{buttonText}\r\n\t\t\t<style jsx>{`\r\n\t\t\t\t@property --r {\r\n\t\t\t\t\tsyntax: \"<length-percentage>\";\r\n\t\t\t\t\tinitial-value: 0px;\r\n\t\t\t\t\tinherits: false;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tbutton {\r\n\t\t\t\t\tplace-self: center;\r\n\t\t\t\t\tborder: solid 2px #0001;\r\n\t\t\t\t\tpadding: 0 1em;\r\n\t\t\t\t\tbox-shadow: inset 1px 3px 1px #fff4;\r\n\t\t\t\t\tbackground: radial-gradient(\r\n\t\t\t\t\t\t\tcircle at var(--x, 0%) var(--y, 0%),\r\n\t\t\t\t\t\t\tblack calc(var(--r) - 1px),\r\n\t\t\t\t\t\t\tvar(--button-color) var(--r)\r\n\t\t\t\t\t\t)\r\n\t\t\t\t\t\tborder-box;\r\n\t\t\t\t\tcolor: white;\r\n\t\t\t\t\tfont:\r\n\t\t\t\t\t\t1.5em/2.25 ubuntu,\r\n\t\t\t\t\t\tsans-serif;\r\n\t\t\t\t\ttransition: --r 0.35s;\r\n\t\t\t\t}\r\n\r\n\t\t\t\tbutton:hover {\r\n\t\t\t\t\t--r: 100%;\r\n\t\t\t\t}\r\n\t\t\t`}</style>\r\n\t\t</button>\r\n\t);\r\n};\r\n\r\nexport default PositionAwareButton;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "cursor-tracking"
+    ],
+    "interaction": "Hovering grows a black circle out of the exact spot the pointer entered until it covers the button; moving away shrinks it back toward the point where you left.",
+    "inspiration": {
+      "source": "Namer UI",
+      "url": "https://namer-ui.netlify.app/components",
+      "authorUrl": "https://namer-ui.netlify.app",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "buttonText",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "buttonWidth",
+        "type": "string",
+        "default": "\"auto\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "borderRadius",
+        "type": "string",
+        "default": "\"2em\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "buttonColor",
+        "type": "string",
+        "default": "\"#ff4500\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onClick",
+        "type": "((event: React.MouseEvent<HTMLButtonElement>) => void)",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/position-aware-button"
+  }
+}

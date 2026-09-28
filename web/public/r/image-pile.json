@@ -1,0 +1,61 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "image-pile",
+  "type": "registry:ui",
+  "title": "Image Pile",
+  "description": "A stack of images that shuffle and change positions automatically. Perfect for creating dynamic image galleries and portfolios.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/image-pile.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/image-pile.tsx",
+      "content": "'use client';\r\n\r\nimport React, { useEffect, useState } from 'react';\r\nimport Image from 'next/image';\r\nimport { motion } from 'framer-motion';\r\n\r\nconst ImagePile = ({ images, speed = 2 }: { images: string[]; speed?: number }) => {\r\n  const [topIndex, setTopIndex] = useState(0);\r\n\r\n  useEffect(() => {\r\n    const id = setInterval(() => {\r\n      setTopIndex((prevIndex) => (prevIndex + 1) % images.length);\r\n    }, speed * 1000);\r\n\r\n    return () => {\r\n      clearInterval(id);\r\n    };\r\n  }, [images.length]);\r\n\r\n  return (\r\n    <div className=\"relative h-[200px] sm:h-[260px] md:h-[390px] lg:h-[450px] xl:h-[500px] w-[310px] sm:w-[500px] md:w-[725px] lg:w-[900px] xl:w-[1200px] overflow-visible\">\r\n      {images.map((image, i) => {\r\n        const key = `stacked-card-${i}`;\r\n        const isTop = topIndex === i;\r\n        const secondTopIndex = (topIndex + 2) % images.length;\r\n        const zIndex = isTop ? 100 : secondTopIndex ? 99 : images.length - i;\r\n        const y: number = Math.random() * 20;\r\n        const x: number = Math.random() * 20;\r\n        const rotation = i * (Math.random() * 1 + 2) - 2;\r\n\r\n        return (\r\n          <motion.div\r\n            key={key}\r\n            className=\"absolute w-full h-full\"\r\n            style={{\r\n              zIndex,\r\n              transformOrigin: 'center center'\r\n            }}\r\n            animate={{\r\n              rotateZ: isTop ? 0 : rotation,\r\n              translateX: Math.random() < 0.5 ? x : -x,\r\n              opacity: isTop ? [0, 1] : 0.8,\r\n              translateY: isTop ? [30, Math.random() < 0.5 ? y : -y] : Math.random() < 0.5 ? y : -y,\r\n              transition: {\r\n                duration: 0.5\r\n              }\r\n            }}\r\n            initial={isTop ? { rotateZ: 0 } : { rotateZ: rotation }}\r\n          >\r\n            <div className=\"relative h-full w-full overflow-hidden rounded-3xl\">\r\n              <Image\r\n                src={image}\r\n                alt={`stacked-card-${i}`}\r\n                height={1080}\r\n                width={1920}\r\n                className=\"h-full w-full object-cover\"\r\n                priority={isTop}\r\n              />\r\n            </div>\r\n          </motion.div>\r\n        );\r\n      })}\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default ImagePile;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "A stack of photos shuffles which one sits on top on a timer.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/imagepile",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "speed",
+        "type": "number",
+        "default": "2",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/image-pile"
+  }
+}

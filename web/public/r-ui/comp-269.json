@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-269",
+  "type": "registry:component",
+  "title": "Comp 269",
+  "description": "Comp 269",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-269.tsx",
+      "content": "import { CircleAlert } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"rounded-md border px-4 py-3\">\r\n      <p className=\"text-sm\">\r\n        <CircleAlert\r\n          className=\"me-3 -mt-0.5 inline-flex text-red-500\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        An error occurred!\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

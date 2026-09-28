@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "leave-rating",
+  "type": "registry:ui",
+  "title": "Leave Rating",
+  "description": "A fun and interactive rating component that lets users share their experience with a smiley face that changes based on their rating. Users can hover over star ratings to see the face transform from sad to happy, making feedback collection engaging and visually appealing.",
+  "dependencies": [
+    "framer-motion",
+    "lucide-react"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/leave-rating.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/leave-rating.tsx",
+      "content": "'use client';\r\n\r\nimport { Star } from 'lucide-react';\r\nimport React, { useState } from 'react';\r\nimport { AnimatePresence, motion, MotionConfig } from 'framer-motion';\r\nimport { cn } from '@/lib/utils';\r\n\r\nconst MOOD_COLORS = ['#f5f5dc', '#f0f0a0', '#f5e907', '#faf32b', '#FFFF00'];\r\nconst LABELS = ['Very Bad', 'Bad', 'Average', 'Good', 'Very Good'];\r\n\r\ninterface RatingControllerProps {\r\n  hovered: number | false;\r\n  setHovered: (hovered: number | false) => void;\r\n  selected: number | false;\r\n  setSelected: (selected: number | false) => void;\r\n}\r\n\r\nconst RatingController = ({\r\n  hovered,\r\n  setHovered,\r\n  selected,\r\n  setSelected\r\n}: RatingControllerProps) => {\r\n  return (\r\n    <div onMouseLeave={() => setHovered(false)} className=\"flex items-center justify-center gap-2\">\r\n      {Array.from({ length: 5 }).map((_, index) => {\r\n        const isActive =\r\n          (hovered !== false && hovered >= index) ||\r\n          (hovered === false && selected !== false && selected >= index);\r\n\r\n        return (\r\n          <div className=\"group relative\" key={`star-${index}`}>\r\n            <Star\r\n              size={32}\r\n              strokeWidth={1}\r\n              stroke={isActive ? '#000000' : '#00000042'}\r\n              fill={isActive ? '#FFFF00' : 'none'}\r\n              onMouseEnter={() => setHovered(index)}\r\n              onClick={() => setSelected(index)}\r\n              className=\"cursor-pointer transition-all duration-100 ease-out\"\r\n            />\r\n            <AnimatePresence mode=\"popLayout\">\r\n              {hovered !== false && hovered === index && (\r\n                <motion.p\r\n                  key={`label-${index}`}\r\n                  initial={{\r\n                    opacity: 0,\r\n                    transform: 'translateY(-7px) translateX(-50%) scale(0.7)'\r\n                  }}\r\n                  animate={{\r\n                    opacity: 1,\r\n                    transform: 'translateY(-7px) translateX(-50%) scale(1)'\r\n                  }}\r\n                  exit={{\r\n                    opacity: 0,\r\n                    transform: 'translateY(-7px) translateX(-50%) scale(0.7)'\r\n                  }}\r\n                  transition={{\r\n                    duration: 0.1,\r\n                    ease: 'easeOut'\r\n                  }}\r\n                  className={cn(\r\n                    'absolute bottom-full left-1/2 -translate-x-1/2 px-2 py-0.5 text-sm bg-zinc-900 shadow-md whitespace-nowrap',\r\n                    'rounded-md'\r\n                  )}\r\n                >\r\n                  {LABELS[index]}\r\n                </motion.p>\r\n              )}\r\n            </AnimatePresence>\r\n          </div>\r\n        );\r\n      })}\r\n    </div>\r\n  );\r\n};\r\n\r\ninterface SmileSvgProps {\r\n  hovered: number | false;\r\n  selected: number | false;\r\n}\r\n\r\nconst SmileSvg = ({ hovered, selected }: SmileSvgProps) => {\r\n  const active = hovered !== false ? hovered : selected !== false ? selected : 4;\r\n\r\n  // 🎨 Mouth shape transitions\r\n  const smileTransition = [\r\n    'M 34 76 Q 48 42 66 76',\r\n    'M 35 72 Q 51 55 66 72',\r\n    'M 35 68 Q 50 70 66 68',\r\n    'M 34 65 Q 50 80 66 64',\r\n    'M 33 63 Q 50 95 67 64'\r\n  ];\r\n\r\n  const mouthLinePoints = [\r\n    { x1: 34, y1: 76, x2: 66, y2: 76 },\r\n    { x1: 35, y1: 72, x2: 66, y2: 72 },\r\n    { x1: 35, y1: 68, x2: 66, y2: 68 },\r\n    { x1: 34, y1: 65, x2: 66, y2: 64 },\r\n    { x1: 33, y1: 63, x2: 67, y2: 64 }\r\n  ];\r\n\r\n  const eyeStates = [\r\n    { cxL: 39, cxR: 61, cy: 42, ry: 14, pupilOffsetY: 6 },\r\n    { cxL: 39.5, cxR: 60.5, cy: 41, ry: 13, pupilOffsetY: 5.5 },\r\n    { cxL: 40, cxR: 60, cy: 40, ry: 12, pupilOffsetY: 5 },\r\n    { cxL: 40.5, cxR: 59.5, cy: 39, ry: 10, pupilOffsetY: 4 },\r\n    { cxL: 41, cxR: 59, cy: 38.5, ry: 8, pupilOffsetY: 3.5 }\r\n  ];\r\n\r\n  const faceStates = [\r\n    { scaleX: 1.05, scaleY: 0.95, rotate: -8 },\r\n    { scaleX: 1.02, scaleY: 0.98, rotate: -1 },\r\n    { scaleX: 1, scaleY: 1, rotate: 0 },\r\n    { scaleX: 0.99, scaleY: 1.025, rotate: 1 },\r\n    { scaleX: 0.98, scaleY: 1.05, rotate: 5 }\r\n  ];\r\n\r\n  const eye = eyeStates[active];\r\n  const face = faceStates[active];\r\n\r\n  return (\r\n    <div className=\"size-[200px]\">\r\n      <MotionConfig transition={{ duration: 0.5, type: 'spring', bounce: 0.25 }}>\r\n        <svg viewBox=\"0 0 100 100\">\r\n          {/* Animated face base */}\r\n          <motion.g\r\n            animate={{\r\n              scaleX: face.scaleX,\r\n              scaleY: face.scaleY,\r\n              rotate: face.rotate,\r\n              transformOrigin: '50% 50%'\r\n            }}\r\n          >\r\n            <motion.circle\r\n              cx=\"50\"\r\n              cy=\"50\"\r\n              r=\"40\"\r\n              animate={{ fill: MOOD_COLORS[active] }}\r\n              stroke=\"#000\"\r\n              strokeWidth={1}\r\n            />\r\n\r\n            {/* Eyes */}\r\n            <motion.ellipse\r\n              animate={{ cy: eye.cy, ry: eye.ry, cx: eye.cxL }}\r\n              rx=\"6\"\r\n              fill=\"white\"\r\n              stroke=\"#000\"\r\n              strokeWidth={1}\r\n            />\r\n            <motion.ellipse\r\n              animate={{\r\n                cy: eye.cy + eye.pupilOffsetY,\r\n                cx: eye.cxL,\r\n                ry: eye.ry / 2\r\n              }}\r\n              rx=\"4\"\r\n              fill=\"black\"\r\n              stroke=\"#000\"\r\n              strokeWidth={1}\r\n            />\r\n\r\n            <motion.ellipse\r\n              animate={{ cy: eye.cy, ry: eye.ry, cx: eye.cxR }}\r\n              rx=\"6\"\r\n              fill=\"white\"\r\n              stroke=\"#000\"\r\n              strokeWidth={1}\r\n            />\r\n            <motion.ellipse\r\n              animate={{\r\n                cy: eye.cy + eye.pupilOffsetY,\r\n                cx: eye.cxR,\r\n                ry: eye.ry / 2\r\n              }}\r\n              rx=\"4\"\r\n              fill=\"black\"\r\n              stroke=\"#000\"\r\n              strokeWidth={1}\r\n            />\r\n\r\n            {/* Mouth curve */}\r\n            <motion.path\r\n              initial={{ d: smileTransition[4] }}\r\n              animate={{ d: smileTransition[active] }}\r\n              fill=\"white\"\r\n              stroke=\"#000\"\r\n              strokeWidth={1.5}\r\n              strokeLinecap=\"round\"\r\n            />\r\n\r\n            {/* Mouth base line */}\r\n            <motion.line\r\n              initial={{\r\n                x1: mouthLinePoints[4].x1,\r\n                x2: mouthLinePoints[4].x2,\r\n                y1: mouthLinePoints[4].y1,\r\n                y2: mouthLinePoints[4].y2\r\n              }}\r\n              animate={{\r\n                x1: mouthLinePoints[active].x1,\r\n                x2: mouthLinePoints[active].x2,\r\n                y1: mouthLinePoints[active].y1,\r\n                y2: mouthLinePoints[active].y2\r\n              }}\r\n              stroke=\"#000\"\r\n              strokeWidth={1.5}\r\n              strokeLinecap=\"round\"\r\n            />\r\n          </motion.g>\r\n        </svg>\r\n      </MotionConfig>\r\n    </div>\r\n  );\r\n};\r\n\r\ninterface SubmitButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {\r\n  children?: React.ReactNode;\r\n}\r\n\r\nconst SubmitButton = ({ children, ...props }: SubmitButtonProps) => {\r\n  return (\r\n    <button\r\n      {...props}\r\n      className=\"bg-blue-500 shadow-md text-sm active:scale-[0.97] hover:bg-blue-600 font-medium text-white px-4 py-2 rounded-md\"\r\n    >\r\n      {children}\r\n    </button>\r\n  );\r\n};\r\n\r\ninterface LeaveRatingProps {\r\n  onSubmit?: (selected: number | false) => void;\r\n  question?: string;\r\n  buttonText?: string;\r\n}\r\n\r\nconst LeaveRating = ({\r\n  onSubmit,\r\n  question = 'How was your experience?',\r\n  buttonText = 'Submit'\r\n}: LeaveRatingProps) => {\r\n  const [hovered, setHovered] = useState<number | false>(false);\r\n  const [selected, setSelected] = useState<number | false>(false);\r\n\r\n  return (\r\n    <div className=\"w-full max-w-xl p-10 flex flex-col items-center justify-center gap-6 bg-white rounded-3xl shadow-md border-[0.5px]\">\r\n      <SmileSvg hovered={hovered} selected={selected} />\r\n      <div className=\"flex flex-col items-center justify-center gap-2\">\r\n        <p className=\"text-base text-black font-medium\">{question}</p>\r\n        <RatingController\r\n          hovered={hovered}\r\n          setHovered={setHovered}\r\n          selected={selected}\r\n          setSelected={setSelected}\r\n        />\r\n      </div>\r\n      <SubmitButton onClick={() => onSubmit?.(selected)}>{buttonText}</SubmitButton>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default LeaveRating;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [
+      "spring",
+      "hover"
+    ],
+    "interaction": "Hover stars and a face morphs from sad to delighted before you submit.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/leaverating",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "onSubmit",
+        "type": "((selected: number | false) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "question",
+        "type": "string",
+        "default": "'How was your experience?'",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "buttonText",
+        "type": "string",
+        "default": "'Submit'",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/leave-rating"
+  }
+}

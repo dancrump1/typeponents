@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-273",
+  "type": "registry:component",
+  "title": "Comp 273",
+  "description": "Comp 273",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-273.tsx",
+      "content": "import { InfoIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"rounded-md border px-4 py-3\">\r\n      <p className=\"text-sm\">\r\n        <InfoIcon\r\n          className=\"me-3 -mt-0.5 inline-flex text-blue-500\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        Just a quick note!\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

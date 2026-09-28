@@ -1,0 +1,149 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "marquee-along-svg",
+  "type": "registry:ui",
+  "title": "Marquee Along SVG",
+  "description": "Marquee Along SVG",
+  "dependencies": [
+    "motion",
+    "svg-path-commander"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/marquee-along-svg/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/marquee-along-svg/component.tsx",
+      "content": "import React, { RefObject, useCallback, useEffect, useMemo, useRef, useState } from \"react\";\nimport {\n\tmotion,\n\tuseAnimationFrame,\n\tuseMotionValue,\n\tuseScroll,\n\tuseSpring,\n\tuseTransform,\n\tuseVelocity,\n} from \"motion/react\";\nimport { cn } from \"@/lib/utils\";\n\n\n\n// Detect mobile device for performance optimizations\nconst isMobile = typeof window !== \"undefined\" &&\n\t(window.innerWidth < 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));\n\ntype MarqueeAlongPathProps = {\n\tchildren?: React.ReactNode;\n\tpath: string;\n\tbaseVelocity?: number;\n\trepeat?: number;\n\tzIndexBase?: number;\n\tenableRollingZIndex?: boolean;\n\tscrollContainerRef?: React.RefObject<HTMLDivElement | null>;\n\tscrollContainer?: RefObject<HTMLDivElement>;\n\tclassName?: string;\n\tdirection?: \"normal\" | \"reverse\";\n\tslowDownSpringConfig?: { damping: number; stiffness: number };\n\tuseScrollVelocity?: boolean;\n\tscrollSpringConfig?: { damping: number; stiffness: number };\n\twidth?: number | string;\n\theight?: number | string;\n\tshowPath?: boolean;\n};\n\ntype MarqueeItemProps = {\n\tbaseOffset: ReturnType<typeof useMotionValue<number>>;\n\titemIndex: number;\n\ttotalItems: number;\n\trepeatIndex: number;\n\tzIndexBase: number;\n\tscaledPath: string;\n\tisHovered: React.MutableRefObject<boolean>;\n\tchildren: React.ReactNode;\n};\n\n/**\n * Wraps a number between a min and max value\n * @param min The minimum value\n * @param max The maximum value\n * @param value The value to wrap\n * @returns The wrapped value between min and max\n */\nconst wrap = (min: number, max: number, value: number): number => {\n\tconst range = max - min;\n\treturn ((((value - min) % range) + range) % range) + min;\n};\n\n\n\nconst MarqueeItem = ({\n\tbaseOffset,\n\titemIndex,\n\ttotalItems,\n\trepeatIndex,\n\t// eslint-disable-next-line @typescript-eslint/no-unused-vars\n\tzIndexBase: _zIndexBase, // Available for future use with dynamic z-index\n\tscaledPath,\n\tisHovered,\n\tchildren,\n}: MarqueeItemProps) => {\n\tconst itemOffset = useTransform(baseOffset, (v: number) => {\n\t\tconst position = (itemIndex * 100) / totalItems;\n\t\tconst wrappedValue = wrap(0, 100, v + position);\n\t\treturn `${wrappedValue}%`;\n\t});\n\n\t// Use with multiple images when svg causes them to overlap\n\t// Note: zIndex transform is available but not currently used in style\n\t// To enable dynamic z-index based on position, uncomment:\n\t// const zIndex = useTransform(itemOffset, (v) => {\n\t// \tconst progress = parseFloat(v.replace(\"%\", \"\"));\n\t// \treturn Math.floor(zIndexBase + progress);\n\t// });\n\t// Then use it in the style prop: zIndex: zIndex\n\n\treturn (\n\t\t<motion.div\n\t\t\tclassName=\"marquee-item absolute top-0 left-0\"\n\t\t\tstyle={{\n\t\t\t\toffsetPath: `path('${scaledPath}')`,\n\t\t\t\toffsetDistance: itemOffset,\n\t\t\t\t// \"auto\" makes element follow path direction\n\t\t\t\t// The smooth curveCardinal path should make rotation changes gradual\n\t\t\t\toffsetRotate: \"auto\",\n\t\t\t\tzIndex: 1,\n\t\t\t\t// GPU acceleration hints for better performance\n\t\t\t\twillChange: \"transform\",\n\t\t\t\ttransform: \"translateZ(0)\", // Force GPU acceleration\n\t\t\t}}\n\t\t\taria-hidden={repeatIndex > 0}\n\t\t\tonMouseEnter={() => (isHovered.current = true)}\n\t\t\tonMouseLeave={() => (isHovered.current = false)}\n\t\t>\n\t\t\t{children}\n\t\t</motion.div>\n\t);\n};\n\nconst MarqueeAlongPath = ({\n\tchildren = (\n\t\t<svg\n\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\twidth=\"18\"\n\t\t\theight=\"24\"\n\t\t\tviewBox=\"0 0 18 24\"\n\t\t\tfill=\"none\"\n\t\t\tstyle={{ rotate: \"90deg\" }}\n\t\t\tpreserveAspectRatio=\"none\"\n\t\t>\n\t\t\t<path d=\"M9 0L18 24L9 18.9474L0 24L9 0Z\" fill=\"#FFBEA5\" />\n\t\t</svg>\n\t),\n\tpath,\n\tbaseVelocity = 5,\n\tdirection = \"normal\",\n\tslowDownSpringConfig = { damping: 50, stiffness: 400 },\n\tuseScrollVelocity = false,\n\tscrollSpringConfig = { damping: 50, stiffness: 400 },\n\tscrollContainer,\n\trepeat = 0,\n\tzIndexBase = 1,\n\tclassName,\n\twidth,\n\theight,\n}: MarqueeAlongPathProps) => {\n\tconst baseOffset = useMotionValue(0);\n\n\t// Scroll tracking\n\tconst { scrollY } = useScroll({\n\t\tcontainer: scrollContainer as RefObject<HTMLDivElement>,\n\t});\n\n\tconst scrollVelocity = useVelocity(scrollY);\n\tconst smoothVelocity = useSpring(scrollVelocity, scrollSpringConfig);\n\n\tconst items = useMemo(() => {\n\t\tconst childrenArray = React.Children.toArray(children);\n\n\t\treturn childrenArray.flatMap((child, childIndex) =>\n\t\t\tArray.from({ length: repeat }, (_, repeatIndex) => {\n\t\t\t\tconst itemIndex = repeatIndex * childrenArray.length + childIndex;\n\t\t\t\tconst key = `${childIndex}-${repeatIndex}`;\n\t\t\t\treturn {\n\t\t\t\t\tchild,\n\t\t\t\t\tchildIndex,\n\t\t\t\t\trepeatIndex,\n\t\t\t\t\titemIndex,\n\t\t\t\t\tkey,\n\t\t\t\t};\n\t\t\t})\n\t\t);\n\t}, [children, repeat]);\n\n\t// Hover and drag state tracking\n\tconst isHovered = useRef(false);\n\n\t// Direction factor for changing direction based on scroll or drag\n\tconst directionFactor = useRef(direction === \"normal\" ? 1 : -1);\n\n\t// Motion values for animation\n\tconst hoverFactorValue = useMotionValue(1);\n\tconst defaultVelocity = useMotionValue(1);\n\tconst smoothHoverFactor = useSpring(hoverFactorValue, slowDownSpringConfig);\n\n\t// Transform scroll velocity into a factor that affects marquee speed\n\tconst velocityFactor = useTransform(\n\t\tuseScrollVelocity ? smoothVelocity : defaultVelocity,\n\t\t[0, 1000],\n\t\t[0, 5],\n\t\t{ clamp: false }\n\t);\n\t// Throttle animation frame updates on mobile for better performance\n\tconst lastUpdateTime = useRef(0);\n\tconst throttleMs = isMobile ? 16 : 0; // ~60fps on mobile, unlimited on desktop\n\n\tuseAnimationFrame((time, delta) => {\n\t\t// Throttle updates on mobile\n\t\tif (isMobile && time - lastUpdateTime.current < throttleMs) {\n\t\t\treturn;\n\t\t}\n\t\tlastUpdateTime.current = time;\n\n\t\tif (isHovered.current) {\n\t\t\thoverFactorValue.set(0.3);\n\t\t} else {\n\t\t\thoverFactorValue.set(1);\n\t\t}\n\n\t\tlet moveBy =\n\t\t\t((baseVelocity * delta) / 1000) *\n\t\t\tdirectionFactor.current *\n\t\t\tsmoothHoverFactor.get();\n\n\t\tif (velocityFactor.get() < 0) {\n\t\t\tdirectionFactor.current = -1;\n\t\t} else if (velocityFactor.get() > 0) {\n\t\t\tdirectionFactor.current = 1;\n\t\t}\n\n\t\tmoveBy += directionFactor.current * moveBy * velocityFactor.get();\n\n\t\tbaseOffset.set(baseOffset.get() + moveBy);\n\t});\n\n\tconst wrapperRef = useRef<HTMLDivElement>(null);\n\n\tconst marqueeContainerRef = useRef<HTMLDivElement>(null);\n\t// Original SVG dimensions\n\t// TODO: Base svg h/w on the svg we pass in to the component\n\tconst originalWidth = typeof width === \"string\" ? parseFloat(width) || 175 : (width || 175);\n\tconst originalHeight = typeof height === \"string\" ? parseFloat(height) || 165 : (height || 165);\n\n\t// Scale method #2 with D3\n\tconst [scaledPath, setScaledPath] = useState<string | null>(null);\n\tconst [currentViewBox, setCurrentViewBox] = useState(\n\t\t`0 0 ${originalWidth} ${originalHeight}`\n\t);\n\n\t// ResizeObserver for immediate size updates (better than window resize)\n\tconst resizeObserverRef = useRef<ResizeObserver | null>(null);\n\tconst pathCalculationTimeoutRef = useRef<NodeJS.Timeout | null>(null);\n\tconst lastDimensionsRef = useRef<{ width: number; height: number } | null>(null);\n\tconst workerRef = useRef<Worker | null>(null);\n\tconst idleCallbackRef = useRef<number | null>(null);\n\n\tconst updatePath = useCallback(() => {\n\t\tconst wrapper = wrapperRef.current;\n\t\tif (!wrapper) return;\n\n\t\tconst containerWidth = wrapper.clientWidth;\n\t\tconst containerHeight = wrapper.clientHeight;\n\n\t\t// Check if dimensions actually changed significantly (avoid unnecessary recalculations)\n\t\tconst lastDims = lastDimensionsRef.current;\n\t\tif (lastDims) {\n\t\t\tconst widthDiff = Math.abs(containerWidth - lastDims.width);\n\t\t\tconst heightDiff = Math.abs(containerHeight - lastDims.height);\n\t\t\t// Only recalculate if change is significant (more than 1px)\n\t\t\tif (widthDiff < 1 && heightDiff < 1) {\n\t\t\t\treturn;\n\t\t\t}\n\t\t}\n\t\tlastDimensionsRef.current = { width: containerWidth, height: containerHeight };\n\n\t\t// Immediately update viewBox for instant visual feedback\n\t\tsetCurrentViewBox(`0 0 ${containerWidth} ${containerHeight}`);\n\n\t\t// Clear any pending path calculations\n\t\tif (pathCalculationTimeoutRef.current) {\n\t\t\tclearTimeout(pathCalculationTimeoutRef.current);\n\t\t}\n\n\t\t// Terminate any existing worker to avoid race conditions\n\t\tif (workerRef.current) {\n\t\t\tworkerRef.current.terminate();\n\t\t\tworkerRef.current = null;\n\t\t}\n\n\t\t// Debounce path calculation with a longer delay to prevent blocking\n\t\tpathCalculationTimeoutRef.current = setTimeout(() => {\n\t\t\t// Bundled worker URL (Turbopack/webpack must resolve this statically)\n\t\t\tconst worker = new Worker(\n\t\t\t\tnew URL(\"./marquee-path-worker.ts\", import.meta.url),\n\t\t\t\t{ type: \"module\" }\n\t\t\t);\n\t\t\tworkerRef.current = worker;\n\n\t\t\tworker.postMessage({\n\t\t\t\tpath,\n\t\t\t\toriginalWidth,\n\t\t\t\toriginalHeight,\n\t\t\t\tnewWidth: containerWidth,\n\t\t\t\tnewHeight: containerHeight,\n\t\t\t});\n\n\t\t\tworker.onmessage = (e) => {\n\t\t\t\tsetScaledPath(e.data);\n\t\t\t\tworker.terminate();\n\t\t\t\tworkerRef.current = null;\n\t\t\t};\n\n\t\t\tworker.onerror = (error) => {\n\t\t\t\tconsole.error('Path worker error:', error);\n\t\t\t\t// Fallback to original path if worker fails\n\t\t\t\tsetScaledPath(path);\n\t\t\t\tworker.terminate();\n\t\t\t\tworkerRef.current = null;\n\t\t\t};\n\t\t}, isMobile ? 300 : 200); // Proper debounce: 300ms on mobile, 200ms on desktop\n\t}, [path, originalWidth, originalHeight]);\n\n\tuseEffect(() => {\n\t\tconst wrapper = wrapperRef.current;\n\t\tif (!wrapper) {\n\t\t\t// If wrapper isn't ready, try again after a short delay\n\t\t\tconst timeoutId = setTimeout(() => {\n\t\t\t\tconst retryWrapper = wrapperRef.current;\n\t\t\t\tif (retryWrapper) {\n\t\t\t\t\tupdatePath();\n\t\t\t\t}\n\t\t\t}, 100);\n\t\t\treturn () => clearTimeout(timeoutId);\n\t\t}\n\n\t\t// Defer initial path calculation to avoid blocking render\n\t\t// Use requestIdleCallback when available, otherwise setTimeout\n\t\tconst scheduleInitialCalculation = () => {\n\t\t\tif (typeof requestIdleCallback !== 'undefined') {\n\t\t\t\tidleCallbackRef.current = requestIdleCallback(() => {\n\t\t\t\t\tupdatePath();\n\t\t\t\t}, { timeout: 1000 });\n\t\t\t} else {\n\t\t\t\t// Fallback: defer with setTimeout to yield to main thread\n\t\t\t\tsetTimeout(() => {\n\t\t\t\t\tupdatePath();\n\t\t\t\t}, 100);\n\t\t\t}\n\t\t};\n\n\t\tscheduleInitialCalculation();\n\n\t\t// Use ResizeObserver for more efficient and immediate resize detection\n\t\tif (typeof ResizeObserver !== \"undefined\") {\n\t\t\tresizeObserverRef.current = new ResizeObserver((entries) => {\n\t\t\t\t// Only process if size actually changed\n\t\t\t\tfor (const entry of entries) {\n\t\t\t\t\tif (entry.contentRect.width > 0 && entry.contentRect.height > 0) {\n\t\t\t\t\t\tupdatePath();\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t});\n\n\t\t\tresizeObserverRef.current.observe(wrapper);\n\t\t} else {\n\t\t\t// Fallback to window resize for older browsers\n\t\t\tconst handleResize = () => {\n\t\t\t\tupdatePath();\n\t\t\t};\n\n\t\t\twindow.addEventListener(\"resize\", handleResize, { passive: true });\n\t\t\treturn () => {\n\t\t\t\twindow.removeEventListener(\"resize\", handleResize);\n\t\t\t};\n\t\t}\n\n\t\treturn () => {\n\t\t\tif (resizeObserverRef.current) {\n\t\t\t\tresizeObserverRef.current.disconnect();\n\t\t\t}\n\t\t\tif (pathCalculationTimeoutRef.current) {\n\t\t\t\tclearTimeout(pathCalculationTimeoutRef.current);\n\t\t\t}\n\t\t\tif (idleCallbackRef.current !== null && typeof cancelIdleCallback !== 'undefined') {\n\t\t\t\tcancelIdleCallback(idleCallbackRef.current);\n\t\t\t\tidleCallbackRef.current = null;\n\t\t\t}\n\t\t\tif (workerRef.current) {\n\t\t\t\tworkerRef.current.terminate();\n\t\t\t\tworkerRef.current = null;\n\t\t\t}\n\t\t};\n\t}, [updatePath]);\n\n\treturn (\n\t\t<div\n\t\t\tclassName={cn(\"w-full h-full relative\", className)}\n\t\t\tref={wrapperRef}\n\t\t\tstyle={{\n\t\t\t\t// GPU acceleration hints\n\t\t\t\twillChange: \"transform\",\n\t\t\t\ttransform: \"translateZ(0)\",\n\t\t\t}}\n\t\t>\n\t\t\t{scaledPath ? (\n\t\t\t\t<>\n\t\t\t\t\t<svg\n\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\theight=\"100%\"\n\t\t\t\t\t\tviewBox={currentViewBox}\n\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t// Optimize SVG rendering\n\t\t\t\t\t\t\tshapeRendering: isMobile ? \"optimizeSpeed\" : \"geometricPrecision\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<path\n\t\t\t\t\t\t\td={scaledPath}\n\t\t\t\t\t\t\tfill={\"none\"}\n\t\t\t\t\t\t\tstroke=\"#EEE7E4\"\n\t\t\t\t\t\t\tstrokeWidth={4}\n\t\t\t\t\t\t/>\n\t\t\t\t\t</svg>\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"marquee-container absolute top-0 left-0 w-full h-full\"\n\t\t\t\t\t\tref={marqueeContainerRef}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\t// GPU acceleration for container\n\t\t\t\t\t\t\twillChange: \"transform\",\n\t\t\t\t\t\t\ttransform: \"translateZ(0)\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t{items.map(({ child, repeatIndex, itemIndex, key }) => (\n\t\t\t\t\t\t\t<MarqueeItem\n\t\t\t\t\t\t\t\tkey={key}\n\t\t\t\t\t\t\t\tbaseOffset={baseOffset}\n\t\t\t\t\t\t\t\titemIndex={itemIndex}\n\t\t\t\t\t\t\t\ttotalItems={items.length}\n\t\t\t\t\t\t\t\trepeatIndex={repeatIndex}\n\t\t\t\t\t\t\t\tzIndexBase={zIndexBase}\n\t\t\t\t\t\t\t\tscaledPath={scaledPath}\n\t\t\t\t\t\t\t\tisHovered={isHovered}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t{child}\n\t\t\t\t\t\t\t</MarqueeItem>\n\t\t\t\t\t\t))}\n\t\t\t\t\t</div>\n\t\t\t\t</>\n\t\t\t) : (\n\t\t\t\t<svg\n\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\theight=\"100%\"\n\t\t\t\t\tviewBox={`0 0 ${originalWidth} ${originalHeight}`}\n\t\t\t\t\tfill=\"none\"\n\t\t\t\t\txmlns=\"http://www.w3.org/2000/svg\"\n\t\t\t\t\tpreserveAspectRatio=\"none\"\n\t\t\t\t\tclassName=\"opacity-50\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tshapeRendering: isMobile ? \"optimizeSpeed\" : \"geometricPrecision\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<path\n\t\t\t\t\t\td={path}\n\t\t\t\t\t\tfill={\"none\"}\n\t\t\t\t\t\tstroke=\"#EEE7E4\"\n\t\t\t\t\t\tstrokeWidth={4}\n\t\t\t\t\t/>\n\t\t\t\t</svg>\n\t\t\t)}\n\t\t</div>\n\t);\n};\n\nexport default MarqueeAlongPath;\n"
+    },
+    {
+      "path": "components/ui/marquee-along-svg/marquee-path-worker.ts",
+      "type": "registry:ui",
+      "target": "components/ui/marquee-along-svg/marquee-path-worker.ts",
+      "content": "/// <reference lib=\"webworker\" />\n\nimport SVGPathCommander from \"svg-path-commander\";\n\nexport type MarqueePathWorkerPayload = {\n\tpath: string;\n\toriginalWidth: number;\n\toriginalHeight: number;\n\tnewWidth: number;\n\tnewHeight: number;\n};\n\nself.onmessage = (e: MessageEvent<MarqueePathWorkerPayload>) => {\n\tconst { path, originalWidth, originalHeight, newWidth, newHeight } = e.data;\n\tif (\n\t\t!path ||\n\t\t!originalWidth ||\n\t\t!originalHeight ||\n\t\t!Number.isFinite(newWidth) ||\n\t\t!Number.isFinite(newHeight)\n\t) {\n\t\tself.postMessage(path ?? \"\");\n\t\treturn;\n\t}\n\tconst sx = newWidth / originalWidth;\n\tconst sy = newHeight / originalHeight;\n\tconst scaled = SVGPathCommander.transformPath(path, {\n\t\tscale: [sx, sy, 1],\n\t\torigin: [0, 0, 0],\n\t});\n\tself.postMessage(SVGPathCommander.pathToString(scaled));\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven",
+      "hover",
+      "autoplay",
+      "responsive"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "path",
+        "type": "string",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "baseVelocity",
+        "type": "number",
+        "default": "5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "repeat",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "zIndexBase",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableRollingZIndex",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollContainerRef",
+        "type": "React.RefObject<HTMLDivElement | null>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollContainer",
+        "type": "React.RefObject<HTMLDivElement>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "direction",
+        "type": "\"normal\" | \"reverse\"",
+        "default": "\"normal\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "slowDownSpringConfig",
+        "type": "{ damping: number; stiffness: number; }",
+        "default": "{ damping: 50, stiffness: 400 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "useScrollVelocity",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "scrollSpringConfig",
+        "type": "{ damping: number; stiffness: number; }",
+        "default": "{ damping: 50, stiffness: 400 }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "string | number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "height",
+        "type": "string | number",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showPath",
+        "type": "boolean",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/marquee-along-svg/component"
+  }
+}

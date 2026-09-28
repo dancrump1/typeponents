@@ -1,0 +1,45 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "progress-carousel",
+  "type": "registry:ui",
+  "title": "Progress Carousel",
+  "description": "Image carousel with captioned tab buttons across the bottom, each filling with a progress bar while its slide is showing.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/progress-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/progress-carousel.tsx",
+      "content": "import React, {\n\tcreateContext,\n\tFC,\n\tReactNode,\n\tuseContext,\n\tuseEffect,\n\tuseRef,\n\tuseState,\n} from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion } from \"motion/react\";\n\n// Credit:\n// https://www.ui-layouts.com/components/progressive-carousel\n\n// Define the type for the context value\ninterface ProgressCarouselContextType {\n\tactive: string;\n\tprogress: number;\n\thandleButtonClick: (value: string) => void;\n\tvertical: boolean;\n}\n\n// Define the type for the component props\ninterface ProgressCarouselProps {\n\tchildren: ReactNode;\n\tduration?: number;\n\tfastDuration?: number;\n\tvertical?: boolean;\n\tactiveSlider: string;\n\tclassName?: string;\n}\n\ninterface SliderContentProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n}\n\ninterface SliderWrapperProps {\n\tchildren: ReactNode;\n\tvalue: string;\n\tclassName?: string;\n}\n\ninterface ProgressBarProps {\n\tchildren: ReactNode;\n\tclassName?: string;\n}\n\ninterface SliderBtnProps {\n\tchildren: ReactNode;\n\tvalue: string;\n\tclassName?: string;\n\tprogressBarClass?: string;\n}\n\n// Create the context with an undefined initial value\nconst ProgressCarouselContext = createContext<\n\tProgressCarouselContextType | undefined\n>(undefined);\n\nexport const useProgressCarouselContext = (): ProgressCarouselContextType => {\n\tconst context = useContext(ProgressCarouselContext);\n\tif (!context) {\n\t\tthrow new Error(\n\t\t\t\"useProgressCarouselContext must be used within a ProgressCarousel\"\n\t\t);\n\t}\n\treturn context;\n};\n\nexport const ProgressCarousel: FC<ProgressCarouselProps> = ({\n\tchildren,\n\tduration = 5000,\n\tfastDuration = 400,\n\tvertical = false,\n\tactiveSlider,\n\tclassName,\n}) => {\n\tconst [active, setActive] = useState<string>(activeSlider);\n\tconst [progress, setProgress] = useState<number>(0);\n\tconst [isFastForward, setIsFastForward] = useState<boolean>(false);\n\tconst frame = useRef<number>(0);\n\tconst firstFrameTime = useRef<number>(performance.now());\n\tconst targetValue = useRef<string | null>(null);\n\tconst [sliderValues, setSliderValues] = useState<string[]>([]);\n\n\tuseEffect(() => {\n\t\tconst getChildren = React.Children.toArray(children).find(\n\t\t\t(child) => (child as React.ReactElement).type === SliderContent\n\t\t) as React.ReactElement | undefined;\n\n\t\tif (getChildren) {\n\t\t\tconst values = React.Children.toArray(getChildren.props.children).map(\n\t\t\t\t(child) => (child as React.ReactElement).props.value as string\n\t\t\t);\n\t\t\tsetSliderValues(values);\n\t\t}\n\t}, [children]);\n\n\tuseEffect(() => {\n\t\tif (sliderValues.length > 0) {\n\t\t\tfirstFrameTime.current = performance.now();\n\t\t\tframe.current = requestAnimationFrame(animate);\n\t\t}\n\t\treturn () => {\n\t\t\tcancelAnimationFrame(frame.current);\n\t\t};\n\t}, [sliderValues, active, isFastForward]);\n\n\tconst animate = (now: number) => {\n\t\tconst currentDuration = isFastForward ? fastDuration : duration;\n\t\tconst elapsedTime = now - firstFrameTime.current;\n\t\tconst timeFraction = elapsedTime / currentDuration;\n\n\t\tif (timeFraction <= 1) {\n\t\t\tsetProgress(\n\t\t\t\tisFastForward\n\t\t\t\t\t? progress + (100 - progress) * timeFraction\n\t\t\t\t\t: timeFraction * 100\n\t\t\t);\n\t\t\tframe.current = requestAnimationFrame(animate);\n\t\t} else {\n\t\t\tif (isFastForward) {\n\t\t\t\tsetIsFastForward(false);\n\t\t\t\tif (targetValue.current !== null) {\n\t\t\t\t\tsetActive(targetValue.current);\n\t\t\t\t\ttargetValue.current = null;\n\t\t\t\t}\n\t\t\t} else {\n\t\t\t\t// Move to the next slide\n\t\t\t\tconst currentIndex = sliderValues.indexOf(active);\n\t\t\t\tconst nextIndex = (currentIndex + 1) % sliderValues.length;\n\t\t\t\tsetActive(sliderValues[nextIndex]);\n\t\t\t}\n\t\t\tsetProgress(0);\n\t\t\tfirstFrameTime.current = performance.now();\n\t\t}\n\t};\n\n\tconst handleButtonClick = (value: string) => {\n\t\tif (value !== active) {\n\t\t\tconst elapsedTime = performance.now() - firstFrameTime.current;\n\t\t\tconst currentProgress = (elapsedTime / duration) * 100;\n\t\t\tsetProgress(currentProgress);\n\t\t\ttargetValue.current = value;\n\t\t\tsetIsFastForward(true);\n\t\t\tfirstFrameTime.current = performance.now();\n\t\t}\n\t};\n\n\treturn (\n\t\t<ProgressCarouselContext.Provider\n\t\t\tvalue={{ active, progress, handleButtonClick, vertical }}\n\t\t>\n\t\t\t<div className={cn(\"relative\", className)}>{children}</div>\n\t\t</ProgressCarouselContext.Provider>\n\t);\n};\n\nexport const SliderContent: FC<SliderContentProps> = ({\n\tchildren,\n\tclassName,\n}) => {\n\treturn <div className={cn(\"\", className)}>{children}</div>;\n};\n\nexport const SliderWrapper: FC<SliderWrapperProps> = ({\n\tchildren,\n\tvalue,\n\tclassName,\n}) => {\n\tconst { active } = useProgressCarouselContext();\n\n\treturn (\n\t\t<AnimatePresence mode=\"popLayout\">\n\t\t\t{active === value && (\n\t\t\t\t<motion.div\n\t\t\t\t\tkey={value}\n\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\t\texit={{ opacity: 0 }}\n\t\t\t\t\tclassName={cn(\"\", className)}\n\t\t\t\t>\n\t\t\t\t\t{children}\n\t\t\t\t</motion.div>\n\t\t\t)}\n\t\t</AnimatePresence>\n\t);\n};\n\nexport const SliderBtnGroup: FC<ProgressBarProps> = ({\n\tchildren,\n\tclassName,\n}) => {\n\treturn <div className={cn(\"\", className)}>{children}</div>;\n};\n\nexport const SliderBtn: FC<SliderBtnProps> = ({\n\tchildren,\n\tvalue,\n\tclassName,\n\tprogressBarClass,\n}) => {\n\tconst { active, progress, handleButtonClick, vertical } =\n\t\tuseProgressCarouselContext();\n\n\treturn (\n\t\t<button\n\t\t\tclassName={cn(\n\t\t\t\t`relative ${active === value ? \"opacity-100\" : \"opacity-50\"}`,\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tonClick={() => handleButtonClick(value)}\n\t\t\tkey={value}\n\t\t>\n\t\t\t{children}\n\t\t\t<div\n\t\t\t\tclassName=\"absolute inset-0 overflow-hidden -z-10 max-h-full max-w-full \"\n\t\t\t\trole=\"progressbar\"\n\t\t\t\taria-valuenow={active === value ? progress : 0}\n\t\t\t>\n\t\t\t\t<span\n\t\t\t\t\tclassName={cn(\"absolute left-0 \", progressBarClass)}\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\t[vertical ? \"height\" : \"width\"]:\n\t\t\t\t\t\t\tactive === value ? `${progress}%` : \"0%\",\n\t\t\t\t\t}}\n\t\t\t\t/>\n\t\t\t</div>\n\t\t</button>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "Slides advance on their own as the active tab's bar fills; clicking another tab rushes the current bar to the end, then cross-fades to that slide and restarts the timer.",
+    "inspiration": {
+      "source": "UI Layouts",
+      "url": "https://www.ui-layouts.com/components/progressive-carousel",
+      "authorUrl": "https://www.ui-layouts.com",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/progress-carousel"
+  }
+}

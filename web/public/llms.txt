@@ -1,0 +1,572 @@
+# DriveBrandStudio component registry
+
+> 450 React components for Tailwind CSS v4, distributed as a shadcn registry.
+
+Install any component with the shadcn CLI. It rewrites imports to match the target project's `components.json`, so `cn` resolves to whatever the project already uses:
+
+```bash
+npx shadcn@latest add https://components.drivedev.net/r/{name}.json
+```
+
+Full markdown for one component (description, props, source, attribution): https://components.drivedev.net/docs/{name}.md
+
+## 3D & Canvas
+
+- [3D Card](https://components.drivedev.net/docs/3d-card.md) — Card wrapper that tilts in 3D toward the pointer, with its text and image layered at different depths.
+- [Attractor](https://components.drivedev.net/docs/attractor.md) — Physics field where the elements you drop in are pulled toward a fixed point and pushed away by the cursor.
+- [Bookshelf](https://components.drivedev.net/docs/bookshelf.md) — Shelf of 3D hardback books, one per newsletter issue, with the title printed on each spine and cover.
+- [Brick Breaker](https://components.drivedev.net/docs/brick-breaker.md) — Canvas brick breaker game with a paddle, a bouncing ball, lives, combo scoring and multiple levels.
+- [Canvas Reveal](https://components.drivedev.net/docs/canvas-reveal.md) — Full-panel grid of tiny coloured dots rendered on a canvas, fading out into the background at the top.
+- [Container Scroll](https://components.drivedev.net/docs/container-scroll.md) — Heading above a large device-style frame, tipped back in 3D, holding a grid of profile cards.
+- [Cubes](https://components.drivedev.net/docs/cubes.md)
+- [Globe](https://components.drivedev.net/docs/globe.md) — Rotating 3D globe with hexagon-dotted landmasses and coloured arcs flying between pairs of cities.
+- [Iphone](https://components.drivedev.net/docs/iphone.md)
+- [Lanyard](https://components.drivedev.net/docs/lanyard.md)
+- [Lens](https://components.drivedev.net/docs/lens.md)
+- [Macbook](https://components.drivedev.net/docs/macbook.md)
+- [Model Viewer](https://components.drivedev.net/docs/model-viewer.md)
+- [Orbit Gallery](https://components.drivedev.net/docs/orbit-gallery.md) — WebGL gallery of image tiles laid out on concentric rings that orbit a shared centre at different speeds.
+- [Rubik Cube](https://components.drivedev.net/docs/rubik-cube.md) — An interactive 3D Rubik's cube component with multiple dimensions, visual modes, and smooth drag-to-rotate animations.
+- [Sphere Gallery](https://components.drivedev.net/docs/sphere-gallery.md) — WebGL gallery of images mapped onto a sphere that you can orbit and focus.
+- [Spinning Ring](https://components.drivedev.net/docs/spinning-ring.md)
+- [Spiral 3D Slider](https://components.drivedev.net/docs/spiral-3d-slider.md)
+- [Webcam Pixel Grid](https://components.drivedev.net/docs/webcam-pixel-grid.md)
+
+## Accordions
+
+- [Accordion Slices](https://components.drivedev.net/docs/accordion-slices.md) — Row of vertical label strips, each with an icon, that open into a full-height image panel.
+- [Accordion Solutions](https://components.drivedev.net/docs/accordion-solutions.md) — Stacked list of solution cards beside a large preview image, with one card expanded at a time.
+- [Animated Accordion](https://components.drivedev.net/docs/animated-accordion.md) — Vertical stack of photo panels, each with a headline, where the open one shows its full copy and two buttons.
+- [Circle Accordion](https://components.drivedev.net/docs/circle-accordion.md)
+- [FAQ Section](https://components.drivedev.net/docs/faq-section.md)
+- [Shifting Dropdown](https://components.drivedev.net/docs/shifting-dropdown.md)
+- [Slice Accordion](https://components.drivedev.net/docs/slice-accordion.md)
+- [Spring FAQ](https://components.drivedev.net/docs/spring-faq.md)
+- [Stripe Accordion](https://components.drivedev.net/docs/stripe-accordion.md)
+
+## Backgrounds
+
+- [Aurora Background](https://components.drivedev.net/docs/aurora-background.md) — Full-bleed backdrop of soft banded aurora light behind whatever you put in it.
+- [Background](https://components.drivedev.net/docs/background.md) — Full-screen hero image with a tint overlay, loaded at whichever size suits the viewport.
+- [Background Beams](https://components.drivedev.net/docs/background-beams.md) — Backdrop of thin curved lines sweeping diagonally across the frame, each lit by a travelling blue-to-purple glow.
+- [Background Boxes](https://components.drivedev.net/docs/background-boxes.md) — Backdrop grid of empty cells with faint plus marks at the intersections.
+- [Background Gradient](https://components.drivedev.net/docs/background-gradient.md) — Card wrapper ringed by a four-colour radial gradient with a blurred glow behind it.
+- [Backlight](https://components.drivedev.net/docs/backlight.md) — Wrapper that casts a blurred, oversaturated copy of its contents outward as a glow.
+- [Blur Vignette](https://components.drivedev.net/docs/blur-vignette.md) — Image frame with a blurred border that fades inward, softening the edges instead of cropping them.
+- [Boids Ecosystem](https://components.drivedev.net/docs/boids-ecosystem.md) — Dark canvas backdrop of small coloured triangles that flock together and turn as a group, like birds.
+- [Browser Window](https://components.drivedev.net/docs/browser-window.md) — Browser chrome frame with traffic-light buttons, an optional address bar and sidebar, wrapping any content as a screenshot-style mockup.
+- [Circuit Board](https://components.drivedev.net/docs/circuit-board.md)
+- [Cpu Architecture](https://components.drivedev.net/docs/cpu-architecture.md) — Line-drawn circuit diagram of a CPU chip with traces fanning out to labelled pins around it.
+- [Curcuit Board](https://components.drivedev.net/docs/curcuit-board.md)
+- [Dark Veil](https://components.drivedev.net/docs/dark-veil.md)
+- [Dither](https://components.drivedev.net/docs/dither.md) — Full-bleed WebGL background of drifting noise waves, posterised into a coarse retro dither pattern of chunky pixels.
+- [Dot Background](https://components.drivedev.net/docs/dot-background.md) — Full-width canvas grid of purple and pink dots joined by faint lines, like a soft particle mesh.
+- [Evil Eye](https://components.drivedev.net/docs/evil-eye.md)
+- [Faulty Terminal](https://components.drivedev.net/docs/faulty-terminal.md)
+- [Fire Shader](https://components.drivedev.net/docs/fire-shader.md)
+- [Fluid Glass](https://components.drivedev.net/docs/fluid-glass.md)
+- [Fluid Morph](https://components.drivedev.net/docs/fluid-morph.md)
+- [Frequency](https://components.drivedev.net/docs/frequency.md)
+- [Galaxy](https://components.drivedev.net/docs/galaxy.md) — Full-bleed starfield background of layered, twinkling stars set in a slowly rotating galaxy.
+- [Glowing Background](https://components.drivedev.net/docs/glowing-background.md) — Dark card topped with a grid of tiny dots that light up like stars, above a title and description.
+- [Gradient Background](https://components.drivedev.net/docs/gradient-background.md)
+- [Gradient Blinds](https://components.drivedev.net/docs/gradient-blinds.md)
+- [Grainient](https://components.drivedev.net/docs/grainient.md)
+- [Grid Distortion](https://components.drivedev.net/docs/grid-distortion.md)
+- [Grid Distortion Background](https://components.drivedev.net/docs/grid-distortion-background.md)
+- [Laser Flow](https://components.drivedev.net/docs/laser-flow.md)
+- [Light Pillar](https://components.drivedev.net/docs/light-pillar.md)
+- [Light Rays](https://components.drivedev.net/docs/light-rays.md)
+- [Lightfall](https://components.drivedev.net/docs/lightfall.md)
+- [Line Background](https://components.drivedev.net/docs/line-background.md)
+- [Magnetic Field Background](https://components.drivedev.net/docs/magnetic-field-background.md)
+- [Matrix Background](https://components.drivedev.net/docs/matrix-background.md)
+- [Meteors](https://components.drivedev.net/docs/meteors.md)
+- [Particle Background](https://components.drivedev.net/docs/particle-background.md)
+- [Particle Galaxy](https://components.drivedev.net/docs/particle-galaxy.md)
+- [Path Finder Loader](https://components.drivedev.net/docs/path-finder-loader.md)
+- [Photon Beam](https://components.drivedev.net/docs/photon-beam.md)
+- [Pixel Snow](https://components.drivedev.net/docs/pixel-snow.md)
+- [Prismatic Burst](https://components.drivedev.net/docs/prismatic-burst.md) — Full-bleed burst of prismatic light rays radiating from a centre point through a colour ramp you choose.
+- [Progressive Blur](https://components.drivedev.net/docs/progressive-blur.md) — Layered blur overlay that ramps from clear to fully blurred across one chosen edge of whatever sits behind it.
+- [Screen Saver](https://components.drivedev.net/docs/screen-saver.md)
+- [Shape Blur](https://components.drivedev.net/docs/shape-blur.md)
+- [Side Rays](https://components.drivedev.net/docs/side-rays.md)
+- [Snowflakes](https://components.drivedev.net/docs/snowflakes.md)
+- [Starfield Wrapper](https://components.drivedev.net/docs/starfield-wrapper.md) — A wrapper that puts your content over a starfield flying toward the viewer, with pale blue stars streaming out from the centre.
+- [Strands](https://components.drivedev.net/docs/strands.md)
+- [String Art Background](https://components.drivedev.net/docs/string-art-background.md)
+- [Threads](https://components.drivedev.net/docs/threads.md)
+- [Tiles Background](https://components.drivedev.net/docs/tiles-background.md)
+- [Tunnel](https://components.drivedev.net/docs/tunnel.md)
+- [Wavy Block](https://components.drivedev.net/docs/wavy-block.md)
+
+## Buttons
+
+- [Action Hint](https://components.drivedev.net/docs/action-hint.md) — Wrapper that floats a small label above a button to confirm what the click did.
+- [Btn08](https://components.drivedev.net/docs/btn08.md) — Share button that trades itself for a row of social icons in the same footprint.
+- [Button Text Slide](https://components.drivedev.net/docs/button-text-slide.md) — Solid or outlined link button whose label swaps for a second line of text on hover.
+- [Discover Button](https://components.drivedev.net/docs/discover-button.md) — Floating search bar paired with a pill of category tabs, where the search field takes over the whole row when opened.
+- [Dynamic Island](https://components.drivedev.net/docs/dynamic-island.md) — Black pill notch that reshapes itself between a compact weather badge, an incoming call banner and a countdown timer.
+- [Fab](https://components.drivedev.net/docs/fab.md)
+- [Fab Grid](https://components.drivedev.net/docs/fab-grid.md)
+- [Family Button](https://components.drivedev.net/docs/family-button.md)
+- [Family Drawer](https://components.drivedev.net/docs/family-drawer.md)
+- [Fishy Button](https://components.drivedev.net/docs/fishy-button.md)
+- [Fold Hover Button](https://components.drivedev.net/docs/fold-hover-button.md)
+- [Galaxy Button](https://components.drivedev.net/docs/galaxy-button.md) — Pill button filled with a colour gradient, ringed by tiny stars that stream inward past the label.
+- [Hold To Confirm](https://components.drivedev.net/docs/hold-to-confirm.md)
+- [Hold To Confirm Smooth](https://components.drivedev.net/docs/hold-to-confirm-smooth.md)
+- [Horizontal CTA](https://components.drivedev.net/docs/horizontal-cta.md)
+- [Hover Border](https://components.drivedev.net/docs/hover-border.md)
+- [Interactive CTA](https://components.drivedev.net/docs/interactive-cta.md) — A floating call-to-action component that expands from a compact icon to reveal contact information and navigation links. Features smooth animations, customizable positioning, and dynamic content.
+- [Magnet Button](https://components.drivedev.net/docs/magnet-button.md)
+- [Position Aware Button](https://components.drivedev.net/docs/position-aware-button.md) — Solid pill button that fills with a dark circle growing from wherever the pointer touched it.
+- [Power Off Slide](https://components.drivedev.net/docs/power-off-slide.md) — Slide-to-power-off track with a draggable knob carrying a red power icon and a shimmering label.
+- [Scaling Button](https://components.drivedev.net/docs/scaling-button.md)
+- [Share Button](https://components.drivedev.net/docs/share-button.md)
+- [Sideivdeo](https://components.drivedev.net/docs/sideivdeo.md)
+- [Slide Button](https://components.drivedev.net/docs/slide-button.md)
+- [Social Links](https://components.drivedev.net/docs/social-links.md)
+- [Specular Button](https://components.drivedev.net/docs/specular-button.md) — Button with a specular highlight that follows the pointer.
+- [Spotlight Button](https://components.drivedev.net/docs/spotlight-button.md)
+- [Staggered Dropdown](https://components.drivedev.net/docs/staggered-dropdown.md) — An actions menu that unrolls below a button, with an icon and label on every row.
+- [Video Button](https://components.drivedev.net/docs/video-button.md)
+
+## Cards
+
+- [3D Card](https://components.drivedev.net/docs/3d-card.md) — Card wrapper that tilts in 3D toward the pointer, with its text and image layered at different depths.
+- [Animated Hover Card](https://components.drivedev.net/docs/animated-hover-card.md) — Tall gradient card with a title and a subtitle that stays hidden until you hover.
+- [Card Deck](https://components.drivedev.net/docs/card-deck.md) — Stack of image cards that fans out into a tilted 3D spread and pulls one card forward when picked.
+- [Card Hover](https://components.drivedev.net/docs/card-hover.md) — Grid of linked title-and-description cards with a rounded highlight panel that follows the pointer.
+- [Card Rotation](https://components.drivedev.net/docs/card-rotation.md) — Draggable horizontal row of square cards seen in perspective, with the row fading out at both edges.
+- [Card Stack](https://components.drivedev.net/docs/card-stack.md) — Stack of testimonial cards with the ones behind peeking out above, slightly smaller each step back.
+- [Card Swap](https://components.drivedev.net/docs/card-swap.md) — Slanted 3D stack of cards in the corner of a section that deals itself through on a timer.
+- [Cards](https://components.drivedev.net/docs/cards.md) — Set of flip-card building blocks — container, header, divider, front and back faces, and buttons — for cards with two sides.
+- [Collection Surfer](https://components.drivedev.net/docs/collection-surfer.md) — Full-screen gallery of collection photos strung along a diagonal line receding into 3D depth.
+- [Color Change Cards](https://components.drivedev.net/docs/color-change-cards.md) — Grid of photo tiles that sit desaturated behind a heading, a caption and a corner arrow.
+- [Curtain Reveal Card](https://components.drivedev.net/docs/curtain-reveal-card.md)
+- [Cutout Card](https://components.drivedev.net/docs/cutout-card.md)
+- [Flip Card](https://components.drivedev.net/docs/flip-card.md)
+- [Focus Cards](https://components.drivedev.net/docs/focus-cards.md)
+- [Goomorphic Card](https://components.drivedev.net/docs/goomorphic-card.md)
+- [Holographic Card](https://components.drivedev.net/docs/holographic-card.md) — Card with a holographic sheen that tracks the pointer.
+- [Hover](https://components.drivedev.net/docs/hover.md)
+- [Hover Card](https://components.drivedev.net/docs/hover-card.md)
+- [Hover Cards](https://components.drivedev.net/docs/hover-cards.md)
+- [Inflected Card](https://components.drivedev.net/docs/inflected-card.md)
+- [Info Card](https://components.drivedev.net/docs/info-card.md)
+- [Interactive Folder](https://components.drivedev.net/docs/interactive-folder.md) — An animated folder component that expands to reveal file contents with smooth spring animations and interactive hover effects.
+- [Lane Card](https://components.drivedev.net/docs/lane-card.md)
+- [Popular Price Card](https://components.drivedev.net/docs/popular-price-card.md) — Pricing card with a Most Popular badge tucked behind its top edge, above a checked feature list.
+- [Price Card](https://components.drivedev.net/docs/price-card.md) — Single pricing card showing plan name, monthly price and a feature list with circled check marks.
+- [Reveal Card](https://components.drivedev.net/docs/reveal-card.md) — Card covered by a full-bleed image that slides away diagonally to expose a title block and a More link.
+- [Rounded Scrollbar](https://components.drivedev.net/docs/rounded-scrollbar.md)
+- [Scratch Card](https://components.drivedev.net/docs/scratch-card.md) — Scratch-off card that reveals content underneath.
+- [Scrollable Card Stack](https://components.drivedev.net/docs/scrollable-card-stack.md) — Deck of video cards stacked front to back, each one behind sitting a little higher, smaller and fainter, with dots underneath for position.
+- [Shift Card](https://components.drivedev.net/docs/shift-card.md)
+- [Showcase Card](https://components.drivedev.net/docs/showcase-card.md)
+- [Skeumorphic Music Card](https://components.drivedev.net/docs/skeumorphic-music-card.md) — A music player card with realistic shadows and 3D effects. Includes play, pause, and skip controls for music apps.
+- [Social Media Card](https://components.drivedev.net/docs/social-media-card.md) — A versatile card component that mimics the look and feel of popular social media platforms. Supports Twitter/X, Reddit, and Peerlist styles with authentic layouts, interaction buttons, and platform-specific design elements.
+- [Spotlight Cards](https://components.drivedev.net/docs/spotlight-cards.md)
+- [Spring Modal](https://components.drivedev.net/docs/spring-modal.md)
+- [Squishy Pricing](https://components.drivedev.net/docs/squishy-pricing.md)
+- [Stacking Cards](https://components.drivedev.net/docs/stacking-cards.md) — A column of full-height cards that pin to the top of the screen and pile up on each other as you scroll.
+- [Trading Card](https://components.drivedev.net/docs/trading-card.md) — A card that moves in 3D when you hover over it. Perfect for showcasing profiles, characters, or products with engaging effects.
+- [Wobble Card](https://components.drivedev.net/docs/wobble-card.md)
+- [Zoom Blur Card](https://components.drivedev.net/docs/zoom-blur-card.md)
+
+## Carousels
+
+- [Award Carousel](https://components.drivedev.net/docs/award-carousel.md) — Row of laurel-wreath award badges above the matching quote and a row of dots.
+- [Box Carousel](https://components.drivedev.net/docs/box-carousel.md) — Carousel built as a 3D box, with one image or video on each face and the box turning to show the next.
+- [Carousel Circle](https://components.drivedev.net/docs/carousel-circle.md) — Tilted ring of looping video thumbnails orbiting a phone mockup that plays whichever clip is at the front.
+- [Carousel Stack](https://components.drivedev.net/docs/carousel-stack.md) — Carousel that keeps its slides in a stack, the upcoming ones peeking out below the top card, with back and forward arrows.
+- [CSS Box](https://components.drivedev.net/docs/css-box.md) — Six-sided 3D box that holds any content on each face, spun by dragging or snapped to a named side.
+- [Hover Greyscale Logo Carousel](https://components.drivedev.net/docs/hover-greyscale-logo-carousel.md)
+- [Infinite Carousel](https://components.drivedev.net/docs/infinite-carousel.md)
+- [Infinite Scrolling Logos Animation](https://components.drivedev.net/docs/infinite-scrolling-logos-animation.md)
+- [Logo Carousel](https://components.drivedev.net/docs/logo-carousel.md)
+- [Logo Loop](https://components.drivedev.net/docs/logo-loop.md)
+- [Morph Slider](https://components.drivedev.net/docs/morph-slider.md)
+- [Parallax Carousel](https://components.drivedev.net/docs/parallax-carousel.md)
+- [Pixelated Carousel](https://components.drivedev.net/docs/pixelated-carousel.md) — A carousel that shows images with a pixelated effect. Images change with a grid animation that makes them look blocky.
+- [Progress Carousel](https://components.drivedev.net/docs/progress-carousel.md) — Image carousel with captioned tab buttons across the bottom, each filling with a progress bar while its slide is showing.
+- [Project Showcase](https://components.drivedev.net/docs/project-showcase.md) — Two-column project showcase pairing a stack of tilted screenshots with the project name, role and write-up.
+- [Ribbon Logos](https://components.drivedev.net/docs/ribbon-logos.md)
+- [Smooth Slider](https://components.drivedev.net/docs/smooth-slider.md)
+- [Spiral 3D Slider](https://components.drivedev.net/docs/spiral-3d-slider.md)
+- [Stacked Carousel](https://components.drivedev.net/docs/stacked-carousel.md)
+
+## Cursor & Pointer Effects
+
+- [Cursor Carousel](https://components.drivedev.net/docs/cursor-carousel.md)
+- [Cursor Follow](https://components.drivedev.net/docs/cursor-follow.md)
+- [Cursor Mask](https://components.drivedev.net/docs/cursor-mask.md)
+- [Eagle Vision](https://components.drivedev.net/docs/eagle-vision.md) — A visual effect inspired by Assassin's Creed that shows rotating rings following your mouse cursor. The rings get smaller and turn green when you hover over target elements, creating an immersive gaming-style interface.
+- [Edge Bounce](https://components.drivedev.net/docs/edge-bounce.md) — Wrapper that makes whatever sits inside it flinch away from the cursor the moment the pointer touches it.
+- [Eye Tracking](https://components.drivedev.net/docs/eye-tracking.md)
+- [Follow Cursor](https://components.drivedev.net/docs/follow-cursor.md)
+- [Following Eyes](https://components.drivedev.net/docs/following-eyes.md)
+- [Following Pointer](https://components.drivedev.net/docs/following-pointer.md)
+- [Gravity](https://components.drivedev.net/docs/gravity.md)
+- [Hover Squares](https://components.drivedev.net/docs/hover-squares.md)
+- [Image Pixel Trail](https://components.drivedev.net/docs/image-pixel-trail.md) — Pointer trail made of pixelated image fragments.
+- [Logo Particles](https://components.drivedev.net/docs/logo-particles.md)
+- [Mask Cursor Effect](https://components.drivedev.net/docs/mask-cursor-effect.md) — A component that reveals hidden content through a circular mask that follows your mouse. Perfect for creating interactive reveal effects.
+- [Mask Effect](https://components.drivedev.net/docs/mask-effect.md)
+- [Mouse Image Trail](https://components.drivedev.net/docs/mouse-image-trail.md)
+- [Parallax Floating](https://components.drivedev.net/docs/parallax-floating.md)
+- [Pointer](https://components.drivedev.net/docs/pointer.md)
+- [Smokey Cursor](https://components.drivedev.net/docs/smokey-cursor.md)
+- [Smooth Cursor](https://components.drivedev.net/docs/smooth-cursor.md)
+- [Sticker Peel](https://components.drivedev.net/docs/sticker-peel.md) — A round sticker with a message hidden underneath, drawn with a mirrored curl so the peeled part looks like it is folding over.
+- [Target Cursor](https://components.drivedev.net/docs/target-cursor.md)
+- [Text Bounce](https://components.drivedev.net/docs/text-bounce.md) — Heading whose individual letters shy away from the pointer and spring back.
+- [Tooltip Cat](https://components.drivedev.net/docs/tooltip-cat.md)
+- [Tooltip Dog](https://components.drivedev.net/docs/tooltip-dog.md)
+
+## Data & Tables
+
+- [List Rotator](https://components.drivedev.net/docs/list-rotator.md)
+- [Number Ticker](https://components.drivedev.net/docs/number-ticker.md) — Numeric counter that runs up to its target figure, comma-grouped and set on fixed-width digits so it never jitters.
+- [Table](https://components.drivedev.net/docs/table.md)
+- [Timeline](https://components.drivedev.net/docs/timeline.md) — Vertical timeline of dated events.
+- [View List](https://components.drivedev.net/docs/view-list.md)
+
+## Footers
+
+- [Simple Footer](https://components.drivedev.net/docs/simple-footer.md)
+
+## Forms & Inputs
+
+- [Action Search Bar](https://components.drivedev.net/docs/action-search-bar.md) — Command-palette search field that lists matching actions with icons, shortcuts and type labels.
+- [Checkbox Animated](https://components.drivedev.net/docs/checkbox-animated.md) — Checkbox drawn as a single continuous stroke that turns from a rounded square into a tick.
+- [Curved Input](https://components.drivedev.net/docs/curved-input.md)
+- [Dialog Form](https://components.drivedev.net/docs/dialog-form.md) — An interactive form component that transforms from a button into a modal dialog with smooth animations. Features form validation, loading states, and success feedback with beautiful visual effects.
+- [Electric AI Input](https://components.drivedev.net/docs/electric-ai-input.md) — A modern AI-style input component with file upload support. Features smooth loading animations, customizable colors, and an intuitive interface perfect for AI chat applications.
+- [Fancy Input](https://components.drivedev.net/docs/fancy-input.md)
+- [File Input](https://components.drivedev.net/docs/file-input.md) — A sophisticated file upload component with drag-and-drop functionality, animated loading states, and file previews. Features file validation, size limits, and smooth transitions between upload states with beautiful visual feedback.
+- [Gradient Checkbox](https://components.drivedev.net/docs/gradient-checkbox.md)
+- [Input Animated](https://components.drivedev.net/docs/input-animated.md)
+- [Interest Picker](https://components.drivedev.net/docs/interest-picker.md) — An interactive component that allows users to select their interests from a visually appealing marquee-style grid. Users can choose from predefined categories with smooth animations and a minimum selection requirement.
+- [Leave Rating](https://components.drivedev.net/docs/leave-rating.md) — A fun and interactive rating component that lets users share their experience with a smiley face that changes based on their rating. Users can hover over star ratings to see the face transform from sad to happy, making feedback collection engaging and visually appealing.
+- [Option Wheel](https://components.drivedev.net/docs/option-wheel.md) — Vertical picker whose options curl along an arc, fading and blurring the further each label sits from the selected one.
+- [OTP Input](https://components.drivedev.net/docs/otp-input.md) — A six-digit OTP input component with smooth animations, auto-focus navigation, and visual feedback for verification success or errors.
+- [Searchbar](https://components.drivedev.net/docs/searchbar.md)
+- [Select Modal](https://components.drivedev.net/docs/select-modal.md)
+- [Signature](https://components.drivedev.net/docs/signature.md)
+- [Stacked Input Form](https://components.drivedev.net/docs/stacked-input-form.md) — A progressive form that stacks input fields vertically with smooth animations, allowing users to focus on one field at a time while maintaining context.
+
+## Games
+
+- [Snake Game](https://components.drivedev.net/docs/snake-game.md)
+
+## Grids & Layouts
+
+- [Bento](https://components.drivedev.net/docs/bento.md) — Bento grid of uneven tiles, each with an image, icon, title and short blurb, that link somewhere when clicked.
+- [Business Footer](https://components.drivedev.net/docs/business-footer.md) — Five-column site footer with a brand block, postal address, social icons and grouped product, company, resource and legal links.
+- [Chroma Grid](https://components.drivedev.net/docs/chroma-grid.md) — Grid of profile cards held in greyscale, with a circular window of full colour that follows the pointer.
+- [Cielia Replication](https://components.drivedev.net/docs/cielia-replication.md)
+- [Content With Image](https://components.drivedev.net/docs/content-with-image.md) — Two-column marketing section pairing a heading and paragraph with a full-height photo beside them.
+- [Expandable Screen](https://components.drivedev.net/docs/expandable-screen.md)
+- [Feature](https://components.drivedev.net/docs/feature.md)
+- [Fractal Grid](https://components.drivedev.net/docs/fractal-grid.md)
+- [Grid Content](https://components.drivedev.net/docs/grid-content.md)
+- [Grid Hero](https://components.drivedev.net/docs/grid-hero.md)
+- [Grid To Flex](https://components.drivedev.net/docs/grid-to-flex.md)
+- [Hero Parallax](https://components.drivedev.net/docs/hero-parallax.md)
+- [Hover Footer](https://components.drivedev.net/docs/hover-footer.md)
+- [How It Works](https://components.drivedev.net/docs/how-it-works.md)
+- [Ksier](https://components.drivedev.net/docs/ksier.md)
+- [Layout Grid](https://components.drivedev.net/docs/layout-grid.md)
+- [Magic Bento](https://components.drivedev.net/docs/magic-bento.md)
+- [Masonry](https://components.drivedev.net/docs/masonry.md)
+- [Masonry Grid](https://components.drivedev.net/docs/masonry-grid.md) — A grid layout that arranges items like Pinterest, automatically fitting them together without gaps. Perfect for image galleries and portfolios.
+- [Movie Gallery](https://components.drivedev.net/docs/movie-gallery.md)
+- [Parallax Floating](https://components.drivedev.net/docs/parallax-floating.md)
+- [Pricing Table](https://components.drivedev.net/docs/pricing-table.md) — Four-column pricing grid with a monthly/annual billing toggle and one best-value plan tinted by a warm gradient.
+- [Scrolltrigger Replication](https://components.drivedev.net/docs/scrolltrigger-replication.md)
+- [Services](https://components.drivedev.net/docs/services.md)
+- [Shift Card](https://components.drivedev.net/docs/shift-card.md)
+- [Simple Grid](https://components.drivedev.net/docs/simple-grid.md)
+- [Skeleton](https://components.drivedev.net/docs/skeleton.md)
+- [Split Flap Display](https://components.drivedev.net/docs/split-flap-display.md)
+- [Spotlight Cards](https://components.drivedev.net/docs/spotlight-cards.md)
+- [Sticky Scroll Reveal](https://components.drivedev.net/docs/sticky-scroll-reveal.md)
+- [Tabbed FAQ](https://components.drivedev.net/docs/tabbed-faq.md)
+- [Terminal](https://components.drivedev.net/docs/terminal.md)
+- [Testimonial Grid](https://components.drivedev.net/docs/testimonial-grid.md)
+- [Text Flipping Board](https://components.drivedev.net/docs/text-flipping-board.md) — Airport split-flap departure board that spells out a message across a grid of hinged character tiles.
+
+## Images
+
+- [Clip Path SVG Mask](https://components.drivedev.net/docs/clip-path-svg-mask.md)
+- [Compare](https://components.drivedev.net/docs/compare.md) — Before and after image comparison split by a glowing vertical divider that throws off sparks.
+- [CSS Box](https://components.drivedev.net/docs/css-box.md) — Six-sided 3D box that holds any content on each face, spun by dragging or snapped to a named side.
+- [Folding Logos](https://components.drivedev.net/docs/folding-logos.md)
+- [Fullscreen Image](https://components.drivedev.net/docs/fullscreen-image.md)
+- [Ghost SVG](https://components.drivedev.net/docs/ghost-svg.md) — Ghost-shaped silhouette filled with a churning yellow blob, with two tall eyes that watch the pointer.
+- [Halftone Reveal](https://components.drivedev.net/docs/halftone-reveal.md)
+- [Image Pile](https://components.drivedev.net/docs/image-pile.md) — A stack of images that shuffle and change positions automatically. Perfect for creating dynamic image galleries and portfolios.
+- [Image Pixel Trail](https://components.drivedev.net/docs/image-pixel-trail.md) — Pointer trail made of pixelated image fragments.
+- [Image Reveal](https://components.drivedev.net/docs/image-reveal.md)
+- [Image Ripple](https://components.drivedev.net/docs/image-ripple.md)
+- [Image Wheel](https://components.drivedev.net/docs/image-wheel.md)
+- [Image Zoom](https://components.drivedev.net/docs/image-zoom.md)
+- [Image Zoom Effect](https://components.drivedev.net/docs/image-zoom-effect.md)
+- [Infinite Zoom](https://components.drivedev.net/docs/infinite-zoom.md)
+- [Mask Effect](https://components.drivedev.net/docs/mask-effect.md)
+- [Media Between Text](https://components.drivedev.net/docs/media-between-text.md)
+- [Parallax Floating](https://components.drivedev.net/docs/parallax-floating.md)
+- [Pixel Image](https://components.drivedev.net/docs/pixel-image.md)
+- [Pixel Swap](https://components.drivedev.net/docs/pixel-swap.md)
+- [Sine Wave](https://components.drivedev.net/docs/sine-wave.md) — An animated component that arranges items in a sine wave pattern with smooth spring animations. Perfect for creating dynamic, flowing layouts with customizable amplitude and frequency.
+- [Squonk](https://components.drivedev.net/docs/squonk.md)
+- [Sticker Peel](https://components.drivedev.net/docs/sticker-peel.md) — A round sticker with a message hidden underneath, drawn with a mirrored curl so the peeled part looks like it is folding over.
+- [Swap Logos](https://components.drivedev.net/docs/swap-logos.md)
+- [Webcam Pixel Grid](https://components.drivedev.net/docs/webcam-pixel-grid.md)
+
+## Loaders
+
+- [Circular Bars Loader](https://components.drivedev.net/docs/circular-bars-loader.md)
+- [Dual Ring Loader](https://components.drivedev.net/docs/dual-ring-loader.md) — Loading spinner built from two concentric rings, each with a gap in its outline, the smaller one nested inside the larger.
+- [Jelly Loader](https://components.drivedev.net/docs/jelly-loader.md) — A loading animation with circles that move and scale like jelly. Perfect for showing that something is loading on your website.
+- [Modern Loader](https://components.drivedev.net/docs/modern-loader.md)
+- [Nine Dot Loader](https://components.drivedev.net/docs/nine-dot-loader.md) — Loading indicator made of a three-by-three grid of rounded dots that pulse out of step with each other.
+- [Preloader](https://components.drivedev.net/docs/preloader.md) — Full-screen black loading overlay with a curved bottom edge and a single word cycling through a short phrase.
+- [Spinner](https://components.drivedev.net/docs/spinner.md)
+- [Split Reveal](https://components.drivedev.net/docs/split-reveal.md)
+- [Stripes Preloader](https://components.drivedev.net/docs/stripes-preloader.md)
+- [Three Bounce Loader](https://components.drivedev.net/docs/three-bounce-loader.md)
+- [Three Dot Loader](https://components.drivedev.net/docs/three-dot-loader.md)
+
+## Media Galleries
+
+- [Diamond Gallery](https://components.drivedev.net/docs/diamond-gallery.md)
+- [Dome Gallery](https://components.drivedev.net/docs/dome-gallery.md) — Photo grid wrapped onto the inside of a dome, so tiles curve away and shrink toward the edges of the frame.
+- [Drift Wall](https://components.drivedev.net/docs/drift-wall.md) — Wall of image tiles in columns that scroll past each other endlessly, tilted back in perspective and faded out at the edges.
+- [Film Reel](https://components.drivedev.net/docs/film-reel.md)
+- [Folder](https://components.drivedev.net/docs/folder.md)
+- [Hover Gallery](https://components.drivedev.net/docs/hover-gallery.md)
+- [Image Wheel](https://components.drivedev.net/docs/image-wheel.md)
+- [Infinite Moving Cards](https://components.drivedev.net/docs/infinite-moving-cards.md)
+- [Marquee Along SVG](https://components.drivedev.net/docs/marquee-along-svg.md)
+- [Orbit Gallery](https://components.drivedev.net/docs/orbit-gallery.md) — WebGL gallery of image tiles laid out on concentric rings that orbit a shared centre at different speeds.
+- [Parallax Floating](https://components.drivedev.net/docs/parallax-floating.md)
+- [Parallax Scroll](https://components.drivedev.net/docs/parallax-scroll.md)
+- [Photo Gallery](https://components.drivedev.net/docs/photo-gallery.md) — An interactive photo gallery with smooth animations and layout transitions. Features a masonry-style grid with alternating row offsets, click-to-expand functionality, and elegant vignette effects for a premium visual experience.
+- [Sideivdeo](https://components.drivedev.net/docs/sideivdeo.md)
+- [Sphere Gallery](https://components.drivedev.net/docs/sphere-gallery.md) — WebGL gallery of images mapped onto a sphere that you can orbit and focus.
+- [Spiral Gallery](https://components.drivedev.net/docs/spiral-gallery.md)
+
+## Modals
+
+- [Dialog Stack](https://components.drivedev.net/docs/dialog-stack.md)
+- [Linear Dialog](https://components.drivedev.net/docs/linear-dialog.md)
+- [Spring Cards](https://components.drivedev.net/docs/spring-cards.md)
+
+## Navigation
+
+- [3D Nav Bar](https://components.drivedev.net/docs/3d-nav-bar.md) — Desktop nav bar whose top-level items open a floating panel of links beside a large preview image.
+- [Apple Spotlight](https://components.drivedev.net/docs/apple-spotlight.md) — A beautiful search component inspired by macOS Spotlight.
+- [Bubble Menu](https://components.drivedev.net/docs/bubble-menu.md) — Floating navigation bar of a logo bubble and a hamburger button that opens a full-screen grid of tilted menu pills.
+- [Circle Menu](https://components.drivedev.net/docs/circle-menu.md) — A circular navigation menu that expands items in a circle around a central button with smooth animations and hover effects.
+- [Curved Navbar](https://components.drivedev.net/docs/curved-navbar.md)
+- [Expanding Tabs](https://components.drivedev.net/docs/expanding-tabs.md)
+- [Flipped Menu](https://components.drivedev.net/docs/flipped-menu.md)
+- [Floating Nav](https://components.drivedev.net/docs/floating-nav.md)
+- [Flower Menu](https://components.drivedev.net/docs/flower-menu.md)
+- [Flowing Nav](https://components.drivedev.net/docs/flowing-nav.md)
+- [Following Headers](https://components.drivedev.net/docs/following-headers.md)
+- [Glass Nav](https://components.drivedev.net/docs/glass-nav.md) — Frosted glass navigation bar with a centred logo, link pills and a collapsible mobile menu.
+- [Gooey Tabs](https://components.drivedev.net/docs/gooey-tabs.md)
+- [Horizontal Scroll Gallery](https://components.drivedev.net/docs/horizontal-scroll-gallery.md)
+- [Hover Image Links](https://components.drivedev.net/docs/hover-image-links.md)
+- [Infinite Menu](https://components.drivedev.net/docs/infinite-menu.md)
+- [Line Sidebar](https://components.drivedev.net/docs/line-sidebar.md)
+- [Line Sidebar2](https://components.drivedev.net/docs/line-sidebar2.md)
+- [Link Hover](https://components.drivedev.net/docs/link-hover.md)
+- [Link Preview](https://components.drivedev.net/docs/link-preview.md)
+- [Magnet Tabs](https://components.drivedev.net/docs/magnet-tabs.md) — MagnetTabs is a stylish tab navigation component for switching between sections in a user interface. It’s ideal for dashboards, settings pages, admin panels, or product views, anywhere content needs to be organized into tabs for better usability.
+- [Mobile Nav](https://components.drivedev.net/docs/mobile-nav.md)
+- [Mobile Nav Basic](https://components.drivedev.net/docs/mobile-nav-basic.md)
+- [Nav Bar](https://components.drivedev.net/docs/nav-bar.md)
+- [Navbar2](https://components.drivedev.net/docs/navbar2.md)
+- [Navbar3](https://components.drivedev.net/docs/navbar3.md) — Minimal navigation bar pinned to the top of the page, with a logo, one text link, and a light/dark mode toggle.
+- [Navigation](https://components.drivedev.net/docs/navigation.md) — Sticky site header with a logo, inline page links, a call-to-action button, and a hamburger menu on narrow screens.
+- [Opposite Scroll Links](https://components.drivedev.net/docs/opposite-scroll-links.md) — Split index of full-height image links, with the left and right columns scrolling past each other in opposite directions.
+- [Performant Sidebar](https://components.drivedev.net/docs/performant-sidebar.md)
+- [Resize Navbar](https://components.drivedev.net/docs/resize-navbar.md)
+- [Rich Popover](https://components.drivedev.net/docs/rich-popover.md)
+- [Scroll Island](https://components.drivedev.net/docs/scroll-island.md) — Floating pill docked at the bottom of the page showing a circular progress ring, the current section title and a scroll percentage.
+- [Sidebar](https://components.drivedev.net/docs/sidebar.md) — Collapsible sidebar navigation.
+- [Sidebar](https://components.drivedev.net/docs/stackbits-sidebar.md) — A collapsible navigation sidebar with smooth expand/collapse animations and hover previews. Features icon-based navigation with animated content panels that slide in and out seamlessly.
+- [Tabs](https://components.drivedev.net/docs/tabs.md)
+- [Tabs Transition Panel](https://components.drivedev.net/docs/tabs-transition-panel.md)
+- [Takeover Links](https://components.drivedev.net/docs/takeover-links.md)
+
+## Scroll
+
+- [Dominoes List Scroll](https://components.drivedev.net/docs/dominoes-list-scroll.md) — A scrollable component that displays images with domino-like falling animations as you scroll. Each image rotates and falls like a domino piece, creating a smooth cascading effect that responds to your scroll position with realistic 3D shadows.
+- [Dominoes Scroll Indicator](https://components.drivedev.net/docs/dominoes-scroll-indicator.md) — A scroll indicator that shows domino-like bars that rotate as you scroll through content. Each bar rotates at different positions to create a cascading effect.
+- [Flip Scroll](https://components.drivedev.net/docs/flip-scroll.md) — A scrollable component that displays images with 3D flip animations as you scroll. Each image flips to reveal a back face, creating an engaging card-flipping effect that responds to scroll position.
+- [Flow Scroll](https://components.drivedev.net/docs/flow-scroll.md) — A scrollable component that displays images in a flowing grid layout as you scroll. Each image smoothly scales and slides into view, creating a dynamic waterfall effect where images flow from the sides and center themselves, making your gallery feel alive and responsive to every scroll movement.
+- [Glowing Scroll Indicator](https://components.drivedev.net/docs/glowing-scroll-indicator.md) — A visual scroll indicator that shows animated glowing bars that light up and grow as you scroll down the page. Features a smooth red marker that moves across the bars to show your exact scroll position, creating an eye-catching glowing wave effect.
+- [Horizontal Scroll](https://components.drivedev.net/docs/horizontal-scroll.md) — A scrollable component that displays images in a horizontal carousel layout with 3D rotation effects. As you scroll vertically, the images animate with smooth horizontal movement, perspective transforms, and dynamic blur effects to create an immersive visual experience.
+- [Rolling Ball Scroll Indicator](https://components.drivedev.net/docs/rolling-ball-scroll-indicator.md) — A scroll indicator that displays animated bars with a rolling ball that moves across them as you scroll. The bars grow and shrink based on your scroll position while a colorful ball rolls smoothly from left to right.
+- [Scattered Scroll](https://components.drivedev.net/docs/scattered-scroll.md)
+- [Scroll Expand](https://components.drivedev.net/docs/scroll-expand.md)
+- [Scroll Split Card](https://components.drivedev.net/docs/scroll-split-card.md) — Tall scroll section where a single wide photo is secretly three panels that pull apart and flip over into content cards.
+- [Scroll Velocity](https://components.drivedev.net/docs/scroll-velocity.md) — Marquee rows of repeating text or logos that slide sideways forever, with the page scroll acting as a throttle.
+- [Stack Scroll](https://components.drivedev.net/docs/stack-scroll.md) — A scrollable component that displays images in a stacked card layout. As you scroll, the cards animate with smooth transitions, scaling, and positioning effects to create an engaging visual experience.
+- [SVG Follow Scroll](https://components.drivedev.net/docs/svg-follow-scroll.md)
+- [Swap Column Features](https://components.drivedev.net/docs/swap-column-features.md)
+
+## Special Effects & FX
+
+- [Animated List](https://components.drivedev.net/docs/animated-list.md) — Scrollable list of rows that appear as they come into view, with the top and bottom edges fading out.
+- [Aurora Background](https://components.drivedev.net/docs/aurora-background.md) — Full-bleed backdrop of soft banded aurora light behind whatever you put in it.
+- [Ballpit](https://components.drivedev.net/docs/ballpit.md) — Pit of glossy 3D spheres that pile up and bounce off the walls of the frame.
+- [Bottom Blur](https://components.drivedev.net/docs/bottom-blur.md) — Strip pinned across the bottom of the viewport that blurs whatever passes behind it, in steps from clear to heavy.
+- [Dynamic Theme](https://components.drivedev.net/docs/dynamic-theme.md) — Sticky top navigation that recolours itself to stay legible over alternating light and dark page sections.
+- [Elastic Line](https://components.drivedev.net/docs/elastic-line.md)
+- [Elastic Mesh](https://components.drivedev.net/docs/elastic-mesh.md)
+- [Electric Border](https://components.drivedev.net/docs/electric-border.md)
+- [Floating Dock](https://components.drivedev.net/docs/floating-dock.md)
+- [Fuzzy Overlay](https://components.drivedev.net/docs/fuzzy-overlay.md)
+- [Glowing Effect](https://components.drivedev.net/docs/glowing-effect.md) — Multicoloured glow that traces the border of whatever card or panel it is dropped into.
+- [Hover Transition](https://components.drivedev.net/docs/hover-transition.md)
+- [Icon Wheel](https://components.drivedev.net/docs/icon-wheel.md) — A rotating wheel that displays your tech stack icons in continuous motion. Perfect for showcasing programming languages and frameworks on your portfolio with smooth animations and hover effects.
+- [Inner Glow](https://components.drivedev.net/docs/inner-glow.md)
+- [Interactive Team](https://components.drivedev.net/docs/interactive-team.md)
+- [Lamp](https://components.drivedev.net/docs/lamp.md)
+- [Lamphome](https://components.drivedev.net/docs/lamphome.md)
+- [Logo Particles](https://components.drivedev.net/docs/logo-particles.md)
+- [Magnet Lines](https://components.drivedev.net/docs/magnet-lines.md)
+- [Music Player](https://components.drivedev.net/docs/music-player.md)
+- [Opposite Scroll](https://components.drivedev.net/docs/opposite-scroll.md) — Two-column scroll section pairing stacked text panels on one side with a full-height image column on the other.
+- [Peel Reveal](https://components.drivedev.net/docs/peel-reveal.md)
+- [Pin](https://components.drivedev.net/docs/pin.md)
+- [Ping Pong](https://components.drivedev.net/docs/ping-pong.md)
+- [Ripple Transition](https://components.drivedev.net/docs/ripple-transition.md)
+- [Scroll Horizontal](https://components.drivedev.net/docs/scroll-horizontal.md)
+- [Scroll Horizontal 2](https://components.drivedev.net/docs/scroll-horizontal-2.md)
+- [Shuffle Hero](https://components.drivedev.net/docs/shuffle-hero.md)
+- [Sliding Numbers](https://components.drivedev.net/docs/sliding-numbers.md)
+- [Sparkles](https://components.drivedev.net/docs/sparkles.md)
+- [Spotlight](https://components.drivedev.net/docs/spotlight.md)
+- [Spring Element](https://components.drivedev.net/docs/spring-element.md)
+- [Spring Element 2](https://components.drivedev.net/docs/spring-element2.md) — Contained spring that you pull from an anchor; the coil stretches with the drag and snaps back on release.
+- [Squonk](https://components.drivedev.net/docs/squonk.md)
+- [Status Indicator](https://components.drivedev.net/docs/status-indicator.md) — A coloured status dot with an optional label, in green, red, yellow or grey for active, down, fixing and idle.
+- [Sticker Peel](https://components.drivedev.net/docs/sticker-peel.md) — A round sticker with a message hidden underneath, drawn with a mirrored curl so the peeled part looks like it is folding over.
+- [Sticky Countdown](https://components.drivedev.net/docs/sticky-countdown.md) — A slim announcement bar that sticks to the top of the page counting down the days, hours, minutes and seconds to a date.
+- [SVG Follow Scroll](https://components.drivedev.net/docs/svg-follow-scroll.md)
+- [Tag Cloud Dynamic](https://components.drivedev.net/docs/tag-cloud-dynamic.md)
+- [Text Loop](https://components.drivedev.net/docs/text-loop.md) — Endless ticker of repeating words riding a coloured ribbon bent into a wave, circle, infinity loop, arch or straight line.
+- [Tooltip Cat](https://components.drivedev.net/docs/tooltip-cat.md)
+- [Tooltip Dog](https://components.drivedev.net/docs/tooltip-dog.md)
+- [Tracing Beam](https://components.drivedev.net/docs/tracing-beam.md)
+- [Trippy](https://components.drivedev.net/docs/trippy.md)
+- [Wobble Card](https://components.drivedev.net/docs/wobble-card.md)
+
+## Testimonials
+
+- [Book Testimonials](https://components.drivedev.net/docs/book-testimonials.md) — Testimonials bound as a hardback book, with a cover, a clickable index and one quote, photo and star rating per page.
+- [Gradient Testimonials](https://components.drivedev.net/docs/gradient-testimonials.md)
+- [Typewriter Testimonials](https://components.drivedev.net/docs/typewriter-testimonials.md)
+
+## Text
+
+- [Bubble Text](https://components.drivedev.net/docs/bubble-text.md) — Oversized thin heading whose letters thicken and brighten under the pointer.
+- [Circle Text](https://components.drivedev.net/docs/circle-text.md)
+- [Code Block](https://components.drivedev.net/docs/code-block.md)
+- [Code Block Animated](https://components.drivedev.net/docs/code-block-animated.md) — Syntax-highlighted code frame with a language icon, a copy button and an optional typewriter reveal.
+- [Code Block2](https://components.drivedev.net/docs/code-block2.md) — Tabbed code block with a sliding underline on the active tab and a copy button that flips to a tick.
+- [Codeblock3](https://components.drivedev.net/docs/codeblock3.md) — Multi-tab code panel with a copy button, a scrollable snippet area and an underline marking the open tab.
+- [Colorful Text](https://components.drivedev.net/docs/colorful-text.md) — Headline text where every letter takes its own colour from a rotating rainbow palette.
+- [Dia Text Reveal](https://components.drivedev.net/docs/dia-text-reveal.md)
+- [Falling Text](https://components.drivedev.net/docs/falling-text.md)
+- [Fuzzy Text](https://components.drivedev.net/docs/fuzzy-text.md)
+- [Ghost Label](https://components.drivedev.net/docs/ghost-label.md) — Oversized faint word sitting behind content as a watermark-style background label.
+- [Gif Text](https://components.drivedev.net/docs/gif-text.md) — Heavy headline text with an animated GIF playing inside the letterforms instead of a flat colour.
+- [Half Filled Text](https://components.drivedev.net/docs/half-filled-text.md)
+- [Hero Highlight](https://components.drivedev.net/docs/hero-highlight.md)
+- [Letter Hover](https://components.drivedev.net/docs/letter-hover.md)
+- [Stroke Text](https://components.drivedev.net/docs/stroke-text.md)
+- [Text Along Path](https://components.drivedev.net/docs/text-along-path.md)
+- [Text Cursor](https://components.drivedev.net/docs/text-cursor.md) — Pointer trail that drops a repeating character or emoji along the path of the cursor.
+- [Text Curve](https://components.drivedev.net/docs/text-curve.md) — Oversized marquee whose repeating words run along a curved arc instead of a straight line.
+- [Text Enhanced](https://components.drivedev.net/docs/text-enhanced.md) — Bold italic word stacked with a staircase of coloured drop shadows fanning out behind it.
+- [Text Flipping Board](https://components.drivedev.net/docs/text-flipping-board.md) — Airport split-flap departure board that spells out a message across a grid of hinged character tiles.
+- [Text Focus](https://components.drivedev.net/docs/text-focus.md) — Blurred sentence with one word held sharp inside a glowing camera-style focus bracket.
+- [Text Gradient](https://components.drivedev.net/docs/text-gradient.md) — Hero block whose three headline words take turns lighting up in their own colour gradient, matched by a glowing call-to-action button.
+- [Text Highlighter](https://components.drivedev.net/docs/text-highlighter.md) — Marker-pen highlight that sweeps across a phrase, in any of four directions and following the line wraps.
+- [Text Hover](https://components.drivedev.net/docs/text-hover.md) — Large outlined headline that only shows its rainbow gradient inside a soft circle around the pointer.
+- [Text Morph](https://components.drivedev.net/docs/text-morph.md)
+- [Text Parallax Content](https://components.drivedev.net/docs/text-parallax-content.md)
+- [Text Proximity](https://components.drivedev.net/docs/text-proximity.md)
+- [Text Reveal](https://components.drivedev.net/docs/text-reveal.md)
+- [Text Roll](https://components.drivedev.net/docs/text-roll.md)
+- [Text Rotate](https://components.drivedev.net/docs/text-rotate.md)
+- [Text Split](https://components.drivedev.net/docs/text-split.md)
+- [Text Trail](https://components.drivedev.net/docs/text-trail.md)
+- [Text Type](https://components.drivedev.net/docs/text-type.md)
+- [Text Underline](https://components.drivedev.net/docs/text-underline.md)
+
+## Text Animations
+
+- [Canvas Text](https://components.drivedev.net/docs/canvas-text.md) — Heading drawn on a canvas so its letterforms are filled with stacked coloured lines instead of solid colour.
+- [Depth Text](https://components.drivedev.net/docs/depth-text.md)
+- [Echo Text](https://components.drivedev.net/docs/echo-text.md) — Oversized headline trailed by a stack of tinted, progressively blurrier copies of itself, like a motion echo.
+- [Flipping Text](https://components.drivedev.net/docs/flipping-text.md)
+- [Letter3d Swap](https://components.drivedev.net/docs/letter3d-swap.md)
+- [Particle Text](https://components.drivedev.net/docs/particle-text.md) — Text that dissolves into particles and reforms.
+- [Random Letter Swap Hover](https://components.drivedev.net/docs/random-letter-swap-hover.md) — Text label whose characters flip over to an identical copy in a shuffled order, so the swap scatters across the word.
+- [Scroll Float](https://components.drivedev.net/docs/scroll-float.md)
+- [Scroll Reveal](https://components.drivedev.net/docs/scroll-reveal.md) — Large block of heading text that sits at a slight tilt and straightens as it scrolls into view, its words going from faint and blurred to solid.
+- [Scroll Reveal Paragraph](https://components.drivedev.net/docs/scroll-reveal-paragraph.md) — Paragraph printed in faint grey that fills in to full contrast one word at a time, tied to how far it has scrolled up the screen.
+- [Text Along Path](https://components.drivedev.net/docs/text-along-path.md)
+- [Text Animate](https://components.drivedev.net/docs/text-animate.md) — Text primitive that reveals a heading by line, word or letter, with presets for fading, blurring, sliding and scaling.
+- [Text Bounce](https://components.drivedev.net/docs/text-bounce.md) — Heading whose individual letters shy away from the pointer and spring back.
+- [Text Cursor](https://components.drivedev.net/docs/text-cursor.md) — Pointer trail that drops a repeating character or emoji along the path of the cursor.
+- [Text Flipping Board](https://components.drivedev.net/docs/text-flipping-board.md) — Airport split-flap departure board that spells out a message across a grid of hinged character tiles.
+- [Text Loop](https://components.drivedev.net/docs/text-loop.md) — Endless ticker of repeating words riding a coloured ribbon bent into a wave, circle, infinity loop, arch or straight line.
+- [Text Morph](https://components.drivedev.net/docs/text-morph.md)
+- [Text Parallax Content](https://components.drivedev.net/docs/text-parallax-content.md)
+- [Text Reveal](https://components.drivedev.net/docs/text-reveal.md)
+- [Text Roll](https://components.drivedev.net/docs/text-roll.md)
+- [Text Rotate](https://components.drivedev.net/docs/text-rotate.md)
+- [Text Split](https://components.drivedev.net/docs/text-split.md)
+- [Text Split2](https://components.drivedev.net/docs/text-split2.md) — Splits a string into letters or words so each piece can be animated independently.
+- [Text Trail](https://components.drivedev.net/docs/text-trail.md)
+- [Text Type](https://components.drivedev.net/docs/text-type.md)
+- [Underline To Background](https://components.drivedev.net/docs/underline-to-background.md)
+- [Vertical Cut Reveal](https://components.drivedev.net/docs/vertical-cut-reveal.md)
+- [Word Tornado](https://components.drivedev.net/docs/word-tornado.md)
+
+## Utilities
+
+- [Ascii Converter](https://components.drivedev.net/docs/ascii-converter.md) — Two-pane tool that redraws an uploaded image as ASCII art, with controls for detail, character set and colour.
+- [Color Picker](https://components.drivedev.net/docs/color-picker.md) — Swatch button that opens a picker panel with a saturation field, a rainbow hue slider, a hex input and preset chips.
+- [Editor](https://components.drivedev.net/docs/editor.md)
+- [Game 237](https://components.drivedev.net/docs/game-237.md) — First-person chase game set in a snowy 3D hedge maze, with a 60 second countdown and a red figure hunting you.
+- [Page Transitions](https://components.drivedev.net/docs/page-transitions.md)
+- [Pipeline](https://components.drivedev.net/docs/pipeline.md)
+- [Sandbox](https://components.drivedev.net/docs/sandbox.md)
+- [Sticky Countdown](https://components.drivedev.net/docs/sticky-countdown.md) — A slim announcement bar that sticks to the top of the page counting down the days, hours, minutes and seconds to a date.
+- [System Banner](https://components.drivedev.net/docs/system-banner.md)
+- [Theme Animations](https://components.drivedev.net/docs/theme-animations.md) — View-transition recipes for circular, blurred and polygonal theme switches.
+- [Tool Tip](https://components.drivedev.net/docs/tool-tip.md)
+- [Tour](https://components.drivedev.net/docs/tour.md)
+- [Tour2](https://components.drivedev.net/docs/tour2.md)
+
+## Videos
+
+- [Video Hero](https://components.drivedev.net/docs/video-hero.md)
+- [Video Masking](https://components.drivedev.net/docs/video-masking.md)
+- [Video Player](https://components.drivedev.net/docs/video-player.md)
+- [Video Player2](https://components.drivedev.net/docs/video-player2.md) — Custom video player with overlay controls.
+- [Video Player3](https://components.drivedev.net/docs/video-player3.md) — Alternate custom video player layout.
+- [Video Viewer](https://components.drivedev.net/docs/video-viewer.md)

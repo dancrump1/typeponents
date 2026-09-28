@@ -1,0 +1,30 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "light-pillar",
+	title: "Light Pillar",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["webgl", "cursor-tracking", "autoplay"],
+	dependencies: ["three"],
+	registryDependencies: [],
+	props: [
+		{ name: "topColor", type: "string", default: "'#5227FF'" },
+		{ name: "bottomColor", type: "string", default: "'#FF9FFC'" },
+		{ name: "intensity", type: "number", default: "1.0" },
+		{ name: "rotationSpeed", type: "number", default: "0.3" },
+		{ name: "interactive", type: "boolean", default: "false" },
+		{ name: "className", type: "string", default: "''" },
+		{ name: "glowAmount", type: "number", default: "0.005" },
+		{ name: "pillarWidth", type: "number", default: "3.0" },
+		{ name: "pillarHeight", type: "number", default: "0.4" },
+		{ name: "noiseIntensity", type: "number", default: "0.5" },
+		{ name: "mixBlendMode", type: "Property.MixBlendMode", default: "'screen'" },
+		{ name: "pillarRotation", type: "number", default: "0" },
+		{ name: "quality", type: "\"low\" | \"medium\" | \"high\"", default: "'high'" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

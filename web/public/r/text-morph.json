@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-morph",
+  "type": "registry:ui",
+  "title": "Text Morph",
+  "description": "Text Morph",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-morph.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-morph.tsx",
+      "content": "\"use client\";\n\nimport { useId, useMemo } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { AnimatePresence, motion, Transition, Variants } from \"motion/react\";\n\n// Credit:\n// https://motion-primitives.com/docs/text-morph\n\nexport type TextMorphProps = {\n\tchildren: string;\n\tas?: React.ElementType;\n\tclassName?: string;\n\tstyle?: React.CSSProperties;\n\tvariants?: Variants;\n\ttransition?: Transition;\n};\n\nexport function TextMorph({\n\tchildren,\n\tas: Component = \"p\",\n\tclassName,\n\tstyle,\n\tvariants,\n\ttransition,\n}: TextMorphProps) {\n\tconst uniqueId = useId();\n\n\tconst characters = useMemo(() => {\n\t\tconst charCounts: Record<string, number> = {};\n\n\t\treturn children.split(\"\").map((char) => {\n\t\t\tconst lowerChar = char.toLowerCase();\n\t\t\tcharCounts[lowerChar] = (charCounts[lowerChar] || 0) + 1;\n\n\t\t\treturn {\n\t\t\t\tid: `${uniqueId}-${lowerChar}${charCounts[lowerChar]}`,\n\t\t\t\tlabel: char === \" \" ? \"\\u00A0\" : char,\n\t\t\t};\n\t\t});\n\t}, [children, uniqueId]);\n\n\tconst defaultVariants: Variants = {\n\t\tinitial: { opacity: 0 },\n\t\tanimate: { opacity: 1 },\n\t\texit: { opacity: 0 },\n\t};\n\n\tconst defaultTransition: Transition = {\n\t\ttype: \"spring\",\n\t\tstiffness: 280,\n\t\tdamping: 18,\n\t\tmass: 0.3,\n\t};\n\n\treturn (\n\t\t<Component className={cn(className)} aria-label={children} style={style}>\n\t\t\t<AnimatePresence mode=\"popLayout\" initial={false}>\n\t\t\t\t{characters.map((character) => (\n\t\t\t\t\t<motion.span\n\t\t\t\t\t\tkey={character.id}\n\t\t\t\t\t\tlayoutId={character.id}\n\t\t\t\t\t\tclassName=\"inline-block\"\n\t\t\t\t\t\taria-hidden=\"true\"\n\t\t\t\t\t\tinitial=\"initial\"\n\t\t\t\t\t\tanimate=\"animate\"\n\t\t\t\t\t\texit=\"exit\"\n\t\t\t\t\t\tvariants={variants || defaultVariants}\n\t\t\t\t\t\ttransition={transition || defaultTransition}\n\t\t\t\t\t>\n\t\t\t\t\t\t{character.label}\n\t\t\t\t\t</motion.span>\n\t\t\t\t))}\n\t\t\t</AnimatePresence>\n\t\t</Component>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Motion Primitives",
+      "url": "https://motion-primitives.com/docs/text-morph",
+      "authorUrl": "https://motion-primitives.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "as",
+        "type": "ElementType<any, keyof JSX.IntrinsicElements>",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "style",
+        "type": "CSSProperties",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variants",
+        "type": "Variants",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "transition",
+        "type": "Transition",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-morph"
+  }
+}

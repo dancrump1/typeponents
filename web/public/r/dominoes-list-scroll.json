@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dominoes-list-scroll",
+  "type": "registry:ui",
+  "title": "Dominoes List Scroll",
+  "description": "A scrollable component that displays images with domino-like falling animations as you scroll. Each image rotates and falls like a domino piece, creating a smooth cascading effect that responds to your scroll position with realistic 3D shadows.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/dominoes-list-scroll.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/dominoes-list-scroll.tsx",
+      "content": "'use client';\n\nimport { motion, MotionValue, useMotionValueEvent, useScroll, useTransform } from 'framer-motion';\r\nimport Image from 'next/image';\r\nimport React, { useRef } from 'react';\r\n\r\nconst DominoesItem = ({\r\n  image,\r\n  index,\r\n  scrollYProgress,\r\n  totalItems,\r\n  height,\r\n  width,\r\n  enableShadow\r\n}: {\r\n  image: string;\r\n  index: number;\r\n  scrollYProgress: MotionValue<number>;\r\n  totalItems: number;\r\n  height: number;\r\n  width: number;\r\n  enableShadow: boolean;\r\n}) => {\r\n  const thisDominoePosition = index / totalItems;\r\n  const preStep = Math.max(0, thisDominoePosition - 0.04);\r\n  const postStep = Math.min(1, thisDominoePosition + 0.04);\r\n\r\n  const rotateX = useTransform(\r\n    scrollYProgress,\r\n    [0, preStep, thisDominoePosition, postStep, 1],\r\n    [0, 0, 0, 90, 90]\r\n  );\r\n  const antiRotateX = useTransform(\r\n    scrollYProgress,\r\n    [0, preStep, thisDominoePosition, postStep, 1],\r\n    [90, 90, 90, 0, 0]\r\n  );\r\n\r\n  const translateZ = useTransform(\r\n    scrollYProgress,\r\n    [0, preStep, thisDominoePosition, postStep, 1],\r\n    [-height * index, -height, 0, height, height * (totalItems - index)]\r\n  );\r\n  const antiSkewX = useTransform(\r\n    scrollYProgress,\r\n    [0, preStep, thisDominoePosition, postStep, 1],\r\n    [30, 30, 30, 0, 0]\r\n  );\r\n  const shadowOpacity = useTransform(\r\n    scrollYProgress,\r\n    [0, preStep, thisDominoePosition, postStep, postStep, 1],\r\n    [0.6, 0.6, 0.6, 0.6, 0, 0]\r\n  );\r\n\r\n  return (\r\n    <motion.div\r\n      style={{\r\n        rotateX,\r\n        translateZ,\r\n        zIndex: totalItems - index,\r\n        transformOrigin: 'bottom',\r\n        transformStyle: 'preserve-3d',\r\n        height,\r\n        width,\r\n        transition: '100ms ease-out'\r\n      }}\r\n      className=\"absolute\"\r\n    >\r\n      {/* shadow */}\r\n      {enableShadow && (\r\n        <motion.span\r\n          style={{\r\n            rotateX: antiRotateX,\r\n            transformOrigin: 'bottom',\r\n            skewX: antiSkewX,\r\n            opacity: shadowOpacity,\r\n            transition: '100ms ease-out'\r\n          }}\r\n          className=\"absolute inset-0 bg-black z-0 opacity-0 rounded\"\r\n        />\r\n      )}\r\n      <Image\r\n        src={image}\r\n        alt={image}\r\n        width={width}\r\n        height={height}\r\n        className=\"w-full h-full object-cover rounded z-[1]\"\r\n      />\r\n    </motion.div>\r\n  );\r\n};\r\n\r\nconst DominoesListScroll = ({\r\n  items,\r\n  height = 500,\r\n  width = 384,\r\n  enableShadow = false\r\n}: {\r\n  items: { image: string }[];\r\n  height?: number;\r\n  width?: number;\r\n  enableShadow?: boolean;\r\n}) => {\r\n  const scrollRef = useRef<HTMLDivElement>(null);\r\n  const { scrollYProgress } = useScroll({\r\n    container: scrollRef\r\n  });\r\n  useMotionValueEvent(scrollYProgress, 'change', (latest) => {\r\n    console.log({ latest });\r\n  });\r\n\r\n  return (\r\n    <div className=\"h-full w-full relative overflow-hidden\">\r\n      <div className=\"sticky top-0 left-0 h-screen w-full flex items-center justify-center z-10 pointer-events-none\">\r\n        <div\r\n          style={{\r\n            perspective: '1000px',\r\n            transformStyle: 'preserve-3d'\r\n          }}\r\n          className=\"flex flex-col items-center justify-center w-full\"\r\n        >\r\n          {items.map((item, index) => (\r\n            <DominoesItem\r\n              key={`dominoe-${index}`}\r\n              image={item.image}\r\n              index={index}\r\n              scrollYProgress={scrollYProgress}\r\n              totalItems={items.length}\r\n              height={height}\r\n              width={width}\r\n              enableShadow={enableShadow}\r\n            />\r\n          ))}\r\n        </div>\r\n      </div>\r\n      <div\r\n        ref={scrollRef}\r\n        className=\" w-full overflow-y-auto h-full bg-white absolute top-0 left-0\"\r\n      >\r\n        <div\r\n          style={{\r\n            height: items.length * 500\r\n          }}\r\n          className=\"w-full bg-white\"\r\n        ></div>\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default DominoesListScroll;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Scroll"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "Images tip over like dominos as you scroll, with optional 3D shadows.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/dominoeslistscroll",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ image: string; }[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "height",
+        "type": "number",
+        "default": "500",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "width",
+        "type": "number",
+        "default": "384",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableShadow",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/dominoes-list-scroll"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-underline",
+  "type": "registry:ui",
+  "title": "Text Underline",
+  "description": "Text Underline",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-underline.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-underline.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\n\nexport const AnimatedTextUnderline = () => {\n\tconst draw = {\n\t\thidden: { pathLength: 0, opacity: 0 },\n\t\tvisible: {\n\t\t\tpathLength: 1,\n\t\t\topacity: 1,\n\t\t\ttransition: {\n\t\t\t\tpathLength: { delay: 0.5, type: \"spring\", duration: 2, bounce: 0 },\n\t\t\t\topacity: { delay: 0.5, duration: 1 },\n\t\t\t},\n\t\t},\n\t};\n\treturn (\n\t\t<div>\n\t\t\t<h1 className=\"text-5xl font-bold tracking-tight text-foreground sm:text-7xl\">\n\t\t\t\t<span className=\"relative whitespace-nowrap text-teal-800 font-alliance\">\n\t\t\t\t\t<motion.svg\n\t\t\t\t\t\taria-hidden=\"true\"\n\t\t\t\t\t\tviewBox=\"0 0 418 42\"\n\t\t\t\t\t\tclassName=\"absolute left-0 top-1/3 fill-teal-500\"\n\t\t\t\t\t\tpreserveAspectRatio=\"xMidYMid meet\"\n\t\t\t\t\t\twidth=\"100%\"\n\t\t\t\t\t\theight=\"100%\"\n\t\t\t\t\t\tinitial=\"hidden\"\n\t\t\t\t\t\tanimate=\"visible\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<motion.path\n\t\t\t\t\t\t\td=\"M203.371.916c-26.013-2.078-76.686 1.963-124.73 9.946L67.3 12.749C35.421 18.062 18.2 21.766 6.004 25.934 1.244 27.561.828 27.778.874 28.61c.07 1.214.828 1.121 9.595-1.176 9.072-2.377 17.15-3.92 39.246-7.496C123.565 7.986 157.869 4.492 195.942 5.046c7.461.108 19.25 1.696 19.17 2.582-.107 1.183-7.874 4.31-25.75 10.366-21.992 7.45-35.43 12.534-36.701 13.884-2.173 2.308-.202 4.407 4.442 4.734 2.654.187 3.263.157 15.593-.78 35.401-2.686 57.944-3.488 88.365-3.143 46.327.526 75.721 2.23 130.788 7.584 19.787 1.924 20.814 1.98 24.557 1.332l.066-.011c1.201-.203\"\n\t\t\t\t\t\t\tvariants={draw}\n\t\t\t\t\t\t\tstrokeWidth=\"6\"\n\t\t\t\t\t\t\tfill=\"none\"\n\t\t\t\t\t\t\tstroke=\"#009080\"\n\t\t\t\t\t\t/>\n\t\t\t\t\t</motion.svg>\n\t\t\t\t\t<span className=\"relative text-teal-800 font-alliance\">\n\t\t\t\t\t\tAnimated\n\t\t\t\t\t</span>\n\t\t\t\t</span>\n\t\t\t\tDrawing Effect\n\t\t\t</h1>\n\t\t</div>\n\t);\n};\n\nfunction App() {\n\treturn (\n\t\t<div className=\"h-screen\">\n\t\t\t<AnimatedTextUnderline />\n\t\t</div>\n\t);\n}\n\nexport default App;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-underline"
+  }
+}

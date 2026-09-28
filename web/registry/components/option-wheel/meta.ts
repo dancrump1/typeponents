@@ -1,0 +1,45 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "option-wheel",
+	title: "Option Wheel",
+	description:
+		"Vertical picker whose options curl along an arc, fading and blurring the further each label sits from the selected one.",
+	interaction:
+		"Scroll, drag up or down, or press the arrow keys to spin the list; it eases to the nearest option, snaps it to the centre and brightens its label. Clicking any visible option pulls it into the middle.",
+	categories: ["Forms & Inputs"],
+	tags: ["drag", "cursor-tracking", "keyboard", "autoplay"],
+	inspiration: {
+		source: "React Bits",
+		url: "https://reactbits.dev/components/option-wheel",
+		authorUrl: "https://reactbits.dev",
+		relationship: "adaptation",
+	},
+	dependencies: [],
+	registryDependencies: [],
+	props: [
+		{ name: "items", type: "string[]" },
+		{ name: "defaultSelected", type: "number" },
+		{ name: "onChange", type: "((index: number, item: string) => void)" },
+		{ name: "textColor", type: "string" },
+		{ name: "activeColor", type: "string" },
+		{ name: "side", type: "Side" },
+		{ name: "fontSize", type: "number" },
+		{ name: "spacing", type: "number" },
+		{ name: "curve", type: "number" },
+		{ name: "tilt", type: "number" },
+		{ name: "blur", type: "number" },
+		{ name: "fade", type: "number" },
+		{ name: "minOpacity", type: "number" },
+		{ name: "smoothing", type: "number" },
+		{ name: "inset", type: "number" },
+		{ name: "loop", type: "boolean" },
+		{ name: "draggable", type: "boolean" },
+		{ name: "soundUrl", type: "string" },
+		{ name: "soundVolume", type: "number" },
+		{ name: "className", type: "string" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

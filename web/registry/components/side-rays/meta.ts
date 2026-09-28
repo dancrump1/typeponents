@@ -1,0 +1,35 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "side-rays",
+	title: "Side Rays",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["webgl", "scroll-driven", "autoplay"],
+	inspiration: {
+		source: "React Bits",
+		url: "https://www.reactbits.dev/backgrounds/side-rays",
+		authorUrl: "https://www.reactbits.dev",
+		relationship: "adaptation",
+	},
+	dependencies: ["ogl"],
+	registryDependencies: [],
+	props: [
+		{ name: "speed", type: "number", default: "2.5" },
+		{ name: "rayColor1", type: "string", default: "'#EAB308'" },
+		{ name: "rayColor2", type: "string", default: "'#96c8ff'" },
+		{ name: "intensity", type: "number", default: "2" },
+		{ name: "spread", type: "number", default: "2" },
+		{ name: "origin", type: "Origin", default: "'top-right'" },
+		{ name: "tilt", type: "number", default: "0" },
+		{ name: "saturation", type: "number", default: "1.5" },
+		{ name: "blend", type: "number", default: "0.75" },
+		{ name: "falloff", type: "number", default: "2.0" },
+		{ name: "opacity", type: "number", default: "1.0" },
+		{ name: "className", type: "string", default: "''" },
+	],
+	risk: { heavy: true, fullscreen: false, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

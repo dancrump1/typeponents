@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tracing-beam",
+  "type": "registry:ui",
+  "title": "Tracing Beam",
+  "description": "Tracing Beam",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tracing-beam.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tracing-beam.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useEffect, useRef, useState } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { motion, useScroll, useSpring, useTransform } from \"motion/react\";\r\n\r\nexport const TracingBeam = ({\r\n\tchildren,\r\n\tclassName,\r\n\tcontainerRef,\r\n}: {\r\n\tchildren: React.ReactNode;\r\n\tclassName?: string;\r\n}) => {\r\n\tconst ref = useRef<HTMLDivElement>(null);\r\n\tconst [componentContainerRef, setComponentContainerRef] = useState(null);\r\n\tuseEffect(() => {\r\n\t\tsetComponentContainerRef(containerRef);\r\n\t}, [containerRef]);\r\n\r\n\tconst { scrollYProgress } = useScroll({\r\n\t\ttarget: ref,\r\n\t\toffset: [\"start start\", \"end start\"],\r\n\t\t// container: componentContainerRef || null,\r\n\t});\r\n\r\n\tconst contentRef = useRef<HTMLDivElement>(null);\r\n\tconst [svgHeight, setSvgHeight] = useState(0);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (contentRef.current) {\r\n\t\t\tsetSvgHeight(contentRef.current.offsetHeight);\r\n\t\t}\r\n\t}, []);\r\n\r\n\tconst y1 = useSpring(\r\n\t\tuseTransform(scrollYProgress, [0, 0.8], [50, svgHeight]),\r\n\t\t{\r\n\t\t\tstiffness: 500,\r\n\t\t\tdamping: 90,\r\n\t\t}\r\n\t);\r\n\tconst y2 = useSpring(\r\n\t\tuseTransform(scrollYProgress, [0, 1], [50, svgHeight - 200]),\r\n\t\t{\r\n\t\t\tstiffness: 500,\r\n\t\t\tdamping: 90,\r\n\t\t}\r\n\t);\r\n\r\n\tif (!!componentContainerRef && componentContainerRef?.current === undefined)\r\n\t\treturn null;\r\n\r\n\treturn (\r\n\t\t<motion.div\r\n\t\t\tref={ref}\r\n\t\t\tclassName={cn(\r\n\t\t\t\t\"relative w-full max-w-4xl mx-auto h-full px-6\",\r\n\t\t\t\tclassName\r\n\t\t\t)}\r\n\t\t>\r\n\t\t\t<div className=\"absolute -left-4 md:-left-20 top-3 pt-24\">\r\n\t\t\t\t<motion.div\r\n\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\tdelay: 0.5,\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\tboxShadow:\r\n\t\t\t\t\t\t\tscrollYProgress.get() > 0\r\n\t\t\t\t\t\t\t\t? \"none\"\r\n\t\t\t\t\t\t\t\t: \"rgba(0, 0, 0, 0.24) 0px 3px 8px\",\r\n\t\t\t\t\t}}\r\n\t\t\t\t\tclassName=\"ml-[27px] h-4 w-4 rounded-full border border-netural-200 shadow-xs flex items-center justify-center\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\tduration: 0.2,\r\n\t\t\t\t\t\t\tdelay: 0.5,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\tbackgroundColor: \"white\",\r\n\t\t\t\t\t\t\tborderColor: \"white\",\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t\tclassName=\"h-2 w-2  rounded-full border border-neutral-300 bg-background\"\r\n\t\t\t\t\t/>\r\n\t\t\t\t</motion.div>\r\n\t\t\t\t<svg\r\n\t\t\t\t\tviewBox={`0 0 20 ${svgHeight}`}\r\n\t\t\t\t\twidth=\"20\"\r\n\t\t\t\t\theight={svgHeight} // Set the SVG height\r\n\t\t\t\t\tclassName=\" ml-4 block\"\r\n\t\t\t\t\taria-hidden=\"true\"\r\n\t\t\t\t>\r\n\t\t\t\t\t<motion.path\r\n\t\t\t\t\t\td={`M 1 0V -36 l 18 24 V ${\r\n\t\t\t\t\t\t\tsvgHeight * 0.8\r\n\t\t\t\t\t\t} l -18 24V ${svgHeight}`}\r\n\t\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\t\tstroke=\"hsl(358 70% 42%)\"\r\n\t\t\t\t\t\tstrokeOpacity=\"0.16\"\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\tduration: 10,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t></motion.path>\r\n\t\t\t\t\t<motion.path\r\n\t\t\t\t\t\td={`M 1 0V -36 l 18 24 V ${\r\n\t\t\t\t\t\t\tsvgHeight * 0.8\r\n\t\t\t\t\t\t} l -18 24V ${svgHeight}`}\r\n\t\t\t\t\t\tfill=\"none\"\r\n\t\t\t\t\t\tstroke=\"url(#gradient)\"\r\n\t\t\t\t\t\tstrokeWidth=\"1.25\"\r\n\t\t\t\t\t\tclassName=\"motion-reduce:hidden\"\r\n\t\t\t\t\t\ttransition={{\r\n\t\t\t\t\t\t\tduration: 10,\r\n\t\t\t\t\t\t}}\r\n\t\t\t\t\t></motion.path>\r\n\t\t\t\t\t<defs>\r\n\t\t\t\t\t\t<motion.linearGradient\r\n\t\t\t\t\t\t\tid=\"gradient\"\r\n\t\t\t\t\t\t\tgradientUnits=\"userSpaceOnUse\"\r\n\t\t\t\t\t\t\tx1=\"0\"\r\n\t\t\t\t\t\t\tx2=\"0\"\r\n\t\t\t\t\t\t\ty1={y1} // set y1 for gradient\r\n\t\t\t\t\t\t\ty2={y2} // set y2 for gradient\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<stop stopColor=\"hsl(358 70% 42%)\" stopOpacity=\"0\"></stop>\r\n\t\t\t\t\t\t\t<stop stopColor=\"hsl(358 70% 42%)\"></stop>\r\n\t\t\t\t\t\t\t<stop offset=\"0.325\" stopColor=\"hsl(358 70% 42%)\"></stop>\r\n\t\t\t\t\t\t\t<stop\r\n\t\t\t\t\t\t\t\toffset=\"1\"\r\n\t\t\t\t\t\t\t\tstopColor=\"hsl(345 6% 13%)\"\r\n\t\t\t\t\t\t\t\tstopOpacity=\"0\"\r\n\t\t\t\t\t\t\t></stop>\r\n\t\t\t\t\t\t</motion.linearGradient>\r\n\t\t\t\t\t</defs>\r\n\t\t\t\t</svg>\r\n\t\t\t</div>\r\n\t\t\t<div className=\"\" ref={contentRef}>\r\n\t\t\t\t{children}\r\n\t\t\t</div>\r\n\t\t</motion.div>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "featured",
+      "spring",
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 9,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tracing-beam"
+  }
+}

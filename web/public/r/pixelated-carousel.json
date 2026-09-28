@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pixelated-carousel",
+  "type": "registry:ui",
+  "title": "Pixelated Carousel",
+  "description": "A carousel that shows images with a pixelated effect. Images change with a grid animation that makes them look blocky.",
+  "dependencies": [
+    "framer-motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/pixelated-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/pixelated-carousel.tsx",
+      "content": "'use client';\r\n\r\nimport Image from 'next/image';\r\nimport React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';\r\nimport { motion } from 'framer-motion';\r\n\r\nconst PixelatedCarousel = ({\r\n  pixelSize = 100,\r\n  animationDelayStep = 0.02,\r\n  images,\r\n  pixelTransitionDuration = 0.1\r\n}: {\r\n  pixelSize?: number;\r\n  animationDelayStep?: number;\r\n  images: string[];\r\n  pixelTransitionDuration?: number;\r\n}) => {\r\n  const [activeImageIndex, setActiveImageIndex] = useState(0);\r\n  const ref = useRef<HTMLDivElement>(null);\r\n  const [grid, setGrid] = useState<{ rows: number; cols: number }>({ rows: 0, cols: 0 });\r\n  const [isInitialized, setIsInitialized] = useState(false);\r\n  const [isFirstCycle, setIsFirstCycle] = useState(true);\r\n\r\n  const SIZE = pixelSize;\r\n  const ANIMATION_DELAY_STEP = animationDelayStep;\r\n  const PIXEL_TRANSITION_DURATION = pixelTransitionDuration;\r\n\r\n  const sizeOfBox = useMemo(() => {\r\n    if (!ref.current || grid.rows === 0 || grid.cols === 0) {\r\n      return { h: 0, w: 0 };\r\n    }\r\n    const height = ref.current.clientHeight;\r\n    const width = ref.current.clientWidth;\r\n    return {\r\n      h: height / grid.rows,\r\n      w: width / grid.cols\r\n    };\r\n  }, [grid.rows, grid.cols]);\r\n\r\n  const shuffledDelays = useMemo(() => {\r\n    const totalBoxes = grid.rows * grid.cols;\r\n    if (totalBoxes === 0) return [];\r\n\r\n    const delays = Array.from({ length: totalBoxes }, (_, i) => i * PIXEL_TRANSITION_DURATION);\r\n\r\n    for (let i = delays.length - 1; i > 0; i--) {\r\n      const j = Math.floor(Math.random() * (i + 1));\r\n      [delays[i], delays[j]] = [delays[j], delays[i]];\r\n    }\r\n\r\n    return delays;\r\n  }, [grid.rows, grid.cols, PIXEL_TRANSITION_DURATION]);\r\n\r\n  const boxState = useMemo(() => {\r\n    if (shuffledDelays.length === 0) return [];\r\n\r\n    return shuffledDelays.map((delay) => {\r\n      const baseShade = 20 - Math.floor(Math.random() * 20);\r\n      return {\r\n        delay,\r\n        color: `rgb(${baseShade}, ${baseShade}, ${baseShade})`\r\n      };\r\n    });\r\n  }, [shuffledDelays]);\r\n\r\n  const calculateGrid = useCallback(() => {\r\n    if (!ref.current) return { rows: 0, cols: 0 };\r\n\r\n    const height = ref.current.clientHeight;\r\n    const width = ref.current.clientWidth;\r\n    const rows = Math.floor(height / SIZE);\r\n    const cols = Math.floor(width / SIZE);\r\n\r\n    return { rows, cols };\r\n  }, [SIZE]);\r\n\r\n  const initialize = useCallback(() => {\r\n    const newGrid = calculateGrid();\r\n\r\n    setGrid((prev) => {\r\n      if (prev.rows === newGrid.rows && prev.cols === newGrid.cols) {\r\n        return prev;\r\n      }\r\n      return newGrid;\r\n    });\r\n\r\n    setIsInitialized(true);\r\n  }, [calculateGrid]);\r\n\r\n  useEffect(() => {\r\n    initialize();\r\n\r\n    const handleResize = () => initialize();\r\n    window.addEventListener('resize', handleResize);\r\n    return () => window.removeEventListener('resize', handleResize);\r\n  }, [initialize]);\r\n\r\n  useEffect(() => {\r\n    if (!isInitialized || grid.rows === 0 || grid.cols === 0) return;\r\n\r\n    const allBoxesBlackTime =\r\n      ANIMATION_DELAY_STEP * (grid.rows * grid.cols - 1) + PIXEL_TRANSITION_DURATION;\r\n\r\n    if (isFirstCycle) {\r\n      const firstTimeout = setTimeout(() => {\r\n        setActiveImageIndex((prev) => (prev + 1) % images.length);\r\n        setIsFirstCycle(false);\r\n      }, allBoxesBlackTime * 1000);\r\n\r\n      return () => clearTimeout(firstTimeout);\r\n    } else {\r\n      const id = setInterval(() => {\r\n        setActiveImageIndex((prev) => (prev + 1) % images.length);\r\n      }, allBoxesBlackTime * 1000 * 2);\r\n\r\n      return () => clearInterval(id);\r\n    }\r\n  }, [\r\n    images.length,\r\n    grid.rows,\r\n    grid.cols,\r\n    isInitialized,\r\n    isFirstCycle,\r\n    ANIMATION_DELAY_STEP,\r\n    PIXEL_TRANSITION_DURATION\r\n  ]);\r\n\r\n  const gridElements = useMemo(() => {\r\n    if (!isInitialized || grid.rows === 0 || grid.cols === 0) return null;\r\n\r\n    return Array.from({ length: grid.rows }).map((_, row) => (\r\n      <span key={row} className=\"flex\">\r\n        {Array.from({ length: grid.cols }).map((_, col) => {\r\n          const boxIndex = row * grid.cols + col;\r\n          const box = boxState[boxIndex];\r\n\r\n          if (!box) return null;\r\n\r\n          return (\r\n            <motion.span\r\n              key={col}\r\n              style={{\r\n                height: sizeOfBox.h,\r\n                width: sizeOfBox.w,\r\n                backgroundColor: box.color\r\n              }}\r\n              initial={{\r\n                opacity: 0\r\n              }}\r\n              animate={{\r\n                opacity: 1\r\n              }}\r\n              transition={{\r\n                duration: PIXEL_TRANSITION_DURATION,\r\n                repeat: Infinity,\r\n                repeatType: 'reverse',\r\n                delay: box.delay,\r\n                repeatDelay: grid.rows * grid.cols * ANIMATION_DELAY_STEP\r\n              }}\r\n            />\r\n          );\r\n        })}\r\n      </span>\r\n    ));\r\n  }, [\r\n    isInitialized,\r\n    grid.rows,\r\n    grid.cols,\r\n    boxState,\r\n    sizeOfBox,\r\n    PIXEL_TRANSITION_DURATION,\r\n    ANIMATION_DELAY_STEP\r\n  ]);\r\n\r\n  return (\r\n    <div ref={ref} className=\"h-full w-full relative\">\r\n      {isInitialized && (\r\n        <span className=\"h-full w-full absolute top-0 left-0 z-10\">{gridElements}</span>\r\n      )}\r\n      <div className=\"h-full w-full z-0 relative\">\r\n        {images.map((image, index) => (\r\n          <Image\r\n            src={image}\r\n            key={image + index}\r\n            alt=\"pixelated carousel\"\r\n            fill\r\n            className=\"object-cover absolute top-0 left-0 h-full w-full\"\r\n            style={{\r\n              zIndex: activeImageIndex === index ? 10 : 0\r\n            }}\r\n          />\r\n        ))}\r\n      </div>\r\n    </div>\r\n  );\r\n};\r\n\r\nexport default PixelatedCarousel;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "autoplay"
+    ],
+    "interaction": "Images dissolve into a pixel grid before resolving into the next slide.",
+    "inspiration": {
+      "source": "StackBits",
+      "url": "https://stackbits.dev/docs/pixelatedcarousel",
+      "author": "Samit Kapoor",
+      "authorUrl": "https://github.com/samitkapoor",
+      "relationship": "port",
+      "license": "MIT"
+    },
+    "props": [
+      {
+        "name": "images",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "pixelSize",
+        "type": "number",
+        "default": "100",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "animationDelayStep",
+        "type": "number",
+        "default": "0.02",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pixelTransitionDuration",
+        "type": "number",
+        "default": "0.1",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/pixelated-carousel"
+  }
+}

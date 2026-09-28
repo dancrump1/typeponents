@@ -1,0 +1,49 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "share-button",
+  "type": "registry:ui",
+  "title": "Share Button",
+  "description": "Share Button",
+  "dependencies": [
+    "lucide-react"
+  ],
+  "registryDependencies": [
+    "button"
+  ],
+  "files": [
+    {
+      "path": "components/ui/share-button.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/share-button.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useState } from \"react\";\r\n\r\nimport { Button } from \"@/components/ui/button\";\r\nimport { cn } from \"@/lib/utils\";\r\nimport { LucideIcon } from \"lucide-react\";\r\n\r\ninterface ShareLink {\r\n\ticon: LucideIcon;\r\n\thref?: string;\r\n\tonClick?: () => void;\r\n\tlabel?: string;\r\n}\r\n\r\ninterface ShareButtonProps\r\n\textends React.ButtonHTMLAttributes<HTMLButtonElement> {\r\n\tlinks: ShareLink[];\r\n\tchildren: React.ReactNode;\r\n}\r\n\r\nconst ShareButton = ({\r\n\tclassName,\r\n\tlinks,\r\n\tchildren,\r\n\t...props\r\n}: ShareButtonProps) => {\r\n\tconst [isHovered, setIsHovered] = useState(false);\r\n\r\n\treturn (\r\n\t\t<div\r\n\t\t\tclassName=\"relative\"\r\n\t\t\tonMouseEnter={() => setIsHovered(true)}\r\n\t\t\tonMouseLeave={() => setIsHovered(false)}\r\n\t\t>\r\n\t\t\t<Button\r\n\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\"relative min-w-40  rounded-3xl \",\r\n\t\t\t\t\t\"bg-background dark:bg-background\",\r\n\t\t\t\t\t\"hover:bg-background dark:hover:bg-background\",\r\n\t\t\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\t\t\t\"border border-black/10 dark:border-white/10\",\r\n\t\t\t\t\t\"transition-[opacity,background-color,color,border-color] duration-300\",\r\n\t\t\t\t\tisHovered ? \"opacity-0\" : \"opacity-100\",\r\n\t\t\t\t\tclassName\r\n\t\t\t\t)}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t<span className=\"flex items-center gap-2\">{children}</span>\r\n\t\t\t</Button>\r\n\r\n\t\t\t<div className=\"absolute left-0 top-0 flex h-10\">\r\n\t\t\t\t{links.map((link, index) => {\r\n\t\t\t\t\tconst Icon = link.icon;\r\n\t\t\t\t\treturn (\r\n\t\t\t\t\t\t<button\r\n\t\t\t\t\t\t\ttype=\"button\"\r\n\t\t\t\t\t\t\tkey={index + \"share-button\"}\r\n\t\t\t\t\t\t\tonClick={link.onClick}\r\n\t\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\t\t\"h-10\",\r\n\t\t\t\t\t\t\t\t\"w-10\",\r\n\t\t\t\t\t\t\t\t\"flex items-center justify-center\",\r\n\t\t\t\t\t\t\t\t\"bg-background dark:bg-background\",\r\n\t\t\t\t\t\t\t\t\"text-foreground dark:text-foreground\",\r\n\t\t\t\t\t\t\t\t\"transition-all duration-300\",\r\n\t\t\t\t\t\t\t\tindex === 0 && \"rounded-l-3xl\",\r\n\t\t\t\t\t\t\t\tindex === links.length - 1 && \"rounded-r-3xl\",\r\n\t\t\t\t\t\t\t\t\"border-r border-white/10 last:border-r-0 dark:border-black/10\",\r\n\t\t\t\t\t\t\t\t\"hover:bg-background dark:hover:bg-background\",\r\n\t\t\t\t\t\t\t\t\"\",\r\n\t\t\t\t\t\t\t\tisHovered\r\n\t\t\t\t\t\t\t\t\t? \"translate-x-0 opacity-100\"\r\n\t\t\t\t\t\t\t\t\t: \"-translate-x-full opacity-0\",\r\n\t\t\t\t\t\t\t\tindex === 0 && \"duration-200\",\r\n\t\t\t\t\t\t\t\tindex === 1 && \"delay-50 duration-200\",\r\n\t\t\t\t\t\t\t\tindex === 2 && \"delay-100 duration-200\",\r\n\t\t\t\t\t\t\t\tindex === 3 && \"delay-150 duration-200\"\r\n\t\t\t\t\t\t\t)}\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<Icon className=\"size-4\" />\r\n\t\t\t\t\t\t</button>\r\n\t\t\t\t\t);\r\n\t\t\t\t})}\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n};\r\n\r\nexport default ShareButton;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Buttons"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "links",
+        "type": "ShareLink[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/share-button"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spotlight-border",
+  "type": "registry:block",
+  "title": "Spotlight border",
+  "description": "Spotlight border",
+  "files": [
+    {
+      "path": "components/usages/spotlightborderusage.tsx",
+      "content": "import { Spotlight } from \"@/registry/open-source/spotlight\";\n\nexport default function SpotlightBorder() {\n\treturn (\n\t\t<div className=\"relative aspect-video h-[200px] overflow-hidden rounded-xl bg-background/30 p-px dark:bg-background/30\">\n\t\t\t<Spotlight\n\t\t\t\tclassName=\"from-blue-600 via-blue-500 to-blue-400 blur-3xl dark:from-blue-200 dark:via-blue-300 dark:to-blue-400\"\n\t\t\t\tsize={124}\n\t\t\t/>\n\t\t\t<div className=\"relative h-full w-full rounded-xl bg-background dark:bg-background\"></div>\n\t\t</div>\n\t);\n}\n",
+      "type": "registry:block",
+      "target": "~/example.tsx"
+    },
+    {
+      "path": "components/usages/spotlightborderusage.tsx",
+      "content": "import { Spotlight } from \"@/registry/open-source/spotlight\";\n\nexport default function SpotlightBorder() {\n\treturn (\n\t\t<div className=\"relative aspect-video h-[200px] overflow-hidden rounded-xl bg-background/30 p-px dark:bg-background/30\">\n\t\t\t<Spotlight\n\t\t\t\tclassName=\"from-blue-600 via-blue-500 to-blue-400 blur-3xl dark:from-blue-200 dark:via-blue-300 dark:to-blue-400\"\n\t\t\t\tsize={124}\n\t\t\t/>\n\t\t\t<div className=\"relative h-full w-full rounded-xl bg-background dark:bg-background\"></div>\n\t\t</div>\n\t);\n}\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "registry/open-source/spotlight.tsx",
+      "content": "\"use client\";\n\nimport React, { useCallback, useEffect, useRef, useState } from \"react\";\n\nimport { cn } from \"@/registry/utilities/cn\";\nimport { motion, SpringOptions, useSpring, useTransform } from \"motion/react\";\n\nexport type SpotlightProps = {\n\tclassName?: string;\n\tsize?: number;\n\tspringOptions?: SpringOptions;\n};\n\nexport function Spotlight({\n\tclassName,\n\tsize = 200,\n\tspringOptions = { bounce: 0 },\n}: SpotlightProps) {\n\tconst containerRef = useRef<HTMLDivElement>(null);\n\tconst [isHovered, setIsHovered] = useState(false);\n\tconst [parentElement, setParentElement] = useState<HTMLElement | null>(null);\n\n\tconst mouseX = useSpring(0, springOptions);\n\tconst mouseY = useSpring(0, springOptions);\n\n\tconst spotlightLeft = useTransform(mouseX, (x) => `${x - size / 2}px`);\n\tconst spotlightTop = useTransform(mouseY, (y) => `${y - size / 2}px`);\n\n\tuseEffect(() => {\n\t\tif (containerRef.current) {\n\t\t\tconst parent = containerRef.current.parentElement;\n\t\t\tif (parent) {\n\t\t\t\tparent.style.position = \"relative\";\n\t\t\t\tparent.style.overflow = \"hidden\";\n\t\t\t\tsetParentElement(parent);\n\t\t\t}\n\t\t}\n\t}, []);\n\n\tconst handleMouseMove = useCallback(\n\t\t(event: MouseEvent) => {\n\t\t\tif (!parentElement) return;\n\t\t\tconst { left, top } = parentElement.getBoundingClientRect();\n\t\t\tmouseX.set(event.clientX - left);\n\t\t\tmouseY.set(event.clientY - top);\n\t\t},\n\t\t[mouseX, mouseY, parentElement]\n\t);\n\n\tuseEffect(() => {\n\t\tif (!parentElement) return;\n\n\t\tconst abortController = new AbortController();\n\n\t\tparentElement.addEventListener(\"mousemove\", handleMouseMove, {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\t\tparentElement.addEventListener(\"mouseenter\", () => setIsHovered(true), {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\t\tparentElement.addEventListener(\"mouseleave\", () => setIsHovered(false), {\n\t\t\tsignal: abortController.signal,\n\t\t});\n\n\t\treturn () => {\n\t\t\tabortController.abort();\n\t\t};\n\t}, [parentElement, handleMouseMove]);\n\n\treturn (\n\t\t<motion.div\n\t\t\tref={containerRef}\n\t\t\tclassName={cn(\n\t\t\t\t\"pointer-events-none absolute rounded-full bg-[radial-gradient(circle_at_center,var(--tw-gradient-stops),transparent_80%)] blur-xl transition-opacity duration-200\",\n\t\t\t\t\"from-background via-background to-background\",\n\t\t\t\tisHovered ? \"opacity-100\" : \"opacity-0\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t\tstyle={{\n\t\t\t\twidth: size,\n\t\t\t\theight: size,\n\t\t\t\tleft: spotlightLeft,\n\t\t\t\ttop: spotlightTop,\n\t\t\t}}\n\t\t/>\n\t);\n}\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "registry/utilities/cn.ts",
+      "content": "import { ClassValue, clsx } from \"clsx\";\r\nimport { twMerge } from \"tailwind-merge\";\r\n\r\nexport function cn(...inputs: ClassValue[]) {\r\n\treturn twMerge(clsx(inputs));\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "Cards"
+  ]
+}

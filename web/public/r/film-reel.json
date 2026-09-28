@@ -1,0 +1,56 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "film-reel",
+  "type": "registry:ui",
+  "title": "Film Reel",
+  "description": "Film Reel",
+  "dependencies": [
+    "lodash",
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/film-reel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/film-reel.tsx",
+      "content": "\"use client\";\n\nimport React, { useEffect, useState } from \"react\";\n\nimport { debounce } from \"lodash\";\nimport { motion, useAnimation, useInView } from \"motion/react\";\n\n// Credit:\n// https://www.serenity-ui.com/components/filmroll\n\nconst FilmReel = ({ videos }: { videos: string[] }) => {\n\tconst controls = useAnimation();\n\n\tuseEffect(() => {\n\t\tconst updateAnimationSpeed = debounce(() => {\n\t\t\tconst isMobile = window.innerWidth < 640;\n\t\t\tconst duration = isMobile ? 10 : 40;\n\n\t\t\tcontrols.start({\n\t\t\t\tx: [\"0%\", \"-100%\"],\n\t\t\t\ttransition: {\n\t\t\t\t\tduration,\n\t\t\t\t\tease: \"linear\",\n\t\t\t\t\trepeat: Infinity,\n\t\t\t\t\trepeatType: \"loop\",\n\t\t\t\t},\n\t\t\t});\n\t\t}, 100);\n\n\t\tupdateAnimationSpeed();\n\t\twindow.addEventListener(\"resize\", updateAnimationSpeed);\n\n\t\treturn () => window.removeEventListener(\"resize\", updateAnimationSpeed);\n\t}, [controls]);\n\n\treturn (\n\t\t<div className=\"w-full bg-linear-to-r from-background via-background to-background overflow-hidden py-3\">\n\t\t\t<motion.div className=\"flex\" animate={controls}>\n\t\t\t\t{[...Array(2)].map((_, containerIndex) => (\n\t\t\t\t\t<div\n\t\t\t\t\t\tkey={containerIndex}\n\t\t\t\t\t\tclassName=\"flex-none flex flex-col mx-4\"\n\t\t\t\t\t>\n\t\t\t\t\t\t<FilmPerforations />\n\t\t\t\t\t\t<div className=\"flex space-x-8 py-4\">\n\t\t\t\t\t\t\t{videos.map((videoUrl, index) => (\n\t\t\t\t\t\t\t\t<ZoomableVideo\n\t\t\t\t\t\t\t\t\tkey={index + \"film-reel\"}\n\t\t\t\t\t\t\t\t\tvideoUrl={videoUrl}\n\t\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t\t))}\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<FilmPerforations />\n\t\t\t\t\t</div>\n\t\t\t\t))}\n\t\t\t</motion.div>\n\t\t</div>\n\t);\n};\n\nconst ZoomableVideo = ({ videoUrl }: { videoUrl: string }) => {\n\tconst [hovered, setHovered] = useState(false);\n\tconst [position, setPosition] = useState({ x: 0, y: 0 });\n\tconst { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });\n\n\tconst handleMouseMove = (e: React.MouseEvent) => {\n\t\tconst { left, top } = e.currentTarget.getBoundingClientRect();\n\t\tconst x = e.clientX - left;\n\t\tconst y = e.clientY - top;\n\t\tsetPosition({ x, y });\n\t};\n\n\treturn (\n\t\t<div\n\t\t\tref={ref}\n\t\t\tclassName=\"relative w-64 sm:w-80 overflow-hidden rounded-lg border-4 border-gray-800 bg-background\"\n\t\t\tonMouseEnter={() => setHovered(true)}\n\t\t\tonMouseLeave={() => setHovered(false)}\n\t\t\tonMouseMove={handleMouseMove}\n\t\t\tstyle={{\n\t\t\t\ttransition: \"transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)\",\n\t\t\t}}\n\t\t>\n\t\t\t{inView && (\n\t\t\t\t<motion.video\n\t\t\t\t\tautoPlay\n\t\t\t\t\tloop\n\t\t\t\t\tmuted\n\t\t\t\t\tclassName=\"w-full h-full object-cover transition-all\"\n\t\t\t\t\tinitial={{ opacity: 0 }}\n\t\t\t\t\tanimate={{ opacity: 1 }}\n\t\t\t\t\ttransition={{ duration: 0.5 }}\n\t\t\t\t>\n\t\t\t\t\t<source src={videoUrl} type=\"video/mp4\" />\n\t\t\t\t\tYour browser does not support the video tag.\n\t\t\t\t</motion.video>\n\t\t\t)}\n\t\t\t{hovered && (\n\t\t\t\t<div\n\t\t\t\t\tclassName=\"absolute border border-gray-300 rounded-full pointer-events-none\"\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttop: `${position.y}px`,\n\t\t\t\t\t\tleft: `${position.x}px`,\n\t\t\t\t\t\twidth: \"150px\",\n\t\t\t\t\t\theight: \"150px\",\n\t\t\t\t\t\ttransform: \"translate(-50%, -50%)\",\n\t\t\t\t\t\tbackground: \"rgba(0, 0, 0, 0.3)\",\n\t\t\t\t\t\tbackgroundImage: `radial-gradient(circle, rgba(255, 255, 255, 0.15) 20%, rgba(0, 0, 0, 0.4) 80%)`,\n\t\t\t\t\t\tboxShadow: \"0 0 10px rgba(0, 0, 0, 0.3)\",\n\t\t\t\t\t\toverflow: \"hidden\",\n\t\t\t\t\t\tpointerEvents: \"none\",\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<div\n\t\t\t\t\t\tclassName=\"absolute\"\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\twidth: \"300%\",\n\t\t\t\t\t\t\theight: \"300%\",\n\t\t\t\t\t\t\tbackgroundImage: `url(${videoUrl})`,\n\t\t\t\t\t\t\tbackgroundSize: \"auto\",\n\t\t\t\t\t\t\tbackgroundPosition: `-${position.x * 3}px -${\n\t\t\t\t\t\t\t\tposition.y * 3\n\t\t\t\t\t\t\t}px`,\n\t\t\t\t\t\t\tbackgroundRepeat: \"no-repeat\",\n\t\t\t\t\t\t\tbackgroundColor: \"transparent\",\n\t\t\t\t\t\t\ttransform: \"translate(-50%, -50%)\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t)}\n\t\t</div>\n\t);\n};\n\nconst FilmPerforations: React.FC = React.memo(function FilmPerforations() {\n\treturn (\n\t\t<div className=\"flex justify-between py-2\">\n\t\t\t{[...Array(20)].map((_, index) => (\n\t\t\t\t<div\n\t\t\t\t\tkey={index + \"film-perf\"}\n\t\t\t\t\tclassName=\"w-8 h-4 bg-background rounded shadow-md border border-gray-700\"\n\t\t\t\t></div>\n\t\t\t))}\n\t\t</div>\n\t);\n});\n\nexport default FilmReel;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Media Galleries"
+    ],
+    "tags": [
+      "scroll-driven",
+      "hover",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Serenity UI",
+      "url": "https://www.serenity-ui.com/components/filmroll",
+      "authorUrl": "https://www.serenity-ui.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "videos",
+        "type": "string[]",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/film-reel"
+  }
+}

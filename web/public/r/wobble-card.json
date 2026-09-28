@@ -1,0 +1,60 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "wobble-card",
+  "type": "registry:ui",
+  "title": "Wobble Card",
+  "description": "Wobble Card",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/wobble-card.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/wobble-card.tsx",
+      "content": "\"use client\";\n\nimport React, { useState } from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport { motion } from \"motion/react\";\n\n// https://ui.aceternity.com/components/wobble-card\n\nconst WobbleCard = ({\n\tchildren,\n\tcontainerClassName,\n\tclassName,\n}: {\n\tchildren: React.ReactNode;\n\tcontainerClassName?: string;\n\tclassName?: string;\n}) => {\n\tconst [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });\n\tconst [isHovering, setIsHovering] = useState(false);\n\n\tconst handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {\n\t\tconst { clientX, clientY } = event;\n\t\tconst rect = event.currentTarget.getBoundingClientRect();\n\t\tconst x = (clientX - (rect.left + rect.width / 2)) / 20;\n\t\tconst y = (clientY - (rect.top + rect.height / 2)) / 20;\n\t\tsetMousePosition({ x, y });\n\t};\n\treturn (\n\t\t<motion.section\n\t\t\tonMouseMove={handleMouseMove}\n\t\t\tonMouseEnter={() => setIsHovering(true)}\n\t\t\tonMouseLeave={() => {\n\t\t\t\tsetIsHovering(false);\n\t\t\t\tsetMousePosition({ x: 0, y: 0 });\n\t\t\t}}\n\t\t\tstyle={{\n\t\t\t\ttransform: isHovering\n\t\t\t\t\t? `translate3d(${mousePosition.x}px, ${mousePosition.y}px, 0) scale3d(1, 1, 1)`\n\t\t\t\t\t: \"translate3d(0px, 0px, 0) scale3d(1, 1, 1)\",\n\t\t\t\ttransition: \"transform 0.1s ease-out\",\n\t\t\t}}\n\t\t\tclassName={cn(\n\t\t\t\t\"mx-auto w-full bg-indigo-800  relative rounded-2xl overflow-hidden\",\n\t\t\t\tcontainerClassName\n\t\t\t)}\n\t\t>\n\t\t\t<div\n\t\t\t\tclassName=\"relative  h-full bg-[radial-gradient(88%_100%_at_top,rgba(255,255,255,0.5),rgba(255,255,255,0))]  sm:mx-0 sm:rounded-2xl overflow-hidden\"\n\t\t\t\tstyle={{\n\t\t\t\t\tboxShadow:\n\t\t\t\t\t\t\"0 10px 32px rgba(34, 42, 53, 0.12), 0 1px 1px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(34, 42, 53, 0.05), 0 4px 6px rgba(34, 42, 53, 0.08), 0 24px 108px rgba(47, 48, 55, 0.10)\",\n\t\t\t\t}}\n\t\t\t>\n\t\t\t\t<motion.div\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\ttransform: isHovering\n\t\t\t\t\t\t\t? `translate3d(${-mousePosition.x}px, ${-mousePosition.y}px, 0) scale3d(1.03, 1.03, 1)`\n\t\t\t\t\t\t\t: \"translate3d(0px, 0px, 0) scale3d(1, 1, 1)\",\n\t\t\t\t\t\ttransition: \"transform 0.1s ease-out\",\n\t\t\t\t\t}}\n\t\t\t\t\tclassName={cn(\"h-full px-4 py-20 sm:px-10\", className)}\n\t\t\t\t>\n\t\t\t\t\t{children}\n\t\t\t\t</motion.div>\n\t\t\t</div>\n\t\t</motion.section>\n\t);\n};\n\nexport default WobbleCard;\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Cards",
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/wobble-card",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "containerClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/wobble-card"
+  }
+}

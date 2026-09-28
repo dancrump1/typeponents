@@ -1,0 +1,164 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-type",
+  "type": "registry:ui",
+  "title": "Text Type",
+  "description": "Text Type",
+  "dependencies": [
+    "gsap"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-type.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-type.tsx",
+      "content": "\"use client\";\r\n\r\nimport { createElement, ElementType, useEffect, useRef, useState } from \"react\";\r\n\r\nimport { gsap } from \"gsap\";\r\n\r\ninterface TextTypeProps {\r\n\tclassName?: string;\r\n\tshowCursor?: boolean;\r\n\thideCursorWhileTyping?: boolean;\r\n\tcursorCharacter?: string | React.ReactNode;\r\n\tcursorBlinkDuration?: number;\r\n\tcursorClassName?: string;\r\n\ttext: string | string[];\r\n\tas?: ElementType;\r\n\ttypingSpeed?: number;\r\n\tinitialDelay?: number;\r\n\tpauseDuration?: number;\r\n\tdeletingSpeed?: number;\r\n\tloop?: boolean;\r\n\ttextColors?: string[];\r\n\tvariableSpeed?: { min: number; max: number };\r\n\tonSentenceComplete?: (sentence: string, index: number) => void;\r\n\tstartOnVisible?: boolean;\r\n\treverseMode?: boolean;\r\n}\r\n\r\nconst TextType = ({\r\n\ttext,\r\n\tas: Component = \"div\",\r\n\ttypingSpeed = 50,\r\n\tinitialDelay = 0,\r\n\tpauseDuration = 2000,\r\n\tdeletingSpeed = 30,\r\n\tloop = true,\r\n\tclassName = \"\",\r\n\tshowCursor = true,\r\n\thideCursorWhileTyping = false,\r\n\tcursorCharacter = \"|\",\r\n\tcursorClassName = \"\",\r\n\tcursorBlinkDuration = 0.5,\r\n\ttextColors = [],\r\n\tvariableSpeed,\r\n\tonSentenceComplete,\r\n\tstartOnVisible = false,\r\n\treverseMode = false,\r\n\t...props\r\n}: TextTypeProps & React.HTMLAttributes<HTMLElement>) => {\r\n\tconst [displayedText, setDisplayedText] = useState(\"\");\r\n\tconst [currentCharIndex, setCurrentCharIndex] = useState(0);\r\n\tconst [isDeleting, setIsDeleting] = useState(false);\r\n\tconst [currentTextIndex, setCurrentTextIndex] = useState(0);\r\n\tconst [isVisible, setIsVisible] = useState(!startOnVisible);\r\n\tconst cursorRef = useRef<HTMLSpanElement>(null);\r\n\tconst containerRef = useRef<HTMLElement>(null);\r\n\r\n\tconst textArray = Array.isArray(text) ? text : [text];\r\n\r\n\tconst getRandomSpeed = () => {\r\n\t\tif (!variableSpeed) return typingSpeed;\r\n\t\tconst { min, max } = variableSpeed;\r\n\t\treturn Math.random() * (max - min) + min;\r\n\t};\r\n\r\n\tconst getCurrentTextColor = () => {\r\n\t\tif (textColors.length === 0) return \"#ffffff\";\r\n\t\treturn textColors[currentTextIndex % textColors.length];\r\n\t};\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!startOnVisible || !containerRef.current) return;\r\n\r\n\t\tconst observer = new IntersectionObserver(\r\n\t\t\t(entries) => {\r\n\t\t\t\tentries.forEach((entry) => {\r\n\t\t\t\t\tif (entry.isIntersecting) {\r\n\t\t\t\t\t\tsetIsVisible(true);\r\n\t\t\t\t\t}\r\n\t\t\t\t});\r\n\t\t\t},\r\n\t\t\t{ threshold: 0.1 }\r\n\t\t);\r\n\r\n\t\tobserver.observe(containerRef.current);\r\n\t\treturn () => observer.disconnect();\r\n\t}, [startOnVisible]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (showCursor && cursorRef.current) {\r\n\t\t\tgsap.set(cursorRef.current, { opacity: 1 });\r\n\t\t\tgsap.to(cursorRef.current, {\r\n\t\t\t\topacity: 0,\r\n\t\t\t\tduration: cursorBlinkDuration,\r\n\t\t\t\trepeat: -1,\r\n\t\t\t\tyoyo: true,\r\n\t\t\t\tease: \"power2.inOut\",\r\n\t\t\t});\r\n\t\t}\r\n\t}, [showCursor, cursorBlinkDuration]);\r\n\r\n\tuseEffect(() => {\r\n\t\tif (!isVisible) return;\r\n\r\n\t\tlet timeout: NodeJS.Timeout;\r\n\r\n\t\tconst currentText = textArray[currentTextIndex];\r\n\t\tconst processedText = reverseMode\r\n\t\t\t? currentText.split(\"\").reverse().join(\"\")\r\n\t\t\t: currentText;\r\n\r\n\t\tconst executeTypingAnimation = () => {\r\n\t\t\tif (isDeleting) {\r\n\t\t\t\tif (displayedText === \"\") {\r\n\t\t\t\t\tsetIsDeleting(false);\r\n\t\t\t\t\tif (currentTextIndex === textArray.length - 1 && !loop) {\r\n\t\t\t\t\t\treturn;\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tif (onSentenceComplete) {\r\n\t\t\t\t\t\tonSentenceComplete(\r\n\t\t\t\t\t\t\ttextArray[currentTextIndex],\r\n\t\t\t\t\t\t\tcurrentTextIndex\r\n\t\t\t\t\t\t);\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tsetCurrentTextIndex((prev) => (prev + 1) % textArray.length);\r\n\t\t\t\t\tsetCurrentCharIndex(0);\r\n\t\t\t\t\ttimeout = setTimeout(() => {}, pauseDuration);\r\n\t\t\t\t} else {\r\n\t\t\t\t\ttimeout = setTimeout(() => {\r\n\t\t\t\t\t\tsetDisplayedText((prev) => prev.slice(0, -1));\r\n\t\t\t\t\t}, deletingSpeed);\r\n\t\t\t\t}\r\n\t\t\t} else {\r\n\t\t\t\tif (currentCharIndex < processedText.length) {\r\n\t\t\t\t\ttimeout = setTimeout(\r\n\t\t\t\t\t\t() => {\r\n\t\t\t\t\t\t\tsetDisplayedText(\r\n\t\t\t\t\t\t\t\t(prev) => prev + processedText[currentCharIndex]\r\n\t\t\t\t\t\t\t);\r\n\t\t\t\t\t\t\tsetCurrentCharIndex((prev) => prev + 1);\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t\tvariableSpeed ? getRandomSpeed() : typingSpeed\r\n\t\t\t\t\t);\r\n\t\t\t\t} else if (textArray.length > 1) {\r\n\t\t\t\t\ttimeout = setTimeout(() => {\r\n\t\t\t\t\t\tsetIsDeleting(true);\r\n\t\t\t\t\t}, pauseDuration);\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t};\r\n\r\n\t\tif (currentCharIndex === 0 && !isDeleting && displayedText === \"\") {\r\n\t\t\ttimeout = setTimeout(executeTypingAnimation, initialDelay);\r\n\t\t} else {\r\n\t\t\texecuteTypingAnimation();\r\n\t\t}\r\n\r\n\t\treturn () => clearTimeout(timeout);\r\n\t}, [\r\n\t\tcurrentCharIndex,\r\n\t\tdisplayedText,\r\n\t\tisDeleting,\r\n\t\ttypingSpeed,\r\n\t\tdeletingSpeed,\r\n\t\tpauseDuration,\r\n\t\ttextArray,\r\n\t\tcurrentTextIndex,\r\n\t\tloop,\r\n\t\tinitialDelay,\r\n\t\tisVisible,\r\n\t\treverseMode,\r\n\t\tvariableSpeed,\r\n\t\tonSentenceComplete,\r\n\t]);\r\n\r\n\tconst shouldHideCursor =\r\n\t\thideCursorWhileTyping &&\r\n\t\t(currentCharIndex < textArray[currentTextIndex].length || isDeleting);\r\n\r\n\treturn createElement(\r\n\t\tComponent,\r\n\t\t{\r\n\t\t\tref: containerRef,\r\n\t\t\tclassName: `inline-block whitespace-pre-wrap tracking-tight ${className}`,\r\n\t\t\t...props,\r\n\t\t},\r\n\t\t<span className=\"inline\" style={{ color: getCurrentTextColor() }}>\r\n\t\t\t{displayedText}\r\n\t\t</span>,\r\n\t\tshowCursor && (\r\n\t\t\t<span\r\n\t\t\t\tref={cursorRef}\r\n\t\t\t\tclassName={`ml-1 inline-block opacity-100 ${shouldHideCursor ? \"hidden\" : \"\"} ${cursorClassName}`}\r\n\t\t\t>\r\n\t\t\t\t{cursorCharacter}\r\n\t\t\t</span>\r\n\t\t)\r\n\t);\r\n};\r\n\r\nexport default TextType;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text",
+      "Text Animations"
+    ],
+    "tags": [
+      "scroll-driven"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "text",
+        "type": "string | string[]",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "showCursor",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hideCursorWhileTyping",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cursorCharacter",
+        "type": "ReactNode",
+        "default": "\"|\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cursorBlinkDuration",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "cursorClassName",
+        "type": "string",
+        "default": "\"\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "as",
+        "type": "ElementType",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "typingSpeed",
+        "type": "number",
+        "default": "50",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "initialDelay",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "pauseDuration",
+        "type": "number",
+        "default": "2000",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "deletingSpeed",
+        "type": "number",
+        "default": "30",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "loop",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "textColors",
+        "type": "string[]",
+        "default": "[]",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "variableSpeed",
+        "type": "{ min: number; max: number; }",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "onSentenceComplete",
+        "type": "((sentence: string, index: number) => void)",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "startOnVisible",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "reverseMode",
+        "type": "boolean",
+        "default": "false",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-type"
+  }
+}

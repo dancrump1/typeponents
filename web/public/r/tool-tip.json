@@ -1,0 +1,54 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tool-tip",
+  "type": "registry:ui",
+  "title": "Tool Tip",
+  "description": "Tool Tip",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/tool-tip.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/tool-tip.tsx",
+      "content": "\"use client\";\r\n\r\nimport React, { useState } from \"react\";\r\n\r\nimport {\r\n\tAnimatePresence,\r\n\tmotion,\r\n\tuseMotionValue,\r\n\tuseSpring,\r\n\tuseTransform,\r\n} from \"motion/react\";\r\n\r\n// https://ui.aceternity.com/components/animated-tooltip\r\n\r\nexport const AnimatedTooltip = ({\r\n\titems,\r\n}: {\r\n\titems: {\r\n\t\tid: number;\r\n\t\tfirstName: string;\r\n\t\tjobTitle: string;\r\n\t\timage: [{ url: string }];\r\n\t}[];\r\n}) => {\r\n\tconst [hoveredIndex, setHoveredIndex] = useState<number | null>(null);\r\n\tconst springConfig = { stiffness: 100, damping: 5 };\r\n\tconst x = useMotionValue(0); // going to set this value on mouse move\r\n\t// rotate the tooltip\r\n\tconst rotate = useSpring(\r\n\t\tuseTransform(x, [-100, 100], [-45, 45]),\r\n\t\tspringConfig\r\n\t);\r\n\t// translate the tooltip\r\n\tconst translateX = useSpring(\r\n\t\tuseTransform(x, [-100, 100], [-50, 50]),\r\n\t\tspringConfig\r\n\t);\r\n\tconst handleMouseMove = (event: any) => {\r\n\t\tconst halfWidth = event.target.offsetWidth / 2;\r\n\t\tx.set(event.nativeEvent.offsetX - halfWidth); // set the x value, which is then used in transform and rotate\r\n\t};\r\n\r\n\treturn (\r\n\t\t<>\r\n\t\t\t{items.map((item, idx) => (\r\n\t\t\t\t<div\r\n\t\t\t\t\tclassName=\"-mr-4  relative group basis-1/4\"\r\n\t\t\t\t\tkey={idx + \"tooltip\"}\r\n\t\t\t\t\tonMouseEnter={() => setHoveredIndex(item.id)}\r\n\t\t\t\t\tonMouseLeave={() => setHoveredIndex(null)}\r\n\t\t\t\t>\r\n\t\t\t\t\t{hoveredIndex === item.id && (\r\n\t\t\t\t\t\t<motion.div\r\n\t\t\t\t\t\t\tinitial={{ opacity: 0, y: 20, scale: 0.6 }}\r\n\t\t\t\t\t\t\tanimate={{\r\n\t\t\t\t\t\t\t\topacity: 1,\r\n\t\t\t\t\t\t\t\ty: 0,\r\n\t\t\t\t\t\t\t\tscale: 1,\r\n\t\t\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\t\t\tstiffness: 260,\r\n\t\t\t\t\t\t\t\t\tdamping: 10,\r\n\t\t\t\t\t\t\t\t},\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\texit={{ opacity: 0, y: 20, scale: 0.6 }}\r\n\t\t\t\t\t\t\tstyle={{\r\n\t\t\t\t\t\t\t\ttranslateX: translateX,\r\n\t\t\t\t\t\t\t\trotate: rotate,\r\n\t\t\t\t\t\t\t\twhiteSpace: \"nowrap\",\r\n\t\t\t\t\t\t\t}}\r\n\t\t\t\t\t\t\tclassName=\"absolute -top-16 -left-1/2 translate-x-1/2 flex text-xs  flex-col items-center justify-center rounded-md bg-background z-40 shadow-xl px-4 py-2\"\r\n\t\t\t\t\t\t>\r\n\t\t\t\t\t\t\t<div className=\"absolute inset-x-10 z-30 w-[20%] -bottom-px bg-linear-to-r from-transparent via-emerald-500 to-transparent h-px \" />\r\n\t\t\t\t\t\t\t<div className=\"absolute left-10 w-[40%] z-30 -bottom-px bg-linear-to-r from-transparent via-sky-500 to-transparent h-px \" />\r\n\t\t\t\t\t\t\t<div className=\"font-bold text-foreground relative z-30 text-base\">\r\n\t\t\t\t\t\t\t\t{item.firstName}\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t\t<div className=\"text-foreground text-xs\">{item.jobTitle}</div>\r\n\t\t\t\t\t\t</motion.div>\r\n\t\t\t\t\t)}\r\n\t\t\t\t\t{!!item.image.length && (\r\n\t\t\t\t\t\t<img\r\n\t\t\t\t\t\t\tonMouseMove={handleMouseMove}\r\n\t\t\t\t\t\t\theight={100}\r\n\t\t\t\t\t\t\twidth={100}\r\n\t\t\t\t\t\t\tsrc={item.image?.[0].url}\r\n\t\t\t\t\t\t\talt={item.firstName}\r\n\t\t\t\t\t\t\tclassName=\"object-cover m-0! p-0! object-top rounded-full h-14 w-14 border-2 group-hover:scale-105 group-hover:z-30 border-white  relative transition duration-500\"\r\n\t\t\t\t\t\t/>\r\n\t\t\t\t\t)}\r\n\t\t\t\t</div>\r\n\t\t\t))}\r\n\t\t</>\r\n\t);\r\n};\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Utilities"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/animated-tooltip",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ id: number; firstName: string; jobTitle: string; image:…",
+        "description": "",
+        "required": true
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/tool-tip"
+  }
+}

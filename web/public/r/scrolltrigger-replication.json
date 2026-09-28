@@ -1,0 +1,50 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scrolltrigger-replication",
+  "type": "registry:ui",
+  "title": "Scrolltrigger Replication",
+  "description": "Scrolltrigger Replication",
+  "dependencies": [
+    "@gsap/react",
+    "clsx",
+    "gsap",
+    "lenis",
+    "tempus"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/scrolltrigger-replication/component.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scrolltrigger-replication/component.tsx",
+      "content": "\"use client\";\n\nimport React, { useRef } from \"react\";\n\nimport { useGSAP } from \"@gsap/react\";\nimport gsap from \"gsap\";\n\nimport SectionHeading from \"./components/section-heading\";\n\nconst CTAButton = () => {\n\tconst containerRef = useRef(null);\n\tconst buttonRef = useRef(null);\n\n\tconst { contextSafe } = useGSAP({ scope: containerRef });\n\n\tconst onMouseOver = contextSafe(() => {\n\t\tgsap.to(buttonRef.current, {\n\t\t\t\"--cta-target\": \"0%\",\n\t\t\tease: \"power1.inOut\",\n\t\t\tduration: 0.4,\n\t\t});\n\t});\n\n\tconst onMouseOut = contextSafe(() => {\n\t\tgsap.to(buttonRef.current, {\n\t\t\t\"--cta-target\": \"100%\",\n\t\t\tease: \"power1.inOut\",\n\t\t\tduration: 0.4,\n\t\t});\n\t});\n\n\treturn (\n\t\t<section ref={containerRef} id=\"button\">\n\t\t\t<SectionHeading title=\"CTA Button\" />\n\n\t\t\t<div className=\"container grid min-h-[50vh] place-items-center py-10 lg:py-20\">\n\t\t\t\t<div>\n\t\t\t\t\t<button\n\t\t\t\t\t\tref={buttonRef}\n\t\t\t\t\t\tclassName=\"peer relative isolate pt-1\"\n\t\t\t\t\t\tonMouseOver={onMouseOver}\n\t\t\t\t\t\tonMouseOut={onMouseOut}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\tbackground: `linear-gradient(to bottom, #fff var(--cta-target), #000 var(--cta-target))`,\n\t\t\t\t\t\t}}\n\t\t\t\t\t>\n\t\t\t\t\t\t<span className=\"heading-60-150 inline-block bg-[linear-gradient(to_bottom,#000_var(--cta-target),#fff_var(--cta-target))] pt-1 text-foreground [-webkit-background-clip:text] [-webkit-text-fill-color:transparent] lg:pt-2 lg:text-[200px]\">\n\t\t\t\t\t\t\tContact Us\n\t\t\t\t\t\t</span>\n\t\t\t\t\t</button>\n\n\t\t\t\t\t<div className=\"grid grid-cols-3 overflow-hidden [&_div]:peer-hover:-translate-y-full\">\n\t\t\t\t\t\t<div className=\"ease-power-1-in-out duration-400 relative aspect-3/1 overflow-hidden transition-transform\">\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 h-full w-full object-cover\"\n\t\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\t\tloading=\"lazy\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"ease-power-1-in-out duration-400 relative aspect-3/2 h-2/3 overflow-hidden transition-transform\">\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 h-full w-full object-cover\"\n\t\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\t\tloading=\"lazy\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t<div className=\"ease-power-1-in-out duration-400 relative aspect-square h-full overflow-hidden transition-transform\">\n\t\t\t\t\t\t\t<img\n\t\t\t\t\t\t\t\tsrc=\"/itjustworks.jpg\"\n\t\t\t\t\t\t\t\tclassName=\"absolute inset-0 h-full w-full object-cover\"\n\t\t\t\t\t\t\t\talt=\"\"\n\t\t\t\t\t\t\t\tloading=\"lazy\"\n\t\t\t\t\t\t\t/>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t</section>\n\t);\n};\n\nexport default CTAButton;\n"
+    },
+    {
+      "path": "components/ui/scrolltrigger-replication/components/section-heading.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/scrolltrigger-replication/components/section-heading.tsx",
+      "content": "import clsx from \"clsx\";\nimport React from \"react\";\n\nconst SectionHeading = ({title}: {title: string}) => {\n    return (\n        <h2\n            className={\n                \"heading-60-150 container scale-75 bg-background py-10 text-center text-foreground lg:py-20\"\n            }>\n            {title}\n        </h2>\n    );\n};\n\nexport default SectionHeading;"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Grids & Layouts"
+    ],
+    "tags": [
+      "hover"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/scrolltrigger-replication/component"
+  }
+}

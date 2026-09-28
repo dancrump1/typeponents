@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pixel-image",
+  "type": "registry:ui",
+  "title": "Pixel Image",
+  "description": "Pixel Image",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/pixel-image.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/pixel-image.tsx",
+      "content": "\"use client\";\n\nimport { memo, useEffect, useMemo, useState } from \"react\";\n\nimport Image from \"next/image\";\n\nimport { cn } from \"@/lib/utils\";\n\n// Credit:\n// https://magicui.design/docs/components/pixel-image\n\ntype Grid = {\n\trows: number;\n\tcols: number;\n};\n\nconst DEFAULT_GRIDS: Record<string, Grid> = {\n\t\"6x4\": { rows: 4, cols: 6 },\n\t\"8x8\": { rows: 8, cols: 8 },\n\t\"8x3\": { rows: 3, cols: 8 },\n\t\"4x6\": { rows: 6, cols: 4 },\n\t\"3x8\": { rows: 8, cols: 3 },\n};\n\ntype PredefinedGridKey = keyof typeof DEFAULT_GRIDS;\n\ninterface PixelImageProps {\n\tsrc: string;\n\tgrid?: PredefinedGridKey;\n\tcustomGrid?: Grid;\n\tgrayscaleAnimation?: boolean;\n\tpixelFadeInDuration?: number; // in ms\n\tmaxAnimationDelay?: number; // in ms\n\tcolorRevealDelay?: number; // in ms\n}\n\nconst PixelImage = ({\n\tsrc,\n\tgrid = \"6x4\",\n\tgrayscaleAnimation = true,\n\tpixelFadeInDuration = 1000,\n\tmaxAnimationDelay = 1200,\n\tcolorRevealDelay = 1300,\n\tcustomGrid,\n}: PixelImageProps) => {\n\tconst [isVisible, setIsVisible] = useState(false);\n\tconst [showColor, setShowColor] = useState(false);\n\n\tconst MIN_GRID = 1;\n\tconst MAX_GRID = 16;\n\n\tconst { rows, cols } = useMemo(() => {\n\t\tconst isValidGrid = (grid?: Grid) => {\n\t\t\tif (!grid) return false;\n\t\t\tconst { rows, cols } = grid;\n\t\t\treturn (\n\t\t\t\tNumber.isInteger(rows) &&\n\t\t\t\tNumber.isInteger(cols) &&\n\t\t\t\trows >= MIN_GRID &&\n\t\t\t\tcols >= MIN_GRID &&\n\t\t\t\trows <= MAX_GRID &&\n\t\t\t\tcols <= MAX_GRID\n\t\t\t);\n\t\t};\n\n\t\treturn isValidGrid(customGrid) ? customGrid! : DEFAULT_GRIDS[grid];\n\t}, [customGrid, grid]);\n\n\tuseEffect(() => {\n\t\tsetIsVisible(true);\n\t\tconst colorTimeout = setTimeout(() => {\n\t\t\tsetShowColor(true);\n\t\t}, colorRevealDelay);\n\t\treturn () => clearTimeout(colorTimeout);\n\t}, [colorRevealDelay]);\n\n\tconst pieces = useMemo(() => {\n\t\tconst total = rows * cols;\n\t\treturn Array.from({ length: total }, (_, index) => {\n\t\t\tconst row = Math.floor(index / cols);\n\t\t\tconst col = index % cols;\n\n\t\t\tconst clipPath = `polygon(\n        ${col * (100 / cols)}% ${row * (100 / rows)}%,\n        ${(col + 1) * (100 / cols)}% ${row * (100 / rows)}%,\n        ${(col + 1) * (100 / cols)}% ${(row + 1) * (100 / rows)}%,\n        ${col * (100 / cols)}% ${(row + 1) * (100 / rows)}%\n      )`;\n\n\t\t\tconst delay = Math.random() * maxAnimationDelay;\n\t\t\treturn {\n\t\t\t\tclipPath,\n\t\t\t\tdelay,\n\t\t\t};\n\t\t});\n\t}, [rows, cols, maxAnimationDelay]);\n\n\treturn (\n\t\t<div className=\"relative h-72 w-72 select-none md:h-96 md:w-96\">\n\t\t\t{pieces.map((piece, index) => (\n\t\t\t\t<div\n\t\t\t\t\tkey={index}\n\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\"absolute inset-0 transition-opacity ease-out\",\n\t\t\t\t\t\tisVisible ? \"opacity-100\" : \"opacity-0\"\n\t\t\t\t\t)}\n\t\t\t\t\tstyle={{\n\t\t\t\t\t\tclipPath: piece.clipPath,\n\t\t\t\t\t\ttransitionDelay: `${piece.delay}ms`,\n\t\t\t\t\t\ttransitionDuration: `${pixelFadeInDuration}ms`,\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<Image\n\t\t\t\t\t\tsrc={src}\n\t\t\t\t\t\tfill\n\t\t\t\t\t\talt={`Pixel image piece ${index + 1}`}\n\t\t\t\t\t\tclassName={cn(\n\t\t\t\t\t\t\t\"z-1 object-cover rounded-[2.5rem]\",\n\t\t\t\t\t\t\tgrayscaleAnimation &&\n\t\t\t\t\t\t\t\t(showColor ? \"grayscale-0\" : \"grayscale\")\n\t\t\t\t\t\t)}\n\t\t\t\t\t\tstyle={{\n\t\t\t\t\t\t\ttransition: grayscaleAnimation\n\t\t\t\t\t\t\t\t? `filter ${pixelFadeInDuration}ms cubic-bezier(0.4, 0, 0.2, 1)`\n\t\t\t\t\t\t\t\t: \"none\",\n\t\t\t\t\t\t}}\n\t\t\t\t\t\tdraggable={false}\n\t\t\t\t\t/>\n\t\t\t\t</div>\n\t\t\t))}\n\t\t</div>\n\t);\n};\n\nexport default memo(PixelImage);\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Images"
+    ],
+    "tags": [
+      "drag"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Magic UI",
+      "url": "https://magicui.design/docs/components/pixel-image",
+      "authorUrl": "https://magicui.design",
+      "relationship": "adaptation"
+    },
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/pixel-image"
+  }
+}

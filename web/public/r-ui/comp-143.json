@@ -1,0 +1,27 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-143",
+  "type": "registry:component",
+  "title": "Comp 143",
+  "description": "Comp 143",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-143.tsx",
+      "content": "import { useId } from \"react\";\r\n\r\nimport { Checkbox } from \"@/components/ui/checkbox\";\r\nimport { Label } from \"@/components/ui/label\";\r\n\r\nexport default function Component() {\r\n\tconst id = useId();\r\n\treturn (\r\n\t\t<div className=\"flex items-start gap-2\">\r\n\t\t\t<Checkbox\r\n\t\t\t\tid={id}\r\n\t\t\t\tclassName=\"order-1\"\r\n\t\t\t\taria-describedby={`${id}-description`}\r\n\t\t\t/>\r\n\t\t\t<div className=\"grid grow gap-2\">\r\n\t\t\t\t<Label htmlFor={id}>\r\n\t\t\t\t\tLabel{\" \"}\r\n\t\t\t\t\t<span className=\"text-muted-foreground text-xs leading-[inherit] font-normal\">\r\n\t\t\t\t\t\t(Sublabel)\r\n\t\t\t\t\t</span>\r\n\t\t\t\t</Label>\r\n\t\t\t\t<p\r\n\t\t\t\t\tid={`${id}-description`}\r\n\t\t\t\t\tclassName=\"text-muted-foreground text-xs\"\r\n\t\t\t\t>\r\n\t\t\t\t\tYou can use this checkbox with a label and a description.\r\n\t\t\t\t</p>\r\n\t\t\t</div>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/checkbox.tsx",
+      "content": "\"use client\";\r\n\r\nimport React from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport * as CheckboxPrimitive from \"@radix-ui/react-checkbox\";\r\nimport { Check } from \"lucide-react\";\r\n\r\nconst Checkbox = React.forwardRef<\r\n\tReact.ElementRef<typeof CheckboxPrimitive.Root>,\r\n\tReact.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>\r\n>(({ className, ...props }, ref) => (\r\n\t<CheckboxPrimitive.Root\r\n\t\tref={ref}\r\n\t\tclassName={cn(\r\n\t\t\t\"peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground\",\r\n\t\t\tclassName\r\n\t\t)}\r\n\t\t{...props}\r\n\t>\r\n\t\t<CheckboxPrimitive.Indicator\r\n\t\t\tclassName={cn(\"flex items-center justify-center text-current\")}\r\n\t\t>\r\n\t\t\t<Check className=\"h-4 w-4\" />\r\n\t\t</CheckboxPrimitive.Indicator>\r\n\t</CheckboxPrimitive.Root>\r\n));\r\nCheckbox.displayName = CheckboxPrimitive.Root.displayName;\r\n\r\nexport { Checkbox };\r\n",
+      "type": "registry:ui"
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "content": "\"use client\";\n\nimport React from \"react\";\n\nimport { cn } from \"@/lib/utils\";\nimport * as LabelPrimitive from \"@radix-ui/react-label\";\nimport { cva, type VariantProps } from \"class-variance-authority\";\n\nconst labelVariants = cva(\n\t\"text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70\"\n);\n\nconst Label = React.forwardRef<\n\tReact.ElementRef<typeof LabelPrimitive.Root>,\n\tReact.ComponentPropsWithoutRef<typeof LabelPrimitive.Root> &\n\t\tVariantProps<typeof labelVariants>\n>(({ className, ...props }, ref) => (\n\t<LabelPrimitive.Root\n\t\tref={ref}\n\t\tclassName={cn(labelVariants(), className)}\n\t\t{...props}\n\t/>\n));\nLabel.displayName = LabelPrimitive.Root.displayName;\n\nexport { Label };\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

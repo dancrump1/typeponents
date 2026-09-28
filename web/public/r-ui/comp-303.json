@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-303",
+  "type": "registry:component",
+  "title": "Comp 303",
+  "description": "Comp 303",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-303.tsx",
+      "content": "import { EclipseIcon } from \"lucide-react\"\r\n\r\nexport default function Component() {\r\n  return (\r\n    <div className=\"dark bg-muted text-foreground px-4 py-3\">\r\n      <p className=\"text-center text-sm\">\r\n        <EclipseIcon\r\n          className=\"me-3 -mt-0.5 inline-flex opacity-60\"\r\n          size={16}\r\n          aria-hidden=\"true\"\r\n        />\r\n        Get the most out of your app with real-time updates and analytics{\" \"}\r\n        <span className=\"text-muted-foreground\">·</span>{\" \"}\r\n        <a href=\"#\" className=\"font-medium underline hover:no-underline\">\r\n          Upgrade\r\n        </a>\r\n      </p>\r\n    </div>\r\n  )\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

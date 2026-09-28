@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fuzzy-text",
+  "type": "registry:ui",
+  "title": "Fuzzy Text",
+  "description": "Fuzzy Text",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/fuzzy-text.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/fuzzy-text.tsx",
+      "content": "import React, { useEffect, useRef } from \"react\";\r\n\r\n// Credit:\r\n// https://www.reactbits.dev/text-animations/fuzzy-text\r\n\r\ninterface FuzzyTextProps {\r\n\tchildren: React.ReactNode;\r\n\tfontSize?: number | string;\r\n\tfontWeight?: string | number;\r\n\tfontFamily?: string;\r\n\tcolor?: string;\r\n\tenableHover?: boolean;\r\n\tbaseIntensity?: number;\r\n\thoverIntensity?: number;\r\n}\r\n\r\nconst FuzzyText: React.FC<FuzzyTextProps> = ({\r\n\tchildren,\r\n\tfontSize = \"clamp(2rem, 8vw, 8rem)\",\r\n\tfontWeight = 900,\r\n\tfontFamily = \"inherit\",\r\n\tcolor = \"#fff\",\r\n\tenableHover = true,\r\n\tbaseIntensity = 0.18,\r\n\thoverIntensity = 0.5,\r\n}) => {\r\n\tconst canvasRef = useRef<HTMLCanvasElement>(null);\r\n\r\n\tuseEffect(() => {\r\n\t\tconst canvas = canvasRef.current;\r\n\t\tif (!canvas) return;\r\n\t\tconst ctx = canvas.getContext(\"2d\");\r\n\t\tif (!ctx) return;\r\n\r\n\t\tconst computedFontFamily =\r\n\t\t\tfontFamily === \"inherit\"\r\n\t\t\t\t? window.getComputedStyle(canvas).fontFamily || \"sans-serif\"\r\n\t\t\t\t: fontFamily;\r\n\r\n\t\tconst fontSizeStr =\r\n\t\t\ttypeof fontSize === \"number\" ? `${fontSize}px` : fontSize;\r\n\t\tlet numericFontSize: number;\r\n\t\tif (typeof fontSize === \"number\") {\r\n\t\t\tnumericFontSize = fontSize;\r\n\t\t} else {\r\n\t\t\tconst temp = document.createElement(\"span\");\r\n\t\t\ttemp.style.fontSize = fontSize;\r\n\t\t\tdocument.body.appendChild(temp);\r\n\t\t\tconst computedSize = window.getComputedStyle(temp).fontSize;\r\n\t\t\tnumericFontSize = parseFloat(computedSize);\r\n\t\t\tdocument.body.removeChild(temp);\r\n\t\t}\r\n\r\n\t\tconst text = React.Children.toArray(children).join(\"\");\r\n\r\n\t\tconst offscreen = document.createElement(\"canvas\");\r\n\t\tconst offCtx = offscreen.getContext(\"2d\");\r\n\t\tif (!offCtx) return;\r\n\r\n\t\toffCtx.font = `${fontWeight} ${fontSizeStr} ${computedFontFamily}`;\r\n\t\toffCtx.textBaseline = \"alphabetic\";\r\n\t\tconst metrics = offCtx.measureText(text);\r\n\r\n\t\tconst actualLeft = metrics.actualBoundingBoxLeft ?? 0;\r\n\t\tconst actualRight = metrics.actualBoundingBoxRight ?? metrics.width;\r\n\t\tconst actualAscent = metrics.actualBoundingBoxAscent ?? numericFontSize;\r\n\t\tconst actualDescent =\r\n\t\t\tmetrics.actualBoundingBoxDescent ?? numericFontSize * 0.2;\r\n\r\n\t\tconst textBoundingWidth = Math.ceil(actualLeft + actualRight);\r\n\t\tconst tightHeight = Math.ceil(actualAscent + actualDescent);\r\n\r\n\t\tconst extraWidthBuffer = 10;\r\n\t\tconst offscreenWidth = textBoundingWidth + extraWidthBuffer;\r\n\r\n\t\toffscreen.width = offscreenWidth;\r\n\t\toffscreen.height = tightHeight;\r\n\r\n\t\tconst xOffset = extraWidthBuffer / 2;\r\n\t\toffCtx.font = `${fontWeight} ${fontSizeStr} ${computedFontFamily}`;\r\n\t\toffCtx.textBaseline = \"alphabetic\";\r\n\t\toffCtx.fillStyle = color;\r\n\t\toffCtx.fillText(text, xOffset - actualLeft, actualAscent);\r\n\r\n\t\tconst horizontalMargin = 50;\r\n\t\tconst verticalMargin = 0;\r\n\t\tcanvas.width = offscreenWidth + horizontalMargin * 2;\r\n\t\tcanvas.height = tightHeight + verticalMargin * 2;\r\n\t\tctx.translate(horizontalMargin, verticalMargin);\r\n\r\n\t\tconst interactiveLeft = horizontalMargin + xOffset;\r\n\t\tconst interactiveTop = verticalMargin;\r\n\t\tconst interactiveRight = interactiveLeft + textBoundingWidth;\r\n\t\tconst interactiveBottom = interactiveTop + tightHeight;\r\n\r\n\t\tlet isHovering = false;\r\n\t\tconst fuzzRange = 30;\r\n\t\tlet animationFrameId: number;\r\n\r\n\t\tconst run = () => {\r\n\t\t\tctx.clearRect(\r\n\t\t\t\t-fuzzRange,\r\n\t\t\t\t-fuzzRange,\r\n\t\t\t\toffscreenWidth + 2 * fuzzRange,\r\n\t\t\t\ttightHeight + 2 * fuzzRange\r\n\t\t\t);\r\n\t\t\tconst intensity = isHovering ? hoverIntensity : baseIntensity;\r\n\t\t\tfor (let j = 0; j < tightHeight; j++) {\r\n\t\t\t\tconst dx = Math.floor(\r\n\t\t\t\t\tintensity * (Math.random() - 0.5) * fuzzRange\r\n\t\t\t\t);\r\n\t\t\t\tctx.drawImage(\r\n\t\t\t\t\toffscreen,\r\n\t\t\t\t\t0,\r\n\t\t\t\t\tj,\r\n\t\t\t\t\toffscreenWidth,\r\n\t\t\t\t\t1,\r\n\t\t\t\t\tdx,\r\n\t\t\t\t\tj,\r\n\t\t\t\t\toffscreenWidth,\r\n\t\t\t\t\t1\r\n\t\t\t\t);\r\n\t\t\t}\r\n\t\t\tanimationFrameId = window.requestAnimationFrame(run);\r\n\t\t};\r\n\r\n\t\trun();\r\n\r\n\t\tconst isInsideTextArea = (x: number, y: number) => {\r\n\t\t\treturn (\r\n\t\t\t\tx >= interactiveLeft &&\r\n\t\t\t\tx <= interactiveRight &&\r\n\t\t\t\ty >= interactiveTop &&\r\n\t\t\t\ty <= interactiveBottom\r\n\t\t\t);\r\n\t\t};\r\n\r\n\t\tconst handleMouseMove = (e: MouseEvent) => {\r\n\t\t\tif (!enableHover) return;\r\n\t\t\tconst rect = canvas.getBoundingClientRect();\r\n\t\t\tconst x = e.clientX - rect.left;\r\n\t\t\tconst y = e.clientY - rect.top;\r\n\t\t\tisHovering = isInsideTextArea(x, y);\r\n\t\t};\r\n\r\n\t\tconst handleMouseLeave = () => {\r\n\t\t\tisHovering = false;\r\n\t\t};\r\n\r\n\t\tconst handleTouchMove = (e: TouchEvent) => {\r\n\t\t\tif (!enableHover) return;\r\n\t\t\te.preventDefault();\r\n\t\t\tconst rect = canvas.getBoundingClientRect();\r\n\t\t\tconst touch = e.touches[0];\r\n\t\t\tconst x = touch.clientX - rect.left;\r\n\t\t\tconst y = touch.clientY - rect.top;\r\n\t\t\tisHovering = isInsideTextArea(x, y);\r\n\t\t};\r\n\r\n\t\tconst handleTouchEnd = () => {\r\n\t\t\tisHovering = false;\r\n\t\t};\r\n\r\n\t\tif (enableHover) {\r\n\t\t\tcanvas.addEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\tcanvas.addEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t\tcanvas.addEventListener(\"touchmove\", handleTouchMove, {\r\n\t\t\t\tpassive: false,\r\n\t\t\t});\r\n\t\t\tcanvas.addEventListener(\"touchend\", handleTouchEnd);\r\n\t\t}\r\n\r\n\t\treturn () => {\r\n\t\t\twindow.cancelAnimationFrame(animationFrameId);\r\n\t\t\tif (enableHover) {\r\n\t\t\t\tcanvas.removeEventListener(\"mousemove\", handleMouseMove);\r\n\t\t\t\tcanvas.removeEventListener(\"mouseleave\", handleMouseLeave);\r\n\t\t\t\tcanvas.removeEventListener(\"touchmove\", handleTouchMove);\r\n\t\t\t\tcanvas.removeEventListener(\"touchend\", handleTouchEnd);\r\n\t\t\t}\r\n\t\t};\r\n\t}, [\r\n\t\tchildren,\r\n\t\tfontSize,\r\n\t\tfontWeight,\r\n\t\tfontFamily,\r\n\t\tcolor,\r\n\t\tenableHover,\r\n\t\tbaseIntensity,\r\n\t\thoverIntensity,\r\n\t]);\r\n\r\n\treturn <canvas ref={canvasRef} />;\r\n};\r\n\r\nexport default FuzzyText;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text"
+    ],
+    "tags": [
+      "canvas",
+      "cursor-tracking",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "React Bits",
+      "url": "https://www.reactbits.dev/text-animations/fuzzy-text",
+      "authorUrl": "https://www.reactbits.dev",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "fontSize",
+        "type": "string | number",
+        "default": "\"clamp(2rem, 8vw, 8rem)\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontWeight",
+        "type": "string | number",
+        "default": "900",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "fontFamily",
+        "type": "string",
+        "default": "\"inherit\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"#fff\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "enableHover",
+        "type": "boolean",
+        "default": "true",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "baseIntensity",
+        "type": "number",
+        "default": "0.18",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "hoverIntensity",
+        "type": "number",
+        "default": "0.5",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": true,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/fuzzy-text"
+  }
+}

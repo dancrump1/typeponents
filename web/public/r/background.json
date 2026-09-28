@@ -1,0 +1,36 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "background",
+  "type": "registry:ui",
+  "title": "Background",
+  "description": "Full-screen hero image with a tint overlay, loaded at whichever size suits the viewport.",
+  "dependencies": [],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/background.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/background.tsx",
+      "content": "import React from \"react\";\r\n\r\nconst Background = ({ image, position = \"center\" }) => {\r\n\treturn (\r\n\t\t<>\r\n\t\t\t<picture className=\"bkg\">\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 450px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={450}\r\n\t\t\t\t\theight={750}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 750px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={750}\r\n\t\t\t\t\theight={750}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 1050px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={1300}\r\n\t\t\t\t\theight={1300}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 1400px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={1400}\r\n\t\t\t\t\theight={1200}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 2000px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={2000}\r\n\t\t\t\t\theight={1250}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<source\r\n\t\t\t\t\tmedia=\"(max-width: 2500px)\"\r\n\t\t\t\t\tsrcSet={image.url}\r\n\t\t\t\t\twidth={2500}\r\n\t\t\t\t\theight={1400}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t/>\r\n\t\t\t\t<img\r\n\t\t\t\t\tsrc={image.url}\r\n\t\t\t\t\twidth={5000}\r\n\t\t\t\t\theight={2800}\r\n\t\t\t\t\tstyle={{ objectFit: \"cover\" }}\r\n\t\t\t\t\talt={image.title}\r\n\t\t\t\t\tclassName={`h-screen w-screen object-cover object-${position}`}\r\n\t\t\t\t/>\r\n\t\t\t</picture>\r\n\t\t\t<div className=\"overlay\"></div>\r\n\t\t</>\r\n\t);\r\n};\r\n\r\nexport default Background;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Backgrounds"
+    ],
+    "tags": [],
+    "interaction": "Static layout — the image is picked to match the screen width on load and does not respond to input.",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/background"
+  }
+}

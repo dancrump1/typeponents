@@ -1,0 +1,43 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hover-greyscale-logo-carousel",
+  "type": "registry:ui",
+  "title": "Hover Greyscale Logo Carousel",
+  "description": "Hover Greyscale Logo Carousel",
+  "dependencies": [
+    "motion",
+    "react-icons",
+    "react-use-measure"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/hover-greyscale-logo-carousel.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/hover-greyscale-logo-carousel.tsx",
+      "content": "import { motion, useAnimationFrame, useMotionValue } from \"motion/react\";\r\nimport { useState, type Dispatch, type SetStateAction } from \"react\";\r\nimport type { IconType } from \"react-icons\";\r\nimport {\r\n    SiAirtable,\r\n    SiAsana,\r\n    SiAtlassian,\r\n    SiCanva,\r\n    SiDropbox,\r\n    SiFigma,\r\n    SiGoogle,\r\n    SiHubspot,\r\n    SiMiro,\r\n    SiShopify,\r\n    SiStripe,\r\n    SiTwilio,\r\n    SiWoocommerce,\r\n} from \"react-icons/si\";\r\nimport useMeasure from \"react-use-measure\";\r\n\r\ntype Logo = {\r\n    id: string;\r\n    name: string;\r\n    Icon: IconType;\r\n    brandColor: string;\r\n};\r\n\r\nconst LOGOS: Logo[] = [\r\n    { id: \"stripe\", name: \"stripe\", Icon: SiStripe, brandColor: \"#635bff\" },\r\n    { id: \"google\", name: \"Google\", Icon: SiGoogle, brandColor: \"#4285f4\" },\r\n    { id: \"shopify\", name: \"shopify\", Icon: SiShopify, brandColor: \"#7ab55c\" },\r\n    { id: \"figma\", name: \"Figma\", Icon: SiFigma, brandColor: \"#111827\" },\r\n    { id: \"miro\", name: \"Miro\", Icon: SiMiro, brandColor: \"#f7c600\" },\r\n    { id: \"dropbox\", name: \"Dropbox\", Icon: SiDropbox, brandColor: \"#0061ff\" },\r\n    { id: \"asana\", name: \"Asana\", Icon: SiAsana, brandColor: \"#f06a6a\" },\r\n    {\r\n        id: \"atlassian\",\r\n        name: \"Atlassian\",\r\n        Icon: SiAtlassian,\r\n        brandColor: \"#1868db\",\r\n    },\r\n    { id: \"airtable\", name: \"Airtable\", Icon: SiAirtable, brandColor: \"#f97316\" },\r\n    { id: \"hubspot\", name: \"HubSpot\", Icon: SiHubspot, brandColor: \"#ff7a59\" },\r\n    { id: \"twilio\", name: \"Twilio\", Icon: SiTwilio, brandColor: \"#f22f46\" },\r\n    {\r\n        id: \"woocommerce\",\r\n        name: \"woo\",\r\n        Icon: SiWoocommerce,\r\n        brandColor: \"#7f54b3\",\r\n    },\r\n    { id: \"canva\", name: \"Canva\", Icon: SiCanva, brandColor: \"#00c4cc\" },\r\n];\r\n\r\nconst SCROLL_SPEED = 56;\r\n\r\n\r\n\r\nconst HoverGreyscaleLogoCarousel = () => {\r\n    const [hoveredLogo, setHoveredLogo] = useState<string | null>(null);\r\n    const [measureRef, { width }] = useMeasure();\r\n    const x = useMotionValue(0);\r\n\r\n    useAnimationFrame((_, delta) => {\r\n        if (hoveredLogo || !width) {\r\n            return;\r\n        }\r\n\r\n        const next = x.get() - (delta / 1000) * SCROLL_SPEED;\r\n        x.set(next <= -width ? next + width : next);\r\n    });\r\n\r\n    return (\r\n        <div className=\"border-y border-neutral-300 px-4\">\r\n            <div className=\"max-w-7xl mx-auto border-x border-neutral-300\">\r\n                <motion.div\r\n                    initial={{ opacity: 0, y: 24 }}\r\n                    animate={{ opacity: 1, y: 0 }}\r\n                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}\r\n                    className=\"overflow-hidden bg-white\"\r\n                >\r\n                    <div className=\"overflow-hidden\">\r\n                        <motion.div style={{ x }} className=\"flex w-max\">\r\n                            <div ref={measureRef} className=\"flex\">\r\n                                {LOGOS.map((logo) => (\r\n                                    <LogoCell\r\n                                        key={`primary-${logo.id}`}\r\n                                        hoveredLogo={hoveredLogo}\r\n                                        logo={logo}\r\n                                        setHoveredLogo={setHoveredLogo}\r\n                                    />\r\n                                ))}\r\n                            </div>\r\n                            <div className=\"flex\">\r\n                                {LOGOS.map((logo) => (\r\n                                    <LogoCell\r\n                                        key={`duplicate-${logo.id}`}\r\n                                        hoveredLogo={hoveredLogo}\r\n                                        logo={logo}\r\n                                        setHoveredLogo={setHoveredLogo}\r\n                                    />\r\n                                ))}\r\n                            </div>\r\n                        </motion.div>\r\n                    </div>\r\n                </motion.div>\r\n            </div>\r\n        </div>\r\n    );\r\n};\r\n\r\nconst LogoCell = ({\r\n    hoveredLogo,\r\n    logo,\r\n    setHoveredLogo,\r\n}: {\r\n    hoveredLogo: string | null;\r\n    logo: Logo;\r\n    setHoveredLogo: Dispatch<SetStateAction<string | null>>;\r\n}) => {\r\n    const isDimmed = hoveredLogo !== null && hoveredLogo !== logo.id;\r\n\r\n    return (\r\n        <motion.button\r\n            type=\"button\"\r\n            onPointerEnter={() => setHoveredLogo(logo.id)}\r\n            onPointerLeave={() =>\r\n                setHoveredLogo((current) => (current === logo.id ? null : current))\r\n            }\r\n            onFocus={() => setHoveredLogo(logo.id)}\r\n            onBlur={() =>\r\n                setHoveredLogo((current) => (current === logo.id ? null : current))\r\n            }\r\n            animate={{\r\n                filter: isDimmed ? \"grayscale(1)\" : \"grayscale(0)\",\r\n                opacity: isDimmed ? 0.5 : 1,\r\n            }}\r\n            whileHover={{ y: -3 }}\r\n            transition={{ duration: 0.25, ease: \"easeOut\" }}\r\n            className=\"flex h-[72px] min-w-[148px] items-center justify-center px-5 md:h-[82px] md:min-w-[176px] md:px-7\"\r\n            aria-label={logo.name}\r\n        >\r\n            <div\r\n                className=\"flex items-center gap-3 whitespace-nowrap transition-transform duration-200\"\r\n                style={{ color: logo.brandColor }}\r\n            >\r\n                <logo.Icon className=\"text-[1.15rem] md:text-[1.3rem]\" />\r\n                <span className=\"text-[1rem] font-semibold tracking-[-0.04em] md:text-[1.35rem]\">\r\n                    {logo.name}\r\n                </span>\r\n            </div>\r\n        </motion.button>\r\n    );\r\n};\r\n\r\nexport default HoverGreyscaleLogoCarousel;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Carousels"
+    ],
+    "tags": [
+      "hover",
+      "autoplay"
+    ],
+    "interaction": "",
+    "inspiration": null,
+    "props": [],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/hover-greyscale-logo-carousel"
+  }
+}

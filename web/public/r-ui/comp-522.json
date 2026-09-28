@@ -1,0 +1,17 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "comp-522",
+  "type": "registry:component",
+  "title": "Comp 522",
+  "description": "Comp 522",
+  "files": [
+    {
+      "path": "registry/ui-basic/comp-522.tsx",
+      "content": "import {\r\n\tStepper,\r\n\tStepperDescription,\r\n\tStepperIndicator,\r\n\tStepperItem,\r\n\tStepperSeparator,\r\n\tStepperTitle,\r\n\tStepperTrigger,\r\n} from \"@/components/ui/stepper\";\r\n\r\nconst steps = [\r\n\t{\r\n\t\tstep: 1,\r\n\t\ttitle: \"Step One\",\r\n\t\tdescription: \"Desc for step one\",\r\n\t},\r\n\t{\r\n\t\tstep: 2,\r\n\t\ttitle: \"Step Two\",\r\n\t\tdescription: \"Desc for step two\",\r\n\t},\r\n\t{\r\n\t\tstep: 3,\r\n\t\ttitle: \"Step Three\",\r\n\t\tdescription: \"Desc for step three\",\r\n\t},\r\n];\r\n\r\nexport default function Component() {\r\n\treturn (\r\n\t\t<div className=\"space-y-8 text-center\">\r\n\t\t\t<Stepper defaultValue={2}>\r\n\t\t\t\t{steps.map(({ step, title, description }) => (\r\n\t\t\t\t\t<StepperItem\r\n\t\t\t\t\t\tkey={step}\r\n\t\t\t\t\t\tstep={step}\r\n\t\t\t\t\t\tclassName=\"relative flex-1 flex-col!\"\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t<StepperTrigger className=\"flex-col gap-3 rounded\">\r\n\t\t\t\t\t\t\t<StepperIndicator />\r\n\t\t\t\t\t\t\t<div className=\"space-y-0.5 px-2\">\r\n\t\t\t\t\t\t\t\t<StepperTitle>{title}</StepperTitle>\r\n\t\t\t\t\t\t\t\t<StepperDescription className=\"max-sm:hidden\">\r\n\t\t\t\t\t\t\t\t\t{description}\r\n\t\t\t\t\t\t\t\t</StepperDescription>\r\n\t\t\t\t\t\t\t</div>\r\n\t\t\t\t\t\t</StepperTrigger>\r\n\t\t\t\t\t\t{step < steps.length && (\r\n\t\t\t\t\t\t\t<StepperSeparator className=\"absolute inset-x-0 top-3 left-[calc(50%+0.75rem+0.125rem)] -order-1 m-0 -translate-y-1/2 group-data-[orientation=horizontal]/stepper:w-[calc(100%-1.5rem-0.25rem)] group-data-[orientation=horizontal]/stepper:flex-none\" />\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t</StepperItem>\r\n\t\t\t\t))}\r\n\t\t\t</Stepper>\r\n\t\t\t<p\r\n\t\t\t\tclassName=\"text-muted-foreground mt-2 text-xs\"\r\n\t\t\t\trole=\"region\"\r\n\t\t\t\taria-live=\"polite\"\r\n\t\t\t>\r\n\t\t\t\tStepper with titles and descriptions\r\n\t\t\t</p>\r\n\t\t</div>\r\n\t);\r\n}\r\n",
+      "type": "registry:ui"
+    }
+  ],
+  "categories": [
+    "ui-primitive"
+  ]
+}

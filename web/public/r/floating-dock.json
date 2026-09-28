@@ -1,0 +1,69 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "floating-dock",
+  "type": "registry:ui",
+  "title": "Floating Dock",
+  "description": "Floating Dock",
+  "dependencies": [
+    "@tabler/icons-react",
+    "motion",
+    "react-icons"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/floating-dock.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/floating-dock.tsx",
+      "content": "/**\n * Note: Use position fixed according to your needs\n * Desktop navbar is better positioned at the bottom\n * Mobile navbar is better positioned at bottom right.\n **/\n\nimport { useRef, useState } from \"react\";\n\nimport Link from \"next/link\";\n\nimport { cn } from \"@/lib/utils\";\nimport {\n\tIconBrandGithub,\n\tIconBrandX,\n\tIconExchange,\n\tIconHome,\n\tIconNewSection,\n\tIconTerminal2,\n} from \"@tabler/icons-react\";\nimport {\n\tAnimatePresence,\n\tmotion,\n\tMotionValue,\n\tuseMotionValue,\n\tuseSpring,\n\tuseTransform,\n} from \"motion/react\";\nimport { FiMenu } from \"react-icons/fi\";\n\n// https://ui.aceternity.com/components/floating-dock\n\nconst links = [\n\t{\n\t\ttitle: \"Home\",\n\t\ticon: (\n\t\t\t<IconHome className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n\n\t{\n\t\ttitle: \"Products\",\n\t\ticon: (\n\t\t\t<IconTerminal2 className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n\t{\n\t\ttitle: \"Components\",\n\t\ticon: (\n\t\t\t<IconNewSection className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n\t{\n\t\ttitle: \"Aceternity UI\",\n\t\ticon: (\n\t\t\t<img\n\t\t\t\tsrc=\"https://assets.aceternity.com/logo-dark.png\"\n\t\t\t\twidth={20}\n\t\t\t\theight={20}\n\t\t\t\talt=\"Aceternity Logo\"\n\t\t\t/>\n\t\t),\n\t\thref: \"#\",\n\t},\n\t{\n\t\ttitle: \"Changelog\",\n\t\ticon: (\n\t\t\t<IconExchange className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n\n\t{\n\t\ttitle: \"Twitter\",\n\t\ticon: (\n\t\t\t<IconBrandX className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n\t{\n\t\ttitle: \"GitHub\",\n\t\ticon: (\n\t\t\t<IconBrandGithub className=\"h-full w-full text-foreground dark:text-foreground\" />\n\t\t),\n\t\thref: \"#\",\n\t},\n];\n\nexport const FloatingDock = ({\n\titems = links,\n\tdesktopClassName,\n\tmobileClassName,\n}: {\n\titems: { title: string; icon: React.ReactNode; href: string }[];\n\tdesktopClassName?: string;\n\tmobileClassName?: string;\n}) => {\n\treturn (\n\t\t<>\n\t\t\t<FloatingDockDesktop items={items} className={desktopClassName} />\n\t\t\t<FloatingDockMobile items={items} className={mobileClassName} />\n\t\t</>\n\t);\n};\n\nconst FloatingDockMobile = ({\n\titems,\n\tclassName,\n}: {\n\titems: { title: string; icon: React.ReactNode; href: string }[];\n\tclassName?: string;\n}) => {\n\tconst [open, setOpen] = useState(false);\n\treturn (\n\t\t<div className={cn(\"relative block md:hidden\", className)}>\n\t\t\t<AnimatePresence>\n\t\t\t\t{open && (\n\t\t\t\t\t<motion.div\n\t\t\t\t\t\tlayoutId=\"nav\"\n\t\t\t\t\t\tclassName=\"absolute top-12 right-12 mb-2 inset-x-0 flex flex-col gap-2\"\n\t\t\t\t\t>\n\t\t\t\t\t\t{items.map((item, idx) => (\n\t\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\t\tkey={item.title}\n\t\t\t\t\t\t\t\tinitial={{ opacity: 0, y: -10 }}\n\t\t\t\t\t\t\t\tanimate={{\n\t\t\t\t\t\t\t\t\topacity: 1,\n\t\t\t\t\t\t\t\t\ty: 0,\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\texit={{\n\t\t\t\t\t\t\t\t\topacity: 0,\n\t\t\t\t\t\t\t\t\ty: -10,\n\t\t\t\t\t\t\t\t\ttransition: {\n\t\t\t\t\t\t\t\t\t\tdelay: (items.length - 1 - idx) * 0.05,\n\t\t\t\t\t\t\t\t\t},\n\t\t\t\t\t\t\t\t}}\n\t\t\t\t\t\t\t\ttransition={{ delay: (items.length - 1 + idx) * 0.05 }}\n\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t<Link\n\t\t\t\t\t\t\t\t\thref={item.href}\n\t\t\t\t\t\t\t\t\tkey={item.title}\n\t\t\t\t\t\t\t\t\tclassName=\"h-10 w-10 rounded-full bg-background dark:bg-background flex items-center justify-center\"\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t<div className=\"h-4 w-4\">{item.icon}</div>\n\t\t\t\t\t\t\t\t</Link>\n\t\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t\t))}\n\t\t\t\t\t</motion.div>\n\t\t\t\t)}\n\t\t\t</AnimatePresence>\n\t\t\t<button\n\t\t\t\tonClick={() => setOpen(!open)}\n\t\t\t\tclassName=\"h-10 w-10 rounded-full bg-background dark:bg-background flex items-center justify-center\"\n\t\t\t>\n\t\t\t\t<FiMenu className=\"\" />\n\t\t\t</button>\n\t\t</div>\n\t);\n};\n\nconst FloatingDockDesktop = ({\n\titems,\n\tclassName,\n}: {\n\titems: { title: string; icon: React.ReactNode; href: string }[];\n\tclassName?: string;\n}) => {\n\tlet mouseX = useMotionValue(Infinity);\n\treturn (\n\t\t<motion.div\n\t\t\tonMouseMove={(e) => mouseX.set(e.pageX)}\n\t\t\tonMouseLeave={() => mouseX.set(Infinity)}\n\t\t\tclassName={cn(\n\t\t\t\t\"mx-auto hidden md:flex h-16 gap-4 items-end  rounded-2xl bg-background dark:bg-background px-4 pb-3\",\n\t\t\t\tclassName\n\t\t\t)}\n\t\t>\n\t\t\t{items.map((item) => (\n\t\t\t\t<IconContainer mouseX={mouseX} key={item.title} {...item} />\n\t\t\t))}\n\t\t</motion.div>\n\t);\n};\n\nfunction IconContainer({\n\tmouseX,\n\ttitle,\n\ticon,\n\thref,\n}: {\n\tmouseX: MotionValue;\n\ttitle: string;\n\ticon: React.ReactNode;\n\thref: string;\n}) {\n\tlet ref = useRef<HTMLDivElement>(null);\n\n\tlet distance = useTransform(mouseX, (val) => {\n\t\tlet bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };\n\n\t\treturn val - bounds.x - bounds.width / 2;\n\t});\n\n\tlet widthTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);\n\tlet heightTransform = useTransform(distance, [-150, 0, 150], [40, 80, 40]);\n\n\tlet widthTransformIcon = useTransform(\n\t\tdistance,\n\t\t[-150, 0, 150],\n\t\t[20, 40, 20]\n\t);\n\tlet heightTransformIcon = useTransform(\n\t\tdistance,\n\t\t[-150, 0, 150],\n\t\t[20, 40, 20]\n\t);\n\n\tlet width = useSpring(widthTransform, {\n\t\tmass: 0.1,\n\t\tstiffness: 150,\n\t\tdamping: 12,\n\t});\n\tlet height = useSpring(heightTransform, {\n\t\tmass: 0.1,\n\t\tstiffness: 150,\n\t\tdamping: 12,\n\t});\n\n\tlet widthIcon = useSpring(widthTransformIcon, {\n\t\tmass: 0.1,\n\t\tstiffness: 150,\n\t\tdamping: 12,\n\t});\n\tlet heightIcon = useSpring(heightTransformIcon, {\n\t\tmass: 0.1,\n\t\tstiffness: 150,\n\t\tdamping: 12,\n\t});\n\n\tconst [hovered, setHovered] = useState(false);\n\n\treturn (\n\t\t<Link href={href}>\n\t\t\t<motion.div\n\t\t\t\tref={ref}\n\t\t\t\tstyle={{ width, height }}\n\t\t\t\tonMouseEnter={() => setHovered(true)}\n\t\t\t\tonMouseLeave={() => setHovered(false)}\n\t\t\t\tclassName=\"aspect-square rounded-full bg-background dark:bg-background flex items-center justify-center relative\"\n\t\t\t>\n\t\t\t\t<AnimatePresence>\n\t\t\t\t\t{hovered && (\n\t\t\t\t\t\t<motion.div\n\t\t\t\t\t\t\tinitial={{ opacity: 0, y: 10, x: \"-50%\" }}\n\t\t\t\t\t\t\tanimate={{ opacity: 1, y: 0, x: \"-50%\" }}\n\t\t\t\t\t\t\texit={{ opacity: 0, y: 2, x: \"-50%\" }}\n\t\t\t\t\t\t\tclassName=\"px-2 py-0.5 whitespace-pre rounded-md bg-background border dark:bg-background dark:border-neutral-900 dark:text-foreground border-gray-200 text-foreground absolute left-1/2 -translate-x-1/2 -top-8 w-fit text-xs\"\n\t\t\t\t\t\t>\n\t\t\t\t\t\t\t{title}\n\t\t\t\t\t\t</motion.div>\n\t\t\t\t\t)}\n\t\t\t\t</AnimatePresence>\n\t\t\t\t<motion.div\n\t\t\t\t\tstyle={{ width: widthIcon, height: heightIcon }}\n\t\t\t\t\tclassName=\"flex items-center justify-center\"\n\t\t\t\t>\n\t\t\t\t\t{icon}\n\t\t\t\t</motion.div>\n\t\t\t</motion.div>\n\t\t</Link>\n\t);\n}\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Special Effects & FX"
+    ],
+    "tags": [
+      "spring",
+      "hover",
+      "cursor-tracking"
+    ],
+    "interaction": "",
+    "inspiration": {
+      "source": "Aceternity UI",
+      "url": "https://ui.aceternity.com/components/floating-dock",
+      "authorUrl": "https://ui.aceternity.com",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "items",
+        "type": "{ title: string; icon: React.ReactNode; href: string; }[]",
+        "default": "links",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "desktopClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "mobileClassName",
+        "type": "string",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/floating-dock"
+  }
+}

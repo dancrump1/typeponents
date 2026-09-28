@@ -1,0 +1,36 @@
+import { defineComponent } from "@/registry/schema";
+
+export default defineComponent({
+	slug: "gradient-background",
+	title: "Gradient Background",
+	description: "",
+	interaction: "",
+	categories: ["Backgrounds"],
+	tags: ["cursor-tracking"],
+	inspiration: {
+		source: "Aceternity UI",
+		url: "https://ui.aceternity.com/components/background-gradient-animation",
+		authorUrl: "https://ui.aceternity.com",
+		relationship: "adaptation",
+	},
+	dependencies: [],
+	registryDependencies: [],
+	props: [
+		{ name: "gradientBackgroundStart", type: "string", default: "\"rgb(108, 0, 162)\"" },
+		{ name: "gradientBackgroundEnd", type: "string", default: "\"rgb(0, 17, 82)\"" },
+		{ name: "firstColor", type: "string", default: "\"18, 113, 255\"" },
+		{ name: "secondColor", type: "string", default: "\"221, 74, 255\"" },
+		{ name: "thirdColor", type: "string", default: "\"100, 220, 255\"" },
+		{ name: "fourthColor", type: "string", default: "\"200, 50, 50\"" },
+		{ name: "fifthColor", type: "string", default: "\"180, 180, 50\"" },
+		{ name: "pointerColor", type: "string", default: "\"140, 100, 255\"" },
+		{ name: "size", type: "string", default: "\"80%\"" },
+		{ name: "blendingValue", type: "string", default: "\"hard-light\"" },
+		{ name: "className", type: "string" },
+		{ name: "interactive", type: "boolean", default: "true" },
+		{ name: "containerClassName", type: "string" },
+	],
+	risk: { heavy: false, fullscreen: true, clientOnly: false },
+	rating: 5,
+	status: "needs-review",
+});

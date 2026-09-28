@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "checkbox-animated",
+  "type": "registry:ui",
+  "title": "Checkbox Animated",
+  "description": "Checkbox drawn as a single continuous stroke that turns from a rounded square into a tick.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/checkbox-animated.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/checkbox-animated.tsx",
+      "content": "\"use client\";\n\nimport { motion } from \"motion/react\";\n\n// Credit:\n// https://berlix.vercel.app/docs/checkbox\n\ninterface CheckBoxProps {\n\tchecked: boolean;\n\tonClick: () => void;\n\tsize?: number;\n\tcolor?: string;\n\tduration?: number;\n}\n\nexport const CheckBoxAnimated = ({\n\tchecked,\n\tonClick,\n\tsize = 32,\n\tcolor = \"#00e599\",\n\tduration = 1,\n}: CheckBoxProps) => {\n\treturn (\n\t\t<div className=\"select-none cursor-pointer\" onClick={onClick}>\n\t\t\t<svg width={size} height={size} viewBox=\"0 0 40 40\" fill=\"none\">\n\t\t\t\t<motion.path\n\t\t\t\t\td=\"M 2.45 24.95 V 33.95 C 2.45 35.9382 4.0618 37.55 6.05 37.55 H 33.95 C 35.9382 37.55 37.55 35.9382 37.55 33.95 V 6.05 C 37.55 4.0618 35.9382 2.45 33.95 2.45 H 6.05 C 4.0618 2.45 2.45 4.0618 2.45 6.05 V 22.0617 C 2.45 23.0443 2.8516 23.9841 3.5616 24.6633 L 10.0451 30.8649 C 11.5404 32.2952 13.9308 32.1735 15.2731 30.5988 L 36.2 6.05\"\n\t\t\t\t\tstroke={color}\n\t\t\t\t\tstrokeLinecap=\"round\"\n\t\t\t\t\tstrokeWidth={3}\n\t\t\t\t\tanimate={{\n\t\t\t\t\t\tstrokeDasharray: checked ? 150 : 132,\n\t\t\t\t\t\tstrokeDashoffset: checked ? -134 : 0,\n\t\t\t\t\t}}\n\t\t\t\t\ttransition={{\n\t\t\t\t\t\tduration,\n\t\t\t\t\t\tease: \"easeInOut\",\n\t\t\t\t\t}}\n\t\t\t\t/>\n\t\t\t</svg>\n\t\t</div>\n\t);\n};\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Forms & Inputs"
+    ],
+    "tags": [],
+    "interaction": "Clicking it redraws the outline as one unbroken line: the square unwinds and reforms into a checkmark, and clicking again runs the same line back into a square.",
+    "inspiration": {
+      "source": "berlix.vercel.app",
+      "url": "https://berlix.vercel.app/docs/checkbox",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "checked",
+        "type": "boolean",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "onClick",
+        "type": "() => void",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "size",
+        "type": "number",
+        "default": "32",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "color",
+        "type": "string",
+        "default": "\"#00e599\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "1",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": false,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/checkbox-animated"
+  }
+}

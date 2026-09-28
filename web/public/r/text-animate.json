@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "text-animate",
+  "type": "registry:ui",
+  "title": "Text Animate",
+  "description": "Text primitive that reveals a heading by line, word or letter, with presets for fading, blurring, sliding and scaling.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/text-animate.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/text-animate.tsx",
+      "content": "\"use client\";\r\n\r\nimport { ElementType } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { AnimatePresence, motion, MotionProps, Variants } from \"motion/react\";\r\n\r\ntype AnimationType = \"text\" | \"word\" | \"character\" | \"line\";\r\ntype AnimationVariant =\r\n\t| \"fadeIn\"\r\n\t| \"blurIn\"\r\n\t| \"blurInUp\"\r\n\t| \"blurInDown\"\r\n\t| \"slideUp\"\r\n\t| \"slideDown\"\r\n\t| \"slideLeft\"\r\n\t| \"slideRight\"\r\n\t| \"scaleUp\"\r\n\t| \"scaleDown\";\r\n\r\ninterface TextAnimateProps extends MotionProps {\r\n\t/**\r\n\t * The text content to animate\r\n\t */\r\n\tchildren: string;\r\n\t/**\r\n\t * The class name to be applied to the component\r\n\t */\r\n\tclassName?: string;\r\n\t/**\r\n\t * The class name to be applied to each segment\r\n\t */\r\n\tsegmentClassName?: string;\r\n\t/**\r\n\t * The delay before the animation starts\r\n\t */\r\n\tdelay?: number;\r\n\t/**\r\n\t * The duration of the animation\r\n\t */\r\n\tduration?: number;\r\n\t/**\r\n\t * Custom motion variants for the animation\r\n\t */\r\n\tvariants?: Variants;\r\n\t/**\r\n\t * The element type to render\r\n\t */\r\n\tas?: ElementType;\r\n\t/**\r\n\t * How to split the text (\"text\", \"word\", \"character\")\r\n\t */\r\n\tby?: AnimationType;\r\n\t/**\r\n\t * Whether to start animation when component enters viewport\r\n\t */\r\n\tstartOnView?: boolean;\r\n\t/**\r\n\t * Whether to animate only once\r\n\t */\r\n\tonce?: boolean;\r\n\t/**\r\n\t * The animation preset to use\r\n\t */\r\n\tanimation?: AnimationVariant;\r\n}\r\n\r\nfunction TextAnimate({\r\n\tchildren,\r\n\tdelay = 0,\r\n\tduration = 0.6,\r\n\tvariants,\r\n\tclassName,\r\n\tsegmentClassName,\r\n\tas: Component = \"span\",\r\n\tstartOnView = true,\r\n\tonce = true,\r\n\tby = \"character\",\r\n\tanimation = \"fadeIn\",\r\n\t...props\r\n}: TextAnimateProps) {\r\n\tconst MotionComponent = motion.create(Component);\r\n\r\n\tconst staggerTimings: Record<AnimationType, number> = {\r\n\t\ttext: 0.06,\r\n\t\tword: 0.05,\r\n\t\tcharacter: duration / 15,\r\n\t\tline: 0.06,\r\n\t};\r\n\r\n\tconst defaultContainerVariants = {\r\n\t\thidden: { opacity: 1 },\r\n\t\tshow: {\r\n\t\t\topacity: 1,\r\n\t\t\ttransition: {\r\n\t\t\t\tstaggerChildren: 0.05,\r\n\t\t\t},\r\n\t\t},\r\n\t\texit: {\r\n\t\t\topacity: 0,\r\n\t\t\ttransition: {\r\n\t\t\t\tstaggerChildren: 0.05,\r\n\t\t\t\tstaggerDirection: -1,\r\n\t\t\t},\r\n\t\t},\r\n\t};\r\n\r\n\tconst defaultItemVariants: Variants = {\r\n\t\thidden: { opacity: 0 },\r\n\t\tshow: {\r\n\t\t\topacity: 1,\r\n\t\t},\r\n\t\texit: {\r\n\t\t\topacity: 0,\r\n\t\t},\r\n\t};\r\n\tconst defaultItemAnimationVariants: Record<\r\n\t\tAnimationVariant,\r\n\t\t{ container: Variants; item: Variants }\r\n\t> = {\r\n\t\tfadeIn: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { opacity: 0, y: 0 },\r\n\t\t\t\tshow: (delay: number) => ({\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tdelay,\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t\texit: {\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tblurIn: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { opacity: 0, filter: \"blur(10px)\" },\r\n\t\t\t\tshow: (i: number) => ({\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tdelay: i * 0.1,\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t\texit: {\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tblurInUp: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { opacity: 0, filter: \"blur(10px)\", y: 20 },\r\n\t\t\t\tshow: (delay: number) => ({\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\ty: { duration },\r\n\t\t\t\t\t\topacity: { duration: 0.4 },\r\n\t\t\t\t\t\tfilter: { duration },\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t\texit: {\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\tfilter: \"blur(10px)\",\r\n\t\t\t\t\ty: 20,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\ty: { duration },\r\n\t\t\t\t\t\topacity: { duration: 0.4 },\r\n\t\t\t\t\t\tfilter: { duration },\r\n\t\t\t\t\t},\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tblurInDown: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { opacity: 0, filter: \"blur(10px)\", y: -20 },\r\n\t\t\t\tshow: (delay: number) => ({\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\tfilter: \"blur(0px)\",\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\ty: { duration },\r\n\t\t\t\t\t\topacity: { duration: 0.4 },\r\n\t\t\t\t\t\tfilter: { duration },\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t},\r\n\t\t},\r\n\t\tslideUp: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { y: 20, opacity: 0 },\r\n\t\t\t\tshow: (delay: number) => ({\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tdelay,\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t\texit: {\r\n\t\t\t\t\ty: -20,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t},\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tslideDown: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { y: -20, opacity: 0 },\r\n\t\t\t\tshow: {\r\n\t\t\t\t\ty: 0,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t\texit: {\r\n\t\t\t\t\ty: 20,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tslideLeft: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { x: 20, opacity: 0 },\r\n\t\t\t\tshow: {\r\n\t\t\t\t\tx: 0,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t\texit: {\r\n\t\t\t\t\tx: -20,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tslideRight: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { x: -20, opacity: 0 },\r\n\t\t\t\tshow: {\r\n\t\t\t\t\tx: 0,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t\texit: {\r\n\t\t\t\t\tx: 20,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tscaleUp: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { scale: 0.5, opacity: 0 },\r\n\t\t\t\tshow: {\r\n\t\t\t\t\tscale: 1,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t\tscale: {\r\n\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\tdamping: 15,\r\n\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t},\r\n\t\t\t\t},\r\n\t\t\t\texit: {\r\n\t\t\t\t\tscale: 0.5,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t\tscaleDown: {\r\n\t\t\tcontainer: defaultContainerVariants,\r\n\t\t\titem: {\r\n\t\t\t\thidden: { scale: 1.5, opacity: 0 },\r\n\t\t\t\tshow: (delay: number) => ({\r\n\t\t\t\t\tscale: 1,\r\n\t\t\t\t\topacity: 1,\r\n\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\tdelay,\r\n\t\t\t\t\t\tduration,\r\n\t\t\t\t\t\tscale: {\r\n\t\t\t\t\t\t\ttype: \"spring\",\r\n\t\t\t\t\t\t\tdamping: 15,\r\n\t\t\t\t\t\t\tstiffness: 300,\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t},\r\n\t\t\t\t}),\r\n\t\t\t\texit: {\r\n\t\t\t\t\tscale: 1.5,\r\n\t\t\t\t\topacity: 0,\r\n\t\t\t\t\ttransition: { duration },\r\n\t\t\t\t},\r\n\t\t\t},\r\n\t\t},\r\n\t};\r\n\r\n\t// Use provided variants or default variants based on animation type\r\n\tconst finalVariants = animation\r\n\t\t? {\r\n\t\t\t\tcontainer: {\r\n\t\t\t\t\t...defaultItemAnimationVariants[animation].container,\r\n\t\t\t\t\tshow: {\r\n\t\t\t\t\t\t...defaultItemAnimationVariants[animation].container.show,\r\n\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\tstaggerChildren: staggerTimings[by],\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t},\r\n\t\t\t\t\texit: {\r\n\t\t\t\t\t\t...defaultItemAnimationVariants[animation].container.exit,\r\n\t\t\t\t\t\ttransition: {\r\n\t\t\t\t\t\t\tstaggerChildren: staggerTimings[by],\r\n\t\t\t\t\t\t\tstaggerDirection: -1,\r\n\t\t\t\t\t\t},\r\n\t\t\t\t\t},\r\n\t\t\t\t},\r\n\t\t\t\titem: defaultItemAnimationVariants[animation].item,\r\n\t\t\t}\r\n\t\t: { container: defaultContainerVariants, item: defaultItemVariants };\r\n\r\n\tlet segments: string[] = [];\r\n\tswitch (by) {\r\n\t\tcase \"word\":\r\n\t\t\tsegments = children.split(/(\\s+)/);\r\n\t\t\tbreak;\r\n\t\tcase \"character\":\r\n\t\t\tsegments = children.split(\"\");\r\n\t\t\tbreak;\r\n\t\tcase \"line\":\r\n\t\t\tsegments = children.split(\"\\n\");\r\n\t\t\tbreak;\r\n\t\tcase \"text\":\r\n\t\tdefault:\r\n\t\t\tsegments = [children];\r\n\t\t\tbreak;\r\n\t}\r\n\r\n\treturn (\r\n\t\t<AnimatePresence mode=\"popLayout\">\r\n\t\t\t<MotionComponent\r\n\t\t\t\tvariants={finalVariants.container}\r\n\t\t\t\tinitial=\"hidden\"\r\n\t\t\t\tviewport={{ once }}\r\n\t\t\t\twhileInView={startOnView ? \"show\" : undefined}\r\n\t\t\t\tanimate={startOnView ? undefined : \"show\"}\r\n\t\t\t\texit=\"exit\"\r\n\t\t\t\tclassName={cn(\"whitespace-pre-wrap\", className)}\r\n\t\t\t\t{...props}\r\n\t\t\t>\r\n\t\t\t\t{segments.map((segment, i) => (\r\n\t\t\t\t\t<motion.span\r\n\t\t\t\t\t\tkey={`${by}-${segment}-${i}`}\r\n\t\t\t\t\t\tvariants={finalVariants.item}\r\n\t\t\t\t\t\tcustom={i * staggerTimings[by]}\r\n\t\t\t\t\t\tclassName={cn(\r\n\t\t\t\t\t\t\tby === \"word\" ? \"block\" : \"inline-block whitespace-pre\",\r\n\t\t\t\t\t\t\tsegmentClassName\r\n\t\t\t\t\t\t)}\r\n\t\t\t\t\t>\r\n\t\t\t\t\t\t{segment}\r\n\t\t\t\t\t</motion.span>\r\n\t\t\t\t))}\r\n\t\t\t</MotionComponent>\r\n\t\t</AnimatePresence>\r\n\t);\r\n}\r\n\r\nexport default TextAnimate;\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Text Animations"
+    ],
+    "tags": [
+      "spring"
+    ],
+    "interaction": "When the text scrolls into view its pieces appear one after another in a quick ripple, each letter or word fading, unblurring, sliding or scaling into place depending on the preset chosen.",
+    "inspiration": null,
+    "props": [
+      {
+        "name": "className",
+        "type": "string",
+        "description": "The class name to be applied to the component",
+        "required": false
+      },
+      {
+        "name": "segmentClassName",
+        "type": "string",
+        "description": "The class name to be applied to each segment",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "0",
+        "description": "The delay before the animation starts",
+        "required": false
+      },
+      {
+        "name": "duration",
+        "type": "number",
+        "default": "0.6",
+        "description": "The duration of the animation",
+        "required": false
+      },
+      {
+        "name": "variants",
+        "type": "Variants",
+        "description": "Custom motion variants for the animation",
+        "required": false
+      },
+      {
+        "name": "as",
+        "type": "ElementType",
+        "description": "The element type to render",
+        "required": false
+      },
+      {
+        "name": "by",
+        "type": "AnimationType",
+        "default": "\"character\"",
+        "description": "How to split the text (\"text\", \"word\", \"character\")",
+        "required": false
+      },
+      {
+        "name": "startOnView",
+        "type": "boolean",
+        "default": "true",
+        "description": "Whether to start animation when component enters viewport",
+        "required": false
+      },
+      {
+        "name": "once",
+        "type": "boolean",
+        "default": "true",
+        "description": "Whether to animate only once",
+        "required": false
+      },
+      {
+        "name": "animation",
+        "type": "AnimationVariant",
+        "default": "\"fadeIn\"",
+        "description": "The animation preset to use",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/text-animate"
+  }
+}

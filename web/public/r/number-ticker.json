@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "number-ticker",
+  "type": "registry:ui",
+  "title": "Number Ticker",
+  "description": "Numeric counter that runs up to its target figure, comma-grouped and set on fixed-width digits so it never jitters.",
+  "dependencies": [
+    "motion"
+  ],
+  "registryDependencies": [],
+  "files": [
+    {
+      "path": "components/ui/number-ticker.tsx",
+      "type": "registry:ui",
+      "target": "components/ui/number-ticker.tsx",
+      "content": "\"use client\";\r\n\r\nimport { useEffect, useRef } from \"react\";\r\n\r\nimport { cn } from \"@/lib/utils\";\r\nimport { useInView, useMotionValue, useSpring } from \"motion/react\";\r\n\r\n// https://magicui.design/docs/components/number-ticker\r\n\r\nexport default function NumberTicker({\r\n\tvalue,\r\n\tdirection = \"up\",\r\n\tdelay = 0,\r\n\tclassName,\r\n}: {\r\n\tvalue: number;\r\n\tdirection?: \"up\" | \"down\";\r\n\tclassName?: string;\r\n\tdelay?: number; // delay in s\r\n}) {\r\n\tconst ref = useRef<HTMLSpanElement>(null);\r\n\tconst motionValue = useMotionValue(direction === \"down\" ? value : 0);\r\n\tconst springValue = useSpring(motionValue, {\r\n\t\tdamping: 30,\r\n\t\tstiffness: 100,\r\n\t});\r\n\tconst isInView = useInView(ref, { once: true, margin: \"0px\" });\r\n\r\n\tuseEffect(() => {\r\n\t\tisInView &&\r\n\t\t\tsetTimeout(() => {\r\n\t\t\t\tmotionValue.set(direction === \"down\" ? 0 : value);\r\n\t\t\t}, delay * 1000);\r\n\t}, [motionValue, isInView, delay, value, direction]);\r\n\r\n\tuseEffect(\r\n\t\t() =>\r\n\t\t\tspringValue.on(\"change\", (latest) => {\r\n\t\t\t\tif (ref.current) {\r\n\t\t\t\t\tref.current.textContent = Intl.NumberFormat(\"en-US\").format(\r\n\t\t\t\t\t\tNumber(latest.toFixed(0))\r\n\t\t\t\t\t);\r\n\t\t\t\t}\r\n\t\t\t}),\r\n\t\t[springValue]\r\n\t);\r\n\r\n\treturn (\r\n\t\t<span className={cn(\"inline-block tabular-nums\", className)} ref={ref} />\r\n\t);\r\n}\r\n"
+    }
+  ],
+  "meta": {
+    "categories": [
+      "Data & Tables"
+    ],
+    "tags": [
+      "spring",
+      "scroll-driven"
+    ],
+    "interaction": "The moment the number scrolls into view it races from zero to its final value and eases to a stop, counting down instead if you flip the direction. It fires once and can be held back by a delay.",
+    "inspiration": {
+      "source": "Magic UI",
+      "url": "https://magicui.design/docs/components/number-ticker",
+      "authorUrl": "https://magicui.design",
+      "relationship": "adaptation"
+    },
+    "props": [
+      {
+        "name": "value",
+        "type": "number",
+        "description": "",
+        "required": true
+      },
+      {
+        "name": "direction",
+        "type": "\"up\" | \"down\"",
+        "default": "\"up\"",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "className",
+        "type": "string",
+        "description": "",
+        "required": false
+      },
+      {
+        "name": "delay",
+        "type": "number",
+        "default": "0",
+        "description": "",
+        "required": false
+      }
+    ],
+    "risk": {
+      "heavy": false,
+      "fullscreen": true,
+      "clientOnly": false
+    },
+    "rating": 5,
+    "status": "needs-review",
+    "hidden": false,
+    "gated": false,
+    "importPath": "@/components/ui/number-ticker"
+  }
+}
