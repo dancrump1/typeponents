@@ -206,8 +206,8 @@ function Result({
 			<div className="space-y-2 rounded-md border px-4 py-3 text-sm">
 				<p>
 					{result.restart === "automatic"
-						? "Rebuild finished. The site is restarting so the new preview can load."
-						: "Rebuild finished. This process cannot swap in the new build. Stop it and start the site with npm run host from the web folder."}
+						? "Rebuild finished. The host acknowledged the queue after Next was ready again."
+						: "Rebuild finished. This process is not the host, so it did not restart. Run npm run host from the web folder to consume the queue."}
 				</p>
 				<p>
 					Then open{" "}
@@ -223,17 +223,17 @@ function Result({
 	return (
 		<div className="space-y-2 rounded-md border px-4 py-3 text-sm">
 			<p>
-				Imported <code>{result.slug}</code>. This server is serving a compiled
-				site, so the catalog and preview stay on the previous version until Next
-				rebuilds and the process restarts.
+				Imported <code>{result.slug}</code>. The rebuild is on the{" "}
+				<code>site.publish</code> queue. The catalog stays on the previous
+				version until that job finishes and Next restarts.
 			</p>
 			<p className="text-muted-foreground">
 				{publish.state === "running"
-					? "Rebuilding the site now. This usually takes a few minutes."
-					: "Starting the site rebuild."}
+					? "The host is working through the queue. A build usually takes a few minutes."
+					: "Queued. Waiting for the host to pick up the message."}
 				{result.restart === "manual"
-					? " When it finishes, stop this server and start it again with npm run host from the web folder so the new build is what designers see."
-					: " The site will restart itself when the build finishes."}
+					? " This process is not the host. Run npm run host from the web folder; it consumes the queue, builds, and restarts Next."
+					: " The host acknowledges the message only after the new server is ready."}
 			</p>
 		</div>
 	);

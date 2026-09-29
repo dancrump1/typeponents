@@ -512,6 +512,7 @@ export const demoLoaders: Record<string, DemoLoader> = {
 	"webcam-pixel-grid": () => import("@/registry/components/webcam-pixel-grid/demo"),
 	"wobble-card": () => import("@/registry/components/wobble-card/demo"),
 	"word-focus-scroll": () => import("@/registry/components/word-focus-scroll/demo"),
+	"word-rotate": () => import("@/registry/components/word-rotate/demo"),
 	"word-tornado": () => import("@/registry/components/word-tornado/demo"),
 	"zoom-blur-card": () => import("@/registry/components/zoom-blur-card/demo"),
 };

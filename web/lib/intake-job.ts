@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { CATEGORIES, type Category } from "@/registry/schema";
+import { publishSiteRebuild } from "../scripts/publish-queue.mjs";
 
 export type IntakeRestart = "dev" | "automatic" | "manual";
 
@@ -28,10 +29,6 @@ type LockFile = { pid: number; startedAt: number; label: string };
 
 function tsxBin(): string {
 	return path.join(process.cwd(), "node_modules", ".bin", "tsx");
-}
-
-function publishScript(): string {
-	return path.join(process.cwd(), "scripts", "publish-site.mjs");
 }
 
 export function parseRegistryUrl(raw: string): string | null {
@@ -85,7 +82,6 @@ export async function importRegistryItem(input: {
 	slug: string;
 }): Promise<IntakeResult> {
 	acquireLock("intake");
-	let handoff = false;
 	try {
 		const args = ["scripts/v2/intake.mts", input.url, "--category", input.category];
 		if (input.slug) args.push("--slug", input.slug);
@@ -130,8 +126,23 @@ export async function importRegistryItem(input: {
 			return { ok: true, slug, log, restart: "dev" };
 		}
 
-		startPublish();
-		handoff = true;
+		try {
+			await queuePublish(slug);
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : "Could not queue the rebuild.";
+			writeStatus({
+				state: "error",
+				finishedAt: new Date().toISOString(),
+				error: message,
+				log: logAfterInstall,
+			});
+			return {
+				ok: false,
+				error: `The component was saved, but the rebuild was not queued. ${message}`,
+				log: logAfterInstall,
+			};
+		}
 		return {
 			ok: true,
 			slug,
@@ -139,45 +150,30 @@ export async function importRegistryItem(input: {
 			restart: process.env.INTAKE_HOST === "1" ? "automatic" : "manual",
 		};
 	} finally {
-		if (!handoff) releaseLock();
+		releaseLock();
 	}
 }
 
-/** Runs another production rebuild after a failed publish. */
-export function republishSite(): void {
+/** Queues another production rebuild after a failed publish. */
+export async function republishSite(): Promise<void> {
 	if (process.env.NODE_ENV !== "production") {
 		throw new Error("The dev server picks up new components without a site rebuild.");
 	}
-	acquireLock("publish");
-	try {
-		startPublish();
-	} catch (error) {
-		releaseLock();
-		throw error;
-	}
+	await queuePublish("");
 }
 
-/** Starts the production rebuild. The publish script releases the lock. */
-function startPublish(): void {
-	fs.writeFileSync(
-		STATUS_PATH,
-		JSON.stringify({
-			state: "running",
-			startedAt: new Date().toISOString(),
-			log: "",
-		})
-	);
-	const child = spawn(process.execPath, [publishScript()], {
-		cwd: process.cwd(),
-		detached: true,
-		stdio: "ignore",
-		env: process.env,
+/** Publishes one durable site.publish message. The host process does the build. */
+async function queuePublish(slug: string): Promise<void> {
+	writeStatus({
+		state: "running",
+		startedAt: new Date().toISOString(),
+		log: "Queued site.publish.\n",
 	});
-	child.unref();
-	if (child.pid === undefined) {
-		throw new Error("Could not start the site rebuild.");
-	}
-	writeLock({ pid: child.pid, startedAt: Date.now(), label: "publish" });
+	await publishSiteRebuild({ slug, attempt: 1 });
+}
+
+function writeStatus(status: PublishStatus): void {
+	fs.writeFileSync(STATUS_PATH, JSON.stringify(status, null, 2));
 }
 
 /** Package names intake or registry:build tells us to install. */
@@ -300,10 +296,6 @@ function readLock(): LockFile | null {
 	} catch {
 		return null;
 	}
-}
-
-function writeLock(lock: LockFile): void {
-	fs.writeFileSync(LOCK_PATH, JSON.stringify(lock));
 }
 
 function acquireLock(label: string): void {

@@ -38457,6 +38457,47 @@
       }
     },
     {
+      "name": "word-rotate",
+      "type": "registry:ui",
+      "title": "Word Rotate",
+      "description": "A vertical rotation of words",
+      "dependencies": [
+        "motion"
+      ],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "registry/components/word-rotate/component.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/word-rotate.tsx"
+        }
+      ],
+      "meta": {
+        "categories": [
+          "Text"
+        ],
+        "tags": [],
+        "interaction": "",
+        "inspiration": {
+          "source": "Magic UI",
+          "url": "https://magicui.design/docs/components/word-rotate",
+          "authorUrl": "https://magicui.design",
+          "relationship": "port"
+        },
+        "props": [],
+        "risk": {
+          "heavy": false,
+          "fullscreen": false,
+          "clientOnly": false
+        },
+        "rating": 5,
+        "status": "draft",
+        "hidden": false,
+        "gated": false,
+        "importPath": "@/components/ui/word-rotate"
+      }
+    },
+    {
       "name": "word-tornado",
       "type": "registry:ui",
       "title": "Word Tornado",

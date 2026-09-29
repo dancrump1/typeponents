@@ -61,7 +61,7 @@ export async function retryPublish(): Promise<{ ok: true } | { ok: false; error:
 		return { ok: false, error: "Unlock the library before publishing." };
 	}
 	try {
-		republishSite();
+		await republishSite();
 		return { ok: true };
 	} catch (error) {
 		return {

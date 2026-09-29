@@ -1,0 +1,9 @@
+# Local broker for the site.publish queue.
+# From web/: docker compose up -d
+# Management UI: http://127.0.0.1:15672  (guest / guest)
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"

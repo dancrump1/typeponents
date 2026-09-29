@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
 	/* config options here */
 	distDir: process.env.BUILD_DIR || ".next",
 	transpilePackages: ["three"],
+	serverExternalPackages: ["amqplib"],
 	async redirects() {
 		return [
 			{ source: "/browse", destination: "/library", permanent: false },

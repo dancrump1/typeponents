@@ -10874,6 +10874,29 @@
       "docs": "https://components.drivedev.net/docs/wobble-card.md"
     },
     {
+      "name": "word-rotate",
+      "title": "Word Rotate",
+      "description": "A vertical rotation of words",
+      "categories": [
+        "Text"
+      ],
+      "tags": [],
+      "rating": 5,
+      "status": "draft",
+      "inspiration": {
+        "source": "Magic UI",
+        "url": "https://magicui.design/docs/components/word-rotate",
+        "authorUrl": "https://magicui.design",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "motion"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/word-rotate.json",
+      "url": "https://components.drivedev.net/r/word-rotate.json",
+      "docs": "https://components.drivedev.net/docs/word-rotate.md"
+    },
+    {
       "name": "word-tornado",
       "title": "Word Tornado",
       "description": "Word Tornado",

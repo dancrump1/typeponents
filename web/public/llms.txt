@@ -1,6 +1,6 @@
 # DriveBrandStudio component registry
 
-> 453 React components for Tailwind CSS v4, distributed as a shadcn registry.
+> 454 React components for Tailwind CSS v4, distributed as a shadcn registry.
 
 Install any component with the shadcn CLI. It rewrites imports to match the target project's `components.json`, so `cn` resolves to whatever the project already uses:
 
@@ -517,6 +517,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Text Trail](https://components.drivedev.net/docs/text-trail.md)
 - [Text Type](https://components.drivedev.net/docs/text-type.md)
 - [Text Underline](https://components.drivedev.net/docs/text-underline.md)
+- [Word Rotate](https://components.drivedev.net/docs/word-rotate.md) — A vertical rotation of words
 
 ## Text Animations
 

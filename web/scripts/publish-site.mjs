@@ -1,9 +1,11 @@
 /**
- * Rebuilds the registry, then compiles Next into .next-staging.
+ * Rebuilds the registry, installs any missing npm packages, then compiles
+ * Next into .next-staging. The host process consumes site.publish, and only
+ * swaps this build in after this script exits 0.
  *
  * `npm run build` pins BUILD_DIR=.next, which is the directory the live
  * server is reading. This script calls `next build` directly so the running
- * site stays up until scripts/host.mjs swaps the new build in.
+ * site stays up until the host restarts it.
  */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
@@ -11,8 +13,6 @@ import path from "node:path";
 
 const root = process.cwd();
 const statusPath = path.join(root, ".intake-publish-status.json");
-const readyPath = path.join(root, ".intake-publish-ready");
-const lockPath = path.join(root, ".intake.lock");
 const tsx = path.join(root, "node_modules", ".bin", "tsx");
 const nextBin = path.join(root, "node_modules", "next", "dist", "bin", "next");
 
@@ -64,18 +64,10 @@ function run(command, args, env) {
 	});
 }
 
-// A previous rebuild may still be waiting for host.mjs to claim .next-staging.
-// Starting another build before that claim would delete the signal file.
-const claimDeadline = Date.now() + 15_000;
-while (fs.existsSync(readyPath) && Date.now() < claimDeadline) {
-	await new Promise((resolve) => setTimeout(resolve, 200));
-}
-fs.rmSync(readyPath, { force: true });
 writeStatus("running");
 
 const registryCode = await run(tsx, ["scripts/v2/build.mts"], process.env);
 if (registryCode !== 0) {
-	fs.rmSync(lockPath, { force: true });
 	writeStatus("error", {
 		finishedAt: new Date().toISOString(),
 		error: "Rebuilding the registry catalog failed.",
@@ -91,7 +83,6 @@ if (missing.length) {
 		process.env
 	);
 	if (installCode !== 0) {
-		fs.rmSync(lockPath, { force: true });
 		writeStatus("error", {
 			finishedAt: new Date().toISOString(),
 			error: `Installing ${missing.join(", ")} failed, so the live site was left unchanged.`,
@@ -102,7 +93,6 @@ if (missing.length) {
 
 const buildEnv = { ...process.env, BUILD_DIR: ".next-staging" };
 const buildCode = await run(process.execPath, [nextBin, "build"], buildEnv);
-fs.rmSync(lockPath, { force: true });
 
 if (buildCode !== 0) {
 	writeStatus("error", {
@@ -112,5 +102,4 @@ if (buildCode !== 0) {
 	process.exit(buildCode);
 }
 
-fs.writeFileSync(readyPath, new Date().toISOString());
 writeStatus("ready", { finishedAt: new Date().toISOString() });

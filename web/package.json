@@ -84,6 +84,7 @@
 		"@upstash/ratelimit": "^2.0.6",
 		"@upstash/redis": "^1.35.2",
 		"@use-gesture/react": "^10.3.1",
+		"amqplib": "^2.2.0",
 		"autosize": "^6.0.1",
 		"class-variance-authority": "^0.7.1",
 		"clsx": "^2.1.1",
@@ -180,6 +181,7 @@
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
 		"@tailwindcss/postcss": "^4.2.2",
+		"@types/amqplib": "^0.10.8",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
