@@ -11,6 +11,7 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import amqp from "amqplib";
 
 import {
@@ -25,7 +26,9 @@ import {
 	WORK_QUEUE,
 } from "./publish-queue.mjs";
 
-const root = process.cwd();
+// PM2's working directory is often the repo root. The Next app lives next to
+// this script, and both the build and `next start` have to use that folder.
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const live = path.join(root, ".next");
 const staging = path.join(root, ".next-staging");
 const incoming = path.join(root, ".next-incoming");
@@ -40,6 +43,21 @@ let child = null;
 let swapping = false;
 let consuming = false;
 let reconnectTimer = null;
+let startFailures = 0;
+
+function hasProductionBuild(dir) {
+	return fs.existsSync(path.join(dir, "BUILD_ID"));
+}
+
+/** Put the last good build back when a swap left `.next` without BUILD_ID. */
+function restorePreviousBuild() {
+	if (hasProductionBuild(live)) return true;
+	if (!hasProductionBuild(previous)) return false;
+	fs.rmSync(live, { recursive: true, force: true });
+	fs.renameSync(previous, live);
+	console.error(`Restored the previous production build into ${live}`);
+	return true;
+}
 
 function writeStatus(status) {
 	fs.writeFileSync(statusPath, JSON.stringify(status, null, 2));
@@ -55,6 +73,19 @@ function readStatusError() {
 }
 
 function spawnNext() {
+	if (!hasProductionBuild(live) && !restorePreviousBuild()) {
+		console.error(
+			`No production build in ${live}. The host stays up so the queue can still build one.`
+		);
+		return null;
+	}
+	if (startFailures >= 3) {
+		console.error(
+			"next start failed repeatedly. Waiting for the next successful publish before trying again."
+		);
+		return null;
+	}
+
 	const env = { ...process.env, INTAKE_HOST: "1" };
 	delete env.BUILD_DIR;
 	const next = spawn(process.execPath, [nextBin, "start", "-p", port], {
@@ -65,20 +96,36 @@ function spawnNext() {
 	let readySeen = false;
 	/** @type {Array<() => void>} */
 	const waiters = [];
+	/** @type {Array<(error: Error) => void>} */
+	const exitWaiters = [];
 	const note = (chunk, stream) => {
 		stream.write(chunk);
-		if (!readySeen && chunk.toString().includes("Ready")) {
+		const text = chunk.toString();
+		if (text.includes("Could not find a production build")) {
+			console.error(text.trim());
+		}
+		if (!readySeen && text.includes("Ready")) {
 			readySeen = true;
-			for (const resolve of waiters) resolve();
-			waiters.length = 0;
+			startFailures = 0;
+			for (const resolve of waiters.splice(0)) resolve();
 		}
 	};
 	next.stdout.on("data", (chunk) => note(chunk, process.stdout));
 	next.stderr.on("data", (chunk) => note(chunk, process.stderr));
 	next.on("exit", (code, signal) => {
-		if (swapping) return;
-		console.error(`next start exited (${signal ?? code}). Host is stopping.`);
-		process.exit(code ?? 1);
+		const error = new Error(
+			`next start exited (${signal ?? code}) before it was ready`
+		);
+		for (const reject of exitWaiters.splice(0)) reject(error);
+		if (swapping || readySeen) return;
+		startFailures += 1;
+		console.error(
+			`${error.message}. Host is staying up. Restoring the last good build if this one is incomplete.`
+		);
+		if (!hasProductionBuild(live)) restorePreviousBuild();
+		setTimeout(() => {
+			if (!child || child.exitCode !== null) spawnNext();
+		}, 1000).unref();
 	});
 	next.waitUntilReady = (timeoutMs) =>
 		new Promise((resolve, reject) => {
@@ -92,6 +139,10 @@ function spawnNext() {
 			waiters.push(() => {
 				clearTimeout(timer);
 				resolve();
+			});
+			exitWaiters.push((error) => {
+				clearTimeout(timer);
+				reject(error);
 			});
 		});
 	child = next;
@@ -128,16 +179,31 @@ function runPublish() {
  */
 function restartAndWait() {
 	return new Promise((resolve, reject) => {
-		if (!fs.existsSync(staging)) {
-			reject(new Error("The rebuild finished without a .next-staging directory."));
+		if (!hasProductionBuild(staging)) {
+			reject(
+				new Error(
+					"The rebuild finished without .next-staging/BUILD_ID, so the live site was left running."
+				)
+			);
 			return;
 		}
 		swapping = true;
+		startFailures = 0;
+		let settled = false;
+
+		const fail = (error) => {
+			if (settled) return;
+			settled = true;
+			swapping = false;
+			if (!hasProductionBuild(live)) restorePreviousBuild();
+			if (!child || child.exitCode !== null) spawnNext();
+			reject(error);
+		};
+
 		try {
 			claimStaging();
 		} catch (error) {
-			swapping = false;
-			reject(error);
+			fail(error);
 			return;
 		}
 
@@ -145,13 +211,28 @@ function restartAndWait() {
 			try {
 				promoteIncoming();
 			} catch (error) {
-				swapping = false;
-				reject(error);
+				fail(error);
 				return;
 			}
-			swapping = false;
+			if (!hasProductionBuild(live)) {
+				fail(
+					new Error(
+						"The swapped directory is not a production build, so the previous one was restored."
+					)
+				);
+				return;
+			}
 			const next = spawnNext();
-			next.waitUntilReady(30_000).then(resolve, reject);
+			if (!next) {
+				fail(new Error("next start was not launched."));
+				return;
+			}
+			next.waitUntilReady(120_000).then(() => {
+				if (settled) return;
+				settled = true;
+				swapping = false;
+				resolve();
+			}, fail);
 		};
 
 		const current = child;

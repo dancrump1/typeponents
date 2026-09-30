@@ -10,8 +10,9 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const root = process.cwd();
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const statusPath = path.join(root, ".intake-publish-status.json");
 const tsx = path.join(root, "node_modules", ".bin", "tsx");
 const nextBin = path.join(root, "node_modules", "next", "dist", "bin", "next");
@@ -91,15 +92,17 @@ if (missing.length) {
 	}
 }
 
+const stagingDir = path.join(root, ".next-staging");
 const buildEnv = { ...process.env, BUILD_DIR: ".next-staging" };
 const buildCode = await run(process.execPath, [nextBin, "build"], buildEnv);
 
-if (buildCode !== 0) {
+if (buildCode !== 0 || !fs.existsSync(path.join(stagingDir, "BUILD_ID"))) {
 	writeStatus("error", {
 		finishedAt: new Date().toISOString(),
-		error: "The Next.js build failed, so the live site was left unchanged.",
+		error:
+			"The Next.js build did not produce .next-staging/BUILD_ID, so the live site was left unchanged.",
 	});
-	process.exit(buildCode);
+	process.exit(buildCode || 1);
 }
 
 writeStatus("ready", { finishedAt: new Date().toISOString() });
