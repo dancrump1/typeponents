@@ -25,6 +25,7 @@
 /.intake.lock
 /.intake-publish-ready
 /.intake-publish-status.json
+/.next-dist-dir
 
 # production
 /build

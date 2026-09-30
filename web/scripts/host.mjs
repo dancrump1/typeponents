@@ -63,12 +63,11 @@ function writeStatus(status) {
 	fs.writeFileSync(statusPath, JSON.stringify(status, null, 2));
 }
 
-function readStatusError() {
+function readStatus() {
 	try {
-		const parsed = JSON.parse(fs.readFileSync(statusPath, "utf8"));
-		return typeof parsed.error === "string" ? parsed.error : "Site rebuild failed.";
+		return JSON.parse(fs.readFileSync(statusPath, "utf8"));
 	} catch {
-		return "Site rebuild failed.";
+		return {};
 	}
 }
 
@@ -88,6 +87,8 @@ function spawnNext() {
 
 	const env = { ...process.env, INTAKE_HOST: "1" };
 	delete env.BUILD_DIR;
+	delete env.TYPEPONENTS_DIST_DIR;
+	fs.rmSync(path.join(root, ".next-dist-dir"), { force: true });
 	const next = spawn(process.execPath, [nextBin, "start", "-p", port], {
 		cwd: root,
 		env,
@@ -251,13 +252,20 @@ function restartAndWait() {
 }
 
 async function settleFailure(channel, job) {
-	const error = readStatusError();
+	const status = readStatus();
+	const error =
+		typeof status.error === "string" ? status.error : "Site rebuild failed.";
+	const previousLog = typeof status.log === "string" ? status.log : "";
 	if (job.attempt < MAX_ATTEMPTS) {
 		const nextAttempt = job.attempt + 1;
+		const retryLine = `Retry ${nextAttempt} of ${MAX_ATTEMPTS} in ${RETRY_TTL_MS / 1000}s.`;
 		writeStatus({
 			state: "running",
 			startedAt: new Date().toISOString(),
-			log: `${error}\nRetry ${nextAttempt} of ${MAX_ATTEMPTS} in ${RETRY_TTL_MS / 1000}s.\n`,
+			error,
+			log: previousLog
+				? `${previousLog.trimEnd()}\n\n${retryLine}\n`
+				: `${error}\n${retryLine}\n`,
 		});
 		await enqueueJob(channel, { slug: job.slug, attempt: nextAttempt });
 		return;
@@ -267,7 +275,7 @@ async function settleFailure(channel, job) {
 		state: "error",
 		finishedAt: new Date().toISOString(),
 		error: `${error} Gave up after ${MAX_ATTEMPTS} attempts. The message is on ${DLQ}.`,
-		log: error,
+		log: previousLog || error,
 	});
 }
 

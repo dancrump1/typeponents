@@ -144,6 +144,11 @@ export function IntakeForm({
 
 			{publish.state === "error" ? (
 				<div className="space-y-3">
+					{!result?.ok && publish.error ? (
+						<p className="text-sm text-destructive whitespace-pre-wrap">
+							{publish.error}
+						</p>
+					) : null}
 					{retryError ? (
 						<p className="text-sm text-destructive">{retryError}</p>
 					) : null}
@@ -159,9 +164,7 @@ export function IntakeForm({
 			) : null}
 
 			{result?.log ? <Log log={result.log} /> : null}
-			{publish.log && result?.ok && result.restart !== "dev" ? (
-				<Log log={publish.log} title="Site rebuild" />
-			) : null}
+			{publish.log ? <Log log={publish.log} title="Site rebuild" /> : null}
 		</div>
 	);
 }
@@ -196,7 +199,7 @@ function Result({
 				<p>
 					<code>{result.slug}</code> was saved, but the live site was not updated.
 				</p>
-				<p className="text-destructive">{publish.error}</p>
+				<p className="text-destructive whitespace-pre-wrap">{publish.error}</p>
 			</div>
 		);
 	}

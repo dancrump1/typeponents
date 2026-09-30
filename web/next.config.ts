@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { NextConfig } from "next";
 
 /** @type {import('next').NextConfig} */
@@ -6,12 +8,31 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 	enabled: process.env.ANALYZE === "true",
 });
 
+/**
+ * Hosted rebuilds compile into `.next-staging` while `next start` keeps
+ * serving `.next`. Env vars are the primary signal; a marker file is the
+ * fallback when a host strips or overrides BUILD_DIR for the child process.
+ */
+function resolveDistDir() {
+	const fromEnv = process.env.TYPEPONENTS_DIST_DIR || process.env.BUILD_DIR;
+	if (fromEnv) return fromEnv;
+	try {
+		const marker = fs
+			.readFileSync(path.join(process.cwd(), ".next-dist-dir"), "utf8")
+			.trim();
+		if (marker === ".next" || marker === ".next-staging") return marker;
+	} catch {
+		// Live server and `npm run build` default to .next.
+	}
+	return ".next";
+}
+
 const nextConfig: NextConfig = {
 	outputFileTracingIncludes: {
 		registry: ["./registry/**/*"],
 	},
 	/* config options here */
-	distDir: process.env.BUILD_DIR || ".next",
+	distDir: resolveDistDir(),
 	transpilePackages: ["three"],
 	serverExternalPackages: ["amqplib"],
 	async redirects() {
