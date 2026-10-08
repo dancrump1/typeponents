@@ -1549,6 +1549,34 @@
       "docs": "https://components.drivedev.net/docs/css-box.md"
     },
     {
+      "name": "cube-roll-item",
+      "title": "Cube Roll Item",
+      "description": "A numbered section index where each row is a 3D drum that rolls a quarter turn onto a filled face on hover. The roll follows the pointer — in from the top rolls down, out through the bottom keeps rolling down — while the rules draw in on load.",
+      "categories": [
+        "Navigation"
+      ],
+      "tags": [
+        "hover",
+        "cursor-tracking",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/cube-roll-item",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/cube-roll-item.json",
+      "url": "https://components.drivedev.net/r/cube-roll-item.json",
+      "docs": "https://components.drivedev.net/docs/cube-roll-item.md"
+    },
+    {
       "name": "cubes",
       "title": "Cubes",
       "description": "Cubes",
@@ -3325,6 +3353,34 @@
       "docs": "https://components.drivedev.net/docs/following-pointer.md"
     },
     {
+      "name": "footer-wordmark-rise",
+      "title": "Footer Wordmark Rise",
+      "description": "A dark site footer that rises into view over a glow swelling off the bottom edge, closed by a giant wordmark fitted to the column whose letters climb out of their masks one by one.",
+      "categories": [
+        "Footers"
+      ],
+      "tags": [
+        "scroll-driven",
+        "hover",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/footer-wordmark-rise",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/footer-wordmark-rise.json",
+      "url": "https://components.drivedev.net/r/footer-wordmark-rise.json",
+      "docs": "https://components.drivedev.net/docs/footer-wordmark-rise.md"
+    },
+    {
       "name": "fractal-grid",
       "title": "Fractal Grid",
       "description": "Fractal Grid",
@@ -4014,6 +4070,36 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/grid-to-flex.json",
       "url": "https://components.drivedev.net/r/grid-to-flex.json",
       "docs": "https://components.drivedev.net/docs/grid-to-flex.md"
+    },
+    {
+      "name": "gyro-gallery",
+      "title": "Gyro Gallery",
+      "description": "Gallery tiles riding three concentric, counter-rotating orbits on one tilted plane, like the rings of a gyroscope. The rig turns to face the pointer and calms as it nears; pointing near a piece brings it forward on a lime spoke from the core with its name beside it, and a click opens it. Page scroll winds the rings and swivels the plane.",
+      "categories": [
+        "Media Galleries"
+      ],
+      "tags": [
+        "drag",
+        "scroll-driven",
+        "cursor-tracking",
+        "autoplay",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/gyro-gallery",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/gyro-gallery.json",
+      "url": "https://components.drivedev.net/r/gyro-gallery.json",
+      "docs": "https://components.drivedev.net/docs/gyro-gallery.md"
     },
     {
       "name": "half-filled-text",
@@ -5107,6 +5193,35 @@
       "docs": "https://components.drivedev.net/docs/jelly-loader.md"
     },
     {
+      "name": "kinetic-type-ring",
+      "title": "Kinetic Type Ring",
+      "description": "A phrase wrapped once around a ring in real 3D. A falling dot pulls the letters out of a blur, then drag or scroll spins the ring.",
+      "categories": [
+        "Text Animations"
+      ],
+      "tags": [
+        "drag",
+        "cursor-tracking",
+        "keyboard",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/kinetic-type-ring",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/kinetic-type-ring.json",
+      "url": "https://components.drivedev.net/r/kinetic-type-ring.json",
+      "docs": "https://components.drivedev.net/docs/kinetic-type-ring.md"
+    },
+    {
       "name": "ksier",
       "title": "Ksier",
       "description": "Ksier",
@@ -5625,6 +5740,61 @@
       "docs": "https://components.drivedev.net/docs/list-rotator.md"
     },
     {
+      "name": "loader-iris-ring",
+      "title": "Loader Iris Ring",
+      "description": "A page preloader built around a ring gauge: the arc fills in uneven steps while images flash through its lens and four corner counters sync and go live. Then an iris opens from the lens and the ring flies into the logo in your nav.",
+      "categories": [
+        "Loaders"
+      ],
+      "tags": [
+        "autoplay",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/loader-iris-ring",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "@number-flow/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/loader-iris-ring.json",
+      "url": "https://components.drivedev.net/r/loader-iris-ring.json",
+      "docs": "https://components.drivedev.net/docs/loader-iris-ring.md"
+    },
+    {
+      "name": "loader-line-fold",
+      "title": "Loader Line Fold",
+      "description": "A page preloader: the wordmark rises letter by letter while a hairline fills with a counter riding its tip. Once the page is ready the line travels to the middle, folds into a single point, and the page opens out of that point to every edge.",
+      "categories": [
+        "Loaders"
+      ],
+      "tags": [
+        "autoplay",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/loader-line-fold",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/loader-line-fold.json",
+      "url": "https://components.drivedev.net/r/loader-line-fold.json",
+      "docs": "https://components.drivedev.net/docs/loader-line-fold.md"
+    },
+    {
       "name": "logo-carousel",
       "title": "Logo Carousel",
       "description": "Logo Carousel",
@@ -5688,6 +5858,33 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/logo-particles.json",
       "url": "https://components.drivedev.net/r/logo-particles.json",
       "docs": "https://components.drivedev.net/docs/logo-particles.md"
+    },
+    {
+      "name": "logo-wall-shuffle",
+      "title": "Logo Wall Shuffle",
+      "description": "An integrations wall of staggered logo tiles where one mark at a time lifts away and the next rises in behind it. Every tile is visited before any repeats, and the loop pauses off-screen and in background tabs.",
+      "categories": [
+        "Grids & Layouts"
+      ],
+      "tags": [
+        "scroll-driven",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/logo-wall-shuffle",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/logo-wall-shuffle.json",
+      "url": "https://components.drivedev.net/r/logo-wall-shuffle.json",
+      "docs": "https://components.drivedev.net/docs/logo-wall-shuffle.md"
     },
     {
       "name": "macbook",
@@ -7124,6 +7321,34 @@
       "docs": "https://components.drivedev.net/docs/price-card.md"
     },
     {
+      "name": "pricing-plan-switch",
+      "title": "Pricing Plan Switch",
+      "description": "A pricing section where picking a plan morphs the name badge, crossfades the description and spins the price with Number Flow, while the checklist lights up its included rows. A monthly/yearly toggle re-spins the price.",
+      "categories": [
+        "Cards"
+      ],
+      "tags": [
+        "hover",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/pricing-plan-switch",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "@number-flow/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/pricing-plan-switch.json",
+      "url": "https://components.drivedev.net/r/pricing-plan-switch.json",
+      "docs": "https://components.drivedev.net/docs/pricing-plan-switch.md"
+    },
+    {
       "name": "pricing-table",
       "title": "Pricing Table",
       "description": "Four-column pricing grid with a monthly/annual billing toggle and one best-value plan tinted by a warm gradient.",
@@ -7172,6 +7397,33 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/prismatic-burst.json",
       "url": "https://components.drivedev.net/r/prismatic-burst.json",
       "docs": "https://components.drivedev.net/docs/prismatic-burst.md"
+    },
+    {
+      "name": "process-card-reveal",
+      "title": "Process Card Reveal",
+      "description": "Numbered steps on a timeline whose connector fills before the next card slides and blurs into place — image one way, copy the other. Hover pauses the loop; clicking a step jumps there.",
+      "categories": [
+        "Cards"
+      ],
+      "tags": [
+        "hover",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/process-card-reveal",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/process-card-reveal.json",
+      "url": "https://components.drivedev.net/r/process-card-reveal.json",
+      "docs": "https://components.drivedev.net/docs/process-card-reveal.md"
     },
     {
       "name": "progress-carousel",
@@ -8077,6 +8329,36 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/shuffle-hero.json",
       "url": "https://components.drivedev.net/r/shuffle-hero.json",
       "docs": "https://components.drivedev.net/docs/shuffle-hero.md"
+    },
+    {
+      "name": "shutter-slider",
+      "title": "Shutter Slider",
+      "description": "An autoplaying feature slider. Each image opens through vertical slats that alternate from the top and bottom, the headline letters roll in like drum faces, copy lines rise through masks and the caption pulls into focus — all mirrored when you travel back.",
+      "categories": [
+        "Carousels"
+      ],
+      "tags": [
+        "drag",
+        "scroll-driven",
+        "hover",
+        "cursor-tracking",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/shutter-slider",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/shutter-slider.json",
+      "url": "https://components.drivedev.net/r/shutter-slider.json",
+      "docs": "https://components.drivedev.net/docs/shutter-slider.md"
     },
     {
       "name": "side-rays",
@@ -9303,6 +9585,34 @@
       "docs": "https://components.drivedev.net/docs/string-art-background.md"
     },
     {
+      "name": "strip-wipe",
+      "title": "Strip Wipe",
+      "description": "A split testimonial slider whose photo wipes in as tiled strips beside the quote, the index ticking over on Number Flow. Prev and next reverse the wipe direction.",
+      "categories": [
+        "Testimonials"
+      ],
+      "tags": [
+        "hover",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/strip-wipe",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "@number-flow/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/strip-wipe.json",
+      "url": "https://components.drivedev.net/r/strip-wipe.json",
+      "docs": "https://components.drivedev.net/docs/strip-wipe.md"
+    },
+    {
       "name": "stripe-accordion",
       "title": "Stripe Accordion",
       "description": "Stripe Accordion",
@@ -9662,6 +9972,38 @@
       "install": "npx shadcn@latest add https://components.drivedev.net/r/testimonial-grid.json",
       "url": "https://components.drivedev.net/r/testimonial-grid.json",
       "docs": "https://components.drivedev.net/docs/testimonial-grid.md"
+    },
+    {
+      "name": "testimonial-ring",
+      "title": "Testimonial Ring",
+      "description": "Testimonial cards stood on a 3D ring over a reflecting grid floor. Drag it and it spins with inertia before snapping to a card; scrolling turns it too. Whichever card comes to the front blurs its quote in and rolls its metric on Number Flow.",
+      "categories": [
+        "Testimonials"
+      ],
+      "tags": [
+        "drag",
+        "scroll-driven",
+        "hover",
+        "cursor-tracking",
+        "keyboard",
+        "responsive"
+      ],
+      "rating": 5,
+      "status": "needs-review",
+      "inspiration": {
+        "source": "Tween UI",
+        "url": "https://tween-ui.vercel.app/block/testimonial-ring",
+        "authorUrl": "https://tween-ui.vercel.app",
+        "relationship": "port"
+      },
+      "dependencies": [
+        "@gsap/react",
+        "@number-flow/react",
+        "gsap"
+      ],
+      "install": "npx shadcn@latest add https://components.drivedev.net/r/testimonial-ring.json",
+      "url": "https://components.drivedev.net/r/testimonial-ring.json",
+      "docs": "https://components.drivedev.net/docs/testimonial-ring.md"
     },
     {
       "name": "text-along-path",

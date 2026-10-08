@@ -4574,6 +4574,54 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "cube-roll-item",
+		"title": "Cube Roll Item",
+		"description": "A numbered section index where each row is a 3D drum that rolls a quarter turn onto a filled face on hover. The roll follows the pointer — in from the top rolls down, out through the bottom keeps rolling down — while the rules draw in on load.",
+		"interaction": "Each row is a four-sided drum that rolls toward the pointer onto a filled face with an arrow. On load the rows flip over one by one.",
+		"categories": [
+			"Navigation"
+		],
+		"tags": [
+			"hover",
+			"cursor-tracking",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/cube-roll-item",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "items",
+				"type": "CubeRollItemEntry[]",
+				"default": "DEFAULT_ITEMS",
+				"description": "Rows in the list, numbered in order. Defaults to a four-row sample.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/cube-roll-item",
+		"registryUrl": "https://components.drivedev.net/r/cube-roll-item.json",
+		"files": [
+			"components/ui/cube-roll-item.tsx"
+		]
+	},
+	{
 		"slug": "cubes",
 		"title": "Cubes",
 		"description": "",
@@ -10222,6 +10270,95 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "footer-wordmark-rise",
+		"title": "Footer Wordmark Rise",
+		"description": "A dark site footer that rises into view over a glow swelling off the bottom edge, closed by a giant wordmark fitted to the column whose letters climb out of their masks one by one.",
+		"interaction": "As the footer comes into view, the link rows rise in and the brand name lifts out of the baseline letter by letter. Link labels roll on hover while an underline slides through.",
+		"categories": [
+			"Footers"
+		],
+		"tags": [
+			"scroll-driven",
+			"hover",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/footer-wordmark-rise",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "brand",
+				"type": "string",
+				"default": "'Tween UI'",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "logo",
+				"type": "ReactNode",
+				"default": "TWEEN_MARK",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "description",
+				"type": "string",
+				"default": "'GSAP & CSS animated components for R…",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "columns",
+				"type": "FooterColumn[]",
+				"default": "DEFAULT_COLUMNS",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "socials",
+				"type": "FooterSocial[]",
+				"default": "DEFAULT_SOCIALS",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "legal",
+				"type": "FooterLink[]",
+				"default": "DEFAULT_LEGAL",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "copyright",
+				"type": "string",
+				"description": "",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/footer-wordmark-rise",
+		"registryUrl": "https://components.drivedev.net/r/footer-wordmark-rise.json",
+		"files": [
+			"components/ui/footer-wordmark-rise.tsx"
+		]
+	},
+	{
 		"slug": "fractal-grid",
 		"title": "Fractal Grid",
 		"description": "",
@@ -12405,6 +12542,70 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/grid-to-flex.json",
 		"files": [
 			"components/ui/grid-to-flex.tsx"
+		]
+	},
+	{
+		"slug": "gyro-gallery",
+		"title": "Gyro Gallery",
+		"description": "Gallery tiles riding three concentric, counter-rotating orbits on one tilted plane, like the rings of a gyroscope. The rig turns to face the pointer and calms as it nears; pointing near a piece brings it forward on a lime spoke from the core with its name beside it, and a click opens it. Page scroll winds the rings and swivels the plane.",
+		"interaction": "Tiles ride three counter-rotating orbits that turn to face the pointer. Pointing near a piece brings it forward. Drag throws the rings and scroll winds them.",
+		"categories": [
+			"Media Galleries"
+		],
+		"tags": [
+			"drag",
+			"scroll-driven",
+			"cursor-tracking",
+			"autoplay",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/gyro-gallery",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "items",
+				"type": "GyroItem[]",
+				"default": "DEFAULT_ITEMS",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "title",
+				"type": "string",
+				"default": "'The archive, in orbit.'",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "description",
+				"type": "string",
+				"default": "'Point near a piece to bring it forwa…",
+				"description": "",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": true,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/gyro-gallery",
+		"registryUrl": "https://components.drivedev.net/r/gyro-gallery.json",
+		"files": [
+			"components/ui/gyro-gallery.tsx"
 		]
 	},
 	{
@@ -15722,6 +15923,69 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "kinetic-type-ring",
+		"title": "Kinetic Type Ring",
+		"description": "A phrase wrapped once around a ring in real 3D. A falling dot pulls the letters out of a blur, then drag or scroll spins the ring.",
+		"interaction": "A phrase wraps once around a 3D ring. A falling dot pulls the letters into focus, then the ring idles and dims the letters as they travel behind. Drag, scroll, or the arrow keys spin it.",
+		"categories": [
+			"Text Animations"
+		],
+		"tags": [
+			"drag",
+			"cursor-tracking",
+			"keyboard",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/kinetic-type-ring",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "text",
+				"type": "string",
+				"default": "DEFAULT_TEXT",
+				"description": "The phrase wrapped around the ring. It is repeated verbatim, so end it with\nthe same separator it uses inside — otherwise the loop reads with a seam.",
+				"required": false
+			},
+			{
+				"name": "speed",
+				"type": "number",
+				"default": "14",
+				"description": "Idle spin in degrees per second. The front of the text flows leftwards.",
+				"required": false
+			},
+			{
+				"name": "tilt",
+				"type": "number",
+				"default": "-16",
+				"description": "Resting camera tilt in degrees. Negative looks down on the ring.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": true,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/kinetic-type-ring",
+		"registryUrl": "https://components.drivedev.net/r/kinetic-type-ring.json",
+		"files": [
+			"components/ui/kinetic-type-ring.tsx"
+		]
+	},
+	{
 		"slug": "ksier",
 		"title": "Ksier",
 		"description": "",
@@ -17727,6 +17991,180 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "loader-iris-ring",
+		"title": "Loader Iris Ring",
+		"description": "A page preloader built around a ring gauge: the arc fills in uneven steps while images flash through its lens and four corner counters sync and go live. Then an iris opens from the lens and the ring flies into the logo in your nav.",
+		"interaction": "A ring gauge fills in uneven steps while photos flash through its lens and the percentage rolls. At the end an iris opens and the ring flies into the logo.",
+		"categories": [
+			"Loaders"
+		],
+		"tags": [
+			"autoplay",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/loader-iris-ring",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"@number-flow/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "modules",
+				"type": "LoaderModule[]",
+				"default": "DEFAULT_MODULES",
+				"description": "Counters in the four corners; each one syncs, counts up and goes live in turn.",
+				"required": false
+			},
+			{
+				"name": "frames",
+				"type": "string[]",
+				"default": "DEFAULT_FRAMES",
+				"description": "Images flashed through the lens while the gauge fills.",
+				"required": false
+			},
+			{
+				"name": "status",
+				"type": "Record<Status, string>",
+				"default": "DEFAULT_STATUS",
+				"description": "Words for a module's three states.",
+				"required": false
+			},
+			{
+				"name": "caption",
+				"type": "{ loading: string; done: string; }",
+				"default": "DEFAULT_CAPTION",
+				"description": "Caption under the percentage, while loading and once done.",
+				"required": false
+			},
+			{
+				"name": "fullscreen",
+				"type": "boolean",
+				"default": "false",
+				"description": "Cover the whole viewport and lock page scroll, instead of filling this section.",
+				"required": false
+			},
+			{
+				"name": "onComplete",
+				"type": "(() => void)",
+				"description": "Fires as the iris opens and the page settles in.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/loader-iris-ring",
+		"registryUrl": "https://components.drivedev.net/r/loader-iris-ring.json",
+		"files": [
+			"components/ui/loader-iris-ring.tsx"
+		]
+	},
+	{
+		"slug": "loader-line-fold",
+		"title": "Loader Line Fold",
+		"description": "A page preloader: the wordmark rises letter by letter while a hairline fills with a counter riding its tip. Once the page is ready the line travels to the middle, folds into a single point, and the page opens out of that point to every edge.",
+		"interaction": "The wordmark rises letter by letter while a hairline fills and a counter rides its tip. The line then folds into a point and the page opens out of it.",
+		"categories": [
+			"Loaders"
+		],
+		"tags": [
+			"autoplay",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/loader-line-fold",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "wordmark",
+				"type": "string",
+				"default": "'Tween UI'",
+				"description": "The word that rises letter by letter.",
+				"required": false
+			},
+			{
+				"name": "location",
+				"type": "string",
+				"default": "'Local time'",
+				"description": "Left of the meta row, before the live clock.",
+				"required": false
+			},
+			{
+				"name": "timeZone",
+				"type": "string",
+				"description": "IANA time zone for the clock. Defaults to the visitor's own.",
+				"required": false
+			},
+			{
+				"name": "credit",
+				"type": "string",
+				"description": "Right of the meta row.",
+				"required": false
+			},
+			{
+				"name": "minDuration",
+				"type": "number",
+				"default": "1.6",
+				"description": "Seconds the counter takes to reach 90%, however fast the assets load.",
+				"required": false
+			},
+			{
+				"name": "ready",
+				"type": "(() => Promise<unknown>)",
+				"description": "Resolves when the page is ready. Defaults to fonts plus every image in `children`.",
+				"required": false
+			},
+			{
+				"name": "fullscreen",
+				"type": "boolean",
+				"default": "false",
+				"description": "Cover the whole viewport and lock page scroll, instead of filling this section.",
+				"required": false
+			},
+			{
+				"name": "onComplete",
+				"type": "(() => void)",
+				"description": "Fires as the page starts opening out of the centre point.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/loader-line-fold",
+		"registryUrl": "https://components.drivedev.net/r/loader-line-fold.json",
+		"files": [
+			"components/ui/loader-line-fold.tsx"
+		]
+	},
+	{
 		"slug": "logo-carousel",
 		"title": "Logo Carousel",
 		"description": "",
@@ -17833,6 +18271,73 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/logo-particles.json",
 		"files": [
 			"components/ui/logo-particles.tsx"
+		]
+	},
+	{
+		"slug": "logo-wall-shuffle",
+		"title": "Logo Wall Shuffle",
+		"description": "An integrations wall of staggered logo tiles where one mark at a time lifts away and the next rises in behind it. Every tile is visited before any repeats, and the loop pauses off-screen and in background tabs.",
+		"interaction": "Tiles sit in staggered columns. On a loop one mark lifts away and the next rises in behind it, blurring through the change. The loop pauses off screen.",
+		"categories": [
+			"Grids & Layouts"
+		],
+		"tags": [
+			"scroll-driven",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/logo-wall-shuffle",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "logos",
+				"type": "LogoWallLogo[]",
+				"description": "Marks cycled through the wall. Needs more logos than tiles to keep moving.",
+				"required": true
+			},
+			{
+				"name": "title",
+				"type": "ReactNode",
+				"default": "DEFAULT_TITLE",
+				"description": "Section heading.",
+				"required": false
+			},
+			{
+				"name": "description",
+				"type": "string",
+				"default": "DEFAULT_DESCRIPTION",
+				"description": "Supporting line under the heading.",
+				"required": false
+			},
+			{
+				"name": "columns",
+				"type": "number[]",
+				"default": "DEFAULT_COLUMNS",
+				"description": "Tiles per column, left to right. Every other column drops down.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/logo-wall-shuffle",
+		"registryUrl": "https://components.drivedev.net/r/logo-wall-shuffle.json",
+		"files": [
+			"components/ui/logo-wall-shuffle.tsx"
 		]
 	},
 	{
@@ -22400,6 +22905,103 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "pricing-plan-switch",
+		"title": "Pricing Plan Switch",
+		"description": "A pricing section where picking a plan morphs the name badge, crossfades the description and spins the price with Number Flow, while the checklist lights up its included rows. A monthly/yearly toggle re-spins the price.",
+		"interaction": "Picking a plan morphs the badge, crossfades the description, and spins the price. The monthly and yearly toggle re-spins the price and lights up the included features.",
+		"categories": [
+			"Cards"
+		],
+		"tags": [
+			"hover",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/pricing-plan-switch",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"@number-flow/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "plans",
+				"type": "PricingPlan[]",
+				"default": "DEFAULT_PLANS",
+				"description": "Plans shown in the selector. Defaults to a 3-tier sample.",
+				"required": false
+			},
+			{
+				"name": "features",
+				"type": "string[]",
+				"default": "DEFAULT_FEATURES",
+				"description": "Feature checklist; each plan lights up its first `includedCount` rows.",
+				"required": false
+			},
+			{
+				"name": "eyebrow",
+				"type": "string",
+				"default": "'Pricing'",
+				"description": "Eyebrow badge above the heading.",
+				"required": false
+			},
+			{
+				"name": "heading",
+				"type": "string",
+				"default": "'Simple pricing that scales with you'",
+				"description": "Section heading.",
+				"required": false
+			},
+			{
+				"name": "description",
+				"type": "string",
+				"default": "'Upgrade anytime as your needs evolve…",
+				"description": "Section sub-heading.",
+				"required": false
+			},
+			{
+				"name": "currency",
+				"type": "string",
+				"default": "'$'",
+				"description": "Currency symbol shown before the price.",
+				"required": false
+			},
+			{
+				"name": "ctaText",
+				"type": "string",
+				"default": "'Get started'",
+				"description": "Primary CTA label.",
+				"required": false
+			},
+			{
+				"name": "ctaHref",
+				"type": "string",
+				"default": "'#'",
+				"description": "Primary CTA link.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/pricing-plan-switch",
+		"registryUrl": "https://components.drivedev.net/r/pricing-plan-switch.json",
+		"files": [
+			"components/ui/pricing-plan-switch.tsx"
+		]
+	},
+	{
 		"slug": "pricing-table",
 		"title": "Pricing Table",
 		"description": "Four-column pricing grid with a monthly/annual billing toggle and one best-value plan tinted by a warm gradient.",
@@ -22540,6 +23142,53 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/prismatic-burst.json",
 		"files": [
 			"components/ui/prismatic-burst.tsx"
+		]
+	},
+	{
+		"slug": "process-card-reveal",
+		"title": "Process Card Reveal",
+		"description": "Numbered steps on a timeline whose connector fills before the next card slides and blurs into place — image one way, copy the other. Hover pauses the loop; clicking a step jumps there.",
+		"interaction": "Numbered steps sit on a timeline that fills before the next card slides and blurs into place. Hover pauses the loop. Clicking a step jumps there.",
+		"categories": [
+			"Cards"
+		],
+		"tags": [
+			"hover",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/process-card-reveal",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "steps",
+				"type": "ProcessStep[]",
+				"default": "DEFAULT_STEPS",
+				"description": "Process steps shown in the stacked cards. Defaults to a 4-step sample.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/process-card-reveal",
+		"registryUrl": "https://components.drivedev.net/r/process-card-reveal.json",
+		"files": [
+			"components/ui/process-card-reveal.tsx"
 		]
 	},
 	{
@@ -25269,6 +25918,63 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/shuffle-hero.json",
 		"files": [
 			"components/ui/shuffle-hero.tsx"
+		]
+	},
+	{
+		"slug": "shutter-slider",
+		"title": "Shutter Slider",
+		"description": "An autoplaying feature slider. Each image opens through vertical slats that alternate from the top and bottom, the headline letters roll in like drum faces, copy lines rise through masks and the caption pulls into focus — all mirrored when you travel back.",
+		"interaction": "Each image opens through alternating vertical slats while the headline letters roll in and the copy rises line by line. Going back mirrors the motion. Hover pauses autoplay.",
+		"categories": [
+			"Carousels"
+		],
+		"tags": [
+			"drag",
+			"scroll-driven",
+			"hover",
+			"cursor-tracking",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/shutter-slider",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "slides",
+				"type": "ShutterSlide[]",
+				"default": "DEFAULT_SLIDES",
+				"description": "Slides, in order. Defaults to a three-slide sample.",
+				"required": false
+			},
+			{
+				"name": "autoplay",
+				"type": "number",
+				"default": "6",
+				"description": "Seconds each slide holds before advancing. `0` turns autoplay off.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/shutter-slider",
+		"registryUrl": "https://components.drivedev.net/r/shutter-slider.json",
+		"files": [
+			"components/ui/shutter-slider.tsx"
 		]
 	},
 	{
@@ -29045,6 +29751,61 @@ export const catalog: CatalogEntry[] = [
 		]
 	},
 	{
+		"slug": "strip-wipe",
+		"title": "Strip Wipe",
+		"description": "A split testimonial slider whose photo wipes in as tiled strips beside the quote, the index ticking over on Number Flow. Prev and next reverse the wipe direction.",
+		"interaction": "The photo wipes in as tiled strips beside the quote. Previous wipes right to left and next wipes left to right. Hover pauses the loop.",
+		"categories": [
+			"Testimonials"
+		],
+		"tags": [
+			"hover",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/strip-wipe",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"@number-flow/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "testimonials",
+				"type": "TestimonialSlide[]",
+				"default": "DEFAULT_TESTIMONIALS",
+				"description": "Quotes shown in the split slider. Defaults to a 4-slide sample.",
+				"required": false
+			},
+			{
+				"name": "directional",
+				"type": "boolean",
+				"default": "true",
+				"description": "When true, prev wipes the photo right-to-left and next wipes left-to-right.\nWhen false, every change uses the original right-to-left split.",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": false,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/strip-wipe",
+		"registryUrl": "https://components.drivedev.net/r/strip-wipe.json",
+		"files": [
+			"components/ui/strip-wipe.tsx"
+		]
+	},
+	{
 		"slug": "stripe-accordion",
 		"title": "Stripe Accordion",
 		"description": "",
@@ -30227,6 +30988,65 @@ export const catalog: CatalogEntry[] = [
 		"registryUrl": "https://components.drivedev.net/r/testimonial-grid.json",
 		"files": [
 			"components/ui/testimonial-grid.tsx"
+		]
+	},
+	{
+		"slug": "testimonial-ring",
+		"title": "Testimonial Ring",
+		"description": "Testimonial cards stood on a 3D ring over a reflecting grid floor. Drag it and it spins with inertia before snapping to a card; scrolling turns it too. Whichever card comes to the front blurs its quote in and rolls its metric on Number Flow.",
+		"interaction": "Drag the ring and it spins with your hand, coasts on the flick, and snaps to the nearest card. Scroll turns it as the section passes. The card in front blurs its quote in and rolls its metric.",
+		"categories": [
+			"Testimonials"
+		],
+		"tags": [
+			"drag",
+			"scroll-driven",
+			"hover",
+			"cursor-tracking",
+			"keyboard",
+			"responsive"
+		],
+		"inspiration": {
+			"source": "Tween UI",
+			"url": "https://tween-ui.vercel.app/block/testimonial-ring",
+			"authorUrl": "https://tween-ui.vercel.app",
+			"relationship": "port"
+		},
+		"dependencies": [
+			"@gsap/react",
+			"@number-flow/react",
+			"gsap"
+		],
+		"registryDependencies": [],
+		"props": [
+			{
+				"name": "title",
+				"type": "string",
+				"default": "'In their own words.'",
+				"description": "",
+				"required": false
+			},
+			{
+				"name": "testimonials",
+				"type": "RingTestimonial[]",
+				"default": "DEFAULT_TESTIMONIALS",
+				"description": "",
+				"required": false
+			}
+		],
+		"risk": {
+			"heavy": true,
+			"fullscreen": false,
+			"clientOnly": true
+		},
+		"rating": 5,
+		"status": "needs-review",
+		"hidden": false,
+		"gated": false,
+		"importPath": "@/components/ui/testimonial-ring",
+		"registryUrl": "https://components.drivedev.net/r/testimonial-ring.json",
+		"files": [
+			"components/ui/testimonial-ring.tsx"
 		]
 	},
 	{

@@ -46,6 +46,7 @@ const LIBRARIES = {
 	"x.com": "X",
 	"twitter.com": "X",
 	"drivebrandstudio.com": "Drive Brand Studio",
+	"tween-ui.vercel.app": "Tween UI",
 };
 
 /** Hosts that are asset CDNs or specs, never a design source. */

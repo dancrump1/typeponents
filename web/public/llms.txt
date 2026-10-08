@@ -1,6 +1,6 @@
 # DriveBrandStudio component registry
 
-> 454 React components for Tailwind CSS v4, distributed as a shadcn registry.
+> 466 React components for Tailwind CSS v4, distributed as a shadcn registry.
 
 Install any component with the shadcn CLI. It rewrites imports to match the target project's `components.json`, so `cn` resolves to whatever the project already uses:
 
@@ -161,6 +161,8 @@ Full markdown for one component (description, props, source, attribution): https
 - [Tweet Card](https://components.drivedev.net/docs/magic-tweet-card.md) — A card that displays a tweet with the author's name, handle, and profile picture.
 - [Popular Price Card](https://components.drivedev.net/docs/popular-price-card.md) — Pricing card with a Most Popular badge tucked behind its top edge, above a checked feature list.
 - [Price Card](https://components.drivedev.net/docs/price-card.md) — Single pricing card showing plan name, monthly price and a feature list with circled check marks.
+- [Pricing Plan Switch](https://components.drivedev.net/docs/pricing-plan-switch.md) — A pricing section where picking a plan morphs the name badge, crossfades the description and spins the price with Number Flow, while the checklist lights up its included rows. A monthly/yearly toggle re-spins the price.
+- [Process Card Reveal](https://components.drivedev.net/docs/process-card-reveal.md) — Numbered steps on a timeline whose connector fills before the next card slides and blurs into place — image one way, copy the other. Hover pauses the loop; clicking a step jumps there.
 - [Reveal Card](https://components.drivedev.net/docs/reveal-card.md) — Card covered by a full-bleed image that slides away diagonally to expose a title block and a More link.
 - [Rounded Scrollbar](https://components.drivedev.net/docs/rounded-scrollbar.md)
 - [Scratch Card](https://components.drivedev.net/docs/scratch-card.md) — Scratch-off card that reveals content underneath.
@@ -196,6 +198,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Progress Carousel](https://components.drivedev.net/docs/progress-carousel.md) — Image carousel with captioned tab buttons across the bottom, each filling with a progress bar while its slide is showing.
 - [Project Showcase](https://components.drivedev.net/docs/project-showcase.md) — Two-column project showcase pairing a stack of tilted screenshots with the project name, role and write-up.
 - [Ribbon Logos](https://components.drivedev.net/docs/ribbon-logos.md)
+- [Shutter Slider](https://components.drivedev.net/docs/shutter-slider.md) — An autoplaying feature slider. Each image opens through vertical slats that alternate from the top and bottom, the headline letters roll in like drum faces, copy lines rise through masks and the caption pulls into focus — all mirrored when you travel back.
 - [Smooth Slider](https://components.drivedev.net/docs/smooth-slider.md)
 - [Spiral 3D Slider](https://components.drivedev.net/docs/spiral-3d-slider.md)
 - [Stacked Carousel](https://components.drivedev.net/docs/stacked-carousel.md)
@@ -238,6 +241,7 @@ Full markdown for one component (description, props, source, attribution): https
 
 ## Footers
 
+- [Footer Wordmark Rise](https://components.drivedev.net/docs/footer-wordmark-rise.md) — A dark site footer that rises into view over a glow swelling off the bottom edge, closed by a giant wordmark fitted to the column whose letters climb out of their masks one by one.
 - [Simple Footer](https://components.drivedev.net/docs/simple-footer.md)
 
 ## Forms & Inputs
@@ -282,6 +286,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [How It Works](https://components.drivedev.net/docs/how-it-works.md)
 - [Ksier](https://components.drivedev.net/docs/ksier.md)
 - [Layout Grid](https://components.drivedev.net/docs/layout-grid.md)
+- [Logo Wall Shuffle](https://components.drivedev.net/docs/logo-wall-shuffle.md) — An integrations wall of staggered logo tiles where one mark at a time lifts away and the next rises in behind it. Every tile is visited before any repeats, and the loop pauses off-screen and in background tabs.
 - [Magic Bento](https://components.drivedev.net/docs/magic-bento.md)
 - [Masonry](https://components.drivedev.net/docs/masonry.md)
 - [Masonry Grid](https://components.drivedev.net/docs/masonry-grid.md) — A grid layout that arranges items like Pinterest, automatically fitting them together without gaps. Perfect for image galleries and portfolios.
@@ -335,6 +340,8 @@ Full markdown for one component (description, props, source, attribution): https
 - [Circular Bars Loader](https://components.drivedev.net/docs/circular-bars-loader.md)
 - [Dual Ring Loader](https://components.drivedev.net/docs/dual-ring-loader.md) — Loading spinner built from two concentric rings, each with a gap in its outline, the smaller one nested inside the larger.
 - [Jelly Loader](https://components.drivedev.net/docs/jelly-loader.md) — A loading animation with circles that move and scale like jelly. Perfect for showing that something is loading on your website.
+- [Loader Iris Ring](https://components.drivedev.net/docs/loader-iris-ring.md) — A page preloader built around a ring gauge: the arc fills in uneven steps while images flash through its lens and four corner counters sync and go live. Then an iris opens from the lens and the ring flies into the logo in your nav.
+- [Loader Line Fold](https://components.drivedev.net/docs/loader-line-fold.md) — A page preloader: the wordmark rises letter by letter while a hairline fills with a counter riding its tip. Once the page is ready the line travels to the middle, folds into a single point, and the page opens out of that point to every edge.
 - [Modern Loader](https://components.drivedev.net/docs/modern-loader.md)
 - [Nine Dot Loader](https://components.drivedev.net/docs/nine-dot-loader.md) — Loading indicator made of a three-by-three grid of rounded dots that pulse out of step with each other.
 - [Preloader](https://components.drivedev.net/docs/preloader.md) — Full-screen black loading overlay with a curved bottom edge and a single word cycling through a short phrase.
@@ -351,6 +358,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Drift Wall](https://components.drivedev.net/docs/drift-wall.md) — Wall of image tiles in columns that scroll past each other endlessly, tilted back in perspective and faded out at the edges.
 - [Film Reel](https://components.drivedev.net/docs/film-reel.md)
 - [Folder](https://components.drivedev.net/docs/folder.md)
+- [Gyro Gallery](https://components.drivedev.net/docs/gyro-gallery.md) — Gallery tiles riding three concentric, counter-rotating orbits on one tilted plane, like the rings of a gyroscope. The rig turns to face the pointer and calms as it nears; pointing near a piece brings it forward on a lime spoke from the core with its name beside it, and a click opens it. Page scroll winds the rings and swivels the plane.
 - [Hover Gallery](https://components.drivedev.net/docs/hover-gallery.md)
 - [Image Wheel](https://components.drivedev.net/docs/image-wheel.md)
 - [Infinite Moving Cards](https://components.drivedev.net/docs/infinite-moving-cards.md)
@@ -375,6 +383,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Apple Spotlight](https://components.drivedev.net/docs/apple-spotlight.md) — A beautiful search component inspired by macOS Spotlight.
 - [Bubble Menu](https://components.drivedev.net/docs/bubble-menu.md) — Floating navigation bar of a logo bubble and a hamburger button that opens a full-screen grid of tilted menu pills.
 - [Circle Menu](https://components.drivedev.net/docs/circle-menu.md) — A circular navigation menu that expands items in a circle around a central button with smooth animations and hover effects.
+- [Cube Roll Item](https://components.drivedev.net/docs/cube-roll-item.md) — A numbered section index where each row is a 3D drum that rolls a quarter turn onto a filled face on hover. The roll follows the pointer — in from the top rolls down, out through the bottom keeps rolling down — while the rules draw in on load.
 - [Curved Navbar](https://components.drivedev.net/docs/curved-navbar.md)
 - [Expanding Tabs](https://components.drivedev.net/docs/expanding-tabs.md)
 - [Flipped Menu](https://components.drivedev.net/docs/flipped-menu.md)
@@ -478,6 +487,8 @@ Full markdown for one component (description, props, source, attribution): https
 
 - [Book Testimonials](https://components.drivedev.net/docs/book-testimonials.md) — Testimonials bound as a hardback book, with a cover, a clickable index and one quote, photo and star rating per page.
 - [Gradient Testimonials](https://components.drivedev.net/docs/gradient-testimonials.md)
+- [Strip Wipe](https://components.drivedev.net/docs/strip-wipe.md) — A split testimonial slider whose photo wipes in as tiled strips beside the quote, the index ticking over on Number Flow. Prev and next reverse the wipe direction.
+- [Testimonial Ring](https://components.drivedev.net/docs/testimonial-ring.md) — Testimonial cards stood on a 3D ring over a reflecting grid floor. Drag it and it spins with inertia before snapping to a card; scrolling turns it too. Whichever card comes to the front blurs its quote in and rolls its metric on Number Flow.
 - [Typewriter Testimonials](https://components.drivedev.net/docs/typewriter-testimonials.md)
 
 ## Text
@@ -525,6 +536,7 @@ Full markdown for one component (description, props, source, attribution): https
 - [Depth Text](https://components.drivedev.net/docs/depth-text.md)
 - [Echo Text](https://components.drivedev.net/docs/echo-text.md) — Oversized headline trailed by a stack of tinted, progressively blurrier copies of itself, like a motion echo.
 - [Flipping Text](https://components.drivedev.net/docs/flipping-text.md)
+- [Kinetic Type Ring](https://components.drivedev.net/docs/kinetic-type-ring.md) — A phrase wrapped once around a ring in real 3D. A falling dot pulls the letters out of a blur, then drag or scroll spins the ring.
 - [Letter3d Swap](https://components.drivedev.net/docs/letter3d-swap.md)
 - [Particle Text](https://components.drivedev.net/docs/particle-text.md) — Text that dissolves into particles and reforms.
 - [Random Letter Swap Hover](https://components.drivedev.net/docs/random-letter-swap-hover.md) — Text label whose characters flip over to an identical copy in a shuffled order, so the swap scatters across the word.
